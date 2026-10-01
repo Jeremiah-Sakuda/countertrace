@@ -1,0 +1,22 @@
+{
+  "id": "depth4-wraparound",
+  "source": "Authored for Countertrace from the PRD wraparound requirement. Specified expectations, not executed results.",
+  "parameters": {"DEPTH": 4, "WIDTH": 8},
+  "symbols": {"A": 1, "B": 2, "C": 3, "D": 4, "E": 5, "F": 6, "G": 7},
+  "edges": [
+    {"cycle": 0,  "pre": null,                 "rst": 1, "wr_en": 0, "rd_en": 0, "din": "A", "row": "reset",          "accepted": "reset", "post": [],                   "dout": null, "empty": 1, "full": 0},
+    {"cycle": 1,  "pre": [],                   "rst": 0, "wr_en": 1, "rd_en": 0, "din": "A", "row": "write_not_full", "accepted": "write", "post": ["A"],                "dout": null, "empty": 0, "full": 0},
+    {"cycle": 2,  "pre": ["A"],                "rst": 0, "wr_en": 1, "rd_en": 0, "din": "B", "row": "write_not_full", "accepted": "write", "post": ["A", "B"],           "dout": null, "empty": 0, "full": 0},
+    {"cycle": 3,  "pre": ["A", "B"],           "rst": 0, "wr_en": 1, "rd_en": 0, "din": "C", "row": "write_not_full", "accepted": "write", "post": ["A", "B", "C"],      "dout": null, "empty": 0, "full": 0},
+    {"cycle": 4,  "pre": ["A", "B", "C"],      "rst": 0, "wr_en": 0, "rd_en": 1, "din": "C", "row": "read_not_empty", "accepted": "read",  "post": ["B", "C"],           "dout": "A",  "empty": 0, "full": 0},
+    {"cycle": 5,  "pre": ["B", "C"],           "rst": 0, "wr_en": 1, "rd_en": 0, "din": "D", "row": "write_not_full", "accepted": "write", "post": ["B", "C", "D"],      "dout": null, "empty": 0, "full": 0},
+    {"cycle": 6,  "pre": ["B", "C", "D"],      "rst": 0, "wr_en": 1, "rd_en": 0, "din": "E", "row": "write_not_full", "accepted": "write", "post": ["B", "C", "D", "E"], "dout": null, "empty": 0, "full": 1, "wraps": ["write"]},
+    {"cycle": 7,  "pre": ["B", "C", "D", "E"], "rst": 0, "wr_en": 1, "rd_en": 0, "din": "F", "row": "write_full",     "accepted": "none",  "post": ["B", "C", "D", "E"], "dout": null, "empty": 0, "full": 1},
+    {"cycle": 8,  "pre": ["B", "C", "D", "E"], "rst": 0, "wr_en": 1, "rd_en": 1, "din": "F", "row": "both_full",      "accepted": "read",  "post": ["C", "D", "E"],      "dout": "B",  "empty": 0, "full": 0},
+    {"cycle": 9,  "pre": ["C", "D", "E"],      "rst": 0, "wr_en": 1, "rd_en": 1, "din": "G", "row": "both_mid",       "accepted": "both",  "post": ["D", "E", "G"],      "dout": "C",  "empty": 0, "full": 0, "wraps": ["write"]},
+    {"cycle": 10, "pre": ["D", "E", "G"],      "rst": 0, "wr_en": 0, "rd_en": 1, "din": "G", "row": "read_not_empty", "accepted": "read",  "post": ["E", "G"],           "dout": "D",  "empty": 0, "full": 0},
+    {"cycle": 11, "pre": ["E", "G"],           "rst": 0, "wr_en": 0, "rd_en": 1, "din": "G", "row": "read_not_empty", "accepted": "read",  "post": ["G"],                "dout": "E",  "empty": 0, "full": 0, "wraps": ["read"]},
+    {"cycle": 12, "pre": ["G"],                "rst": 0, "wr_en": 0, "rd_en": 1, "din": "G", "row": "read_not_empty", "accepted": "read",  "post": [],                   "dout": "G",  "empty": 1, "full": 0, "wraps": ["read"]},
+    {"cycle": 13, "pre": [],                   "rst": 0, "wr_en": 1, "rd_en": 1, "din": "A", "row": "both_empty",     "accepted": "write", "post": ["A"],                "dout": null, "empty": 0, "full": 0, "wraps": ["write"]}
+  ]
+}

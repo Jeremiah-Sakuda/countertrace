@@ -1,0 +1,15 @@
+{
+  "id": "depth2-prd-sequence",
+  "source": "Countertrace PRD v1.1, sampling convention table. Specified expectations, not executed results. The wraps field is derived (writes/reads since reset >= DEPTH) and is not part of the PRD table.",
+  "parameters": {"DEPTH": 2, "WIDTH": 8},
+  "symbols": {"A": 161, "B": 178, "C": 195, "D": 212},
+  "edges": [
+    {"cycle": 0, "pre": null,       "rst": 1, "wr_en": 1, "rd_en": 1, "din": "A", "row": "reset",          "accepted": "reset", "post": [],         "dout": null, "empty": 1, "full": 0},
+    {"cycle": 1, "pre": [],         "rst": 0, "wr_en": 1, "rd_en": 1, "din": "A", "row": "both_empty",     "accepted": "write", "post": ["A"],      "dout": null, "empty": 0, "full": 0},
+    {"cycle": 2, "pre": ["A"],      "rst": 0, "wr_en": 1, "rd_en": 1, "din": "B", "row": "both_mid",       "accepted": "both",  "post": ["B"],      "dout": "A",  "empty": 0, "full": 0},
+    {"cycle": 3, "pre": ["B"],      "rst": 0, "wr_en": 1, "rd_en": 0, "din": "C", "row": "write_not_full", "accepted": "write", "post": ["B", "C"], "dout": null, "empty": 0, "full": 1, "wraps": ["write"]},
+    {"cycle": 4, "pre": ["B", "C"], "rst": 0, "wr_en": 1, "rd_en": 1, "din": "D", "row": "both_full",      "accepted": "read",  "post": ["C"],      "dout": "B",  "empty": 0, "full": 0},
+    {"cycle": 5, "pre": ["C"],      "rst": 1, "wr_en": 1, "rd_en": 1, "din": "D", "row": "reset",          "accepted": "reset", "post": [],         "dout": null, "empty": 1, "full": 0},
+    {"cycle": 6, "pre": [],         "rst": 0, "wr_en": 0, "rd_en": 1, "din": "A", "row": "read_empty",     "accepted": "none",  "post": [],         "dout": null, "empty": 1, "full": 0}
+  ]
+}
