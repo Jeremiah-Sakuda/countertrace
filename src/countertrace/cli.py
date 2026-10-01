@@ -125,6 +125,14 @@ def cmd_bundle(args) -> int:
     return 0
 
 
+def cmd_record(args) -> int:
+    from countertrace import runs
+
+    path = runs.record(runs.RunStore(), args.run_id, args.note)
+    print(path)
+    return 0
+
+
 def cmd_replay(args) -> int:
     from countertrace import bundle
 
@@ -169,6 +177,11 @@ def main() -> int:
     export = commands.add_parser("bundle", help="Export a run's evidence bundle")
     export.add_argument("run_id")
     export.set_defaults(func=cmd_bundle)
+
+    record = commands.add_parser("record", help="Freeze a completed run into recorded/ for the public journey")
+    record.add_argument("run_id")
+    record.add_argument("--note", default="", help="Context shown with the recorded run")
+    record.set_defaults(func=cmd_record)
 
     replay = commands.add_parser("replay", help="Re-run deterministic checks from an evidence bundle")
     replay.add_argument("bundle")

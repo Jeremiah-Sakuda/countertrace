@@ -44,3 +44,7 @@ obj_dir/
 
 # Small solver traces used as parser test fixtures
 !tests/data/*.vcd
+
+# Curated recorded runs are evidence shipped for the public journey
+!recorded/**/*.vcd
+!recorded/**/*.log

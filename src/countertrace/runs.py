@@ -224,3 +224,36 @@ def render_summary(state: dict) -> str:
     if v.get("timings"):
         lines.append(f"  timings: {v['timings']}")
     return "\n".join(lines)
+
+
+RECORDED_SKIP = ("/obj/", "/job/designs/")
+
+
+def record(store: RunStore, run_id: str, note: str = "") -> Path:
+    """Copy a completed run's state and evidence into recorded/ (checked in, read-only in the UI)."""
+    import shutil
+
+    state = store.load(run_id)
+    if state.get("state") != "complete":
+        raise ValueError("Only completed runs can be recorded.")
+    source = store.run_dir(run_id)
+    target = ROOT / "recorded" / run_id
+    if target.exists():
+        shutil.rmtree(target)
+    for path in source.rglob("*"):
+        rel = path.relative_to(source)
+        if path.is_dir() or any(part in f"/{rel}" for part in RECORDED_SKIP) or rel.parts[0] == "bundle":
+            continue
+        (target / rel).parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(path, target / rel)
+    v = state.get("verification") or state.get("audit") or {}
+    versions = next((b.get("tool_versions") for b in (v.get("batches") or {}).values() if b.get("tool_versions")),
+                    v.get("tool_versions"))
+    state["recorded"] = True
+    state["recorded_at"] = now()
+    state["recorded_note"] = note or (
+        f"Recorded run from {state.get('finished_at')} on the owner's machine "
+        f"(image {((state.get('image') or {}).get('image_id') or '')[:19]}). Timings are from that run.")
+    state["recorded_versions"] = versions
+    (target / "run.json").write_text(json.dumps(state, indent=1, default=str))
+    return target
