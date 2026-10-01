@@ -470,6 +470,44 @@ def propose_repair(source: str, finding: dict, rows: list[dict], previous: list[
                       model_id=cfg["repair_model_id"] or None)
 
 
+# -- task: supplemental check proposal ----------------------------------------------
+CHECKS_SYSTEM = """You propose a small supplemental check set for a synchronous FIFO, the kind a student would add to a testbench.
+You may only use the provided check templates, contract rows, and named stimulus tests. You cannot write code.
+Choose the tests the checks observe and, for each check, the template, the contract rows where it applies (or null for every edge), and the requirement it targets.
+Reply with one JSON object only:
+{"label": string, "rationale": string, "tests": [string], "checks": [{"id": string, "check": string, "rows": [string] or null, "requirement": string, "text": string}]}
+Use at most 8 checks."""
+
+
+def validate_check_proposal(value: dict, tests: list[str]) -> dict:
+    from countertrace.scoreboard import check_set_from_dict
+
+    chosen = value.get("tests")
+    if not isinstance(chosen, list) or not chosen or any(t not in tests for t in chosen):
+        raise ValueError(f"tests must be a non-empty subset of {tests}")
+    checks = value["checks"]
+    if not isinstance(checks, list) or not 1 <= len(checks) <= 8:
+        raise ValueError("between 1 and 8 checks are required")
+    for i, check in enumerate(checks):
+        check["id"] = re.sub(r"[^a-z0-9_]", "_", str(check.get("id") or f"check_{i}").lower())[:40]
+        check["text"] = str(check.get("text", ""))[:200]
+    data = {"id": "candidate", "label": str(value.get("label", "Model-proposed checks"))[:80],
+            "tests": chosen, "checks": checks}
+    check_set_from_dict(data)  # reviewed templates and known rows only
+    return {**data, "rationale": str(value.get("rationale", ""))[:600]}
+
+
+@guarded
+def propose_check_set(description: str, contract: Contract, tests: list[str]) -> dict:
+    from countertrace.scoreboard import ROWS
+
+    rows = "\n".join(f"- {r}: {REQUIREMENTS[r]['title']}. {REQUIREMENTS[r]['text']}" for r in ROWS)
+    user = (f"Check templates: {json.dumps(CHECKS)}\nContract rows:\n{rows}\nNamed stimulus tests: {', '.join(tests)}\n\n"
+            f"Student's description of what their testbench checks:\n\"\"\"\n{description}\n\"\"\"")
+    return structured("propose_checks", CHECKS_SYSTEM, user,
+                      lambda v: validate_check_proposal(v, tests), max_tokens=1500)
+
+
 # -- feasibility check ------------------------------------------------------------
 def feasibility_check() -> dict:
     """One authenticated call explaining the newest recorded failure; preserves sanitized metadata."""

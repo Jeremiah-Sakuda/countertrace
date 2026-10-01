@@ -307,6 +307,11 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_json(app.create_run(body, visitor), HTTPStatus.CREATED)
         if path == "/api/audits":
             return self.send_json(app.create_audit(body, visitor), HTTPStatus.CREATED)
+        if path == "/api/check-sets/propose":
+            from countertrace import audit
+
+            app.claim_model_call(visitor)
+            return self.send_json(audit.propose(str(body.get("description", ""))[:2000], int(body.get("depth", 4))))
         if path == "/api/interpret":
             app.claim_model_call(visitor)
             return self.send_json(app.interpret(body))

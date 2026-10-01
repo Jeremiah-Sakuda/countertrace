@@ -1,6 +1,6 @@
 # Control service API
 
-The local control service (`countertrace serve`, default `http://127.0.0.1:8765`) serves JSON under `/api` and the built web interface from `apps/web/dist`. It is standard-library Python. All responses are JSON unless noted. Errors return `{"error": string}` with 400, 403, 404, or 500.
+The local control service (`countertrace serve`, default `http://127.0.0.1:8765`) serves JSON under `/api` and the built web interface from `apps/web/dist`. It is standard-library Python. All responses are JSON unless noted. Errors return `{"error": string}` with 400, 403, 404, or 500. 403 covers disabled uploads, a visitor who already has an active run, the hourly model-call cap, and explain/repair/cancel on read-only recorded runs.
 
 Real examples of every run shape are in `.countertrace/runs/*/run.json` after running `countertrace verify` or `countertrace audit`.
 
@@ -12,7 +12,7 @@ Real examples of every run shape are in `.countertrace/runs/*/run.json` after ru
 | `GET /api/profile` | `{supported_depths, contract, timing_example}`. `timing_example` is `fixtures/timing/depth2_prd_sequence.json` (specified expectations, not results). |
 | `GET /api/examples` | `[{id, split: "showcase"\|"development", title, depth, brief, expected: "correct"\|"faulty", base, fault: {id, summary, category, class, intended_consequence}\|null}]` |
 | `GET /api/examples/{id}` | Example plus `{source, contract, contract_hash}`. `contract` is the versioned document the user accepts: `{profile, version, parameters, ports, requirements: {row_id: {title, text}}, checks: {check_id: text}, assumptions: [string], sampling}`. |
-| `GET /api/check-sets` | `[{id, label, origin, description, checks: [{id, check, rows\|null, requirement, text}]}]` |
+| `GET /api/check-sets` | `[{id, label, origin, description, reviewed, tests: [test]\|null, checks: [{id, check, rows\|null, requirement, text}]}]`. `reviewed: false` marks model-proposed candidates. |
 | `GET /api/recorded` | Recorded runs shipped in `recorded/`: `[{id, kind, title, example_id, created_at, finished_at, recorded: true, verdict, recorded_note}]` |
 
 ## Runs
@@ -30,6 +30,7 @@ Real examples of every run shape are in `.countertrace/runs/*/run.json` after ru
 | `GET /api/runs/{id}/files/{path}` | | Raw artifact inside the run directory (logs, VCD, source), as text. |
 | `POST /api/interpret` | `{example_id, brief?}` | Interpretation result (below). |
 | `POST /api/audits` | `{check_set, depth?}` | 201 audit run summary. |
+| `POST /api/check-sets/propose` | `{description, depth?}` | Model result plus `check_set` (saved unreviewed) when `status` is `ok`. Proposals may use only the reviewed templates, contract rows, and frozen-suite tests. |
 
 ### Verification run (`kind: "verification"`)
 

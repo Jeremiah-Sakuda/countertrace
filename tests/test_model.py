@@ -99,6 +99,18 @@ class ModelTest(unittest.TestCase):
         self.assertEqual(kinds, {("cycle", 42), ("signal", "made_up_signal"), ("line", 999)})
         self.assertEqual(check["uncited_steps"], 1)
 
+    def test_check_proposals_limited_to_reviewed_templates(self):
+        good = {"label": "x", "tests": ["fill_drain"], "checks": [
+            {"id": "Full Flag!", "check": "full_flag", "rows": ["write_full"], "requirement": "write_full", "text": "t"}]}
+        self.assertEqual(model.validate_check_proposal(good, ["fill_drain"])["checks"][0]["id"], "full_flag_")
+        for bad in (
+            {**good, "tests": ["made_up"]},
+            {**good, "checks": [{"id": "a", "check": "python_eval", "rows": None, "requirement": "reset"}]},
+            {**good, "checks": [{"id": "a", "check": "read_data", "rows": ["sometimes"], "requirement": "reset"}]},
+        ):
+            with self.assertRaises(ValueError):
+                model.validate_check_proposal(bad, ["fill_drain"])
+
     def test_extract_json_handles_fences_and_reasoning(self):
         self.assertEqual(model.extract_json('<think>x</think>```json\n{"a": 1}\n```'), {"a": 1})
         with self.assertRaises(ValueError):

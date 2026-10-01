@@ -25,8 +25,35 @@ from countertrace.verify import now
 CHECK_SETS = catalog.FIXTURES / "check_sets"
 
 
+def candidate_dir():
+    from countertrace.runs import data_dir
+
+    path = data_dir() / "check_sets"
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
 def list_check_sets() -> list[dict]:
-    return [json.loads(p.read_text()) for p in sorted(CHECK_SETS.glob("*.json"))]
+    reviewed = [{**json.loads(p.read_text()), "reviewed": True} for p in sorted(CHECK_SETS.glob("*.json"))]
+    candidates = [{**json.loads(p.read_text()), "reviewed": False} for p in sorted(candidate_dir().glob("*.json"))]
+    return reviewed + candidates
+
+
+def propose(description: str, depth: int = 4) -> dict:
+    """Ask the model for a candidate set; save it unreviewed. Only the audit evaluates it."""
+    import secrets
+
+    from countertrace import model
+
+    result = model.propose_check_set(description, Contract(depth=depth), list(suite(depth)))
+    if result["status"] == "ok":
+        model_id = next((c.get("model_id") for c in result.get("calls", []) if c.get("model_id")), "model")
+        item = {**result["result"], "id": f"candidate-{secrets.token_hex(3)}",
+                "origin": f"Proposed by {model_id}; not reviewed. Evaluate with the audit before relying on it.",
+                "description": description[:600]}
+        (candidate_dir() / f"{item['id']}.json").write_text(json.dumps(item, indent=2))
+        result["check_set"] = item
+    return result
 
 
 def load_check_set(check_set_id: str) -> dict:
