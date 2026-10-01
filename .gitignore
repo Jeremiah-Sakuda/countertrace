@@ -1,0 +1,43 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.secrets/
+
+# Python and tooling
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+build/
+dist/
+
+# Web dependencies and build output
+node_modules/
+.next/
+coverage/
+*.tsbuildinfo
+
+# Runtime data and private inputs
+.countertrace/
+artifacts/
+uploads/
+runs/
+evaluation/holdout/
+*.vcd
+*.fst
+*.log
+obj_dir/
+
+# OS and editor-local state
+.DS_Store
+.idea/
+.vscode/
+*.swp
