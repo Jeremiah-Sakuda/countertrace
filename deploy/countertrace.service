@@ -1,0 +1,24 @@
+# systemd unit for a hosted Countertrace control service. UNTESTED TEMPLATE.
+# Assumes the repository at /opt/countertrace (owned by user countertrace, member
+# of the docker group), a built verifier image, and /etc/countertrace.env with
+# NEBIUS_* and COUNTERTRACE_* settings (mode 0600).
+[Unit]
+Description=Countertrace control service
+After=docker.service network-online.target
+Requires=docker.service
+
+[Service]
+User=countertrace
+WorkingDirectory=/opt/countertrace
+EnvironmentFile=/etc/countertrace.env
+Environment=PYTHONPATH=/opt/countertrace/src
+Environment=COUNTERTRACE_TRUST_PROXY=true
+ExecStart=/usr/bin/python3 -m countertrace serve --host 127.0.0.1 --port 8765
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+ProtectSystem=full
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

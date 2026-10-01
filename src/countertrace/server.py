@@ -26,6 +26,7 @@ from countertrace.runs import ROOT, RunStore
 WEB_DIST = ROOT / "apps" / "web" / "dist"
 RECORDED = ROOT / "recorded"
 MAX_BODY = 128 * 1024
+MODEL_CALLS_PER_HOUR = int(os.environ.get("COUNTERTRACE_MODEL_CALLS_PER_VISITOR_HOUR", "12"))
 
 
 def uploads_enabled() -> bool:
@@ -37,6 +38,38 @@ class App:
         self.store = RunStore()
         self.model_lock = threading.Lock()
         self.status_cache: tuple[float, dict] | None = None
+        self.visitor_runs: dict[str, str] = {}
+        self.visitor_calls: dict[str, list[float]] = {}
+        self.visitor_lock = threading.Lock()
+
+    # -- per-visitor limits ---------------------------------------------------
+    def claim_run_slot(self, visitor: str) -> None:
+        with self.visitor_lock:
+            run_id = self.visitor_runs.get(visitor)
+            if run_id:
+                try:
+                    active = self.store.load(run_id).get("state") in ("queued", "running")
+                except KeyError:
+                    active = False
+                if active:
+                    raise PermissionError("You already have a run in progress. Wait for it or cancel it first.")
+
+    def note_run(self, visitor: str, run_id: str) -> None:
+        with self.visitor_lock:
+            self.visitor_runs[visitor] = run_id
+
+    def claim_model_call(self, visitor: str) -> None:
+        with self.visitor_lock:
+            now = time.monotonic()
+            calls = [t for t in self.visitor_calls.get(visitor, []) if now - t < 3600]
+            if len(calls) >= MODEL_CALLS_PER_HOUR:
+                raise PermissionError("Model request limit reached for this hour. Recorded evidence remains available.")
+            calls.append(now)
+            self.visitor_calls[visitor] = calls
+
+    def require_live(self, run_id: str) -> None:
+        if re.fullmatch(r"[\w-]{1,64}", run_id) and (RECORDED / run_id).is_dir():
+            raise PermissionError("Recorded runs are read-only. Start a live run to explain or repair it.")
 
     # -- read-only endpoints ----------------------------------------------
     def status(self) -> dict:
@@ -105,7 +138,8 @@ class App:
         return self.store.run_dir(run_id)
 
     # -- actions --------------------------------------------------------------
-    def create_run(self, body: dict) -> dict:
+    def create_run(self, body: dict, visitor: str) -> dict:
+        self.claim_run_slot(visitor)
         if body.get("example_id"):
             item = catalog.example(body["example_id"])
             contract_hash = Contract(depth=item["depth"]).digest()
@@ -122,12 +156,15 @@ class App:
                                                    origin="owner_upload", title=str(body.get("title") or "Custom source")[:80])
         else:
             raise ValueError("example_id or source is required")
+        self.note_run(visitor, state["id"])
         self.store.start(state["id"])
         return state
 
-    def create_audit(self, body: dict) -> dict:
+    def create_audit(self, body: dict, visitor: str) -> dict:
+        self.claim_run_slot(visitor)
         state = self.store.create_audit(check_set=str(body.get("check_set", "weak-learner-v1")),
                                         depth=int(body.get("depth", 4)))
+        self.note_run(visitor, state["id"])
         self.store.start(state["id"])
         return state
 
@@ -190,6 +227,14 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header("Content-Disposition", f'attachment; filename="{download}"')
         self.end_headers()
         self.wfile.write(data)
+
+    def visitor(self) -> str:
+        # Behind a trusted reverse proxy set COUNTERTRACE_TRUST_PROXY=true to use X-Forwarded-For.
+        if os.environ.get("COUNTERTRACE_TRUST_PROXY", "").lower() == "true":
+            forwarded = self.headers.get("X-Forwarded-For", "").split(",")[0].strip()
+            if forwarded:
+                return forwarded
+        return self.client_address[0]
 
     def body(self) -> dict:
         length = int(self.headers.get("Content-Length") or 0)
@@ -257,17 +302,24 @@ class Handler(BaseHTTPRequestHandler):
         app = self.app
         path = unquote(urlsplit(self.path).path)
         body = self.body()
+        visitor = self.visitor()
         if path == "/api/runs":
-            return self.send_json(app.create_run(body), HTTPStatus.CREATED)
+            return self.send_json(app.create_run(body, visitor), HTTPStatus.CREATED)
         if path == "/api/audits":
-            return self.send_json(app.create_audit(body), HTTPStatus.CREATED)
+            return self.send_json(app.create_audit(body, visitor), HTTPStatus.CREATED)
         if path == "/api/interpret":
+            app.claim_model_call(visitor)
             return self.send_json(app.interpret(body))
         if m := re.fullmatch(r"/api/runs/([\w-]+)/cancel", path):
+            app.require_live(m.group(1))
             return self.send_json({"cancelled": app.store.cancel(m.group(1))})
         if m := re.fullmatch(r"/api/runs/([\w-]+)/explain", path):
+            app.require_live(m.group(1))
+            app.claim_model_call(visitor)
             return self.send_json(app.explain(m.group(1)))
         if m := re.fullmatch(r"/api/runs/([\w-]+)/repair", path):
+            app.require_live(m.group(1))
+            app.claim_model_call(visitor)
             return self.send_json(app.repair(m.group(1)))
         if m := re.fullmatch(r"/api/runs/([\w-]+)/candidates", path):
             if not uploads_enabled():

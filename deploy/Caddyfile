@@ -1,0 +1,13 @@
+# Reverse proxy with automatic TLS. UNTESTED TEMPLATE. Replace the host name.
+countertrace.example.org {
+	encode gzip
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options nosniff
+		Referrer-Policy no-referrer
+	}
+	request_body {
+		max_size 256KB
+	}
+	reverse_proxy 127.0.0.1:8765
+}
