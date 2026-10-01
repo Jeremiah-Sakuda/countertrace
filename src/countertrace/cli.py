@@ -89,6 +89,48 @@ def cmd_verify(args) -> int:
     return 0
 
 
+def cmd_survey(args) -> int:
+    """Run every bundled example and print raw outcomes. Development data, not a held-out evaluation."""
+    import time
+
+    from countertrace import catalog, runs
+
+    store = runs.RunStore()
+    rows = []
+    for item in catalog.examples()["examples"]:
+        run = store.create_verification(example_id=item["id"])
+        store.execute(run["id"])
+        state = store.load(run["id"])
+        v = state.get("verification") or {}
+        statuses = {o["id"]: o["status"] for o in v.get("obligations", [])}
+        findings = v.get("findings", [])
+        sim = next((f for f in findings if f["source"] == "simulation"), None)
+        formal = next((f for f in findings if f["source"] == "formal"), None)
+        rows.append({
+            "example": item["id"], "split": item["split"], "depth": item["depth"], "expected": item["expected"],
+            "run_id": run["id"], "state": state["state"], "headline": (state.get("verdict") or {}).get("headline"),
+            "prove": sorted({s for k, s in statuses.items() if k.startswith("prove:")}),
+            "cover": statuses.get("cover:reachability"),
+            "sim_finding": f"{sim['check']}@{sim['cycle']} ({sim['test']})" if sim else None,
+            "formal_finding": f"{formal['check']}@{formal['cycle']}" if formal else None,
+            "replay": (formal or {}).get("replay", {}).get("status"),
+            "first_finding_s": (v.get("timings") or {}).get("first_finding_s"),
+            "total_s": (v.get("timings") or {}).get("total_s"),
+        })
+    print("| Example | Split | Depth | Author intent | Headline | Proof | Reachability | Simulation finding | Formal finding | Replay | First finding (s) | Total (s) |")
+    print("| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |")
+    for r in rows:
+        print(f"| {r['example']} | {r['split']} | {r['depth']} | {r['expected']} | {r['headline']} | {', '.join(r['prove'])} | "
+              f"{r['cover']} | {r['sim_finding'] or '—'} | {r['formal_finding'] or '—'} | {r['replay'] or '—'} | "
+              f"{r['first_finding_s'] or '—'} | {r['total_s']} |")
+    out = runs.data_dir() / "reports"
+    out.mkdir(parents=True, exist_ok=True)
+    path = out / f"survey-{time.strftime('%Y%m%d-%H%M%S')}.json"
+    path.write_text(json.dumps(rows, indent=2))
+    print(f"\nRaw outcomes: {path}")
+    return 0
+
+
 def cmd_audit(args) -> int:
     from countertrace import runs
 
@@ -160,6 +202,9 @@ def main() -> int:
     verify.add_argument("--depth", type=int, choices=(2, 4), help="DEPTH for --file runs")
     verify.add_argument("--formal", default="bmc,prove,cover", help="Comma-separated SBY tasks, or empty")
     verify.set_defaults(func=cmd_verify)
+
+    survey = commands.add_parser("survey", help="Run every bundled example and print raw outcomes")
+    survey.set_defaults(func=cmd_survey)
 
     audit = commands.add_parser("audit", help="Run the supplemental-check audit against the fault library")
     audit.add_argument("--check-set", default="weak-learner-v1")
