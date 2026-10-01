@@ -106,5 +106,26 @@ class RepairLoopTest(unittest.TestCase):
             self.assertIn("-    wire do_write = wr_en;", result["attempts"][2]["diff"])
 
 
+
+class AuditTest(unittest.TestCase):
+    def test_weak_set_misses_boundary_faults_that_the_core_witnesses(self):
+        image_or_skip()
+        from countertrace import runs
+
+        with tempfile.TemporaryDirectory(dir=Path.home()) as tmp:
+            store = runs.RunStore(Path(tmp))
+            run = store.create_audit(check_set="weak-learner-v1", depth=4)
+            store.execute(run["id"])
+            audit = store.load(run["id"])["audit"]
+        self.assertEqual(audit["baseline"], "baseline_clean")
+        by_id = {m["fault_id"]: m for m in audit["mutants"]}
+        self.assertEqual(by_id["count-equivalent-compare"]["classification"], "equivalent")
+        survivors = {m["fault_id"] for m in audit["mutants"] if m["supplemental"]["status"] == "survived"}
+        self.assertEqual(survivors, {"count-overwrite-when-full", "count-full-exchange", "count-empty-bypass"})
+        for fault_id in survivors:
+            self.assertEqual(by_id[fault_id]["classification"], "valid_fault")
+            self.assertEqual(by_id[fault_id]["missing_requirements"], [by_id[fault_id]["target_requirement"]])
+
+
 if __name__ == "__main__":
     unittest.main()

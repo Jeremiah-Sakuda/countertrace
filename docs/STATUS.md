@@ -60,8 +60,8 @@ The bounded repair loop, re-admission, interface checks, and frozen-check-set co
 
 ## Tests
 
-- `make test`: 46 unit tests and negative controls (admission rejections, truncated or tampered traces, solver status and cover parsing, property-inventory controls, model schema/limit/citation handling with a mocked endpoint).
-- `make test-integration`: 6 Docker tests running real RTL (proved control, replayed fault, altered harness hash, cancellation, unsupported syntax, stubbed repair loop).
+- `make test`: 47 unit tests and negative controls (admission rejections, truncated or tampered traces, solver status and cover parsing, property-inventory controls, model schema/limit/citation handling with a mocked endpoint).
+- `make test-integration`: 7 Docker tests running real RTL (proved control, replayed fault, altered harness hash, cancellation, unsupported syntax, stubbed repair loop, weak-set audit).
 
 ## Not yet done
 
