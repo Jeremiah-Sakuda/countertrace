@@ -77,5 +77,34 @@ class IntegrationTest(unittest.TestCase):
         self.assertEqual(state["batches"], {})
 
 
+class RepairLoopTest(unittest.TestCase):
+    """Loop mechanics with a stubbed model. This is not evidence of model repair quality."""
+
+    def test_candidates_are_readmitted_and_judged_by_unchanged_checks(self):
+        image_or_skip()
+        from countertrace import model, repair, runs
+
+        with tempfile.TemporaryDirectory(dir=Path.home()) as tmp:
+            store = runs.RunStore(Path(tmp))
+            parent = store.create_verification(example_id="showcase-overwrite-when-full")
+            store.execute(parent["id"])
+            good = catalog.base_source("fifo_count.v")
+            proposals = iter([
+                {"status": "ok", "result": {"rationale": "rename", "source": good.replace("module fifo", "module fifo2"), "changed_lines": []}, "calls": []},
+                {"status": "ok", "result": {"rationale": "no-op", "source": catalog.fault_source("count-full-exchange"), "changed_lines": []}, "calls": []},
+                {"status": "ok", "result": {"rationale": "gate the write on full", "source": good, "changed_lines": [24]}, "calls": []},
+            ])
+            with mock.patch.object(model, "propose_repair", side_effect=lambda *a, **k: next(proposals)):
+                store.save({**store.load(parent["id"]), "repair": {"status": "running", "attempts": [],
+                                                                   "parent_frozen": store.load(parent["id"])["verification"]["frozen"]}})
+                repair.run_loop(store, parent["id"])
+            result = store.load(parent["id"])["repair"]
+            self.assertEqual([a["status"] for a in result["attempts"]],
+                             ["admission_rejected", "failed_checks", "passed_unchanged_checks"])
+            self.assertTrue(result["attempts"][2]["frozen_match"])
+            self.assertEqual(result["status"], "passed")
+            self.assertIn("-    wire do_write = wr_en;", result["attempts"][2]["diff"])
+
+
 if __name__ == "__main__":
     unittest.main()

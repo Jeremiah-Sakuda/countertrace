@@ -269,6 +269,12 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_json(app.explain(m.group(1)))
         if m := re.fullmatch(r"/api/runs/([\w-]+)/repair", path):
             return self.send_json(app.repair(m.group(1)))
+        if m := re.fullmatch(r"/api/runs/([\w-]+)/candidates", path):
+            if not uploads_enabled():
+                raise PermissionError("Edited candidates are disabled in this build.")
+            from countertrace import repair
+
+            return self.send_json(repair.user_candidate(app.store, m.group(1), str(body.get("source", ""))))
         raise KeyError(path)
 
     def serve_static(self, path: str) -> None:
