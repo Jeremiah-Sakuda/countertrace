@@ -1,4 +1,4 @@
-name: Scaffold checks
+name: Checks
 
 on:
   push:
@@ -8,9 +8,9 @@ permissions:
   contents: read
 
 jobs:
-  scaffold:
+  unit:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     strategy:
       matrix:
         python-version: ["3.11", "3.14"]
@@ -21,9 +21,31 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install package
         run: python -m pip install .
-      - name: Validate scaffold
+      - name: Unit tests, negative controls, and workspace checks
         run: make check PYTHON=python
       - name: Check installed command
         run: countertrace --version
-      - name: Capture prerequisite report
-        run: countertrace doctor --json
+
+  web:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Type-check and build the web interface
+        working-directory: apps/web
+        run: npm ci && npm run build
+
+  verifier:
+    # Builds the pinned verifier image (downloads the OSS CAD Suite release and
+    # checks its SHA-256) and runs real RTL inside it.
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.14"
+      - name: Build verifier image
+        run: PYTHONPATH=src python -m countertrace build-image
+      - name: Integration tests in the isolated verifier
+        run: make test-integration PYTHON=python
