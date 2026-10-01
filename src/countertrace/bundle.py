@@ -182,8 +182,10 @@ def export(store, run_id: str) -> Path:
     }
     manifest["files"] = {name: sha256(data) for name, data in sorted(files.items())}
     files["manifest.json"] = json.dumps(manifest, indent=2).encode()
-    out = run_dir / "bundle" / f"countertrace-{run_id}.zip"
-    out.parent.mkdir(exist_ok=True)
+    from countertrace.runs import data_dir
+
+    out = data_dir() / "bundles" / f"countertrace-{run_id}.zip"
+    out.parent.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as zf:
         for name, data in sorted(files.items()):
             zf.writestr(name, data)

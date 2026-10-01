@@ -1,0 +1,1490 @@
+{
+  "creator": "Yosys 0.69+158 (git sha1 a1a0ad7d4-dirty, Release, GNU /usr/bin/aarch64-linux-gnu-g++ 15.2.0)",
+  "modules": {
+    "fifo": {
+      "attributes": {
+        "src": "dut.v:4.1-51.10",
+        "top": "00000000000000000000000000000001",
+        "dynports": "00000000000000000000000000000001",
+        "hdlname": "fifo"
+      },
+      "parameter_default_values": {
+        "DEPTH": "00000000000000000000000000000100",
+        "WIDTH": "00000000000000000000000000001000"
+      },
+      "ports": {
+        "clk": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "rst": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "wr_en": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "rd_en": {
+          "direction": "input",
+          "bits": [ 5 ]
+        },
+        "din": {
+          "direction": "input",
+          "bits": [ 6, 7, 8, 9, 10, 11, 12, 13 ]
+        },
+        "dout": {
+          "direction": "output",
+          "bits": [ 14, 15, 16, 17, 18, 19, 20, 21 ]
+        },
+        "full": {
+          "direction": "output",
+          "bits": [ 22 ]
+        },
+        "empty": {
+          "direction": "output",
+          "bits": [ 23 ]
+        }
+      },
+      "cells": {
+        "$add$dut.v:38$42": {
+          "hide_name": 1,
+          "type": "$add",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000010",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000010"
+          },
+          "attributes": {
+            "src": "dut.v:38.32-38.45"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 24, 25 ],
+            "B": [ "1" ],
+            "Y": [ 26, 27 ]
+          }
+        },
+        "$add$dut.v:42$45": {
+          "hide_name": 1,
+          "type": "$add",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000010",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000100000"
+          },
+          "attributes": {
+            "src": "dut.v:42.55-42.68"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 28, 29 ],
+            "B": [ "1" ],
+            "Y": [ 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61 ]
+          }
+        },
+        "$add$dut.v:45$47": {
+          "hide_name": 1,
+          "type": "$add",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000011",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000011"
+          },
+          "attributes": {
+            "src": "dut.v:45.35-45.47"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 62, 63, 64 ],
+            "B": [ "1" ],
+            "Y": [ 65, 66, 67 ]
+          }
+        },
+        "$auto$proc_memwr.cc:45:proc_memwr$106": {
+          "hide_name": 1,
+          "type": "$memwr_v2",
+          "parameters": {
+            "ABITS": "00000000000000000000000000000010",
+            "CLK_ENABLE": "1",
+            "CLK_POLARITY": "1",
+            "MEMID": "\\mem",
+            "PORTID": "00000000000000000000000000000000",
+            "PRIORITY_MASK": "",
+            "WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "dut.v:37.17-37.35"
+          },
+          "port_directions": {
+            "ADDR": "input",
+            "CLK": "input",
+            "DATA": "input",
+            "EN": "input"
+          },
+          "connections": {
+            "ADDR": [ 68, 69 ],
+            "CLK": [ 2 ],
+            "DATA": [ 70, 71, 72, 73, 74, 75, 76, 77 ],
+            "EN": [ 78, 79, 80, 81, 82, 83, 84, 85 ]
+          }
+        },
+        "$eq$dut.v:27$30": {
+          "hide_name": 1,
+          "type": "$logic_not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000011",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "dut.v:27.21-27.31"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 62, 63, 64 ],
+            "Y": [ 23 ]
+          }
+        },
+        "$eq$dut.v:28$31": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000011",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000011",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "dut.v:28.21-28.35"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 62, 63, 64 ],
+            "B": [ "0", "0", "1" ],
+            "Y": [ 22 ]
+          }
+        },
+        "$eq$dut.v:42$44": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000010",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000010",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "dut.v:42.28-42.47"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 28, 29 ],
+            "B": [ "1", "1" ],
+            "Y": [ 86 ]
+          }
+        },
+        "$logic_and$dut.v:24$27": {
+          "hide_name": 1,
+          "type": "$logic_and",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "dut.v:24.21-24.42"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 5 ],
+            "B": [ 87 ],
+            "Y": [ 88 ]
+          }
+        },
+        "$logic_and$dut.v:25$29": {
+          "hide_name": 1,
+          "type": "$logic_and",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "dut.v:25.21-25.46"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4 ],
+            "B": [ 89 ],
+            "Y": [ 90 ]
+          }
+        },
+        "$memrd$\\mem$dut.v:41$43": {
+          "hide_name": 1,
+          "type": "$memrd",
+          "parameters": {
+            "ABITS": "00000000000000000000000000000010",
+            "CLK_ENABLE": "00000000000000000000000000000000",
+            "CLK_POLARITY": "00000000000000000000000000000000",
+            "MEMID": "\\mem",
+            "TRANSPARENT": "00000000000000000000000000000000",
+            "WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "dut.v:41.27-41.30"
+          },
+          "port_directions": {
+            "ADDR": "input",
+            "CLK": "input",
+            "DATA": "output",
+            "EN": "input"
+          },
+          "connections": {
+            "ADDR": [ 28, 29 ],
+            "CLK": [ "x" ],
+            "DATA": [ 91, 92, 93, 94, 95, 96, 97, 98 ],
+            "EN": [ "x" ]
+          }
+        },
+        "$ne$dut.v:24$26": {
+          "hide_name": 1,
+          "type": "$reduce_bool",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000011",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "dut.v:24.31-24.41"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 62, 63, 64 ],
+            "Y": [ 87 ]
+          }
+        },
+        "$ne$dut.v:25$28": {
+          "hide_name": 1,
+          "type": "$ne",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000011",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000011",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "dut.v:25.31-25.45"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 62, 63, 64 ],
+            "B": [ "0", "0", "1" ],
+            "Y": [ 89 ]
+          }
+        },
+        "$procdff$100": {
+          "hide_name": 1,
+          "type": "$dff",
+          "parameters": {
+            "CLK_POLARITY": "1",
+            "WIDTH": "00000000000000000000000000000010"
+          },
+          "attributes": {
+            "src": "dut.v:30.5-50.8"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "CLK": [ 2 ],
+            "D": [ 99, 100 ],
+            "Q": [ 24, 25 ]
+          }
+        },
+        "$procdff$101": {
+          "hide_name": 1,
+          "type": "$dff",
+          "parameters": {
+            "CLK_POLARITY": "1",
+            "WIDTH": "00000000000000000000000000000010"
+          },
+          "attributes": {
+            "src": "dut.v:30.5-50.8"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "CLK": [ 2 ],
+            "D": [ 101, 102 ],
+            "Q": [ 28, 29 ]
+          }
+        },
+        "$procdff$102": {
+          "hide_name": 1,
+          "type": "$dff",
+          "parameters": {
+            "CLK_POLARITY": "1",
+            "WIDTH": "00000000000000000000000000000011"
+          },
+          "attributes": {
+            "src": "dut.v:30.5-50.8"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "CLK": [ 2 ],
+            "D": [ 103, 104, 105 ],
+            "Q": [ 62, 63, 64 ]
+          }
+        },
+        "$procdff$103": {
+          "hide_name": 1,
+          "type": "$dff",
+          "parameters": {
+            "CLK_POLARITY": "1",
+            "WIDTH": "00000000000000000000000000000010"
+          },
+          "attributes": {
+            "src": "dut.v:30.5-50.8"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "CLK": [ 2 ],
+            "D": [ 68, 69 ],
+            "Q": [ 106, 107 ]
+          }
+        },
+        "$procdff$104": {
+          "hide_name": 1,
+          "type": "$dff",
+          "parameters": {
+            "CLK_POLARITY": "1",
+            "WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "dut.v:30.5-50.8"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "CLK": [ 2 ],
+            "D": [ 70, 71, 72, 73, 74, 75, 76, 77 ],
+            "Q": [ 108, 109, 110, 111, 112, 113, 114, 115 ]
+          }
+        },
+        "$procdff$105": {
+          "hide_name": 1,
+          "type": "$dff",
+          "parameters": {
+            "CLK_POLARITY": "1",
+            "WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "dut.v:30.5-50.8"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "CLK": [ 2 ],
+            "D": [ 78, 79, 80, 81, 82, 83, 84, 85 ],
+            "Q": [ 116, 117, 118, 119, 120, 121, 122, 123 ]
+          }
+        },
+        "$procdff$99": {
+          "hide_name": 1,
+          "type": "$dff",
+          "parameters": {
+            "CLK_POLARITY": "1",
+            "WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "dut.v:30.5-50.8"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "CLK": [ 2 ],
+            "D": [ 124, 125, 126, 127, 128, 129, 130, 131 ],
+            "Q": [ 14, 15, 16, 17, 18, 19, 20, 21 ]
+          }
+        },
+        "$procmux$50": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "dut.v:36.17-36.25|dut.v:36.13-39.16"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0", "0", "0", "0", "0", "0", "0", "0" ],
+            "B": [ "1", "1", "1", "1", "1", "1", "1", "1" ],
+            "S": [ 90 ],
+            "Y": [ 132, 133, 134, 135, 136, 137, 138, 139 ]
+          }
+        },
+        "$procmux$53": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "dut.v:31.13-31.16|dut.v:31.9-49.12"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 132, 133, 134, 135, 136, 137, 138, 139 ],
+            "B": [ "x", "x", "x", "x", "x", "x", "x", "x" ],
+            "S": [ 3 ],
+            "Y": [ 140, 141, 142, 143, 144, 145, 146, 147 ]
+          }
+        },
+        "$procmux$56": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "dut.v:36.17-36.25|dut.v:36.13-39.16"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "x", "x", "x", "x", "x", "x", "x", "x" ],
+            "B": [ 6, 7, 8, 9, 10, 11, 12, 13 ],
+            "S": [ 90 ],
+            "Y": [ 148, 149, 150, 151, 152, 153, 154, 155 ]
+          }
+        },
+        "$procmux$59": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "dut.v:31.13-31.16|dut.v:31.9-49.12"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 148, 149, 150, 151, 152, 153, 154, 155 ],
+            "B": [ "x", "x", "x", "x", "x", "x", "x", "x" ],
+            "S": [ 3 ],
+            "Y": [ 156, 157, 158, 159, 160, 161, 162, 163 ]
+          }
+        },
+        "$procmux$62": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000010"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "dut.v:36.17-36.25|dut.v:36.13-39.16"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "x", "x" ],
+            "B": [ 24, 25 ],
+            "S": [ 90 ],
+            "Y": [ 164, 165 ]
+          }
+        },
+        "$procmux$65": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000010"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "dut.v:31.13-31.16|dut.v:31.9-49.12"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 164, 165 ],
+            "B": [ "x", "x" ],
+            "S": [ 3 ],
+            "Y": [ 166, 167 ]
+          }
+        },
+        "$procmux$68": {
+          "hide_name": 1,
+          "type": "$pmux",
+          "parameters": {
+            "S_WIDTH": "00000000000000000000000000000010",
+            "WIDTH": "00000000000000000000000000000011"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "dut.v:45.48-45.48|dut.v:44.13-48.20"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 62, 63, 64 ],
+            "B": [ 168, 169, 170, 65, 66, 67 ],
+            "S": [ 171, 172 ],
+            "Y": [ 173, 174, 175 ]
+          }
+        },
+        "$procmux$69_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000010",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000010",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "dut.v:45.48-45.48|dut.v:44.13-48.20"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 88, 90 ],
+            "B": [ "1", "0" ],
+            "Y": [ 171 ]
+          }
+        },
+        "$procmux$70_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000010",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000010",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "dut.v:44.39-44.39|dut.v:44.13-48.20"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 88, 90 ],
+            "B": [ "0", "1" ],
+            "Y": [ 172 ]
+          }
+        },
+        "$procmux$72": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000011"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "dut.v:31.13-31.16|dut.v:31.9-49.12"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 173, 174, 175 ],
+            "B": [ "0", "0", "0" ],
+            "S": [ 3 ],
+            "Y": [ 103, 104, 105 ]
+          }
+        },
+        "$procmux$75": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "dut.v:31.13-31.16|dut.v:31.9-49.12"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 140, 141, 142, 143, 144, 145, 146, 147 ],
+            "B": [ "0", "0", "0", "0", "0", "0", "0", "0" ],
+            "S": [ 3 ],
+            "Y": [ 78, 79, 80, 81, 82, 83, 84, 85 ]
+          }
+        },
+        "$procmux$78": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "dut.v:31.13-31.16|dut.v:31.9-49.12"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 156, 157, 158, 159, 160, 161, 162, 163 ],
+            "B": [ "x", "x", "x", "x", "x", "x", "x", "x" ],
+            "S": [ 3 ],
+            "Y": [ 70, 71, 72, 73, 74, 75, 76, 77 ]
+          }
+        },
+        "$procmux$81": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000010"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "dut.v:31.13-31.16|dut.v:31.9-49.12"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 166, 167 ],
+            "B": [ "x", "x" ],
+            "S": [ 3 ],
+            "Y": [ 68, 69 ]
+          }
+        },
+        "$procmux$83": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000010"
+          },
+          "attributes": {
+            "src": "dut.v:40.17-40.24|dut.v:40.13-43.16"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 28, 29 ],
+            "B": [ 176, 177 ],
+            "S": [ 88 ],
+            "Y": [ 178, 179 ]
+          }
+        },
+        "$procmux$86": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000010"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "dut.v:31.13-31.16|dut.v:31.9-49.12"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 178, 179 ],
+            "B": [ "0", "0" ],
+            "S": [ 3 ],
+            "Y": [ 101, 102 ]
+          }
+        },
+        "$procmux$89": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000010"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "dut.v:36.17-36.25|dut.v:36.13-39.16"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 24, 25 ],
+            "B": [ 26, 27 ],
+            "S": [ 90 ],
+            "Y": [ 180, 181 ]
+          }
+        },
+        "$procmux$92": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000010"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "dut.v:31.13-31.16|dut.v:31.9-49.12"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 180, 181 ],
+            "B": [ "0", "0" ],
+            "S": [ 3 ],
+            "Y": [ 99, 100 ]
+          }
+        },
+        "$procmux$94": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "dut.v:40.17-40.24|dut.v:40.13-43.16"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 14, 15, 16, 17, 18, 19, 20, 21 ],
+            "B": [ 91, 92, 93, 94, 95, 96, 97, 98 ],
+            "S": [ 88 ],
+            "Y": [ 182, 183, 184, 185, 186, 187, 188, 189 ]
+          }
+        },
+        "$procmux$97": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "dut.v:31.13-31.16|dut.v:31.9-49.12"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 182, 183, 184, 185, 186, 187, 188, 189 ],
+            "B": [ 14, 15, 16, 17, 18, 19, 20, 21 ],
+            "S": [ 3 ],
+            "Y": [ 124, 125, 126, 127, 128, 129, 130, 131 ]
+          }
+        },
+        "$sub$dut.v:46$48": {
+          "hide_name": 1,
+          "type": "$sub",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000011",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000011"
+          },
+          "attributes": {
+            "src": "dut.v:46.35-46.47"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 62, 63, 64 ],
+            "B": [ "1" ],
+            "Y": [ 168, 169, 170 ]
+          }
+        },
+        "$ternary$dut.v:42$46": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000100000"
+          },
+          "attributes": {
+            "src": "dut.v:42.27-42.68"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61 ],
+            "B": [ "1", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+            "S": [ 86 ],
+            "Y": [ 176, 177, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219 ]
+          }
+        }
+      },
+      "memories": {
+        "mem": {
+          "hide_name": 0,
+          "attributes": {
+            "src": "dut.v:19.21-19.24"
+          },
+          "width": 8,
+          "start_offset": 0,
+          "size": 4
+        }
+      },
+      "netnames": {
+        "$0$memwr$\\mem$dut.v:37$25_ADDR[1:0]$33": {
+          "hide_name": 1,
+          "bits": [ 68, 69 ],
+          "attributes": {
+            "src": "dut.v:30.5-50.8"
+          }
+        },
+        "$0$memwr$\\mem$dut.v:37$25_DATA[7:0]$34": {
+          "hide_name": 1,
+          "bits": [ 70, 71, 72, 73, 74, 75, 76, 77 ],
+          "attributes": {
+            "src": "dut.v:30.5-50.8"
+          }
+        },
+        "$0$memwr$\\mem$dut.v:37$25_EN[7:0]$35": {
+          "hide_name": 1,
+          "bits": [ 78, 79, 80, 81, 82, 83, 84, 85 ],
+          "attributes": {
+            "src": "dut.v:30.5-50.8"
+          }
+        },
+        "$0\\count[2:0]": {
+          "hide_name": 1,
+          "bits": [ 103, 104, 105 ],
+          "attributes": {
+            "src": "dut.v:30.5-50.8"
+          }
+        },
+        "$0\\dout[7:0]": {
+          "hide_name": 1,
+          "bits": [ 124, 125, 126, 127, 128, 129, 130, 131 ],
+          "attributes": {
+            "src": "dut.v:30.5-50.8"
+          }
+        },
+        "$0\\rd_ptr[1:0]": {
+          "hide_name": 1,
+          "bits": [ 101, 102 ],
+          "attributes": {
+            "src": "dut.v:30.5-50.8"
+          }
+        },
+        "$0\\wr_ptr[1:0]": {
+          "hide_name": 1,
+          "bits": [ 99, 100 ],
+          "attributes": {
+            "src": "dut.v:30.5-50.8"
+          }
+        },
+        "$1$memwr$\\mem$dut.v:37$25_ADDR[1:0]$36": {
+          "hide_name": 1,
+          "bits": [ 68, 69 ],
+          "attributes": {
+            "src": "dut.v:30.5-50.8"
+          }
+        },
+        "$1$memwr$\\mem$dut.v:37$25_DATA[7:0]$37": {
+          "hide_name": 1,
+          "bits": [ 70, 71, 72, 73, 74, 75, 76, 77 ],
+          "attributes": {
+            "src": "dut.v:30.5-50.8"
+          }
+        },
+        "$1$memwr$\\mem$dut.v:37$25_EN[7:0]$38": {
+          "hide_name": 1,
+          "bits": [ 78, 79, 80, 81, 82, 83, 84, 85 ],
+          "attributes": {
+            "src": "dut.v:30.5-50.8"
+          }
+        },
+        "$2$memwr$\\mem$dut.v:37$25_ADDR[1:0]$39": {
+          "hide_name": 1,
+          "bits": [ 166, 167 ],
+          "attributes": {
+            "src": "dut.v:30.5-50.8"
+          }
+        },
+        "$2$memwr$\\mem$dut.v:37$25_DATA[7:0]$40": {
+          "hide_name": 1,
+          "bits": [ 156, 157, 158, 159, 160, 161, 162, 163 ],
+          "attributes": {
+            "src": "dut.v:30.5-50.8"
+          }
+        },
+        "$2$memwr$\\mem$dut.v:37$25_EN[7:0]$41": {
+          "hide_name": 1,
+          "bits": [ 140, 141, 142, 143, 144, 145, 146, 147 ],
+          "attributes": {
+            "src": "dut.v:30.5-50.8"
+          }
+        },
+        "$add$dut.v:38$42_Y": {
+          "hide_name": 1,
+          "bits": [ 26, 27 ],
+          "attributes": {
+            "src": "dut.v:38.32-38.45"
+          }
+        },
+        "$add$dut.v:42$45_Y": {
+          "hide_name": 1,
+          "bits": [ 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61 ],
+          "attributes": {
+            "src": "dut.v:42.55-42.68"
+          }
+        },
+        "$add$dut.v:45$47_Y": {
+          "hide_name": 1,
+          "bits": [ 65, 66, 67 ],
+          "attributes": {
+            "src": "dut.v:45.35-45.47"
+          }
+        },
+        "$eq$dut.v:27$30_Y": {
+          "hide_name": 1,
+          "bits": [ 23 ],
+          "attributes": {
+            "src": "dut.v:27.21-27.31"
+          }
+        },
+        "$eq$dut.v:28$31_Y": {
+          "hide_name": 1,
+          "bits": [ 22 ],
+          "attributes": {
+            "src": "dut.v:28.21-28.35"
+          }
+        },
+        "$eq$dut.v:42$44_Y": {
+          "hide_name": 1,
+          "bits": [ 86 ],
+          "attributes": {
+            "src": "dut.v:42.28-42.47"
+          }
+        },
+        "$logic_and$dut.v:24$27_Y": {
+          "hide_name": 1,
+          "bits": [ 88 ],
+          "attributes": {
+            "src": "dut.v:24.21-24.42"
+          }
+        },
+        "$logic_and$dut.v:25$29_Y": {
+          "hide_name": 1,
+          "bits": [ 90 ],
+          "attributes": {
+            "src": "dut.v:25.21-25.46"
+          }
+        },
+        "$memrd$\\mem$dut.v:41$43_DATA": {
+          "hide_name": 1,
+          "bits": [ 91, 92, 93, 94, 95, 96, 97, 98 ],
+          "attributes": {
+            "src": "dut.v:41.27-41.30"
+          }
+        },
+        "$memwr$\\mem$dut.v:37$25_ADDR": {
+          "hide_name": 1,
+          "bits": [ 106, 107 ],
+          "attributes": {
+            "src": "dut.v:37.17-37.35"
+          }
+        },
+        "$memwr$\\mem$dut.v:37$25_DATA": {
+          "hide_name": 1,
+          "bits": [ 108, 109, 110, 111, 112, 113, 114, 115 ],
+          "attributes": {
+            "src": "dut.v:37.17-37.35"
+          }
+        },
+        "$memwr$\\mem$dut.v:37$25_EN": {
+          "hide_name": 1,
+          "bits": [ 116, 117, 118, 119, 120, 121, 122, 123 ],
+          "attributes": {
+            "src": "dut.v:37.17-37.35"
+          }
+        },
+        "$ne$dut.v:24$26_Y": {
+          "hide_name": 1,
+          "bits": [ 87 ],
+          "attributes": {
+            "src": "dut.v:24.31-24.41"
+          }
+        },
+        "$ne$dut.v:25$28_Y": {
+          "hide_name": 1,
+          "bits": [ 89 ],
+          "attributes": {
+            "src": "dut.v:25.31-25.45"
+          }
+        },
+        "$procmux$50_Y": {
+          "hide_name": 1,
+          "bits": [ 132, 133, 134, 135, 136, 137, 138, 139 ],
+          "attributes": {
+          }
+        },
+        "$procmux$51_CMP": {
+          "hide_name": 1,
+          "bits": [ 90 ],
+          "attributes": {
+          }
+        },
+        "$procmux$53_Y": {
+          "hide_name": 1,
+          "bits": [ 140, 141, 142, 143, 144, 145, 146, 147 ],
+          "attributes": {
+          }
+        },
+        "$procmux$54_CMP": {
+          "hide_name": 1,
+          "bits": [ 3 ],
+          "attributes": {
+          }
+        },
+        "$procmux$56_Y": {
+          "hide_name": 1,
+          "bits": [ 148, 149, 150, 151, 152, 153, 154, 155 ],
+          "attributes": {
+          }
+        },
+        "$procmux$57_CMP": {
+          "hide_name": 1,
+          "bits": [ 90 ],
+          "attributes": {
+          }
+        },
+        "$procmux$59_Y": {
+          "hide_name": 1,
+          "bits": [ 156, 157, 158, 159, 160, 161, 162, 163 ],
+          "attributes": {
+          }
+        },
+        "$procmux$60_CMP": {
+          "hide_name": 1,
+          "bits": [ 3 ],
+          "attributes": {
+          }
+        },
+        "$procmux$62_Y": {
+          "hide_name": 1,
+          "bits": [ 164, 165 ],
+          "attributes": {
+          }
+        },
+        "$procmux$63_CMP": {
+          "hide_name": 1,
+          "bits": [ 90 ],
+          "attributes": {
+          }
+        },
+        "$procmux$65_Y": {
+          "hide_name": 1,
+          "bits": [ 166, 167 ],
+          "attributes": {
+          }
+        },
+        "$procmux$66_CMP": {
+          "hide_name": 1,
+          "bits": [ 3 ],
+          "attributes": {
+          }
+        },
+        "$procmux$68_Y": {
+          "hide_name": 1,
+          "bits": [ 173, 174, 175 ],
+          "attributes": {
+          }
+        },
+        "$procmux$69_CMP": {
+          "hide_name": 1,
+          "bits": [ 171 ],
+          "attributes": {
+          }
+        },
+        "$procmux$70_CMP": {
+          "hide_name": 1,
+          "bits": [ 172 ],
+          "attributes": {
+          }
+        },
+        "$procmux$72_Y": {
+          "hide_name": 1,
+          "bits": [ 103, 104, 105 ],
+          "attributes": {
+          }
+        },
+        "$procmux$73_CMP": {
+          "hide_name": 1,
+          "bits": [ 3 ],
+          "attributes": {
+          }
+        },
+        "$procmux$75_Y": {
+          "hide_name": 1,
+          "bits": [ 78, 79, 80, 81, 82, 83, 84, 85 ],
+          "attributes": {
+          }
+        },
+        "$procmux$76_CMP": {
+          "hide_name": 1,
+          "bits": [ 3 ],
+          "attributes": {
+          }
+        },
+        "$procmux$78_Y": {
+          "hide_name": 1,
+          "bits": [ 70, 71, 72, 73, 74, 75, 76, 77 ],
+          "attributes": {
+          }
+        },
+        "$procmux$79_CMP": {
+          "hide_name": 1,
+          "bits": [ 3 ],
+          "attributes": {
+          }
+        },
+        "$procmux$81_Y": {
+          "hide_name": 1,
+          "bits": [ 68, 69 ],
+          "attributes": {
+          }
+        },
+        "$procmux$82_CMP": {
+          "hide_name": 1,
+          "bits": [ 3 ],
+          "attributes": {
+          }
+        },
+        "$procmux$83_Y": {
+          "hide_name": 1,
+          "bits": [ 178, 179 ],
+          "attributes": {
+          }
+        },
+        "$procmux$84_CMP": {
+          "hide_name": 1,
+          "bits": [ 88 ],
+          "attributes": {
+          }
+        },
+        "$procmux$86_Y": {
+          "hide_name": 1,
+          "bits": [ 101, 102 ],
+          "attributes": {
+          }
+        },
+        "$procmux$87_CMP": {
+          "hide_name": 1,
+          "bits": [ 3 ],
+          "attributes": {
+          }
+        },
+        "$procmux$89_Y": {
+          "hide_name": 1,
+          "bits": [ 180, 181 ],
+          "attributes": {
+          }
+        },
+        "$procmux$90_CMP": {
+          "hide_name": 1,
+          "bits": [ 90 ],
+          "attributes": {
+          }
+        },
+        "$procmux$92_Y": {
+          "hide_name": 1,
+          "bits": [ 99, 100 ],
+          "attributes": {
+          }
+        },
+        "$procmux$93_CMP": {
+          "hide_name": 1,
+          "bits": [ 3 ],
+          "attributes": {
+          }
+        },
+        "$procmux$94_Y": {
+          "hide_name": 1,
+          "bits": [ 182, 183, 184, 185, 186, 187, 188, 189 ],
+          "attributes": {
+          }
+        },
+        "$procmux$95_CMP": {
+          "hide_name": 1,
+          "bits": [ 88 ],
+          "attributes": {
+          }
+        },
+        "$procmux$97_Y": {
+          "hide_name": 1,
+          "bits": [ 124, 125, 126, 127, 128, 129, 130, 131 ],
+          "attributes": {
+          }
+        },
+        "$procmux$98_CMP": {
+          "hide_name": 1,
+          "bits": [ 3 ],
+          "attributes": {
+          }
+        },
+        "$sub$dut.v:46$48_Y": {
+          "hide_name": 1,
+          "bits": [ 168, 169, 170 ],
+          "attributes": {
+            "src": "dut.v:46.35-46.47"
+          }
+        },
+        "$ternary$dut.v:42$46_Y": {
+          "hide_name": 1,
+          "bits": [ 176, 177, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219 ],
+          "attributes": {
+            "src": "dut.v:42.27-42.68"
+          }
+        },
+        "clk": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "dut.v:8.29-8.32"
+          }
+        },
+        "count": {
+          "hide_name": 0,
+          "bits": [ 62, 63, 64 ],
+          "attributes": {
+            "src": "dut.v:22.21-22.26"
+          }
+        },
+        "din": {
+          "hide_name": 0,
+          "bits": [ 6, 7, 8, 9, 10, 11, 12, 13 ],
+          "attributes": {
+            "src": "dut.v:12.29-12.32"
+          }
+        },
+        "do_read": {
+          "hide_name": 0,
+          "bits": [ 88 ],
+          "attributes": {
+            "src": "dut.v:24.10-24.17"
+          }
+        },
+        "do_write": {
+          "hide_name": 0,
+          "bits": [ 90 ],
+          "attributes": {
+            "src": "dut.v:25.10-25.18"
+          }
+        },
+        "dout": {
+          "hide_name": 0,
+          "bits": [ 14, 15, 16, 17, 18, 19, 20, 21 ],
+          "attributes": {
+            "src": "dut.v:13.29-13.33"
+          }
+        },
+        "empty": {
+          "hide_name": 0,
+          "bits": [ 23 ],
+          "attributes": {
+            "src": "dut.v:15.29-15.34"
+          }
+        },
+        "full": {
+          "hide_name": 0,
+          "bits": [ 22 ],
+          "attributes": {
+            "src": "dut.v:14.29-14.33"
+          }
+        },
+        "rd_en": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "src": "dut.v:11.29-11.34"
+          }
+        },
+        "rd_ptr": {
+          "hide_name": 0,
+          "bits": [ 28, 29 ],
+          "attributes": {
+            "src": "dut.v:21.21-21.27"
+          }
+        },
+        "rst": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "dut.v:9.29-9.32"
+          }
+        },
+        "wr_en": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "dut.v:10.29-10.34"
+          }
+        },
+        "wr_ptr": {
+          "hide_name": 0,
+          "bits": [ 24, 25 ],
+          "attributes": {
+            "src": "dut.v:20.21-20.27"
+          }
+        }
+      }
+    }
+  }
+}

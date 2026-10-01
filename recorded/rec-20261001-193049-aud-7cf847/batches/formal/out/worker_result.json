@@ -1,0 +1,491 @@
+{
+  "schema": "countertrace-worker-result/1",
+  "job_id": "5aa5b745a1b3",
+  "tool_versions": {
+    "verilator": "Verilator 5.053 devel rev v5.052-258-ga419e9157 (mod)",
+    "yosys": "Yosys 0.69+158 (git sha1 a1a0ad7d4-dirty, Release, GNU /usr/bin/aarch64-linux-gnu-g++ 15.2.0)",
+    "python": "Python 3.11.2",
+    "oss_cad_suite": "2026-09-30"
+  },
+  "harness_hashes": {
+    "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+    "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+    "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+  },
+  "steps": [
+    {
+      "id": "m00:ports",
+      "argv": [
+        "yosys",
+        "-q",
+        "-p",
+        "read_verilog -sv dut.v; hierarchy -top fifo -chparam DEPTH 4 -chparam WIDTH 8; proc; write_json /out/m00/ports.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.008,
+      "log": "m00/logs/ports.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m00:properties",
+      "argv": [
+        "yosys",
+        "-p",
+        "read -formal -D CT_DUT=fifo dut.v; read -formal -D CT_DUT=fifo ct_formal_top.sv; chparam -set DEPTH 4 -set WIDTH 8 ct_formal_top; prep -top ct_formal_top; write_json /out/m00/properties.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.019,
+      "log": "m00/logs/properties.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m00:formal:bmc",
+      "argv": [
+        "sby",
+        "-f",
+        "ct.sby",
+        "bmc"
+      ],
+      "timeout_s": 150,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 3.353,
+      "log": "m00/logs/sby_bmc.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m00:formal:prove",
+      "argv": [
+        "sby",
+        "-f",
+        "ct.sby",
+        "prove"
+      ],
+      "timeout_s": 150,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.666,
+      "log": "m00/logs/sby_prove.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m01:ports",
+      "argv": [
+        "yosys",
+        "-q",
+        "-p",
+        "read_verilog -sv dut.v; hierarchy -top fifo -chparam DEPTH 4 -chparam WIDTH 8; proc; write_json /out/m01/ports.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.008,
+      "log": "m01/logs/ports.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m01:properties",
+      "argv": [
+        "yosys",
+        "-p",
+        "read -formal -D CT_DUT=fifo dut.v; read -formal -D CT_DUT=fifo ct_formal_top.sv; chparam -set DEPTH 4 -set WIDTH 8 ct_formal_top; prep -top ct_formal_top; write_json /out/m01/properties.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.017,
+      "log": "m01/logs/properties.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m01:formal:bmc",
+      "argv": [
+        "sby",
+        "-f",
+        "ct.sby",
+        "bmc"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.256,
+      "log": "m01/logs/sby_bmc.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m01:formal:prove",
+      "argv": [
+        "sby",
+        "-f",
+        "ct.sby",
+        "prove"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.33,
+      "log": "m01/logs/sby_prove.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m02:ports",
+      "argv": [
+        "yosys",
+        "-q",
+        "-p",
+        "read_verilog -sv dut.v; hierarchy -top fifo -chparam DEPTH 4 -chparam WIDTH 8; proc; write_json /out/m02/ports.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.008,
+      "log": "m02/logs/ports.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m02:properties",
+      "argv": [
+        "yosys",
+        "-p",
+        "read -formal -D CT_DUT=fifo dut.v; read -formal -D CT_DUT=fifo ct_formal_top.sv; chparam -set DEPTH 4 -set WIDTH 8 ct_formal_top; prep -top ct_formal_top; write_json /out/m02/properties.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.017,
+      "log": "m02/logs/properties.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m02:formal:bmc",
+      "argv": [
+        "sby",
+        "-f",
+        "ct.sby",
+        "bmc"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.246,
+      "log": "m02/logs/sby_bmc.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m02:formal:prove",
+      "argv": [
+        "sby",
+        "-f",
+        "ct.sby",
+        "prove"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.362,
+      "log": "m02/logs/sby_prove.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m03:ports",
+      "argv": [
+        "yosys",
+        "-q",
+        "-p",
+        "read_verilog -sv dut.v; hierarchy -top fifo -chparam DEPTH 4 -chparam WIDTH 8; proc; write_json /out/m03/ports.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.008,
+      "log": "m03/logs/ports.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m03:properties",
+      "argv": [
+        "yosys",
+        "-p",
+        "read -formal -D CT_DUT=fifo dut.v; read -formal -D CT_DUT=fifo ct_formal_top.sv; chparam -set DEPTH 4 -set WIDTH 8 ct_formal_top; prep -top ct_formal_top; write_json /out/m03/properties.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.018,
+      "log": "m03/logs/properties.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m03:formal:bmc",
+      "argv": [
+        "sby",
+        "-f",
+        "ct.sby",
+        "bmc"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.241,
+      "log": "m03/logs/sby_bmc.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m03:formal:prove",
+      "argv": [
+        "sby",
+        "-f",
+        "ct.sby",
+        "prove"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.262,
+      "log": "m03/logs/sby_prove.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m04:ports",
+      "argv": [
+        "yosys",
+        "-q",
+        "-p",
+        "read_verilog -sv dut.v; hierarchy -top fifo -chparam DEPTH 4 -chparam WIDTH 8; proc; write_json /out/m04/ports.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.008,
+      "log": "m04/logs/ports.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m04:properties",
+      "argv": [
+        "yosys",
+        "-p",
+        "read -formal -D CT_DUT=fifo dut.v; read -formal -D CT_DUT=fifo ct_formal_top.sv; chparam -set DEPTH 4 -set WIDTH 8 ct_formal_top; prep -top ct_formal_top; write_json /out/m04/properties.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.018,
+      "log": "m04/logs/properties.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m04:formal:bmc",
+      "argv": [
+        "sby",
+        "-f",
+        "ct.sby",
+        "bmc"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.243,
+      "log": "m04/logs/sby_bmc.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m04:formal:prove",
+      "argv": [
+        "sby",
+        "-f",
+        "ct.sby",
+        "prove"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.243,
+      "log": "m04/logs/sby_prove.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m05:ports",
+      "argv": [
+        "yosys",
+        "-q",
+        "-p",
+        "read_verilog -sv dut.v; hierarchy -top fifo -chparam DEPTH 4 -chparam WIDTH 8; proc; write_json /out/m05/ports.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.008,
+      "log": "m05/logs/ports.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m05:properties",
+      "argv": [
+        "yosys",
+        "-p",
+        "read -formal -D CT_DUT=fifo dut.v; read -formal -D CT_DUT=fifo ct_formal_top.sv; chparam -set DEPTH 4 -set WIDTH 8 ct_formal_top; prep -top ct_formal_top; write_json /out/m05/properties.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.018,
+      "log": "m05/logs/properties.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m05:formal:bmc",
+      "argv": [
+        "sby",
+        "-f",
+        "ct.sby",
+        "bmc"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.271,
+      "log": "m05/logs/sby_bmc.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m05:formal:prove",
+      "argv": [
+        "sby",
+        "-f",
+        "ct.sby",
+        "prove"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.242,
+      "log": "m05/logs/sby_prove.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m06:ports",
+      "argv": [
+        "yosys",
+        "-q",
+        "-p",
+        "read_verilog -sv dut.v; hierarchy -top fifo -chparam DEPTH 4 -chparam WIDTH 8; proc; write_json /out/m06/ports.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.008,
+      "log": "m06/logs/ports.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m06:properties",
+      "argv": [
+        "yosys",
+        "-p",
+        "read -formal -D CT_DUT=fifo dut.v; read -formal -D CT_DUT=fifo ct_formal_top.sv; chparam -set DEPTH 4 -set WIDTH 8 ct_formal_top; prep -top ct_formal_top; write_json /out/m06/properties.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.019,
+      "log": "m06/logs/properties.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m06:formal:bmc",
+      "argv": [
+        "sby",
+        "-f",
+        "ct.sby",
+        "bmc"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.27,
+      "log": "m06/logs/sby_bmc.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m06:formal:prove",
+      "argv": [
+        "sby",
+        "-f",
+        "ct.sby",
+        "prove"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.473,
+      "log": "m06/logs/sby_prove.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m07:ports",
+      "argv": [
+        "yosys",
+        "-q",
+        "-p",
+        "read_verilog -sv dut.v; hierarchy -top fifo -chparam DEPTH 4 -chparam WIDTH 8; proc; write_json /out/m07/ports.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.008,
+      "log": "m07/logs/ports.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m07:properties",
+      "argv": [
+        "yosys",
+        "-p",
+        "read -formal -D CT_DUT=fifo dut.v; read -formal -D CT_DUT=fifo ct_formal_top.sv; chparam -set DEPTH 4 -set WIDTH 8 ct_formal_top; prep -top ct_formal_top; write_json /out/m07/properties.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.018,
+      "log": "m07/logs/properties.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m07:formal:bmc",
+      "argv": [
+        "sby",
+        "-f",
+        "ct.sby",
+        "bmc"
+      ],
+      "timeout_s": 150,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 4.091,
+      "log": "m07/logs/sby_bmc.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m07:formal:prove",
+      "argv": [
+        "sby",
+        "-f",
+        "ct.sby",
+        "prove"
+      ],
+      "timeout_s": 150,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.843,
+      "log": "m07/logs/sby_prove.log",
+      "log_truncated": false
+    }
+  ],
+  "deadline_reached": false,
+  "duration_s": 12.688
+}

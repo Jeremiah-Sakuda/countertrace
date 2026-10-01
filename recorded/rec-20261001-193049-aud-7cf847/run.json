@@ -1,0 +1,562 @@
+{
+ "id": "rec-20261001-193049-aud-7cf847",
+ "kind": "audit",
+ "title": "Supplemental-check audit: weak-learner-v1",
+ "check_set": "weak-learner-v1",
+ "depth": 4,
+ "state": "complete",
+ "created_at": "2026-10-01T23:30:49Z",
+ "recorded": true,
+ "started_at": "2026-10-01T23:30:49Z",
+ "image": {
+  "tag": "countertrace-verifier:7d82f4b2482a24f2",
+  "image_id": "sha256:a121730b676386b0ee65267070e85db6e1ee7e04885ee2efcba3e6d51ee5a017",
+  "verifier_digest": "7d82f4b2482a24f2"
+ },
+ "audit": {
+  "check_set": {
+   "id": "weak-learner-v1",
+   "label": "Typical learner checks (deliberately weak)",
+   "origin": "Hand-authored for Countertrace to imitate common directed-testbench checks. Explicitly weak for demonstration; not a user's testbench.",
+   "description": "Drives one directed sequence (fill exactly, drain exactly, wrap once) and checks flags after reset, writes, and reads, plus data order on plain reads. It never requests a write while full, a read while empty, simultaneous operations, or a second reset.",
+   "tests": [
+    "learner_basic"
+   ],
+   "checks": [
+    {
+     "id": "reset_empty",
+     "check": "empty_flag",
+     "rows": [
+      "reset"
+     ],
+     "requirement": "reset",
+     "text": "After reset, empty is high."
+    },
+    {
+     "id": "reset_full",
+     "check": "full_flag",
+     "rows": [
+      "reset"
+     ],
+     "requirement": "reset",
+     "text": "After reset, full is low."
+    },
+    {
+     "id": "write_not_empty",
+     "check": "empty_flag",
+     "rows": [
+      "write_not_full"
+     ],
+     "requirement": "write_not_full",
+     "text": "After a write, empty is low."
+    },
+    {
+     "id": "fill_full",
+     "check": "full_flag",
+     "rows": [
+      "write_not_full"
+     ],
+     "requirement": "write_not_full",
+     "text": "After the last free slot is written, full is high."
+    },
+    {
+     "id": "read_order",
+     "check": "read_data",
+     "rows": [
+      "read_not_empty"
+     ],
+     "requirement": "read_not_empty",
+     "text": "A read returns the oldest word."
+    },
+    {
+     "id": "drain_empty",
+     "check": "empty_flag",
+     "rows": [
+      "read_not_empty"
+     ],
+     "requirement": "read_not_empty",
+     "text": "After the last word is read, empty is high."
+    }
+   ],
+   "reviewed": true
+  },
+  "library_version": "audit-v1",
+  "base": "fifo_count.v",
+  "depth": 4,
+  "contract_hash": "sha256:d8c9a8e739585556ac4f0931dbbbcc14b75d4f197cd000be00d91a1af4a58ce3",
+  "stimulus": [
+   "learner_basic",
+   "fill_drain",
+   "write_when_full",
+   "simultaneous",
+   "wraparound",
+   "recurrent_reset",
+   "random_s1",
+   "random_s2",
+   "random_s3",
+   "random_s4",
+   "random_s5",
+   "random_s6",
+   "random_s7",
+   "random_s8"
+  ],
+  "stages": [
+   {
+    "id": "simulating",
+    "status": "done",
+    "started_at": "2026-10-01T23:30:49Z",
+    "finished_at": "2026-10-01T23:31:13Z"
+   },
+   {
+    "id": "checking_properties",
+    "status": "done",
+    "started_at": "2026-10-01T23:30:49Z",
+    "finished_at": "2026-10-01T23:31:13Z"
+   }
+  ],
+  "mutants": [
+   {
+    "fault_id": "base",
+    "summary": "Known-good base implementation (baseline).",
+    "category": "baseline",
+    "class": null,
+    "core": {
+     "status": "survived",
+     "errors": [],
+     "checks": [],
+     "first": null,
+     "mismatch_rows": []
+    },
+    "formal": {
+     "status": "proved_equivalent",
+     "bmc": "PASS",
+     "prove": "PASS",
+     "failed": []
+    },
+    "classification": "baseline_clean",
+    "supplemental": {
+     "status": "not_applicable",
+     "by": [],
+     "first_cycle": null
+    },
+    "missing_requirements": []
+   },
+   {
+    "fault_id": "count-overwrite-when-full",
+    "summary": "A write while full is not ignored: it overwrites the oldest unread word.",
+    "category": "flags_boundaries",
+    "class": "write_full",
+    "core": {
+     "status": "killed",
+     "errors": [],
+     "checks": [
+      "full_flag",
+      "read_data"
+     ],
+     "first": {
+      "test": "fill_drain",
+      "cycle": 6,
+      "check": "read_data",
+      "requirement_id": "read_not_empty"
+     },
+     "mismatch_rows": [
+      "both_full",
+      "read_not_empty"
+     ]
+    },
+    "formal": {
+     "status": "counterexample",
+     "bmc": "FAIL",
+     "prove": "FAIL",
+     "failed": [
+      {
+       "assertion": "ct_full_flag",
+       "check": "full_flag",
+       "step": 6
+      }
+     ]
+    },
+    "classification": "valid_fault",
+    "supplemental": {
+     "status": "survived",
+     "by": [],
+     "first_cycle": null
+    },
+    "target_requirement": "write_full",
+    "missing_requirements": [
+     "write_full"
+    ]
+   },
+   {
+    "fault_id": "count-full-exchange",
+    "summary": "A simultaneous read and write while full accepts both (full-capacity exchange).",
+    "category": "simultaneous",
+    "class": "both_full",
+    "core": {
+     "status": "killed",
+     "errors": [],
+     "checks": [
+      "full_flag"
+     ],
+     "first": {
+      "test": "simultaneous",
+      "cycle": 6,
+      "check": "full_flag",
+      "requirement_id": "both_full"
+     },
+     "mismatch_rows": [
+      "both_full"
+     ]
+    },
+    "formal": {
+     "status": "counterexample",
+     "bmc": "FAIL",
+     "prove": "FAIL",
+     "failed": [
+      {
+       "assertion": "ct_full_flag",
+       "check": "full_flag",
+       "step": 6
+      }
+     ]
+    },
+    "classification": "valid_fault",
+    "supplemental": {
+     "status": "survived",
+     "by": [],
+     "first_cycle": null
+    },
+    "target_requirement": "both_full",
+    "missing_requirements": [
+     "both_full"
+    ]
+   },
+   {
+    "fault_id": "count-empty-bypass",
+    "summary": "A read while empty consumes a simultaneous write by bypassing it to dout.",
+    "category": "simultaneous",
+    "class": "both_empty",
+    "core": {
+     "status": "killed",
+     "errors": [],
+     "checks": [
+      "empty_flag"
+     ],
+     "first": {
+      "test": "simultaneous",
+      "cycle": 1,
+      "check": "empty_flag",
+      "requirement_id": "both_empty"
+     },
+     "mismatch_rows": [
+      "both_empty"
+     ]
+    },
+    "formal": {
+     "status": "counterexample",
+     "bmc": "FAIL",
+     "prove": "FAIL",
+     "failed": [
+      {
+       "assertion": "ct_empty_flag",
+       "check": "empty_flag",
+       "step": 2
+      }
+     ]
+    },
+    "classification": "valid_fault",
+    "supplemental": {
+     "status": "survived",
+     "by": [],
+     "first_cycle": null
+    },
+    "target_requirement": "both_empty",
+    "missing_requirements": [
+     "both_empty"
+    ]
+   },
+   {
+    "fault_id": "count-reset-keeps-wrptr",
+    "summary": "Reset clears the read pointer and count but not the write pointer.",
+    "category": "reset",
+    "class": "reset",
+    "core": {
+     "status": "killed",
+     "errors": [],
+     "checks": [
+      "read_data"
+     ],
+     "first": {
+      "test": "simultaneous",
+      "cycle": 2,
+      "check": "read_data",
+      "requirement_id": "both_mid"
+     },
+     "mismatch_rows": [
+      "both_full",
+      "both_mid",
+      "read_not_empty"
+     ]
+    },
+    "formal": {
+     "status": "counterexample",
+     "bmc": "FAIL",
+     "prove": "FAIL",
+     "failed": [
+      {
+       "assertion": "ct_read_data",
+       "check": "read_data",
+       "step": 3
+      }
+     ]
+    },
+    "classification": "valid_fault",
+    "supplemental": {
+     "status": "killed",
+     "by": [
+      "read_order"
+     ],
+     "first_cycle": 5
+    },
+    "target_requirement": "reset",
+    "missing_requirements": []
+   },
+   {
+    "fault_id": "count-lost-occupancy",
+    "summary": "A read-only operation does not decrement the occupancy count.",
+    "category": "accounting",
+    "class": "read_not_empty",
+    "core": {
+     "status": "killed",
+     "errors": [],
+     "checks": [
+      "empty_flag",
+      "full_flag"
+     ],
+     "first": {
+      "test": "random_s1",
+      "cycle": 2,
+      "check": "empty_flag",
+      "requirement_id": "read_not_empty"
+     },
+     "mismatch_rows": [
+      "both_full",
+      "read_not_empty",
+      "write_not_full"
+     ]
+    },
+    "formal": {
+     "status": "counterexample",
+     "bmc": "FAIL",
+     "prove": "FAIL",
+     "failed": [
+      {
+       "assertion": "ct_empty_flag",
+       "check": "empty_flag",
+       "step": 3
+      }
+     ]
+    },
+    "classification": "valid_fault",
+    "supplemental": {
+     "status": "killed",
+     "by": [
+      "fill_full",
+      "read_order",
+      "drain_empty"
+     ],
+     "first_cycle": 8
+    },
+    "target_requirement": "read_not_empty",
+    "missing_requirements": []
+   },
+   {
+    "fault_id": "count-wrong-wrap",
+    "summary": "The read pointer wraps to slot 1 instead of slot 0.",
+    "category": "ordering_wraparound",
+    "class": "wraparound",
+    "core": {
+     "status": "killed",
+     "errors": [],
+     "checks": [
+      "read_data"
+     ],
+     "first": {
+      "test": "simultaneous",
+      "cycle": 9,
+      "check": "read_data",
+      "requirement_id": "read_not_empty"
+     },
+     "mismatch_rows": [
+      "both_mid",
+      "read_not_empty"
+     ]
+    },
+    "formal": {
+     "status": "counterexample",
+     "bmc": "FAIL",
+     "prove": "FAIL",
+     "failed": [
+      {
+       "assertion": "ct_read_data",
+       "check": "read_data",
+       "step": 8
+      }
+     ]
+    },
+    "classification": "valid_fault",
+    "supplemental": {
+     "status": "killed",
+     "by": [
+      "read_order"
+     ],
+     "first_cycle": 11
+    },
+    "target_requirement": "wraparound",
+    "missing_requirements": []
+   },
+   {
+    "fault_id": "count-equivalent-compare",
+    "summary": "Replaces count != DEPTH with count < DEPTH. Intended to be behaviorally equivalent on reachable states.",
+    "category": "equivalent_candidate",
+    "class": "none",
+    "core": {
+     "status": "survived",
+     "errors": [],
+     "checks": [],
+     "first": null,
+     "mismatch_rows": []
+    },
+    "formal": {
+     "status": "proved_equivalent",
+     "bmc": "PASS",
+     "prove": "PASS",
+     "failed": []
+    },
+    "classification": "equivalent",
+    "supplemental": {
+     "status": "not_applicable",
+     "by": [],
+     "first_cycle": null
+    },
+    "missing_requirements": []
+   }
+  ],
+  "summary": {
+   "mutants": 7,
+   "valid_faults": 6,
+   "supplemental_killed": 3,
+   "supplemental_survived": 3,
+   "equivalent": 1,
+   "unresolved": 0,
+   "invalid": 0,
+   "note": "Kill counts describe the named supplemental check set on the frozen simulation stimulus only. They are not a design-confidence score."
+  },
+  "requirements": {
+   "reset": {
+    "title": "Reset asserted at a rising edge",
+    "exercised_by_set": true,
+    "covered_by_set": true,
+    "checks": [
+     "empty_flag",
+     "full_flag"
+    ],
+    "surviving_faults": []
+   },
+   "write_not_full": {
+    "title": "Write requested while not full",
+    "exercised_by_set": true,
+    "covered_by_set": true,
+    "checks": [
+     "empty_flag",
+     "full_flag"
+    ],
+    "surviving_faults": []
+   },
+   "read_not_empty": {
+    "title": "Read requested while not empty",
+    "exercised_by_set": true,
+    "covered_by_set": true,
+    "checks": [
+     "empty_flag",
+     "read_data"
+    ],
+    "surviving_faults": []
+   },
+   "read_empty": {
+    "title": "Read requested while empty",
+    "exercised_by_set": false,
+    "covered_by_set": false,
+    "checks": [],
+    "surviving_faults": []
+   },
+   "write_full": {
+    "title": "Write requested while full",
+    "exercised_by_set": false,
+    "covered_by_set": false,
+    "checks": [],
+    "surviving_faults": [
+     "count-overwrite-when-full"
+    ]
+   },
+   "both_mid": {
+    "title": "Read and write between empty and full",
+    "exercised_by_set": false,
+    "covered_by_set": false,
+    "checks": [],
+    "surviving_faults": []
+   },
+   "both_empty": {
+    "title": "Read and write while empty",
+    "exercised_by_set": false,
+    "covered_by_set": false,
+    "checks": [],
+    "surviving_faults": [
+     "count-empty-bypass"
+    ]
+   },
+   "both_full": {
+    "title": "Read and write while full",
+    "exercised_by_set": false,
+    "covered_by_set": false,
+    "checks": [],
+    "surviving_faults": [
+     "count-full-exchange"
+    ]
+   },
+   "idle": {
+    "title": "No request",
+    "exercised_by_set": true,
+    "covered_by_set": false,
+    "checks": [],
+    "surviving_faults": []
+   }
+  },
+  "tool_versions": {
+   "verilator": "Verilator 5.053 devel rev v5.052-258-ga419e9157 (mod)",
+   "yosys": "Yosys 0.69+158 (git sha1 a1a0ad7d4-dirty, Release, GNU /usr/bin/aarch64-linux-gnu-g++ 15.2.0)",
+   "python": "Python 3.11.2",
+   "oss_cad_suite": "2026-09-30"
+  },
+  "set_tests": [
+   "learner_basic"
+  ],
+  "set_rows_exercised": [
+   "idle",
+   "read_not_empty",
+   "reset",
+   "write_not_full"
+  ],
+  "baseline": "baseline_clean"
+ },
+ "finished_at": "2026-10-01T23:31:13Z",
+ "recorded_from": "20261001-193049-aud-7cf847",
+ "recorded_at": "2026-10-01T23:31:41Z",
+ "recorded_note": "Recorded October 1, 2026 on the owner's Apple M3 Pro (Docker in colima, 4 vCPU). Original timings and versions shown. No model explanation was recorded: Nemotron was not configured.",
+ "recorded_versions": {
+  "verilator": "Verilator 5.053 devel rev v5.052-258-ga419e9157 (mod)",
+  "yosys": "Yosys 0.69+158 (git sha1 a1a0ad7d4-dirty, Release, GNU /usr/bin/aarch64-linux-gnu-g++ 15.2.0)",
+  "python": "Python 3.11.2",
+  "oss_cad_suite": "2026-09-30"
+ }
+}

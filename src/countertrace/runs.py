@@ -237,18 +237,23 @@ def record(store: RunStore, run_id: str, note: str = "") -> Path:
     if state.get("state") != "complete":
         raise ValueError("Only completed runs can be recorded.")
     source = store.run_dir(run_id)
-    target = ROOT / "recorded" / run_id
+    target = ROOT / "recorded" / f"rec-{run_id}"
+    referenced = {f.get("vcd") for f in (state.get("verification") or {}).get("findings", [])}
     if target.exists():
         shutil.rmtree(target)
     for path in source.rglob("*"):
         rel = path.relative_to(source)
-        if path.is_dir() or any(part in f"/{rel}" for part in RECORDED_SKIP) or rel.parts[0] == "bundle":
+        if path.is_dir() or any(part in f"/{rel}" for part in RECORDED_SKIP) or rel.parts[0] == "bundle":  # older runs kept bundles here
             continue
+        if path.suffix == ".vcd" and "/sim/" in f"/{rel}" and str(rel) not in referenced:
+            continue  # keep only waveforms that a finding cites
         (target / rel).parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(path, target / rel)
     v = state.get("verification") or state.get("audit") or {}
     versions = next((b.get("tool_versions") for b in (v.get("batches") or {}).values() if b.get("tool_versions")),
                     v.get("tool_versions"))
+    state["recorded_from"] = run_id
+    state["id"] = f"rec-{run_id}"
     state["recorded"] = True
     state["recorded_at"] = now()
     state["recorded_note"] = note or (

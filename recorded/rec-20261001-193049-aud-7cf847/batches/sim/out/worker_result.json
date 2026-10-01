@@ -1,0 +1,2419 @@
+{
+  "schema": "countertrace-worker-result/1",
+  "job_id": "26559104cd35",
+  "tool_versions": {
+    "verilator": "Verilator 5.053 devel rev v5.052-258-ga419e9157 (mod)",
+    "yosys": "Yosys 0.69+158 (git sha1 a1a0ad7d4-dirty, Release, GNU /usr/bin/aarch64-linux-gnu-g++ 15.2.0)",
+    "python": "Python 3.11.2",
+    "oss_cad_suite": "2026-09-30"
+  },
+  "harness_hashes": {
+    "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+    "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+    "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+  },
+  "steps": [
+    {
+      "id": "m00:ports",
+      "argv": [
+        "yosys",
+        "-q",
+        "-p",
+        "read_verilog -sv dut.v; hierarchy -top fifo -chparam DEPTH 4 -chparam WIDTH 8; proc; write_json /out/m00/ports.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.008,
+      "log": "m00/logs/ports.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m00:properties",
+      "argv": [
+        "yosys",
+        "-p",
+        "read -formal -D CT_DUT=fifo dut.v; read -formal -D CT_DUT=fifo ct_formal_top.sv; chparam -set DEPTH 4 -set WIDTH 8 ct_formal_top; prep -top ct_formal_top; write_json /out/m00/properties.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.018,
+      "log": "m00/logs/properties.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m00:compile",
+      "argv": [
+        "verilator",
+        "--binary",
+        "--timing",
+        "--trace",
+        "-Wno-fatal",
+        "-Wno-lint",
+        "-Wno-style",
+        "--x-assign",
+        "unique",
+        "--x-initial",
+        "unique",
+        "-DCT_DUT=fifo",
+        "-GDEPTH=4",
+        "-GWIDTH=8",
+        "--top-module",
+        "ct_sim_top",
+        "--Mdir",
+        "/tmp/work/m00/obj",
+        "-j",
+        "2",
+        "ct_sim_top.sv",
+        "dut.v"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 2.753,
+      "log": "m00/logs/compile.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m00:sim:learner_basic",
+      "argv": [
+        "/tmp/work/m00/obj/Vct_sim_top",
+        "+stim=/job/stimulus/learner_basic.txt",
+        "+trace=/out/m00/sim/learner_basic.trace",
+        "+vcd=/out/m00/sim/learner_basic.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.003,
+      "log": "m00/logs/sim_learner_basic.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m00:sim:fill_drain",
+      "argv": [
+        "/tmp/work/m00/obj/Vct_sim_top",
+        "+stim=/job/stimulus/fill_drain.txt",
+        "+trace=/out/m00/sim/fill_drain.trace",
+        "+vcd=/out/m00/sim/fill_drain.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m00/logs/sim_fill_drain.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m00:sim:write_when_full",
+      "argv": [
+        "/tmp/work/m00/obj/Vct_sim_top",
+        "+stim=/job/stimulus/write_when_full.txt",
+        "+trace=/out/m00/sim/write_when_full.trace",
+        "+vcd=/out/m00/sim/write_when_full.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m00/logs/sim_write_when_full.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m00:sim:simultaneous",
+      "argv": [
+        "/tmp/work/m00/obj/Vct_sim_top",
+        "+stim=/job/stimulus/simultaneous.txt",
+        "+trace=/out/m00/sim/simultaneous.trace",
+        "+vcd=/out/m00/sim/simultaneous.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m00/logs/sim_simultaneous.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m00:sim:wraparound",
+      "argv": [
+        "/tmp/work/m00/obj/Vct_sim_top",
+        "+stim=/job/stimulus/wraparound.txt",
+        "+trace=/out/m00/sim/wraparound.trace",
+        "+vcd=/out/m00/sim/wraparound.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m00/logs/sim_wraparound.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m00:sim:recurrent_reset",
+      "argv": [
+        "/tmp/work/m00/obj/Vct_sim_top",
+        "+stim=/job/stimulus/recurrent_reset.txt",
+        "+trace=/out/m00/sim/recurrent_reset.trace",
+        "+vcd=/out/m00/sim/recurrent_reset.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m00/logs/sim_recurrent_reset.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m00:sim:random_s1",
+      "argv": [
+        "/tmp/work/m00/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s1.txt",
+        "+trace=/out/m00/sim/random_s1.trace",
+        "+vcd=/out/m00/sim/random_s1.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m00/logs/sim_random_s1.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m00:sim:random_s2",
+      "argv": [
+        "/tmp/work/m00/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s2.txt",
+        "+trace=/out/m00/sim/random_s2.trace",
+        "+vcd=/out/m00/sim/random_s2.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m00/logs/sim_random_s2.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m00:sim:random_s3",
+      "argv": [
+        "/tmp/work/m00/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s3.txt",
+        "+trace=/out/m00/sim/random_s3.trace",
+        "+vcd=/out/m00/sim/random_s3.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m00/logs/sim_random_s3.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m00:sim:random_s4",
+      "argv": [
+        "/tmp/work/m00/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s4.txt",
+        "+trace=/out/m00/sim/random_s4.trace",
+        "+vcd=/out/m00/sim/random_s4.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m00/logs/sim_random_s4.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m00:sim:random_s5",
+      "argv": [
+        "/tmp/work/m00/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s5.txt",
+        "+trace=/out/m00/sim/random_s5.trace",
+        "+vcd=/out/m00/sim/random_s5.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m00/logs/sim_random_s5.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m00:sim:random_s6",
+      "argv": [
+        "/tmp/work/m00/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s6.txt",
+        "+trace=/out/m00/sim/random_s6.trace",
+        "+vcd=/out/m00/sim/random_s6.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m00/logs/sim_random_s6.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m00:sim:random_s7",
+      "argv": [
+        "/tmp/work/m00/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s7.txt",
+        "+trace=/out/m00/sim/random_s7.trace",
+        "+vcd=/out/m00/sim/random_s7.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m00/logs/sim_random_s7.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m00:sim:random_s8",
+      "argv": [
+        "/tmp/work/m00/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s8.txt",
+        "+trace=/out/m00/sim/random_s8.trace",
+        "+vcd=/out/m00/sim/random_s8.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m00/logs/sim_random_s8.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m01:ports",
+      "argv": [
+        "yosys",
+        "-q",
+        "-p",
+        "read_verilog -sv dut.v; hierarchy -top fifo -chparam DEPTH 4 -chparam WIDTH 8; proc; write_json /out/m01/ports.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.008,
+      "log": "m01/logs/ports.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m01:properties",
+      "argv": [
+        "yosys",
+        "-p",
+        "read -formal -D CT_DUT=fifo dut.v; read -formal -D CT_DUT=fifo ct_formal_top.sv; chparam -set DEPTH 4 -set WIDTH 8 ct_formal_top; prep -top ct_formal_top; write_json /out/m01/properties.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.017,
+      "log": "m01/logs/properties.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m01:compile",
+      "argv": [
+        "verilator",
+        "--binary",
+        "--timing",
+        "--trace",
+        "-Wno-fatal",
+        "-Wno-lint",
+        "-Wno-style",
+        "--x-assign",
+        "unique",
+        "--x-initial",
+        "unique",
+        "-DCT_DUT=fifo",
+        "-GDEPTH=4",
+        "-GWIDTH=8",
+        "--top-module",
+        "ct_sim_top",
+        "--Mdir",
+        "/tmp/work/m01/obj",
+        "-j",
+        "2",
+        "ct_sim_top.sv",
+        "dut.v"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 2.745,
+      "log": "m01/logs/compile.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m01:sim:learner_basic",
+      "argv": [
+        "/tmp/work/m01/obj/Vct_sim_top",
+        "+stim=/job/stimulus/learner_basic.txt",
+        "+trace=/out/m01/sim/learner_basic.trace",
+        "+vcd=/out/m01/sim/learner_basic.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m01/logs/sim_learner_basic.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m01:sim:fill_drain",
+      "argv": [
+        "/tmp/work/m01/obj/Vct_sim_top",
+        "+stim=/job/stimulus/fill_drain.txt",
+        "+trace=/out/m01/sim/fill_drain.trace",
+        "+vcd=/out/m01/sim/fill_drain.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m01/logs/sim_fill_drain.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m01:sim:write_when_full",
+      "argv": [
+        "/tmp/work/m01/obj/Vct_sim_top",
+        "+stim=/job/stimulus/write_when_full.txt",
+        "+trace=/out/m01/sim/write_when_full.trace",
+        "+vcd=/out/m01/sim/write_when_full.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m01/logs/sim_write_when_full.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m01:sim:simultaneous",
+      "argv": [
+        "/tmp/work/m01/obj/Vct_sim_top",
+        "+stim=/job/stimulus/simultaneous.txt",
+        "+trace=/out/m01/sim/simultaneous.trace",
+        "+vcd=/out/m01/sim/simultaneous.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.001,
+      "log": "m01/logs/sim_simultaneous.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m01:sim:wraparound",
+      "argv": [
+        "/tmp/work/m01/obj/Vct_sim_top",
+        "+stim=/job/stimulus/wraparound.txt",
+        "+trace=/out/m01/sim/wraparound.trace",
+        "+vcd=/out/m01/sim/wraparound.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m01/logs/sim_wraparound.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m01:sim:recurrent_reset",
+      "argv": [
+        "/tmp/work/m01/obj/Vct_sim_top",
+        "+stim=/job/stimulus/recurrent_reset.txt",
+        "+trace=/out/m01/sim/recurrent_reset.trace",
+        "+vcd=/out/m01/sim/recurrent_reset.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.001,
+      "log": "m01/logs/sim_recurrent_reset.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m01:sim:random_s1",
+      "argv": [
+        "/tmp/work/m01/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s1.txt",
+        "+trace=/out/m01/sim/random_s1.trace",
+        "+vcd=/out/m01/sim/random_s1.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m01/logs/sim_random_s1.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m01:sim:random_s2",
+      "argv": [
+        "/tmp/work/m01/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s2.txt",
+        "+trace=/out/m01/sim/random_s2.trace",
+        "+vcd=/out/m01/sim/random_s2.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m01/logs/sim_random_s2.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m01:sim:random_s3",
+      "argv": [
+        "/tmp/work/m01/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s3.txt",
+        "+trace=/out/m01/sim/random_s3.trace",
+        "+vcd=/out/m01/sim/random_s3.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m01/logs/sim_random_s3.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m01:sim:random_s4",
+      "argv": [
+        "/tmp/work/m01/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s4.txt",
+        "+trace=/out/m01/sim/random_s4.trace",
+        "+vcd=/out/m01/sim/random_s4.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m01/logs/sim_random_s4.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m01:sim:random_s5",
+      "argv": [
+        "/tmp/work/m01/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s5.txt",
+        "+trace=/out/m01/sim/random_s5.trace",
+        "+vcd=/out/m01/sim/random_s5.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.003,
+      "log": "m01/logs/sim_random_s5.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m01:sim:random_s6",
+      "argv": [
+        "/tmp/work/m01/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s6.txt",
+        "+trace=/out/m01/sim/random_s6.trace",
+        "+vcd=/out/m01/sim/random_s6.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m01/logs/sim_random_s6.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m01:sim:random_s7",
+      "argv": [
+        "/tmp/work/m01/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s7.txt",
+        "+trace=/out/m01/sim/random_s7.trace",
+        "+vcd=/out/m01/sim/random_s7.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m01/logs/sim_random_s7.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m01:sim:random_s8",
+      "argv": [
+        "/tmp/work/m01/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s8.txt",
+        "+trace=/out/m01/sim/random_s8.trace",
+        "+vcd=/out/m01/sim/random_s8.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m01/logs/sim_random_s8.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m02:ports",
+      "argv": [
+        "yosys",
+        "-q",
+        "-p",
+        "read_verilog -sv dut.v; hierarchy -top fifo -chparam DEPTH 4 -chparam WIDTH 8; proc; write_json /out/m02/ports.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.007,
+      "log": "m02/logs/ports.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m02:properties",
+      "argv": [
+        "yosys",
+        "-p",
+        "read -formal -D CT_DUT=fifo dut.v; read -formal -D CT_DUT=fifo ct_formal_top.sv; chparam -set DEPTH 4 -set WIDTH 8 ct_formal_top; prep -top ct_formal_top; write_json /out/m02/properties.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.017,
+      "log": "m02/logs/properties.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m02:compile",
+      "argv": [
+        "verilator",
+        "--binary",
+        "--timing",
+        "--trace",
+        "-Wno-fatal",
+        "-Wno-lint",
+        "-Wno-style",
+        "--x-assign",
+        "unique",
+        "--x-initial",
+        "unique",
+        "-DCT_DUT=fifo",
+        "-GDEPTH=4",
+        "-GWIDTH=8",
+        "--top-module",
+        "ct_sim_top",
+        "--Mdir",
+        "/tmp/work/m02/obj",
+        "-j",
+        "2",
+        "ct_sim_top.sv",
+        "dut.v"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 2.794,
+      "log": "m02/logs/compile.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m02:sim:learner_basic",
+      "argv": [
+        "/tmp/work/m02/obj/Vct_sim_top",
+        "+stim=/job/stimulus/learner_basic.txt",
+        "+trace=/out/m02/sim/learner_basic.trace",
+        "+vcd=/out/m02/sim/learner_basic.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m02/logs/sim_learner_basic.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m02:sim:fill_drain",
+      "argv": [
+        "/tmp/work/m02/obj/Vct_sim_top",
+        "+stim=/job/stimulus/fill_drain.txt",
+        "+trace=/out/m02/sim/fill_drain.trace",
+        "+vcd=/out/m02/sim/fill_drain.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.001,
+      "log": "m02/logs/sim_fill_drain.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m02:sim:write_when_full",
+      "argv": [
+        "/tmp/work/m02/obj/Vct_sim_top",
+        "+stim=/job/stimulus/write_when_full.txt",
+        "+trace=/out/m02/sim/write_when_full.trace",
+        "+vcd=/out/m02/sim/write_when_full.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m02/logs/sim_write_when_full.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m02:sim:simultaneous",
+      "argv": [
+        "/tmp/work/m02/obj/Vct_sim_top",
+        "+stim=/job/stimulus/simultaneous.txt",
+        "+trace=/out/m02/sim/simultaneous.trace",
+        "+vcd=/out/m02/sim/simultaneous.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m02/logs/sim_simultaneous.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m02:sim:wraparound",
+      "argv": [
+        "/tmp/work/m02/obj/Vct_sim_top",
+        "+stim=/job/stimulus/wraparound.txt",
+        "+trace=/out/m02/sim/wraparound.trace",
+        "+vcd=/out/m02/sim/wraparound.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m02/logs/sim_wraparound.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m02:sim:recurrent_reset",
+      "argv": [
+        "/tmp/work/m02/obj/Vct_sim_top",
+        "+stim=/job/stimulus/recurrent_reset.txt",
+        "+trace=/out/m02/sim/recurrent_reset.trace",
+        "+vcd=/out/m02/sim/recurrent_reset.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.001,
+      "log": "m02/logs/sim_recurrent_reset.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m02:sim:random_s1",
+      "argv": [
+        "/tmp/work/m02/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s1.txt",
+        "+trace=/out/m02/sim/random_s1.trace",
+        "+vcd=/out/m02/sim/random_s1.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m02/logs/sim_random_s1.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m02:sim:random_s2",
+      "argv": [
+        "/tmp/work/m02/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s2.txt",
+        "+trace=/out/m02/sim/random_s2.trace",
+        "+vcd=/out/m02/sim/random_s2.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m02/logs/sim_random_s2.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m02:sim:random_s3",
+      "argv": [
+        "/tmp/work/m02/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s3.txt",
+        "+trace=/out/m02/sim/random_s3.trace",
+        "+vcd=/out/m02/sim/random_s3.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m02/logs/sim_random_s3.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m02:sim:random_s4",
+      "argv": [
+        "/tmp/work/m02/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s4.txt",
+        "+trace=/out/m02/sim/random_s4.trace",
+        "+vcd=/out/m02/sim/random_s4.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m02/logs/sim_random_s4.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m02:sim:random_s5",
+      "argv": [
+        "/tmp/work/m02/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s5.txt",
+        "+trace=/out/m02/sim/random_s5.trace",
+        "+vcd=/out/m02/sim/random_s5.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m02/logs/sim_random_s5.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m02:sim:random_s6",
+      "argv": [
+        "/tmp/work/m02/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s6.txt",
+        "+trace=/out/m02/sim/random_s6.trace",
+        "+vcd=/out/m02/sim/random_s6.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m02/logs/sim_random_s6.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m02:sim:random_s7",
+      "argv": [
+        "/tmp/work/m02/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s7.txt",
+        "+trace=/out/m02/sim/random_s7.trace",
+        "+vcd=/out/m02/sim/random_s7.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m02/logs/sim_random_s7.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m02:sim:random_s8",
+      "argv": [
+        "/tmp/work/m02/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s8.txt",
+        "+trace=/out/m02/sim/random_s8.trace",
+        "+vcd=/out/m02/sim/random_s8.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m02/logs/sim_random_s8.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m03:ports",
+      "argv": [
+        "yosys",
+        "-q",
+        "-p",
+        "read_verilog -sv dut.v; hierarchy -top fifo -chparam DEPTH 4 -chparam WIDTH 8; proc; write_json /out/m03/ports.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.008,
+      "log": "m03/logs/ports.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m03:properties",
+      "argv": [
+        "yosys",
+        "-p",
+        "read -formal -D CT_DUT=fifo dut.v; read -formal -D CT_DUT=fifo ct_formal_top.sv; chparam -set DEPTH 4 -set WIDTH 8 ct_formal_top; prep -top ct_formal_top; write_json /out/m03/properties.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.017,
+      "log": "m03/logs/properties.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m03:compile",
+      "argv": [
+        "verilator",
+        "--binary",
+        "--timing",
+        "--trace",
+        "-Wno-fatal",
+        "-Wno-lint",
+        "-Wno-style",
+        "--x-assign",
+        "unique",
+        "--x-initial",
+        "unique",
+        "-DCT_DUT=fifo",
+        "-GDEPTH=4",
+        "-GWIDTH=8",
+        "--top-module",
+        "ct_sim_top",
+        "--Mdir",
+        "/tmp/work/m03/obj",
+        "-j",
+        "2",
+        "ct_sim_top.sv",
+        "dut.v"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 2.929,
+      "log": "m03/logs/compile.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m03:sim:learner_basic",
+      "argv": [
+        "/tmp/work/m03/obj/Vct_sim_top",
+        "+stim=/job/stimulus/learner_basic.txt",
+        "+trace=/out/m03/sim/learner_basic.trace",
+        "+vcd=/out/m03/sim/learner_basic.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m03/logs/sim_learner_basic.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m03:sim:fill_drain",
+      "argv": [
+        "/tmp/work/m03/obj/Vct_sim_top",
+        "+stim=/job/stimulus/fill_drain.txt",
+        "+trace=/out/m03/sim/fill_drain.trace",
+        "+vcd=/out/m03/sim/fill_drain.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.006,
+      "log": "m03/logs/sim_fill_drain.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m03:sim:write_when_full",
+      "argv": [
+        "/tmp/work/m03/obj/Vct_sim_top",
+        "+stim=/job/stimulus/write_when_full.txt",
+        "+trace=/out/m03/sim/write_when_full.trace",
+        "+vcd=/out/m03/sim/write_when_full.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m03/logs/sim_write_when_full.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m03:sim:simultaneous",
+      "argv": [
+        "/tmp/work/m03/obj/Vct_sim_top",
+        "+stim=/job/stimulus/simultaneous.txt",
+        "+trace=/out/m03/sim/simultaneous.trace",
+        "+vcd=/out/m03/sim/simultaneous.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m03/logs/sim_simultaneous.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m03:sim:wraparound",
+      "argv": [
+        "/tmp/work/m03/obj/Vct_sim_top",
+        "+stim=/job/stimulus/wraparound.txt",
+        "+trace=/out/m03/sim/wraparound.trace",
+        "+vcd=/out/m03/sim/wraparound.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m03/logs/sim_wraparound.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m03:sim:recurrent_reset",
+      "argv": [
+        "/tmp/work/m03/obj/Vct_sim_top",
+        "+stim=/job/stimulus/recurrent_reset.txt",
+        "+trace=/out/m03/sim/recurrent_reset.trace",
+        "+vcd=/out/m03/sim/recurrent_reset.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m03/logs/sim_recurrent_reset.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m03:sim:random_s1",
+      "argv": [
+        "/tmp/work/m03/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s1.txt",
+        "+trace=/out/m03/sim/random_s1.trace",
+        "+vcd=/out/m03/sim/random_s1.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m03/logs/sim_random_s1.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m03:sim:random_s2",
+      "argv": [
+        "/tmp/work/m03/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s2.txt",
+        "+trace=/out/m03/sim/random_s2.trace",
+        "+vcd=/out/m03/sim/random_s2.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m03/logs/sim_random_s2.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m03:sim:random_s3",
+      "argv": [
+        "/tmp/work/m03/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s3.txt",
+        "+trace=/out/m03/sim/random_s3.trace",
+        "+vcd=/out/m03/sim/random_s3.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m03/logs/sim_random_s3.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m03:sim:random_s4",
+      "argv": [
+        "/tmp/work/m03/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s4.txt",
+        "+trace=/out/m03/sim/random_s4.trace",
+        "+vcd=/out/m03/sim/random_s4.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m03/logs/sim_random_s4.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m03:sim:random_s5",
+      "argv": [
+        "/tmp/work/m03/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s5.txt",
+        "+trace=/out/m03/sim/random_s5.trace",
+        "+vcd=/out/m03/sim/random_s5.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m03/logs/sim_random_s5.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m03:sim:random_s6",
+      "argv": [
+        "/tmp/work/m03/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s6.txt",
+        "+trace=/out/m03/sim/random_s6.trace",
+        "+vcd=/out/m03/sim/random_s6.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m03/logs/sim_random_s6.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m03:sim:random_s7",
+      "argv": [
+        "/tmp/work/m03/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s7.txt",
+        "+trace=/out/m03/sim/random_s7.trace",
+        "+vcd=/out/m03/sim/random_s7.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m03/logs/sim_random_s7.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m03:sim:random_s8",
+      "argv": [
+        "/tmp/work/m03/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s8.txt",
+        "+trace=/out/m03/sim/random_s8.trace",
+        "+vcd=/out/m03/sim/random_s8.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m03/logs/sim_random_s8.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m04:ports",
+      "argv": [
+        "yosys",
+        "-q",
+        "-p",
+        "read_verilog -sv dut.v; hierarchy -top fifo -chparam DEPTH 4 -chparam WIDTH 8; proc; write_json /out/m04/ports.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.011,
+      "log": "m04/logs/ports.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m04:properties",
+      "argv": [
+        "yosys",
+        "-p",
+        "read -formal -D CT_DUT=fifo dut.v; read -formal -D CT_DUT=fifo ct_formal_top.sv; chparam -set DEPTH 4 -set WIDTH 8 ct_formal_top; prep -top ct_formal_top; write_json /out/m04/properties.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.018,
+      "log": "m04/logs/properties.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m04:compile",
+      "argv": [
+        "verilator",
+        "--binary",
+        "--timing",
+        "--trace",
+        "-Wno-fatal",
+        "-Wno-lint",
+        "-Wno-style",
+        "--x-assign",
+        "unique",
+        "--x-initial",
+        "unique",
+        "-DCT_DUT=fifo",
+        "-GDEPTH=4",
+        "-GWIDTH=8",
+        "--top-module",
+        "ct_sim_top",
+        "--Mdir",
+        "/tmp/work/m04/obj",
+        "-j",
+        "2",
+        "ct_sim_top.sv",
+        "dut.v"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 2.991,
+      "log": "m04/logs/compile.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m04:sim:learner_basic",
+      "argv": [
+        "/tmp/work/m04/obj/Vct_sim_top",
+        "+stim=/job/stimulus/learner_basic.txt",
+        "+trace=/out/m04/sim/learner_basic.trace",
+        "+vcd=/out/m04/sim/learner_basic.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m04/logs/sim_learner_basic.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m04:sim:fill_drain",
+      "argv": [
+        "/tmp/work/m04/obj/Vct_sim_top",
+        "+stim=/job/stimulus/fill_drain.txt",
+        "+trace=/out/m04/sim/fill_drain.trace",
+        "+vcd=/out/m04/sim/fill_drain.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m04/logs/sim_fill_drain.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m04:sim:write_when_full",
+      "argv": [
+        "/tmp/work/m04/obj/Vct_sim_top",
+        "+stim=/job/stimulus/write_when_full.txt",
+        "+trace=/out/m04/sim/write_when_full.trace",
+        "+vcd=/out/m04/sim/write_when_full.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m04/logs/sim_write_when_full.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m04:sim:simultaneous",
+      "argv": [
+        "/tmp/work/m04/obj/Vct_sim_top",
+        "+stim=/job/stimulus/simultaneous.txt",
+        "+trace=/out/m04/sim/simultaneous.trace",
+        "+vcd=/out/m04/sim/simultaneous.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m04/logs/sim_simultaneous.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m04:sim:wraparound",
+      "argv": [
+        "/tmp/work/m04/obj/Vct_sim_top",
+        "+stim=/job/stimulus/wraparound.txt",
+        "+trace=/out/m04/sim/wraparound.trace",
+        "+vcd=/out/m04/sim/wraparound.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m04/logs/sim_wraparound.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m04:sim:recurrent_reset",
+      "argv": [
+        "/tmp/work/m04/obj/Vct_sim_top",
+        "+stim=/job/stimulus/recurrent_reset.txt",
+        "+trace=/out/m04/sim/recurrent_reset.trace",
+        "+vcd=/out/m04/sim/recurrent_reset.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.001,
+      "log": "m04/logs/sim_recurrent_reset.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m04:sim:random_s1",
+      "argv": [
+        "/tmp/work/m04/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s1.txt",
+        "+trace=/out/m04/sim/random_s1.trace",
+        "+vcd=/out/m04/sim/random_s1.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m04/logs/sim_random_s1.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m04:sim:random_s2",
+      "argv": [
+        "/tmp/work/m04/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s2.txt",
+        "+trace=/out/m04/sim/random_s2.trace",
+        "+vcd=/out/m04/sim/random_s2.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m04/logs/sim_random_s2.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m04:sim:random_s3",
+      "argv": [
+        "/tmp/work/m04/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s3.txt",
+        "+trace=/out/m04/sim/random_s3.trace",
+        "+vcd=/out/m04/sim/random_s3.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m04/logs/sim_random_s3.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m04:sim:random_s4",
+      "argv": [
+        "/tmp/work/m04/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s4.txt",
+        "+trace=/out/m04/sim/random_s4.trace",
+        "+vcd=/out/m04/sim/random_s4.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m04/logs/sim_random_s4.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m04:sim:random_s5",
+      "argv": [
+        "/tmp/work/m04/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s5.txt",
+        "+trace=/out/m04/sim/random_s5.trace",
+        "+vcd=/out/m04/sim/random_s5.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m04/logs/sim_random_s5.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m04:sim:random_s6",
+      "argv": [
+        "/tmp/work/m04/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s6.txt",
+        "+trace=/out/m04/sim/random_s6.trace",
+        "+vcd=/out/m04/sim/random_s6.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m04/logs/sim_random_s6.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m04:sim:random_s7",
+      "argv": [
+        "/tmp/work/m04/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s7.txt",
+        "+trace=/out/m04/sim/random_s7.trace",
+        "+vcd=/out/m04/sim/random_s7.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m04/logs/sim_random_s7.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m04:sim:random_s8",
+      "argv": [
+        "/tmp/work/m04/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s8.txt",
+        "+trace=/out/m04/sim/random_s8.trace",
+        "+vcd=/out/m04/sim/random_s8.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m04/logs/sim_random_s8.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m05:ports",
+      "argv": [
+        "yosys",
+        "-q",
+        "-p",
+        "read_verilog -sv dut.v; hierarchy -top fifo -chparam DEPTH 4 -chparam WIDTH 8; proc; write_json /out/m05/ports.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.008,
+      "log": "m05/logs/ports.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m05:properties",
+      "argv": [
+        "yosys",
+        "-p",
+        "read -formal -D CT_DUT=fifo dut.v; read -formal -D CT_DUT=fifo ct_formal_top.sv; chparam -set DEPTH 4 -set WIDTH 8 ct_formal_top; prep -top ct_formal_top; write_json /out/m05/properties.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.018,
+      "log": "m05/logs/properties.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m05:compile",
+      "argv": [
+        "verilator",
+        "--binary",
+        "--timing",
+        "--trace",
+        "-Wno-fatal",
+        "-Wno-lint",
+        "-Wno-style",
+        "--x-assign",
+        "unique",
+        "--x-initial",
+        "unique",
+        "-DCT_DUT=fifo",
+        "-GDEPTH=4",
+        "-GWIDTH=8",
+        "--top-module",
+        "ct_sim_top",
+        "--Mdir",
+        "/tmp/work/m05/obj",
+        "-j",
+        "2",
+        "ct_sim_top.sv",
+        "dut.v"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 2.788,
+      "log": "m05/logs/compile.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m05:sim:learner_basic",
+      "argv": [
+        "/tmp/work/m05/obj/Vct_sim_top",
+        "+stim=/job/stimulus/learner_basic.txt",
+        "+trace=/out/m05/sim/learner_basic.trace",
+        "+vcd=/out/m05/sim/learner_basic.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m05/logs/sim_learner_basic.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m05:sim:fill_drain",
+      "argv": [
+        "/tmp/work/m05/obj/Vct_sim_top",
+        "+stim=/job/stimulus/fill_drain.txt",
+        "+trace=/out/m05/sim/fill_drain.trace",
+        "+vcd=/out/m05/sim/fill_drain.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m05/logs/sim_fill_drain.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m05:sim:write_when_full",
+      "argv": [
+        "/tmp/work/m05/obj/Vct_sim_top",
+        "+stim=/job/stimulus/write_when_full.txt",
+        "+trace=/out/m05/sim/write_when_full.trace",
+        "+vcd=/out/m05/sim/write_when_full.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.001,
+      "log": "m05/logs/sim_write_when_full.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m05:sim:simultaneous",
+      "argv": [
+        "/tmp/work/m05/obj/Vct_sim_top",
+        "+stim=/job/stimulus/simultaneous.txt",
+        "+trace=/out/m05/sim/simultaneous.trace",
+        "+vcd=/out/m05/sim/simultaneous.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m05/logs/sim_simultaneous.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m05:sim:wraparound",
+      "argv": [
+        "/tmp/work/m05/obj/Vct_sim_top",
+        "+stim=/job/stimulus/wraparound.txt",
+        "+trace=/out/m05/sim/wraparound.trace",
+        "+vcd=/out/m05/sim/wraparound.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m05/logs/sim_wraparound.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m05:sim:recurrent_reset",
+      "argv": [
+        "/tmp/work/m05/obj/Vct_sim_top",
+        "+stim=/job/stimulus/recurrent_reset.txt",
+        "+trace=/out/m05/sim/recurrent_reset.trace",
+        "+vcd=/out/m05/sim/recurrent_reset.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m05/logs/sim_recurrent_reset.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m05:sim:random_s1",
+      "argv": [
+        "/tmp/work/m05/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s1.txt",
+        "+trace=/out/m05/sim/random_s1.trace",
+        "+vcd=/out/m05/sim/random_s1.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m05/logs/sim_random_s1.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m05:sim:random_s2",
+      "argv": [
+        "/tmp/work/m05/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s2.txt",
+        "+trace=/out/m05/sim/random_s2.trace",
+        "+vcd=/out/m05/sim/random_s2.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m05/logs/sim_random_s2.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m05:sim:random_s3",
+      "argv": [
+        "/tmp/work/m05/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s3.txt",
+        "+trace=/out/m05/sim/random_s3.trace",
+        "+vcd=/out/m05/sim/random_s3.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m05/logs/sim_random_s3.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m05:sim:random_s4",
+      "argv": [
+        "/tmp/work/m05/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s4.txt",
+        "+trace=/out/m05/sim/random_s4.trace",
+        "+vcd=/out/m05/sim/random_s4.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m05/logs/sim_random_s4.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m05:sim:random_s5",
+      "argv": [
+        "/tmp/work/m05/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s5.txt",
+        "+trace=/out/m05/sim/random_s5.trace",
+        "+vcd=/out/m05/sim/random_s5.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m05/logs/sim_random_s5.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m05:sim:random_s6",
+      "argv": [
+        "/tmp/work/m05/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s6.txt",
+        "+trace=/out/m05/sim/random_s6.trace",
+        "+vcd=/out/m05/sim/random_s6.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m05/logs/sim_random_s6.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m05:sim:random_s7",
+      "argv": [
+        "/tmp/work/m05/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s7.txt",
+        "+trace=/out/m05/sim/random_s7.trace",
+        "+vcd=/out/m05/sim/random_s7.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m05/logs/sim_random_s7.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m05:sim:random_s8",
+      "argv": [
+        "/tmp/work/m05/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s8.txt",
+        "+trace=/out/m05/sim/random_s8.trace",
+        "+vcd=/out/m05/sim/random_s8.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m05/logs/sim_random_s8.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m06:ports",
+      "argv": [
+        "yosys",
+        "-q",
+        "-p",
+        "read_verilog -sv dut.v; hierarchy -top fifo -chparam DEPTH 4 -chparam WIDTH 8; proc; write_json /out/m06/ports.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.008,
+      "log": "m06/logs/ports.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m06:properties",
+      "argv": [
+        "yosys",
+        "-p",
+        "read -formal -D CT_DUT=fifo dut.v; read -formal -D CT_DUT=fifo ct_formal_top.sv; chparam -set DEPTH 4 -set WIDTH 8 ct_formal_top; prep -top ct_formal_top; write_json /out/m06/properties.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.017,
+      "log": "m06/logs/properties.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m06:compile",
+      "argv": [
+        "verilator",
+        "--binary",
+        "--timing",
+        "--trace",
+        "-Wno-fatal",
+        "-Wno-lint",
+        "-Wno-style",
+        "--x-assign",
+        "unique",
+        "--x-initial",
+        "unique",
+        "-DCT_DUT=fifo",
+        "-GDEPTH=4",
+        "-GWIDTH=8",
+        "--top-module",
+        "ct_sim_top",
+        "--Mdir",
+        "/tmp/work/m06/obj",
+        "-j",
+        "2",
+        "ct_sim_top.sv",
+        "dut.v"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 3.111,
+      "log": "m06/logs/compile.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m06:sim:learner_basic",
+      "argv": [
+        "/tmp/work/m06/obj/Vct_sim_top",
+        "+stim=/job/stimulus/learner_basic.txt",
+        "+trace=/out/m06/sim/learner_basic.trace",
+        "+vcd=/out/m06/sim/learner_basic.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m06/logs/sim_learner_basic.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m06:sim:fill_drain",
+      "argv": [
+        "/tmp/work/m06/obj/Vct_sim_top",
+        "+stim=/job/stimulus/fill_drain.txt",
+        "+trace=/out/m06/sim/fill_drain.trace",
+        "+vcd=/out/m06/sim/fill_drain.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.001,
+      "log": "m06/logs/sim_fill_drain.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m06:sim:write_when_full",
+      "argv": [
+        "/tmp/work/m06/obj/Vct_sim_top",
+        "+stim=/job/stimulus/write_when_full.txt",
+        "+trace=/out/m06/sim/write_when_full.trace",
+        "+vcd=/out/m06/sim/write_when_full.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m06/logs/sim_write_when_full.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m06:sim:simultaneous",
+      "argv": [
+        "/tmp/work/m06/obj/Vct_sim_top",
+        "+stim=/job/stimulus/simultaneous.txt",
+        "+trace=/out/m06/sim/simultaneous.trace",
+        "+vcd=/out/m06/sim/simultaneous.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m06/logs/sim_simultaneous.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m06:sim:wraparound",
+      "argv": [
+        "/tmp/work/m06/obj/Vct_sim_top",
+        "+stim=/job/stimulus/wraparound.txt",
+        "+trace=/out/m06/sim/wraparound.trace",
+        "+vcd=/out/m06/sim/wraparound.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m06/logs/sim_wraparound.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m06:sim:recurrent_reset",
+      "argv": [
+        "/tmp/work/m06/obj/Vct_sim_top",
+        "+stim=/job/stimulus/recurrent_reset.txt",
+        "+trace=/out/m06/sim/recurrent_reset.trace",
+        "+vcd=/out/m06/sim/recurrent_reset.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m06/logs/sim_recurrent_reset.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m06:sim:random_s1",
+      "argv": [
+        "/tmp/work/m06/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s1.txt",
+        "+trace=/out/m06/sim/random_s1.trace",
+        "+vcd=/out/m06/sim/random_s1.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m06/logs/sim_random_s1.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m06:sim:random_s2",
+      "argv": [
+        "/tmp/work/m06/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s2.txt",
+        "+trace=/out/m06/sim/random_s2.trace",
+        "+vcd=/out/m06/sim/random_s2.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m06/logs/sim_random_s2.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m06:sim:random_s3",
+      "argv": [
+        "/tmp/work/m06/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s3.txt",
+        "+trace=/out/m06/sim/random_s3.trace",
+        "+vcd=/out/m06/sim/random_s3.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m06/logs/sim_random_s3.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m06:sim:random_s4",
+      "argv": [
+        "/tmp/work/m06/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s4.txt",
+        "+trace=/out/m06/sim/random_s4.trace",
+        "+vcd=/out/m06/sim/random_s4.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m06/logs/sim_random_s4.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m06:sim:random_s5",
+      "argv": [
+        "/tmp/work/m06/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s5.txt",
+        "+trace=/out/m06/sim/random_s5.trace",
+        "+vcd=/out/m06/sim/random_s5.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m06/logs/sim_random_s5.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m06:sim:random_s6",
+      "argv": [
+        "/tmp/work/m06/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s6.txt",
+        "+trace=/out/m06/sim/random_s6.trace",
+        "+vcd=/out/m06/sim/random_s6.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m06/logs/sim_random_s6.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m06:sim:random_s7",
+      "argv": [
+        "/tmp/work/m06/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s7.txt",
+        "+trace=/out/m06/sim/random_s7.trace",
+        "+vcd=/out/m06/sim/random_s7.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m06/logs/sim_random_s7.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m06:sim:random_s8",
+      "argv": [
+        "/tmp/work/m06/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s8.txt",
+        "+trace=/out/m06/sim/random_s8.trace",
+        "+vcd=/out/m06/sim/random_s8.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m06/logs/sim_random_s8.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m07:ports",
+      "argv": [
+        "yosys",
+        "-q",
+        "-p",
+        "read_verilog -sv dut.v; hierarchy -top fifo -chparam DEPTH 4 -chparam WIDTH 8; proc; write_json /out/m07/ports.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.008,
+      "log": "m07/logs/ports.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m07:properties",
+      "argv": [
+        "yosys",
+        "-p",
+        "read -formal -D CT_DUT=fifo dut.v; read -formal -D CT_DUT=fifo ct_formal_top.sv; chparam -set DEPTH 4 -set WIDTH 8 ct_formal_top; prep -top ct_formal_top; write_json /out/m07/properties.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.017,
+      "log": "m07/logs/properties.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m07:compile",
+      "argv": [
+        "verilator",
+        "--binary",
+        "--timing",
+        "--trace",
+        "-Wno-fatal",
+        "-Wno-lint",
+        "-Wno-style",
+        "--x-assign",
+        "unique",
+        "--x-initial",
+        "unique",
+        "-DCT_DUT=fifo",
+        "-GDEPTH=4",
+        "-GWIDTH=8",
+        "--top-module",
+        "ct_sim_top",
+        "--Mdir",
+        "/tmp/work/m07/obj",
+        "-j",
+        "2",
+        "ct_sim_top.sv",
+        "dut.v"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 2.662,
+      "log": "m07/logs/compile.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m07:sim:learner_basic",
+      "argv": [
+        "/tmp/work/m07/obj/Vct_sim_top",
+        "+stim=/job/stimulus/learner_basic.txt",
+        "+trace=/out/m07/sim/learner_basic.trace",
+        "+vcd=/out/m07/sim/learner_basic.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m07/logs/sim_learner_basic.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m07:sim:fill_drain",
+      "argv": [
+        "/tmp/work/m07/obj/Vct_sim_top",
+        "+stim=/job/stimulus/fill_drain.txt",
+        "+trace=/out/m07/sim/fill_drain.trace",
+        "+vcd=/out/m07/sim/fill_drain.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m07/logs/sim_fill_drain.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m07:sim:write_when_full",
+      "argv": [
+        "/tmp/work/m07/obj/Vct_sim_top",
+        "+stim=/job/stimulus/write_when_full.txt",
+        "+trace=/out/m07/sim/write_when_full.trace",
+        "+vcd=/out/m07/sim/write_when_full.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.001,
+      "log": "m07/logs/sim_write_when_full.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m07:sim:simultaneous",
+      "argv": [
+        "/tmp/work/m07/obj/Vct_sim_top",
+        "+stim=/job/stimulus/simultaneous.txt",
+        "+trace=/out/m07/sim/simultaneous.trace",
+        "+vcd=/out/m07/sim/simultaneous.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m07/logs/sim_simultaneous.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m07:sim:wraparound",
+      "argv": [
+        "/tmp/work/m07/obj/Vct_sim_top",
+        "+stim=/job/stimulus/wraparound.txt",
+        "+trace=/out/m07/sim/wraparound.trace",
+        "+vcd=/out/m07/sim/wraparound.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m07/logs/sim_wraparound.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m07:sim:recurrent_reset",
+      "argv": [
+        "/tmp/work/m07/obj/Vct_sim_top",
+        "+stim=/job/stimulus/recurrent_reset.txt",
+        "+trace=/out/m07/sim/recurrent_reset.trace",
+        "+vcd=/out/m07/sim/recurrent_reset.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m07/logs/sim_recurrent_reset.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m07:sim:random_s1",
+      "argv": [
+        "/tmp/work/m07/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s1.txt",
+        "+trace=/out/m07/sim/random_s1.trace",
+        "+vcd=/out/m07/sim/random_s1.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m07/logs/sim_random_s1.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m07:sim:random_s2",
+      "argv": [
+        "/tmp/work/m07/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s2.txt",
+        "+trace=/out/m07/sim/random_s2.trace",
+        "+vcd=/out/m07/sim/random_s2.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m07/logs/sim_random_s2.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m07:sim:random_s3",
+      "argv": [
+        "/tmp/work/m07/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s3.txt",
+        "+trace=/out/m07/sim/random_s3.trace",
+        "+vcd=/out/m07/sim/random_s3.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m07/logs/sim_random_s3.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m07:sim:random_s4",
+      "argv": [
+        "/tmp/work/m07/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s4.txt",
+        "+trace=/out/m07/sim/random_s4.trace",
+        "+vcd=/out/m07/sim/random_s4.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m07/logs/sim_random_s4.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m07:sim:random_s5",
+      "argv": [
+        "/tmp/work/m07/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s5.txt",
+        "+trace=/out/m07/sim/random_s5.trace",
+        "+vcd=/out/m07/sim/random_s5.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m07/logs/sim_random_s5.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m07:sim:random_s6",
+      "argv": [
+        "/tmp/work/m07/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s6.txt",
+        "+trace=/out/m07/sim/random_s6.trace",
+        "+vcd=/out/m07/sim/random_s6.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m07/logs/sim_random_s6.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m07:sim:random_s7",
+      "argv": [
+        "/tmp/work/m07/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s7.txt",
+        "+trace=/out/m07/sim/random_s7.trace",
+        "+vcd=/out/m07/sim/random_s7.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m07/logs/sim_random_s7.log",
+      "log_truncated": false
+    },
+    {
+      "id": "m07:sim:random_s8",
+      "argv": [
+        "/tmp/work/m07/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s8.txt",
+        "+trace=/out/m07/sim/random_s8.trace",
+        "+vcd=/out/m07/sim/random_s8.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "m07/logs/sim_random_s8.log",
+      "log_truncated": false
+    }
+  ],
+  "deadline_reached": false,
+  "duration_s": 23.229
+}

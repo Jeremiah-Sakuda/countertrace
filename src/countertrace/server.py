@@ -194,7 +194,21 @@ class App:
     def bundle(self, run_id: str) -> Path:
         from countertrace import bundle
 
+        if re.fullmatch(r"[\w-]{1,64}", run_id) and (RECORDED / run_id).is_dir():
+            return bundle.export(RecordedStore(), run_id)
         return bundle.export(self.store, run_id)
+
+
+class RecordedStore:
+    """Read-only access to recorded runs for bundle export."""
+
+    def run_dir(self, run_id: str) -> Path:
+        if not re.fullmatch(r"[\w-]{1,64}", run_id):
+            raise KeyError(run_id)
+        return RECORDED / run_id
+
+    def load(self, run_id: str) -> dict:
+        return json.loads((self.run_dir(run_id) / "run.json").read_text())
 
 
 class Handler(BaseHTTPRequestHandler):

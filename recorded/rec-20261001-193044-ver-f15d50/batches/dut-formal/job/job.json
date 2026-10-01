@@ -1,0 +1,27 @@
+{
+  "schema": "countertrace-job/1",
+  "job_id": "b6ff97838512",
+  "limits": {
+    "compile_s": 60,
+    "sim_s": 30,
+    "solver_s": 120,
+    "bmc_depth": 24,
+    "cover_depth": 24
+  },
+  "batch_limit_s": 900,
+  "designs": [
+    {
+      "id": "dut",
+      "top": "fifo",
+      "depth": 4,
+      "width": 8,
+      "seed": 1,
+      "sim_tests": [],
+      "formal": [
+        "bmc",
+        "prove",
+        "cover"
+      ]
+    }
+  ]
+}
