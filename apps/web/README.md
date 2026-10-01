@@ -1,7 +1,49 @@
 # Web interface
 
-Reserved for the lightweight TypeScript interface described in the [PRD](../../docs/PRD.md). No application or framework dependencies are installed yet.
+The Countertrace workbench UI: a Vite + React 18 + TypeScript (strict) single-page app that consumes the control-service JSON API described in [docs/API.md](../../docs/API.md). It has no CSS framework or router dependency; styles are hand-written with CSS custom-property tokens in `src/styles.css`, and routing uses the URL hash.
 
-Build after the deterministic failure-and-replay slice works. The three surfaces are contract setup, findings, and repair/export. Lead with the violated requirement and cycle table; keep waveforms and formal details expandable. Never render a universal verified badge or invented progress percentages.
+## Develop and build
 
-Recorded evidence and live execution have separate labels and timings. The initial public experience uses bundled examples; arbitrary public uploads are deferred.
+Requires Node 20+.
+
+```bash
+cd apps/web
+npm install
+npm run dev       # Vite dev server on http://localhost:5173, proxies /api to http://127.0.0.1:8765
+npm run build     # tsc --noEmit, then vite build into apps/web/dist
+npm run preview   # serve the built bundle (API calls still need the control service)
+```
+
+Start the control service from the repository root with `PYTHONPATH=src python3 -m countertrace serve --port 8765`. After `npm run build`, the service also serves `apps/web/dist` at `http://127.0.0.1:8765/`, falling back to `index.html` for client routes. `dist/` is git-ignored.
+
+Dependencies: `react`, `react-dom`, `lucide-react` (icons). Dev: `vite`, `@vitejs/plugin-react`, `typescript`, `@types/react`, `@types/react-dom`.
+
+## Surfaces
+
+| Route | Surface | What it shows |
+| --- | --- | --- |
+| `#/` and `#/examples/<id>` | Contract setup | Bundled examples grouped as Showcase and Development, with the author's expected outcome labelled as intent, not a result. The selected example shows its brief, seeded-fault description, line-numbered read-only RTL, the exact contract (requirements, checks, ports, parameters, assumptions, sampling convention), and the PRD depth-2 timing table labelled "Specified expectations (not executed results)". "Interpret brief with Nemotron" shows the decisions table and blocking conflicts; a blocking conflict requires an explicit acknowledgement before acceptance. The user accepts the exact contract version and hash, then starts a live run. |
+| `#/runs/<id>` (verification) | Findings | Polls once a second while the run (or its repair) is active. Leads with the violated requirement, failed check, and first observed mismatch, then an expected-versus-observed table and a keyboard-navigable cycle table for the finding window (full trace on demand). A queue view and an SVG waveform are drawn only from recorded trace rows. Formal counterexamples and their replay status are shown separately. Without a finding the page says "No counterexample found by these methods" with per-method statuses, never "verified". Obligations are grouped by method with "What does this mean?" explanations. Expandable evidence: coverage per contract row, cover steps, integrity notes, admission diagnostics, tool versions and batches, frozen hashes, and raw logs/VCDs. |
+| `#/runs/<id>` (explanation, repair, export) | Explanation, repair, export | "Explain with Nemotron" renders model output under a model-generated label with clickable cycle citations, citation-check warnings, cited RTL lines, and call metrics. "Propose a repair with Nemotron" shows each attempt (n of 3) with status, rationale, unified diff, frozen-hash comparison, and a link to the candidate run. "Edit RTL yourself" appears only when the server reports uploads enabled. "Download evidence bundle" fetches `/api/runs/<id>/bundle`. Recorded runs hide explain, repair, and cancel. |
+| `#/runs/<id>` (audit) and `#/audit` | Check-quality audit | Explains that the audit scores a named supplemental check set, not the user's testbench or design confidence. Lists check sets (model-proposed candidates are labelled "Model-proposed, not reviewed"), offers "Propose a check set with Nemotron" from a description, and runs audits. Results group seeded faults by classification (valid, equivalent, unresolved, invalid, baseline), show core validity separately from supplemental kills, list which requirements the set exercises and checks, and include a short "Which requirement is this check set missing?" exercise. |
+| `#/runs` | Runs | Recorded runs (labelled Recorded, with their own dates) and live runs on this server, each with a worded verdict and icon. |
+
+Every view handles loading, error, and empty states. Endpoints that are missing or failing show their error message instead of placeholder data. When the model is not configured, every model action shows the server's reason and the environment variables to set. It never shows generated text.
+
+## Design rules
+
+The design system is persisted in [`design-system/countertrace/MASTER.md`](design-system/countertrace/MASTER.md) (dark OLED technical style, JetBrains Mono headings, IBM Plex Sans body). Its trust-rule overrides apply:
+
+- Green appears only on individual passing check statuses. Actions and focus use the sky accent.
+- Every status carries an icon and the exact PRD wording, so color is never the only signal.
+- No progress percentages, no universal "verified" badge, and no queue or waveform events that are not in the recorded trace.
+- Visible focus rings, keyboard-navigable cycle rows (arrow keys, Home, End) and citations, `aria-live` run-state announcements, `prefers-reduced-motion` support, and layouts down to 375 px wide without horizontal page scroll.
+
+## Source layout
+
+```text
+src/api/       types.ts (API shapes from docs/API.md), client.ts (fetch wrapper, ApiError)
+src/lib/       hash routing, polling and async hooks, formatting
+src/components/ status badges, cycle table, queue view, waveform, code and diff views, model-result notices, header
+src/views/     SetupView, RunsView, AuditView, run/ (RunView and its panels)
+```
