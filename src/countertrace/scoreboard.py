@@ -189,6 +189,7 @@ class CheckSet:
     label: str
     origin: str
     checks: list[SupplementalCheck] = field(default_factory=list)
+    tests: list[str] | None = None  # frozen suite tests this set observes; None means all
 
     def covered_requirements(self) -> set[str]:
         return {c.requirement for c in self.checks}
@@ -209,4 +210,7 @@ def check_set_from_dict(data: dict) -> CheckSet:
         checks.append(SupplementalCheck(str(item["id"]), item["check"], rows, requirement, str(item.get("text", ""))))
     if not checks:
         raise ValueError("a supplemental check set needs at least one check")
-    return CheckSet(str(data["id"]), str(data["label"]), str(data.get("origin", "unspecified")), checks)
+    tests = data.get("tests")
+    if tests is not None and (not isinstance(tests, list) or not tests or not all(isinstance(t, str) for t in tests)):
+        raise ValueError("tests must be null or a non-empty list of suite test names")
+    return CheckSet(str(data["id"]), str(data["label"]), str(data.get("origin", "unspecified")), checks, tests)

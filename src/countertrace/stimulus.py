@@ -60,6 +60,11 @@ def directed(depth: int) -> dict[str, list[Edge]]:
         fixture = json.loads((TIMING / "depth2_prd_sequence.json").read_text())
         symbols = fixture["symbols"]
         tests["prd_sequence"] = [Edge(e["rst"], e["wr_en"], e["rd_en"], symbols[e["din"]]) for e in fixture["edges"]]
+    # A typical first testbench: fill exactly, drain exactly, wrap once. No boundary
+    # requests, no simultaneous operations, no recurrent reset. Used by weak check sets.
+    tests["learner_basic"] = (
+        Builder(0xB5).reset().write(depth).read(depth).write(2).read(2).write(depth - 1).read(depth - 1).idle().edges
+    )
     tests["fill_drain"] = Builder(0x10).reset().write(depth + 1).read(depth + 1).idle().edges
     tests["write_when_full"] = Builder(0x31).reset().write(depth).write(2).read(depth + 1).edges
     tests["simultaneous"] = (

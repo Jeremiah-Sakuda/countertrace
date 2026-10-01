@@ -1,0 +1,65 @@
+{
+  "id": "weak-learner-v1",
+  "label": "Typical learner checks (deliberately weak)",
+  "origin": "Hand-authored for Countertrace to imitate common directed-testbench checks. Explicitly weak for demonstration; not a user's testbench.",
+  "description": "Drives one directed sequence (fill exactly, drain exactly, wrap once) and checks flags after reset, writes, and reads, plus data order on plain reads. It never requests a write while full, a read while empty, simultaneous operations, or a second reset.",
+  "tests": [
+    "learner_basic"
+  ],
+  "checks": [
+    {
+      "id": "reset_empty",
+      "check": "empty_flag",
+      "rows": [
+        "reset"
+      ],
+      "requirement": "reset",
+      "text": "After reset, empty is high."
+    },
+    {
+      "id": "reset_full",
+      "check": "full_flag",
+      "rows": [
+        "reset"
+      ],
+      "requirement": "reset",
+      "text": "After reset, full is low."
+    },
+    {
+      "id": "write_not_empty",
+      "check": "empty_flag",
+      "rows": [
+        "write_not_full"
+      ],
+      "requirement": "write_not_full",
+      "text": "After a write, empty is low."
+    },
+    {
+      "id": "fill_full",
+      "check": "full_flag",
+      "rows": [
+        "write_not_full"
+      ],
+      "requirement": "write_not_full",
+      "text": "After the last free slot is written, full is high."
+    },
+    {
+      "id": "read_order",
+      "check": "read_data",
+      "rows": [
+        "read_not_empty"
+      ],
+      "requirement": "read_not_empty",
+      "text": "A read returns the oldest word."
+    },
+    {
+      "id": "drain_empty",
+      "check": "empty_flag",
+      "rows": [
+        "read_not_empty"
+      ],
+      "requirement": "read_not_empty",
+      "text": "After the last word is read, empty is high."
+    }
+  ]
+}

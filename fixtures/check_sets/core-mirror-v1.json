@@ -1,0 +1,30 @@
+{
+  "id": "core-mirror-v1",
+  "label": "All core checks on every edge (reference comparison)",
+  "origin": "Mirrors the mandatory core scoreboard; included to show what a complete set of these templates kills.",
+  "description": "Checks empty, full, and read data on every edge. Useful as a comparison point for weaker sets.",
+  "tests": null,
+  "checks": [
+    {
+      "id": "empty_all",
+      "check": "empty_flag",
+      "rows": null,
+      "requirement": "reset",
+      "text": "empty matches reference occupancy after every edge."
+    },
+    {
+      "id": "full_all",
+      "check": "full_flag",
+      "rows": null,
+      "requirement": "write_full",
+      "text": "full matches reference occupancy after every edge."
+    },
+    {
+      "id": "data_all",
+      "check": "read_data",
+      "rows": null,
+      "requirement": "read_not_empty",
+      "text": "dout matches the reference head after every accepted read."
+    }
+  ]
+}
