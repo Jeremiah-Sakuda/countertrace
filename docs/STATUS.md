@@ -63,6 +63,10 @@ The bounded repair loop, re-admission, interface checks, and frozen-check-set co
 - `make test`: 47 unit tests and negative controls (admission rejections, truncated or tampered traces, solver status and cover parsing, property-inventory controls, model schema/limit/citation handling with a mocked endpoint).
 - `make test-integration`: 7 Docker tests running real RTL (proved control, replayed fault, altered harness hash, cancellation, unsupported syntax, stubbed repair loop, weak-set audit).
 
+## Interface and recorded runs
+
+The web interface builds with no TypeScript errors and was checked in a browser against the local service: contract setup, a live run from acceptance to finding, the showcase finding and cycle table, a clean control, the audit result and learner exercise, bundle download, model-unavailable states, and a 375 px layout. No screen-reader testing has been done. Three runs are recorded in `recorded/` (showcase fault, known-good control, weak-set audit); the recorded showcase bundle replayed with matching outcomes.
+
 ## Not yet done
 
 Live Nemotron calls and their measured usefulness; Nebius Serverless Jobs (all verification runs locally in Docker); the frozen evaluation suite with an independently authored, held-out implementation; reviewer and learner recruitment; the usability study; clean-environment replays; hosted deployment and judge access; the demonstration video.
