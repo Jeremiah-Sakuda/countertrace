@@ -1,5 +1,8 @@
 # Timing fixtures
 
-The [PRD](../../docs/PRD.md) specifies a seven-edge depth-2 sequence covering reset, simultaneous requests at empty/intermediate/full occupancy, recurrent reset, and an ignored empty read. Convert those specified expectations into shared fixtures when implementing the monitors. Add wraparound cases and an explicit raw-solver-step to application-cycle mapping.
+Specified expectations from the [PRD](../../docs/PRD.md) sampling convention, not observed hardware results.
 
-These are contract examples, not observed hardware results. Both engines must agree on accepted operations and on when registered output is compared.
+- `depth2_prd_sequence.json`: the PRD's seven-edge depth-2 sequence (reset, simultaneous requests at empty, intermediate, and full occupancy, recurrent reset, and an ignored empty read). The `wraps` field is derived and is not part of the PRD table.
+- `depth4_wraparound.json`: pointer wraparound for depth 4, including an ignored write while full and a simultaneous read and write while full.
+
+`tests/test_contract.py` checks the reference model against both. The depth-2 sequence is also driven through the simulation harness as the `prd_sequence` test. The solver-step to application-cycle mapping is tested against a real solver counterexample in `tests/test_evidence.py`.

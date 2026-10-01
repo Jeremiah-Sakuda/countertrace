@@ -19,7 +19,7 @@ Read `docs/PRD.md` and `docs/ROADMAP.md` before changing product behavior. Keep 
 
 ## Development
 
-- Run `make check` for scaffold changes; add meaningful verification tests when the verifier is implemented.
+- Run `make check` for every change and `make test-integration` (Docker) for verifier changes. Record anything newly observed in `docs/STATUS.md`.
 - Keep development, showcase, and held-out evaluation data separate. Moving a holdout case into prompt development must be recorded.
 - Update the PRD and status documentation when scope changes. Keep the Page and repository PRD aligned when editing the requirements; see `docs/DEVELOPMENT.md`.
 - Do not claim a hardware proof, model benchmark, user result, or completed milestone from a scaffold check.
