@@ -1,4 +1,4 @@
-"""Local diagnostics that neither execute RTL nor call a model endpoint."""
+"""Countertrace command line: diagnostics, verification, audit, model checks, and the local server."""
 
 import argparse
 import json
@@ -6,6 +6,7 @@ import os
 import platform
 import shutil
 import subprocess
+import sys
 
 from countertrace import __version__
 
@@ -29,40 +30,153 @@ def environment_report() -> dict:
             docker_status = "reachable" if result.returncode == 0 else "unavailable"
         except (OSError, subprocess.TimeoutExpired):
             docker_status = "unavailable"
+    verifier_image = "unknown"
+    if docker_status == "reachable":
+        from countertrace import runner
+
+        verifier_image = runner.image_tag() if runner.image_id(runner.image_tag()) else "not_built"
     return {
         "version": __version__,
-        "stage": "workspace_scaffold",
         "python": platform.python_version(),
         "tools_on_path": tools,
         "docker_daemon": docker_status,
+        "verifier_image": verifier_image,
         "configuration_present_in_environment": {
             name: bool(os.environ.get(name, "").strip())
             for name in ("NEBIUS_API_KEY", "NEBIUS_BASE_URL", "NEBIUS_MODEL_ID")
         },
         "model_inference": "not_checked",
-        "rtl_verification": "not_implemented",
-        "note": "Presence is not validation. No model API or RTL execution was attempted.",
+        "note": "Presence is not validation. HDL tools run only inside the verifier image, so "
+                "missing host tools are expected. No model API or RTL execution was attempted.",
     }
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description="Countertrace workspace tools")
-    parser.add_argument("--version", action="version", version=__version__)
-    commands = parser.add_subparsers(dest="command", required=True)
-    doctor = commands.add_parser("doctor", help="Report local prerequisites without inference")
-    doctor.add_argument("--json", action="store_true", help="Print machine-readable diagnostics")
-    args = parser.parse_args()
+def cmd_doctor(args) -> int:
     report = environment_report()
     if args.json:
         print(json.dumps(report, indent=2))
-    else:
-        print(f"Countertrace {__version__}: workspace scaffold")
-        print(f"Python: {report['python']}")
-        for name, present in report["tools_on_path"].items():
-            print(f"  {name}: {'found' if present else 'missing'}")
-        print(f"Docker daemon: {report['docker_daemon']}")
-        for name, present in report["configuration_present_in_environment"].items():
-            print(f"  {name}: {'present' if present else 'not exported'}")
-        print(report["note"])
-        print("RTL verification and model integration remain to be implemented.")
+        return 0
+    print(f"Countertrace {__version__}")
+    print(f"Python: {report['python']}")
+    for name, present in report["tools_on_path"].items():
+        print(f"  {name}: {'found' if present else 'missing'}")
+    print(f"Docker daemon: {report['docker_daemon']}")
+    print(f"Verifier image: {report['verifier_image']}")
+    for name, present in report["configuration_present_in_environment"].items():
+        print(f"  {name}: {'present' if present else 'not exported'}")
+    print(report["note"])
     return 0
+
+
+def cmd_build_image(args) -> int:
+    from countertrace import runner
+
+    info = runner.ensure_image(build=True)
+    print(json.dumps(info, indent=2))
+    return 0
+
+
+def cmd_verify(args) -> int:
+    from countertrace import runs
+
+    store = runs.RunStore()
+    run = store.create_verification(example_id=args.example, source_path=args.file, depth=args.depth,
+                                    formal_tasks=tuple(args.formal.split(",")) if args.formal else ())
+    store.execute(run["id"])
+    state = store.load(run["id"])
+    print(runs.render_summary(state))
+    print(f"\nRun directory: {store.run_dir(run['id'])}")
+    return 0
+
+
+def cmd_audit(args) -> int:
+    from countertrace import runs
+
+    store = runs.RunStore()
+    run = store.create_audit(check_set=args.check_set, depth=args.depth)
+    store.execute(run["id"])
+    state = store.load(run["id"])
+    print(json.dumps(state.get("audit", {}).get("summary", {}), indent=2))
+    print(f"\nRun directory: {store.run_dir(run['id'])}")
+    return 0
+
+
+def cmd_model_check(args) -> int:
+    from countertrace import model
+
+    result = model.feasibility_check()
+    print(json.dumps(result, indent=2))
+    return 0 if result.get("status") == "ok" else 1
+
+
+def cmd_serve(args) -> int:
+    from countertrace import server
+
+    server.serve(args.host, args.port)
+    return 0
+
+
+def cmd_bundle(args) -> int:
+    from countertrace import bundle, runs
+
+    store = runs.RunStore()
+    path = bundle.export(store, args.run_id)
+    print(path)
+    return 0
+
+
+def cmd_replay(args) -> int:
+    from countertrace import bundle
+
+    result = bundle.replay(args.bundle)
+    print(json.dumps(result, indent=2))
+    return 0 if result.get("matches") else 1
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Countertrace FIFO verification workbench")
+    parser.add_argument("--version", action="version", version=__version__)
+    commands = parser.add_subparsers(dest="command", required=True)
+
+    doctor = commands.add_parser("doctor", help="Report local prerequisites without inference")
+    doctor.add_argument("--json", action="store_true", help="Print machine-readable diagnostics")
+    doctor.set_defaults(func=cmd_doctor)
+
+    build = commands.add_parser("build-image", help="Build the pinned verifier image")
+    build.set_defaults(func=cmd_build_image)
+
+    verify = commands.add_parser("verify", help="Verify a bundled example or an owner-controlled file")
+    source = verify.add_mutually_exclusive_group(required=True)
+    source.add_argument("--example", help="Bundled example id")
+    source.add_argument("--file", help="Local RTL file (local test build only)")
+    verify.add_argument("--depth", type=int, choices=(2, 4), help="DEPTH for --file runs")
+    verify.add_argument("--formal", default="bmc,prove,cover", help="Comma-separated SBY tasks, or empty")
+    verify.set_defaults(func=cmd_verify)
+
+    audit = commands.add_parser("audit", help="Run the supplemental-check audit against the fault library")
+    audit.add_argument("--check-set", default="weak-learner-v1")
+    audit.add_argument("--depth", type=int, choices=(2, 4), default=4)
+    audit.set_defaults(func=cmd_audit)
+
+    model_check = commands.add_parser("model-check", help="Make one authenticated Nemotron call and record metadata")
+    model_check.set_defaults(func=cmd_model_check)
+
+    serve = commands.add_parser("serve", help="Run the local control service and web interface")
+    serve.add_argument("--host", default="127.0.0.1")
+    serve.add_argument("--port", type=int, default=8765)
+    serve.set_defaults(func=cmd_serve)
+
+    export = commands.add_parser("bundle", help="Export a run's evidence bundle")
+    export.add_argument("run_id")
+    export.set_defaults(func=cmd_bundle)
+
+    replay = commands.add_parser("replay", help="Re-run deterministic checks from an evidence bundle")
+    replay.add_argument("bundle")
+    replay.set_defaults(func=cmd_replay)
+
+    args = parser.parse_args()
+    return args.func(args)
+
+
+if __name__ == "__main__":
+    sys.exit(main())

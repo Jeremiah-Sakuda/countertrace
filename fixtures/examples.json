@@ -1,0 +1,96 @@
+{
+  "version": "examples-v1",
+  "note": "Bundled public examples. 'expected' is the author's intent; only a recorded run establishes what the verifier observed. Splits: showcase is curated for demonstration; development informs prompts and implementation. Nothing here is held out.",
+  "examples": [
+    {
+      "id": "showcase-overwrite-when-full",
+      "split": "showcase",
+      "title": "Queue that overwrites when full",
+      "source": {"base": "fifo_count.v", "fault": "count-overwrite-when-full"},
+      "depth": 4,
+      "brief": "A 4-entry, 8-bit FIFO for a UART receive path. Bytes must come out in the order they arrived. When the FIFO is full, new bytes are dropped rather than overwriting stored ones. Reset clears the FIFO.",
+      "expected": "faulty"
+    },
+    {
+      "id": "good-count-d4",
+      "split": "showcase",
+      "title": "Known-good control (count style)",
+      "source": {"base": "fifo_count.v"},
+      "depth": 4,
+      "brief": "A 4-entry, 8-bit synchronous FIFO with synchronous active-high reset. Writes when full and reads when empty are ignored.",
+      "expected": "correct"
+    },
+    {
+      "id": "good-count-d2",
+      "split": "development",
+      "title": "Known-good control, depth 2",
+      "source": {"base": "fifo_count.v"},
+      "depth": 2,
+      "brief": "A 2-entry, 8-bit synchronous FIFO.",
+      "expected": "correct"
+    },
+    {
+      "id": "good-wrapbit-d4",
+      "split": "development",
+      "title": "Known-good control (wrap-bit style)",
+      "source": {"base": "fifo_wrapbit.v"},
+      "depth": 4,
+      "brief": "A 4-entry, 8-bit FIFO using wrap-bit pointers.",
+      "expected": "correct"
+    },
+    {
+      "id": "dev-full-exchange",
+      "split": "development",
+      "title": "Accepts a write when full and reading",
+      "source": {"base": "fifo_count.v", "fault": "count-full-exchange"},
+      "depth": 4,
+      "brief": "A 4-entry FIFO. If it is full and a read and write arrive together, it should still accept the write because the read frees a slot.",
+      "expected": "faulty"
+    },
+    {
+      "id": "dev-empty-bypass",
+      "split": "development",
+      "title": "Bypasses a write to a read while empty",
+      "source": {"base": "fifo_count.v", "fault": "count-empty-bypass"},
+      "depth": 2,
+      "brief": "A 2-entry FIFO for a command queue.",
+      "expected": "faulty"
+    },
+    {
+      "id": "dev-reset-keeps-wrptr",
+      "split": "development",
+      "title": "Reset forgets the write pointer",
+      "source": {"base": "fifo_count.v", "fault": "count-reset-keeps-wrptr"},
+      "depth": 4,
+      "brief": "A 4-entry FIFO that may be reset at any time during operation.",
+      "expected": "faulty"
+    },
+    {
+      "id": "dev-wrapbit-full-early",
+      "split": "development",
+      "title": "Reports full one word early",
+      "source": {"base": "fifo_wrapbit.v", "fault": "wrapbit-full-early"},
+      "depth": 4,
+      "brief": "A 4-entry FIFO that should hold exactly four bytes.",
+      "expected": "faulty"
+    },
+    {
+      "id": "dev-wrapbit-read-wrap-lost",
+      "split": "development",
+      "title": "Read pointer loses its wrap bit",
+      "source": {"base": "fifo_wrapbit.v", "fault": "wrapbit-read-wrap-lost"},
+      "depth": 4,
+      "brief": "A 4-entry FIFO used continuously, so its pointers wrap many times.",
+      "expected": "faulty"
+    },
+    {
+      "id": "dev-wrapbit-duplicate",
+      "split": "development",
+      "title": "Duplicates a word on simultaneous read and write",
+      "source": {"base": "fifo_wrapbit.v", "fault": "wrapbit-duplicate-on-simultaneous"},
+      "depth": 4,
+      "brief": "A 4-entry streaming FIFO where reads and writes often happen in the same cycle.",
+      "expected": "faulty"
+    }
+  ]
+}

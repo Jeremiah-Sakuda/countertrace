@@ -1,0 +1,27 @@
+[tasks]
+bmc
+prove
+cover
+
+[options]
+bmc: mode bmc
+bmc: depth @BMC_DEPTH@
+prove: mode prove
+cover: mode cover
+cover: depth @COVER_DEPTH@
+timeout @TIMEOUT@
+
+[engines]
+bmc: abc bmc3
+prove: abc pdr
+cover: smtbmc yices
+
+[script]
+read -formal -D CT_DUT=@TOP@ dut.v
+read -formal -D CT_DUT=@TOP@ ct_formal_top.sv
+chparam -set DEPTH @DEPTH@ -set WIDTH @WIDTH@ ct_formal_top
+prep -top ct_formal_top
+
+[files]
+dut.v
+ct_formal_top.sv

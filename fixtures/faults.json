@@ -1,0 +1,132 @@
+{
+  "version": "faults-v1",
+  "note": "Each fault is a hand-authored edit applied to a known-good fixture. Every 'find' must match exactly once. Classes name the contract row or requirement the fault is intended to violate; whether the independent core actually witnesses it is recorded only by a run.",
+  "authorship": "Authored for Countertrace by the project owner's coding assistant; not externally reviewed.",
+  "faults": [
+    {
+      "id": "count-overwrite-when-full",
+      "base": "fifo_count.v",
+      "class": "write_full",
+      "category": "flags_boundaries",
+      "summary": "A write while full is not ignored: it overwrites the oldest unread word.",
+      "intended_consequence": "An accepted item is lost; the next read returns a newer word.",
+      "edits": [
+        {"find": "wire do_write = wr_en && (count != DEPTH);", "replace": "wire do_write = wr_en;"},
+        {"find": "2'b10:   count <= count + 1'b1;", "replace": "2'b10:   count <= (count == DEPTH) ? count : count + 1'b1;"}
+      ]
+    },
+    {
+      "id": "count-full-exchange",
+      "base": "fifo_count.v",
+      "class": "both_full",
+      "category": "simultaneous",
+      "summary": "A simultaneous read and write while full accepts both (full-capacity exchange).",
+      "intended_consequence": "The queue keeps a word the contract says to ignore.",
+      "edits": [
+        {"find": "wire do_write = wr_en && (count != DEPTH);", "replace": "wire do_write = wr_en && ((count != DEPTH) || do_read);"}
+      ]
+    },
+    {
+      "id": "count-empty-bypass",
+      "base": "fifo_count.v",
+      "class": "both_empty",
+      "category": "simultaneous",
+      "summary": "A read while empty consumes a simultaneous write by bypassing it to dout.",
+      "intended_consequence": "A word that should remain queued is consumed in the same cycle.",
+      "edits": [
+        {"find": "wire do_read  = rd_en && (count != 0);", "replace": "wire do_read  = rd_en && ((count != 0) || wr_en);"},
+        {"find": "dout   <= mem[rd_ptr];", "replace": "dout   <= (count == 0) ? din : mem[rd_ptr];"}
+      ]
+    },
+    {
+      "id": "count-reset-keeps-wrptr",
+      "base": "fifo_count.v",
+      "class": "reset",
+      "category": "reset",
+      "summary": "Reset clears the read pointer and count but not the write pointer.",
+      "intended_consequence": "After a reset, reads return stale storage instead of newly written words.",
+      "edits": [
+        {"find": "            wr_ptr <= 0;\n            rd_ptr <= 0;\n            count  <= 0;", "replace": "            rd_ptr <= 0;\n            count  <= 0;"}
+      ]
+    },
+    {
+      "id": "count-lost-occupancy",
+      "base": "fifo_count.v",
+      "class": "read_not_empty",
+      "category": "accounting",
+      "summary": "A read-only operation does not decrement the occupancy count.",
+      "intended_consequence": "The FIFO reports items that were already removed.",
+      "edits": [
+        {"find": "2'b01:   count <= count - 1'b1;", "replace": "2'b01:   count <= count;"}
+      ]
+    },
+    {
+      "id": "count-wrong-wrap",
+      "base": "fifo_count.v",
+      "class": "wraparound",
+      "category": "ordering_wraparound",
+      "summary": "The read pointer wraps to slot 1 instead of slot 0.",
+      "intended_consequence": "Words are returned out of order after the read pointer wraps.",
+      "edits": [
+        {"find": "rd_ptr <= rd_ptr + 1'b1;", "replace": "rd_ptr <= (rd_ptr == DEPTH - 1) ? 1 : rd_ptr + 1'b1;"}
+      ]
+    },
+    {
+      "id": "count-equivalent-compare",
+      "base": "fifo_count.v",
+      "class": "none",
+      "category": "equivalent_candidate",
+      "summary": "Replaces count != DEPTH with count < DEPTH. Intended to be behaviorally equivalent on reachable states.",
+      "intended_consequence": "None expected; included so the audit reports equivalent mutants separately.",
+      "edits": [
+        {"find": "wire do_write = wr_en && (count != DEPTH);", "replace": "wire do_write = wr_en && (count < DEPTH);"}
+      ]
+    },
+    {
+      "id": "wrapbit-full-early",
+      "base": "fifo_wrapbit.v",
+      "class": "write_not_full",
+      "category": "flags_boundaries",
+      "summary": "full asserts at DEPTH-1 words, losing one slot of capacity.",
+      "intended_consequence": "A legal write is refused and full is reported early.",
+      "edits": [
+        {"find": "assign full  = (head[AW] != tail[AW]) && (head[AW-1:0] == tail[AW-1:0]);", "replace": "assign full  = ((tail - head) == DEPTH - 1);"}
+      ]
+    },
+    {
+      "id": "wrapbit-read-wrap-lost",
+      "base": "fifo_wrapbit.v",
+      "class": "wraparound",
+      "category": "ordering_wraparound",
+      "summary": "The read pointer increments only its index bits, so its wrap bit never toggles.",
+      "intended_consequence": "After the read pointer wraps, empty and full are wrong.",
+      "edits": [
+        {"find": "head <= head + 1'b1;", "replace": "head[AW-1:0] <= head[AW-1:0] + 1'b1;"}
+      ]
+    },
+    {
+      "id": "wrapbit-duplicate-on-simultaneous",
+      "base": "fifo_wrapbit.v",
+      "class": "both_mid",
+      "category": "simultaneous",
+      "summary": "A simultaneous read and write between empty and full outputs the head without removing it.",
+      "intended_consequence": "The same word is read twice.",
+      "edits": [
+        {"find": "head <= head + 1'b1;", "replace": "if (!put) head <= head + 1'b1;"}
+      ]
+    }
+  ],
+  "audit_library": {
+    "version": "audit-v1",
+    "base": "fifo_count.v",
+    "faults": [
+      "count-overwrite-when-full",
+      "count-full-exchange",
+      "count-empty-bypass",
+      "count-reset-keeps-wrptr",
+      "count-lost-occupancy",
+      "count-wrong-wrap",
+      "count-equivalent-compare"
+    ]
+  }
+}
