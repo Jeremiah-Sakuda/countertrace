@@ -41,3 +41,6 @@ obj_dir/
 .idea/
 .vscode/
 *.swp
+
+# Small solver traces used as parser test fixtures
+!tests/data/*.vcd
