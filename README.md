@@ -40,7 +40,7 @@ countertrace audit --check-set weak-learner-v1
 countertrace survey                      # every bundled example, raw outcomes
 countertrace bundle <run-id>             # evidence zip
 countertrace replay <bundle.zip>         # re-run deterministic checks, compare outcomes
-countertrace model-check                 # one authenticated Nemotron call, metadata preserved
+countertrace model-check --run-id <run-id> # explain a local failure and preserve model metadata
 countertrace doctor
 ```
 
@@ -73,6 +73,7 @@ evaluation/         Evaluation protocol; held-out cases stay local until frozen
 
 - [Product requirements](docs/PRD.md) · [Implementation status](docs/STATUS.md) · [Milestones](docs/ROADMAP.md)
 - [Architecture](docs/ARCHITECTURE.md) · [Control service API](docs/API.md) · [Development](docs/DEVELOPMENT.md) · [Deployment plan](docs/DEPLOYMENT.md)
+- [Model gate](docs/MODEL_GATE.md) · [Evaluation protocol](evaluation/README.md) · [Study protocol](evaluation/STUDY.md) · [Release decision](docs/RELEASE_DECISION.md)
 - [Hackathon fit review](docs/reviews/hackathon-fit.md) · [Third-party notices](THIRD_PARTY_NOTICES.md)
 
 ## License and provenance

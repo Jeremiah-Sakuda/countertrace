@@ -1,6 +1,6 @@
 # Evaluation protocol
 
-No cases, participants, or outcomes are established yet. Follow the [PRD](../docs/PRD.md); this checklist prevents accidental claims from scaffold or showcase data.
+No evaluation cases have been admitted or frozen, and no participants or outcomes are established yet. One external FIFO candidate is quarantined locally; see [independent fixture review](INDEPENDENT_FIXTURE.md). Follow the [PRD](../docs/PRD.md); this checklist prevents accidental claims from scaffold or showcase data. Recruitment drafts, session instructions, and scoring are in [STUDY.md](STUDY.md).
 
 ## Freeze before measuring
 

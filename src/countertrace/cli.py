@@ -146,7 +146,7 @@ def cmd_audit(args) -> int:
 def cmd_model_check(args) -> int:
     from countertrace import model
 
-    result = model.feasibility_check()
+    result = model.feasibility_check(args.run_id)
     print(json.dumps(result, indent=2))
     return 0 if result.get("status") == "ok" else 1
 
@@ -211,7 +211,8 @@ def main() -> int:
     audit.add_argument("--depth", type=int, choices=(2, 4), default=4)
     audit.set_defaults(func=cmd_audit)
 
-    model_check = commands.add_parser("model-check", help="Make one authenticated Nemotron call and record metadata")
+    model_check = commands.add_parser("model-check", help="Explain a local failure with Nemotron and preserve the result")
+    model_check.add_argument("--run-id", help="Completed local counterexample run (defaults to the newest)")
     model_check.set_defaults(func=cmd_model_check)
 
     serve = commands.add_parser("serve", help="Run the local control service and web interface")

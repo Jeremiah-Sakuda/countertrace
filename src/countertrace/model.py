@@ -85,7 +85,9 @@ def config() -> dict:
         "spend_limit": env_float("COUNTERTRACE_DEPLOYMENT_SPEND_LIMIT_USD"),
         "price_in": env_float("COUNTERTRACE_MODEL_PRICE_INPUT_PER_MTOK_USD"),
         "price_out": env_float("COUNTERTRACE_MODEL_PRICE_OUTPUT_PER_MTOK_USD"),
-        "system_prefix": os.environ.get("COUNTERTRACE_MODEL_SYSTEM_PREFIX", "detailed thinking off"),
+        # Reasoning controls differ across Nemotron generations and providers.
+        # A model-specific directive must be selected explicitly for the endpoint.
+        "system_prefix": os.environ.get("COUNTERTRACE_MODEL_SYSTEM_PREFIX", ""),
         "timeout": env_int("COUNTERTRACE_MODEL_TIMEOUT_S") or 120,
     }
 
@@ -509,22 +511,44 @@ def propose_check_set(description: str, contract: Contract, tests: list[str]) ->
 
 
 # -- feasibility check ------------------------------------------------------------
-def feasibility_check() -> dict:
-    """One authenticated call explaining the newest recorded failure; preserves sanitized metadata."""
+def feasibility_check(run_id: str | None = None) -> dict:
+    """Explain a completed local failure, attach the result, and retain a check report.
+
+    Schema correction may require another call. A successful transport/schema
+    result still needs human review for explanation usefulness.
+    """
     from countertrace.runs import RunStore, data_dir
 
     store = RunStore()
     candidate = None
-    for item in store.list():
-        if item["kind"] == "verification" and (item.get("verdict") or {}).get("headline") == "counterexample":
-            candidate = store.load(item["id"])
-            break
+    if run_id:
+        try:
+            candidate = store.load(run_id)
+        except KeyError:
+            return {"status": "error", "detail": "The requested local run does not exist."}
+    else:
+        for item in store.list():
+            if (item["kind"] == "verification" and item.get("state") == "complete"
+                    and not item.get("recorded")
+                    and (item.get("verdict") or {}).get("headline") == "counterexample"):
+                candidate = store.load(item["id"])
+                break
     if candidate is None:
         return {"status": "error", "detail": "Run `countertrace verify --example showcase-overwrite-when-full` first."}
+    if (candidate.get("kind") != "verification" or candidate.get("state") != "complete"
+            or candidate.get("recorded")
+            or (candidate.get("verdict") or {}).get("headline") != "counterexample"):
+        return {"status": "error", "detail": "Model checks require a completed, writable local counterexample run."}
     result = explain_run(candidate, (store.run_dir(candidate["id"]) / "dut.v").read_text())
+    # Reload to preserve unrelated fields updated during the request. Keep
+    # failures visible too, matching the interactive explanation endpoint.
+    latest = store.load(candidate["id"])
+    latest["explanation"] = result
+    store.save(latest)
     record = {"checked_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "run_id": candidate["id"],
               "status": result["status"], "detail": result.get("detail"), "calls": result.get("calls"),
-              "citation_check": result.get("citation_check"), "explanation": result.get("result")}
+              "citation_check": result.get("citation_check"), "explanation": result.get("result"),
+              "usefulness_review": "pending"}
     out = data_dir() / "model_checks"
     out.mkdir(parents=True, exist_ok=True)
     (out / f"{record['checked_at'].replace(':', '')}.json").write_text(json.dumps(record, indent=2))

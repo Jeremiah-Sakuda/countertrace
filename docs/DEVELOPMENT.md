@@ -28,9 +28,9 @@ The first build downloads about 700 MB. Later builds reuse the toolchain layer.
 
 ## Model configuration
 
-Only the control service reads `.env`; exported variables take precedence. Set `NEBIUS_API_KEY`, `NEBIUS_BASE_URL` (for example the Token Factory OpenAI-compatible base URL shown in your account), `NEBIUS_MODEL_ID`, `COUNTERTRACE_MODEL_INPUT_TOKEN_LIMIT`, and `COUNTERTRACE_MODEL_OUTPUT_TOKEN_LIMIT`. Calls are refused until all are set. A spend limit is enforced only when per-token prices are configured; otherwise cost is reported as unavailable. Usage is appended to `.countertrace/model_usage.jsonl` without the credential.
+The control process reads `.env`; exported variables take precedence. Set `NEBIUS_API_KEY`, `NEBIUS_BASE_URL` (the Token Factory OpenAI-compatible base URL shown in your account), `NEBIUS_MODEL_ID`, `COUNTERTRACE_MODEL_INPUT_TOKEN_LIMIT`, and `COUNTERTRACE_MODEL_OUTPUT_TOKEN_LIMIT`. Calls are refused until all are set. Usage is appended to `.countertrace/model_usage.jsonl` without the credential. The inference ledger blocks new calls once its estimated spend reaches the configured threshold, only when both prices are configured; it does not reserve in-flight costs or cap VM/account charges. Without prices, cost is unavailable. Separate repair-model pricing is not supported, so use the same model when relying on that estimate.
 
-`countertrace model-check` explains the newest recorded counterexample with one call and stores sanitized metadata in `.countertrace/model_checks/`. This is the remaining October 4 gate item.
+`countertrace model-check --run-id <run-id>` explains a completed local counterexample, attaches the result to that run for recording, and stores sanitized metadata in `.countertrace/model_checks/`. Omit `--run-id` to select the newest completed local counterexample. Read-only recorded runs and controls are rejected. HTTP/schema retries are bounded but can make multiple requests. A successful response still needs a human usefulness review; see [model gate procedure](MODEL_GATE.md). This is the remaining October 4 gate item.
 
 ## Recorded runs
 

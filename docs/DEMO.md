@@ -13,3 +13,5 @@ A 2:45 plan following the PRD's timing table. Every screen must show actual evid
 | 2:20–2:45 | Results and roles | Actual evaluation counts (frozen suite), user observations if obtained, measured Nemotron and Nebius usage. | Evaluation and study not done |
 
 If repair is cut (diagnosis release), replace 1:05–1:35 with a second counterexample and its evidence replay. If only bounded checking is claimed, replace proof wording with the exact depth.
+
+Recording prerequisites: complete the [model gate and showcase refresh](MODEL_GATE.md), record the [release decision](RELEASE_DECISION.md), and replace the results segment with measured evaluation/study outcomes. No final video has been recorded. The October 1 model check returned unavailable because the API key is missing; it provides no explanation or repair footage.

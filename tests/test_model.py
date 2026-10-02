@@ -60,6 +60,48 @@ class ModelTest(unittest.TestCase):
         with mock.patch.dict(os.environ, {k: v for k, v in CONFIG.items() if "TOKEN_LIMIT" not in k}):
             self.assertIn("Token limits", model.public_config()["reason"])
 
+    def test_model_specific_prefix_is_opt_in(self):
+        with mock.patch.dict(os.environ, {**CONFIG, "COUNTERTRACE_DATA_DIR": self.tmp.name}, clear=True), \
+                mock.patch.object(model.request, "urlopen", side_effect=lambda *a, **k: reply('{}')) as call:
+            model.chat("test", "Return JSON.", "Test input")
+            sent = json.loads(call.call_args[0][0].data)
+            self.assertEqual(sent["messages"][0]["content"], "Return JSON.")
+            os.environ["COUNTERTRACE_MODEL_SYSTEM_PREFIX"] = "explicit endpoint directive"
+            model.chat("test", "Return JSON.", "Test input")
+            sent = json.loads(call.call_args[0][0].data)
+            self.assertTrue(sent["messages"][0]["content"].startswith("explicit endpoint directive\n\n"))
+
+    def test_model_check_persists_explanation_for_recording(self):
+        from countertrace.runs import RunStore
+
+        store = RunStore()
+        state = store.create_verification(example_id="showcase-overwrite-when-full")
+        state.update(state="complete", verdict={"headline": "counterexample"})
+        store.save(state)
+        explanation = {"status": "ok", "result": {"summary": "A witnessed failure."},
+                       "calls": [], "citation_check": {"valid": 1, "invalid": []}}
+        with mock.patch.object(model, "explain_run", return_value=explanation) as explain:
+            report = model.feasibility_check(state["id"])
+        self.assertEqual(report["run_id"], state["id"])
+        self.assertEqual(report["usefulness_review"], "pending")
+        self.assertEqual(store.load(state["id"])["explanation"], explanation)
+        explain.assert_called_once()
+
+    def test_model_check_rejects_non_failure_or_recorded_run_without_call(self):
+        from countertrace.runs import RunStore
+
+        store = RunStore()
+        state = store.create_verification(example_id="good-count-d4")
+        state.update(state="complete", verdict={"headline": "no_counterexample"})
+        store.save(state)
+        with mock.patch.object(model, "explain_run") as explain:
+            self.assertEqual(model.feasibility_check(state["id"])["status"], "error")
+            state.update(verdict={"headline": "counterexample"}, recorded=True)
+            store.save(state)
+            self.assertEqual(model.feasibility_check(state["id"])["status"], "error")
+            self.assertEqual(model.feasibility_check("absent-run")["status"], "error")
+            explain.assert_not_called()
+
     def test_interpretation_validated_and_conflicts_flagged(self):
         decisions = [{"topic": t, "brief_says": None, "status": "matches", "note": ""} for t in model.INTERPRET_TOPICS]
         decisions[3] = {"topic": "write_when_full", "brief_says": "accept writes when full", "status": "conflict", "note": "x"}

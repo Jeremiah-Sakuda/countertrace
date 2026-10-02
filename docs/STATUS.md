@@ -8,7 +8,7 @@ Last updated: October 1, 2026. This page records what has actually run. Everythi
 | --- | --- | --- |
 | Deterministic runner distinguishes a known-good control from a witnessed faulty design | Met on development fixtures | Survey below: 3 controls proved, 7 faults with counterexamples |
 | Counterexample replayed with the specified cycle convention | Met on development fixtures | Every formal counterexample below was reproduced by the independent simulation scoreboard at the same cycle and check; the depth-2 PRD sequence and a depth-4 wraparound fixture pass as unit tests |
-| Useful response from an authenticated Nemotron endpoint | **Not met** | The client is implemented and unit-tested against a mocked endpoint only. No Nebius credential is configured on the build machine. Run `countertrace model-check` after configuring `.env`. |
+| Useful response from an authenticated Nemotron endpoint | **Not met** | An explicit showcase model check returned `unavailable` with zero calls because `NEBIUS_API_KEY` is missing. The owner is not signed in to Nebius. Account model availability, prices, schema behavior, and usefulness remain unverified. |
 | Verifier image and toolchain pinned | Met | Debian base digest and OSS CAD Suite `2026-09-30` tarball SHA-256 in [verifier/Dockerfile](../verifier/Dockerfile) |
 
 The gate is therefore **not yet passed**: the model response is outstanding.
@@ -60,7 +60,7 @@ The bounded repair loop, re-admission, interface checks, and frozen-check-set co
 
 ## Tests
 
-- `make test`: 47 unit tests and negative controls (admission rejections, truncated or tampered traces, solver status and cover parsing, property-inventory controls, model schema/limit/citation handling with a mocked endpoint).
+- `make check`: 50 unit tests and negative controls, Python/JSON/TOML validation, documentation links, and whitespace checks pass. The three new tests cover opt-in model directives, attaching a model-check explanation to a local run for recording, and rejection of controls/read-only recordings/missing runs. Model tests still use mocked endpoints.
 - `make test-integration`: 7 Docker tests running real RTL (proved control, replayed fault, altered harness hash, cancellation, unsupported syntax, stubbed repair loop, weak-set audit).
 
 ## Interface and recorded runs
@@ -70,3 +70,10 @@ The web interface builds with no TypeScript errors and was checked in a browser 
 ## Not yet done
 
 Live Nemotron calls and their measured usefulness; Nebius Serverless Jobs (all verification runs locally in Docker); the frozen evaluation suite with an independently authored, held-out implementation; reviewer and learner recruitment; the usability study; clean-environment replays; hosted deployment and judge access; the demonstration video.
+
+## October 1 follow-up preparation
+
+- The model gate now accepts `--run-id` and attaches its explanation result to the local run, so a later recording can contain it. The generic model prefix is blank; Llama-specific reasoning instructions must be explicitly configured for a compatible endpoint. Public-catalog endpoint/model candidates and input/output caps of 16,384/4,096 are in the ignored local `.env`; the API key and account billing remain absent. Report timestamp: `2026-10-02T01:27:57Z` (October 1 EDT), run `20261001-193038-ver-de51cd`, status `unavailable`, no calls. No showcase recording was replaced and no real repair was attempted.
+- A MIT-licensed external FIFO candidate attributed to William Mar is quarantined in ignored `evaluation/holdout/`, pinned and hashed without reading its RTL into development context. Contract compatibility and admission are pending; it does not yet count as an independent control. See [candidate review](../evaluation/INDEPENDENT_FIXTURE.md).
+- Recruitment drafts and a three-person study protocol are prepared in [STUDY.md](../evaluation/STUDY.md); nobody has been contacted or enrolled. The [release decision record](RELEASE_DECISION.md) retains diagnosis as the commitment, with primary scope pending real repair evidence.
+- Caddy 2.11.4 validated the deployment Caddyfile locally in an offline container. No VM, funding, DNS/TLS, systemd deployment, or logged-out public journey has been tested. The [deployment plan](DEPLOYMENT.md) documents a proposed $300 budget before tax; spending approval is pending.
