@@ -127,11 +127,22 @@ def prepare_batch(root: Path, designs: list[tuple[dict, str]], stimulus: dict[st
     return batch
 
 
+def worker_identity() -> str:
+    """Keep bind-mounted outputs owned by the service, without running as root.
+
+    Linux preserves numeric ownership on bind mounts. The image's default UID
+    would leave nested artifacts that the service cannot remove. A root caller
+    still uses the image's unprivileged UID instead of granting worker root.
+    """
+    return f"{os.getuid() or 10001}:{os.getgid() or 10001}"
+
+
 def run_batch(batch: Batch, image: dict, cancel: threading.Event | None = None,
               timeout_s: int = BATCH_LIMIT_S + 60) -> dict:
     name = f"ct-{batch.job_id}"
     argv = [
         "docker", "run", "--rm", "--name", name,
+        "--user", worker_identity(),
         "--network", "none", "--read-only",
         "--tmpfs", f"/tmp:rw,exec,nosuid,size={RESOURCES['tmpfs']}",
         "--cap-drop", "ALL", "--security-opt", "no-new-privileges",

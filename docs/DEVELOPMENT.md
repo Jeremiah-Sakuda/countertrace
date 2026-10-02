@@ -26,6 +26,8 @@ For interface work, run `make serve` in one terminal and `cd apps/web && npm run
 
 The first build downloads about 700 MB. Later builds reuse the toolchain layer.
 
+The launcher runs the worker with the control service's numeric non-root UID/GID so Linux bind-mounted artifacts remain removable by that service. A root UID or GID is replaced with 10001; worker root is never enabled. Run the hosted service as the dedicated `countertrace` user. Network isolation, read-only mounts, dropped capabilities, and resource limits remain in effect.
+
 ## Model configuration
 
 The control process reads `.env`; exported variables take precedence. Set `NEBIUS_API_KEY`, `NEBIUS_BASE_URL` (the Token Factory OpenAI-compatible base URL shown in your account), `NEBIUS_MODEL_ID`, `COUNTERTRACE_MODEL_INPUT_TOKEN_LIMIT`, and `COUNTERTRACE_MODEL_OUTPUT_TOKEN_LIMIT`. Calls are refused until all are set. Usage is appended to `.countertrace/model_usage.jsonl` without the credential. The inference ledger blocks new calls once its estimated spend reaches the configured threshold, only when both prices are configured; it does not reserve in-flight costs or cap VM/account charges. Without prices, cost is unavailable. Separate repair-model pricing is not supported, so use the same model when relying on that estimate.

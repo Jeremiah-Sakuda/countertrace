@@ -60,8 +60,8 @@ The bounded repair loop, re-admission, interface checks, and frozen-check-set co
 
 ## Tests
 
-- `make check`: 50 unit tests and negative controls, Python/JSON/TOML validation, documentation links, and whitespace checks pass. The three new tests cover opt-in model directives, attaching a model-check explanation to a local run for recording, and rejection of controls/read-only recordings/missing runs. Model tests still use mocked endpoints.
-- `make test-integration`: 7 Docker tests running real RTL (proved control, replayed fault, altered harness hash, cancellation, unsupported syntax, stubbed repair loop, weak-set audit).
+- `make check`: 52 unit tests and negative controls, Python/JSON/TOML validation, documentation links, and whitespace checks pass. New tests cover opt-in model directives, attaching a model-check explanation to a local run for recording, rejection of controls/read-only recordings/missing runs, and the worker's non-root UID/GID selection. Model tests still use mocked endpoints.
+- `make test-integration`: 7 Docker tests running real RTL (proved control, replayed fault, altered harness hash, cancellation, unsupported syntax, stubbed repair loop, weak-set audit). Rerun after the worker identity fix: all seven passed locally in 59.34 seconds.
 
 ## Interface and recorded runs
 
@@ -77,3 +77,4 @@ Live Nemotron calls and their measured usefulness; Nebius Serverless Jobs (all v
 - A MIT-licensed external FIFO candidate attributed to William Mar is quarantined in ignored `evaluation/holdout/`, pinned and hashed without reading its RTL into development context. Contract compatibility and admission are pending; it does not yet count as an independent control. See [candidate review](../evaluation/INDEPENDENT_FIXTURE.md).
 - Recruitment drafts and a three-person study protocol are prepared in [STUDY.md](../evaluation/STUDY.md); nobody has been contacted or enrolled. The [release decision record](RELEASE_DECISION.md) retains diagnosis as the commitment, with primary scope pending real repair evidence.
 - Caddy 2.11.4 validated the deployment Caddyfile locally in an offline container. No VM, funding, DNS/TLS, systemd deployment, or logged-out public journey has been tested. The [deployment plan](DEPLOYMENT.md) documents a proposed $300 budget before tax; spending approval is pending.
+- Inspection of [Linux CI on the preceding implementation](https://github.com/Jeremiah-Sakuda/countertrace/actions/runs/36941347402) found six integration errors during artifact cleanup: files created by the image's UID 10001 were not removable by the host runner. The launcher now selects the service's non-root UID/GID, with a non-root fallback for root callers, while preserving worker isolation. Current Linux results are published in the repository's [Checks workflow](https://github.com/Jeremiah-Sakuda/countertrace/actions/workflows/ci.yml); macOS results alone do not establish Linux ownership behavior.
