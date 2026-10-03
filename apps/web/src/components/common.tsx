@@ -106,7 +106,7 @@ export function Section({
       <header className="panel-header">
         <div>
           {eyebrow && <p className="eyebrow">{eyebrow}</p>}
-          <H id={headingId} className="panel-title">
+          <H id={headingId} className="panel-title" tabIndex={-1}>
             {title}
           </H>
         </div>

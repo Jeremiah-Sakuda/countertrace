@@ -868,9 +868,41 @@ code {
   background: var(--color-muted);
 }
 
-.cycle-table tbody tr:focus-visible {
-  outline: 2px solid var(--color-ring);
-  outline-offset: -2px;
+.cycle-select {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 4px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-primary);
+  color: var(--color-soft-foreground);
+  font: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background-color var(--duration) var(--ease-out), border-color var(--duration) var(--ease-out);
+}
+
+.cycle-select:hover,
+.cycle-select[aria-pressed="true"] {
+  border-color: var(--color-accent);
+  background: var(--color-muted);
+  color: var(--color-accent);
+}
+
+.cycle-select svg {
+  color: var(--tone-fail);
+}
+
+.cycle-table tbody th[scope="row"] {
+  padding: 4px 8px;
+}
+
+.cycle-table tbody td {
+  vertical-align: middle;
 }
 
 .cycle-table .bitcol {
@@ -1246,6 +1278,57 @@ code {
 }
 
 /* ---- Run view ------------------------------------------------------------------------ */
+.run-sections {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm) var(--space-md);
+  border-block: 1px solid var(--color-border-subtle);
+  padding: var(--space-sm) 0;
+}
+
+.run-sections-label {
+  color: var(--color-muted-foreground);
+  font-size: 0.875rem;
+}
+
+.run-sections ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.run-sections button {
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--color-card);
+  color: var(--color-accent);
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: border-color var(--duration) var(--ease-out), background-color var(--duration) var(--ease-out);
+}
+
+.run-sections button:hover {
+  background: var(--color-muted);
+  border-color: var(--color-accent);
+}
+
+.run-sections button:active,
+.cycle-select:active {
+  background: var(--color-secondary);
+}
+
+[id^="run-"] {
+  scroll-margin-block: var(--space-lg);
+}
+
 .run-header {
   display: grid;
   gap: var(--space-sm);
@@ -1893,6 +1976,18 @@ code {
   }
   .panel-actions {
     width: 100%;
+  }
+  .run-sections-label {
+    flex-basis: 100%;
+  }
+  .btn-sm,
+  .cycle-link,
+  .mini-details > summary,
+  .site-nav a {
+    min-height: 44px;
+  }
+  .code-input {
+    font-size: 1rem;
   }
 }
 

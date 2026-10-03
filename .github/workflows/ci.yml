@@ -33,7 +33,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Type-check and build the web interface
         working-directory: apps/web
-        run: npm ci && npm run build
+        run: npm ci && npm test && npm run build
 
   verifier:
     # Builds the pinned verifier image (downloads the OSS CAD Suite release and

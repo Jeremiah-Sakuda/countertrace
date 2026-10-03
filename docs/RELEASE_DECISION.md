@@ -1,11 +1,11 @@
 # Release decision record
 
-**Current commitment: diagnosis. Primary release remains unearned.** No authenticated model explanation or model-generated repair has run. The stubbed repair integration test establishes loop mechanics only. This record implements the existing PRD gates; it does not change them.
+**Current commitment: diagnosis. Primary release remains unearned.** An authenticated Ultra explanation and one real unchanged-check showcase repair ran October 3. The explanation was reviewed by Codex, not an independent human. A development success does not satisfy the frozen repair evaluation. This record implements the existing PRD gates; it does not change them.
 
 | Decision | Date | Required evidence | Current result |
 | --- | --- | --- | --- |
-| Model feasibility | October 4 | Useful authenticated Nemotron explanation of a replayed failure | Pending API key and usefulness review |
-| Initial profile | October 8 | Complete diagnosis journey, first real unchanged-check repair, measured verification batch, early feedback | Pending |
+| Model feasibility | October 4 | Useful authenticated Nemotron explanation of a replayed failure | Met October 3 on development evidence; Codex source/trace review, independent human validation pending |
+| Initial profile | October 8 | Complete diagnosis journey, first real unchanged-check repair, measured verification batch, early feedback | Real repair and warm batch measured; complete journey and early feedback pending |
 | Final profile | October 14 | Evidence supports the primary repair target and unchanged-check trust rules; otherwise diagnosis | Pending |
 
 The primary repair target is at least 5 of 8 faulty cases repaired within three candidate attempts, with all-case and attempted-repair denominators. A showcase success is insufficient. Freeze cases and evaluation configuration before the evidence used to make this decision; if that evidence is unavailable by October 14, choose diagnosis. Later evaluations must remain separate from development tuning.
@@ -19,6 +19,6 @@ Both profiles still require the PRD's diagnosis, explanation, audit, reproducibi
 - Evidence manifest: pending; include model/prompt version, suite provenance, budgets, all outcomes, rejected candidates, unresolved cases, and costs or unavailable billing.
 - Repair successes / all 8 cases / attempted cases: not measured.
 - Scope of formal claims: development proofs exist; reviewer and release evaluation pending.
-- Remaining release blockers and owners: model access, independent evaluation, reviewer/learners, hosted access/funding, clean replays, and final video.
+- Remaining release blockers and owners: independent evaluation, reviewer/learners, hosted access/funding, clean replays, and final video.
 
 If diagnosis is selected, remove repair controls from the judged journey and repair promises from the README, submission, and video; retain developer experiments clearly labeled. Use a second held-out counterexample and replay for the replacement video segment. Update [STATUS.md](STATUS.md), [DEMO.md](DEMO.md), and the [roadmap](ROADMAP.md) with the actual decision. No release decision or future reminder is scheduled by this document.

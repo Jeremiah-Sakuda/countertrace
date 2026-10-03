@@ -55,16 +55,17 @@ export function CycleTable({
   onSelect?: (row: CycleRow) => void;
   selectedCycle?: number | null;
 }) {
-  const [active, setActive] = useState(() => {
-    const i = rows.findIndex((r) => r.cycle === markCycle);
-    return i >= 0 ? i : 0;
-  });
+  const [activeCycle, setActiveCycle] = useState(markCycle ?? rows[0]?.cycle);
+  // Keep a keyboard entry point when the full trace is collapsed and the active cycle disappears.
+  const previousIndex = rows.findIndex((r) => r.cycle === activeCycle);
+  const markedIndex = rows.findIndex((r) => r.cycle === markCycle);
+  const active = previousIndex >= 0 ? previousIndex : Math.max(0, markedIndex);
   const [flash, setFlash] = useState<number | null>(null);
-  const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]);
+  const rowRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   const focusIndex = (i: number, center = false) => {
     const clamped = Math.max(0, Math.min(rows.length - 1, i));
-    setActive(clamped);
+    setActiveCycle(rows[clamped]?.cycle);
     const el = rowRefs.current[clamped];
     if (el) {
       el.focus({ preventScroll: true });
@@ -104,7 +105,7 @@ export function CycleTable({
       <table className="data-table cycle-table">
         <caption>
           <span className="sr-only">{caption}. </span>
-          <span className="caption-hint">Use the arrow keys to move between cycles. Queues are shown oldest first.</span>
+          <span className="caption-hint">Select a cycle to inspect its queue. Use ↑ / ↓, Home, or End to move between cycles. Queues are shown oldest first.</span>
         </caption>
         <thead>
           <tr>
@@ -149,24 +150,26 @@ export function CycleTable({
             return (
               <tr
                 key={row.cycle}
-                ref={(el) => {
-                  rowRefs.current[i] = el;
-                }}
-                tabIndex={i === active ? 0 : -1}
                 data-cycle={row.cycle}
                 className={classes}
-                aria-selected={selectedCycle === row.cycle ? true : undefined}
                 onClick={() => focusIndex(i)}
-                onFocus={() => setActive(i)}
               >
                 <th scope="row" className="mono">
-                  {row.cycle}
-                  {isMark && (
-                    <span className="first-mark" title="First observed mismatch">
-                      <Crosshair size={13} aria-hidden="true" />
-                      <span className="sr-only"> (first observed mismatch)</span>
-                    </span>
-                  )}
+                  <button
+                    type="button"
+                    className="cycle-select"
+                    ref={(el) => { rowRefs.current[i] = el; }}
+                    tabIndex={i === active ? 0 : -1}
+                    aria-label={`Inspect cycle ${row.cycle}${isMark ? " (first observed mismatch)" : ""}`}
+                    aria-pressed={selectedCycle === row.cycle}
+                    onFocus={() => {
+                      setActiveCycle(row.cycle);
+                      onSelect?.(row);
+                    }}
+                  >
+                    {row.cycle}
+                    {isMark && <Crosshair size={13} aria-hidden="true" />}
+                  </button>
                 </th>
                 <td className="mono bitcol">{row.rst}</td>
                 <td className="mono bitcol">{row.wr_en}</td>

@@ -107,7 +107,7 @@ function NoCounterexample({ run }: { run: Run }) {
   const methods = ["simulation", "bmc", "prove", "cover"] as const;
   const unresolved = run.verdict?.unresolved ?? run.verification?.unresolved_count ?? 0;
   return (
-    <Section title="No counterexample found by these methods" eyebrow="Result" className="no-cex">
+    <Section id="run-finding" title="No counterexample found by these methods" eyebrow="Result" className="no-cex">
       <p className="prose">
         None of the methods below produced a failing trace. That is not a statement that the design is correct: each method establishes
         only what its label says, for DEPTH {run.depth ?? "?"} and the listed assumptions.
@@ -168,9 +168,32 @@ function VerificationBody({
   const others = findings.filter((f) => f !== primary);
   const depth = run.depth ?? 4;
   const active = run.state === "queued" || run.state === "running";
+  const sections = [
+    { id: "run-finding", label: primary ? "Finding & trace" : "Result" },
+    ...(primary || run.explanation ? [{ id: "run-explanation", label: "Explanation" }] : []),
+    { id: "run-repair", label: "Repair & export" },
+    { id: "run-obligations", label: "Check results" },
+    { id: "run-evidence", label: "Evidence" },
+  ];
+  const goToSection = (id: string) => {
+    const heading = document.getElementById(id);
+    if (!heading) return;
+    heading.focus({ preventScroll: true });
+    heading.scrollIntoView({ block: "start", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  };
 
   return (
     <div className="stack-lg">
+      <nav className="run-sections" aria-label="On this run">
+        <span className="run-sections-label">On this run</span>
+        <ul>
+          {sections.filter((section) => section.id !== "run-finding" || primary || run.state === "complete").map((section) => (
+            <li key={section.id}>
+              <button type="button" onClick={() => goToSection(section.id)}>{section.label}</button>
+            </li>
+          ))}
+        </ul>
+      </nav>
       {active && (
         <Section title="Stages" eyebrow="Live status">
           <StagesPanel stages={v?.stages ?? []} now={now} />
@@ -183,7 +206,7 @@ function VerificationBody({
       ) : run.state === "complete" && run.verdict?.headline === "no_counterexample" ? (
         <NoCounterexample run={run} />
       ) : run.state === "complete" ? (
-        <Section title={run.verdict?.headline === "tool_error" ? "Tool error: no result established" : "No finding to show"} eyebrow="Result">
+        <Section id="run-finding" title={run.verdict?.headline === "tool_error" ? "Tool error: no result established" : "No finding to show"} eyebrow="Result">
           <p className="prose">
             {run.verdict?.headline === "tool_error"
               ? "The tools or artifact integrity checks failed, so nothing was established by the affected methods. A tool error is never treated as a pass. See the integrity notes and logs below."

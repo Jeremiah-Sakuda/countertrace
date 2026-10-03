@@ -1,0 +1,809 @@
+{
+  "date": "2026-10-03",
+  "scope": "One development/showcase FIFO; prompt iterations are not a benchmark or independent evaluation.",
+  "authenticated_nemotron_catalog": [
+    "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "nvidia/nemotron-3-super-120b-a12b",
+    "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B",
+    "nvidia/Nemotron-3_5-Lightning"
+  ],
+  "explanation_checks": [
+    {
+      "checked_at": "2026-10-03T20:39:52Z",
+      "run_id": "20261001-193038-ver-de51cd",
+      "status": "ok",
+      "detail": null,
+      "calls": [
+        {
+          "task": "explain",
+          "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+          "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+          "at": "2026-10-03T20:39:45Z",
+          "attempts": 1,
+          "request_id": "23c58f98b8e8b6e0372c0f6a58d2267b",
+          "latency_ms": 6809,
+          "prompt_tokens": 1660,
+          "completion_tokens": 1568,
+          "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+          "status": "ok",
+          "finish_reason": "stop"
+        }
+      ],
+      "citation_check": {
+        "valid": 17,
+        "invalid": [],
+        "uncited_steps": 0,
+        "allowed_cycles": [
+          0,
+          8
+        ]
+      },
+      "explanation": {
+        "summary": "The FIFO outputs the data from a rejected write (0x65) instead of the oldest stored word (0x21) on a read at cycle 6. This occurs because the design performs a write at cycle 5 even though the FIFO is full, overwriting the head of the queue.",
+        "steps": [
+          {
+            "text": "At cycle 5 the FIFO is full (count == DEPTH) and a write is requested (wr_en=1, din=0x65). The contract treats this as write_full and ignores it, but the RTL writes din into mem[wr_ptr] because do_write lacks a full check.",
+            "cycles": [
+              5
+            ],
+            "signals": [
+              "wr_en",
+              "din",
+              "full",
+              "do_write",
+              "mem",
+              "wr_ptr"
+            ]
+          },
+          {
+            "text": "The write at cycle 5 overwrites the oldest entry (0x21 at index 0) with 0x65. At cycle 6 a read is accepted (rd_en=1, count!=0) and the RTL outputs mem[rd_ptr], which now holds 0x65, causing the read_data mismatch.",
+            "cycles": [
+              6
+            ],
+            "signals": [
+              "rd_en",
+              "do_read",
+              "rd_ptr",
+              "dout",
+              "mem"
+            ]
+          }
+        ],
+        "likely_cause": {
+          "text": "The write enable do_write is defined as wr_en without gating by the full flag, so writes proceed when the FIFO is full and corrupt the queue. The write logic at lines 36-38 then overwrites the head entry.",
+          "lines": [
+            25,
+            36,
+            37,
+            38
+          ]
+        },
+        "next_action": "Change line 25 to `wire do_write = wr_en && !full;` (or `wr_en && (count != DEPTH)`) so that writes are only accepted when the FIFO is not full.",
+        "limits": "This failure proves the FIFO does not ignore writes when full, leading to data corruption on subsequent reads. Any passing checks only cover scenarios where the FIFO is not full at the time of write; they do not establish correct behavior under full conditions."
+      },
+      "usefulness_review": {
+        "reviewer": "Codex assistant, source/trace review; not independent human validation",
+        "accepted": false,
+        "scores": {
+          "requirement": 2,
+          "transaction": 2,
+          "expected_observed": 2,
+          "limits": 0
+        },
+        "note": "Rejected: unsupported assertion that all passing checks exclude full conditions."
+      }
+    },
+    {
+      "checked_at": "2026-10-03T20:42:13Z",
+      "run_id": "20261001-193038-ver-de51cd",
+      "status": "schema_error",
+      "detail": "The model response did not satisfy the schema after one retry.",
+      "calls": [
+        {
+          "task": "explain",
+          "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+          "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+          "at": "2026-10-03T20:41:54Z",
+          "attempts": 1,
+          "request_id": "0c895dc76406d674514a1bff2f6c4170",
+          "latency_ms": 7968,
+          "prompt_tokens": 2531,
+          "completion_tokens": 1800,
+          "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+          "status": "ok",
+          "finish_reason": "length",
+          "schema_error": "no JSON object in response"
+        },
+        {
+          "task": "explain",
+          "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+          "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+          "at": "2026-10-03T20:42:02Z",
+          "attempts": 1,
+          "request_id": "3a6a6c5c7d0e2fde8eb0457b7e82d7bd",
+          "latency_ms": 10592,
+          "prompt_tokens": 2560,
+          "completion_tokens": 1800,
+          "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+          "status": "ok",
+          "finish_reason": "length",
+          "schema_error": "no JSON object in response"
+        }
+      ],
+      "citation_check": null,
+      "explanation": null,
+      "usefulness_review": {
+        "reviewer": "Codex assistant, source/trace review; not independent human validation",
+        "accepted": false,
+        "scores": null,
+        "note": "Rejected: both responses hit the 1,800-token task cap and lacked valid JSON."
+      }
+    },
+    {
+      "checked_at": "2026-10-03T20:42:58Z",
+      "run_id": "20261001-193038-ver-de51cd",
+      "status": "ok",
+      "detail": null,
+      "calls": [
+        {
+          "task": "explain",
+          "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+          "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+          "at": "2026-10-03T20:42:53Z",
+          "attempts": 1,
+          "request_id": "93502f5f2a64f233e095bd62abfb6367",
+          "latency_ms": 5603,
+          "prompt_tokens": 2531,
+          "completion_tokens": 1726,
+          "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+          "status": "ok",
+          "finish_reason": "stop"
+        }
+      ],
+      "citation_check": {
+        "valid": 21,
+        "invalid": [],
+        "uncited_steps": 0,
+        "allowed_cycles": [
+          0,
+          8
+        ]
+      },
+      "explanation": {
+        "summary": "The FIFO writes data even when full, overwriting the oldest entry at the read pointer. A subsequent read then returns the overwritten data (0x65) instead of the expected oldest entry (0x21).",
+        "steps": [
+          {
+            "text": "At cycle 4 the FIFO becomes full (count=4, DEPTH=4) after accepting four writes; the queue holds [0x21,0x32,0x43,0x54].",
+            "cycles": [
+              4
+            ],
+            "signals": [
+              "wr_en",
+              "din",
+              "count",
+              "full"
+            ]
+          },
+          {
+            "text": "At cycle 5 a write is requested while full (wr_en=1, din=0x65). The design writes to mem[wr_ptr] (which equals rd_ptr because the buffer is full) and increments wr_ptr, but count saturates at DEPTH.",
+            "cycles": [
+              5
+            ],
+            "signals": [
+              "wr_en",
+              "din",
+              "wr_ptr",
+              "rd_ptr",
+              "mem",
+              "count"
+            ]
+          },
+          {
+            "text": "At cycle 6 a read is accepted (rd_en=1, count!=0). The read returns mem[rd_ptr], which now holds 0x65 (the overwritten value) instead of the original 0x21.",
+            "cycles": [
+              6
+            ],
+            "signals": [
+              "rd_en",
+              "dout",
+              "rd_ptr",
+              "mem"
+            ]
+          }
+        ],
+        "likely_cause": {
+          "text": "The write enable logic does not check the full flag. Line 25 defines `do_write = wr_en` without gating by `!full`, so writes proceed even when the FIFO is full. The memory write and pointer increment (lines 37-38) execute unconditionally, corrupting the oldest entry. The count update (line 45) correctly saturates, but the damage is already done.",
+          "lines": [
+            25,
+            37,
+            38,
+            45
+          ]
+        },
+        "next_action": "Change `do_write` to `wr_en && !full` (or `wr_en && (count != DEPTH)`) so that writes are only accepted when the FIFO is not full. Also ensure the write pointer does not increment on a rejected write.",
+        "limits": "This failure refutes the contract for the tested configuration (DEPTH=4, WIDTH=8) under the fill_drain trace. The simulation pass for empty_flag covers only the 14 named tests; the counterexamples for full_flag and read_data in simulation and formal methods show those properties are not established. The bounded cover reachability pass does not prove correctness. Other test outcomes come from different traces and do not affect this explanation."
+      },
+      "usefulness_review": {
+        "reviewer": "Codex assistant, source/trace review; not independent human validation",
+        "accepted": false,
+        "scores": {
+          "requirement": 2,
+          "transaction": 2,
+          "expected_observed": 2,
+          "limits": 1
+        },
+        "note": "Needs revision: grouped simulation/formal wording could imply formal read_data had a counterexample; it was unresolved."
+      }
+    },
+    {
+      "checked_at": "2026-10-03T20:45:21Z",
+      "run_id": "20261001-193038-ver-de51cd",
+      "status": "ok",
+      "detail": null,
+      "calls": [
+        {
+          "task": "explain",
+          "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+          "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+          "at": "2026-10-03T20:45:16Z",
+          "attempts": 1,
+          "request_id": "0e608adaaf84138b67748409e9b79e06",
+          "latency_ms": 5629,
+          "prompt_tokens": 2571,
+          "completion_tokens": 2086,
+          "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+          "status": "ok",
+          "finish_reason": "stop"
+        }
+      ],
+      "citation_check": {
+        "valid": 17,
+        "invalid": [],
+        "uncited_steps": 0,
+        "allowed_cycles": [
+          0,
+          8
+        ]
+      },
+      "explanation": {
+        "summary": "At cycle 5 a write is attempted while the FIFO is full; the design incorrectly writes din (0x65) into memory and advances wr_ptr even though the contract rejects the write. At cycle 6 an accepted read returns the overwritten value 0x65 instead of the oldest entry 0x21.",
+        "steps": [
+          {
+            "text": "Cycle 5: wr_en=1 while full (count==DEPTH). The RTL's do_write = wr_en (line 25) lacks a full check, so mem[wr_ptr] is written with 0x65 and wr_ptr increments (lines 36-39). Count stays at DEPTH because the case statement (line 45) blocks increment when full, but the memory and pointer are already corrupted.",
+            "cycles": [
+              5
+            ],
+            "signals": [
+              "wr_en",
+              "din",
+              "full",
+              "count",
+              "wr_ptr",
+              "mem"
+            ]
+          },
+          {
+            "text": "Cycle 6: rd_en=1 triggers an accepted read (do_read=1). The RTL reads mem[rd_ptr] (line 41) which now holds 0x65 (written at cycle 5) instead of the original 0x21, so dout becomes 0x65. The contract expects the oldest word 0x21.",
+            "cycles": [
+              6
+            ],
+            "signals": [
+              "rd_en",
+              "dout",
+              "rd_ptr",
+              "mem"
+            ]
+          }
+        ],
+        "likely_cause": {
+          "text": "do_write is defined as wr_en without gating by !full (line 25). This allows memory write and wr_ptr advance on rejected writes, corrupting the FIFO contents. The count update (line 45) correctly blocks increment when full, but the damage is already done.",
+          "lines": [
+            25,
+            36,
+            37,
+            38,
+            39
+          ]
+        },
+        "next_action": "Change line 25 to `wire do_write = wr_en && !full;` (or `wr_en && (count != DEPTH)`) so that writes are only performed when the FIFO is not full.",
+        "limits": "This simulation failure (read_data in fill_drain at cycle 6) refutes the contract for the tested configuration (DEPTH=4, WIDTH=8). The simulation empty_flag passed 14 named tests but does not cover this read_data failure. The simulation full_flag failed in 6 of 14 tests (random_s1, random_s4, random_s5, random_s7) indicating separate full-flag issues. Formal checks for read_data and empty_flag are unresolved (solver stopped at another property's counterexample); formal full_flag produced a counterexample at application cycle 5. Reachability cover passed (bounded, depth 24) but only establishes"
+      },
+      "usefulness_review": {
+        "reviewer": "Codex assistant, source/trace review; not independent human validation",
+        "accepted": false,
+        "scores": {
+          "requirement": 2,
+          "transaction": 2,
+          "expected_observed": 2,
+          "limits": 1
+        },
+        "note": "Needs revision: the application silently cut the limitations field at 600 characters, leaving an incomplete sentence."
+      }
+    },
+    {
+      "checked_at": "2026-10-03T20:47:58Z",
+      "run_id": "20261001-193038-ver-de51cd",
+      "status": "ok",
+      "detail": null,
+      "calls": [
+        {
+          "task": "explain",
+          "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+          "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+          "at": "2026-10-03T20:47:53Z",
+          "attempts": 1,
+          "request_id": "829fdf28d8b316e208a65fe5710ce9aa",
+          "latency_ms": 5483,
+          "prompt_tokens": 2571,
+          "completion_tokens": 1879,
+          "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+          "status": "ok",
+          "finish_reason": "stop"
+        }
+      ],
+      "citation_check": {
+        "valid": 28,
+        "invalid": [],
+        "uncited_steps": 0,
+        "allowed_cycles": [
+          0,
+          8
+        ]
+      },
+      "explanation": {
+        "summary": "At cycle 5 the FIFO is full (count==DEPTH) but the design still writes din=0x65 into mem[wr_ptr] and advances wr_ptr because do_write lacks a full check. At cycle 6 the read pointer rd_ptr=0 now points to the overwritten location, so dout becomes 0x65 instead of the expected oldest word 0x21.",
+        "steps": [
+          {
+            "text": "Cycles 1-4: four accepted writes fill the FIFO; queue becomes [0x21,0x32,0x43,0x54], count=4, wr_ptr=4, rd_ptr=0.",
+            "cycles": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "signals": [
+              "wr_en",
+              "din",
+              "count",
+              "wr_ptr",
+              "rd_ptr"
+            ]
+          },
+          {
+            "text": "Cycle 5: wr_en=1 while full; contract says write_full (no accept), but RTL's do_write=wr_en (line 25) triggers memory write and pointer increment, overwriting mem[0] with 0x65 and moving wr_ptr to 1; count stays 4 due to ternary at line 45.",
+            "cycles": [
+              5
+            ],
+            "signals": [
+              "wr_en",
+              "din",
+              "full",
+              "do_write",
+              "mem[0]",
+              "wr_ptr",
+              "count"
+            ]
+          },
+          {
+            "text": "Cycle 6: rd_en=1 accepted (read_not_empty); RTL reads mem[rd_ptr] (mem[0]) which now holds 0x65, outputs dout=0x65, advances rd_ptr to 1; expected dout=0x21 (oldest).",
+            "cycles": [
+              6
+            ],
+            "signals": [
+              "rd_en",
+              "do_read",
+              "rd_ptr",
+              "dout",
+              "mem[0]"
+            ]
+          }
+        ],
+        "likely_cause": {
+          "text": "do_write is defined as wr_en without checking full (line 25), so the write block (lines 36-38) executes even when the FIFO is full, corrupting the oldest entry and advancing wr_ptr. The count update (line 45) correctly saturates, but the memory and pointer side-effects remain.",
+          "lines": [
+            25,
+            36,
+            37,
+            38,
+            45
+          ]
+        },
+        "next_action": "Change line 25 to `wire do_write = wr_en && !full;` (or `wr_en && (count != DEPTH)`) so writes are gated by the full flag, matching the contract's write_not_full/write_full rows.",
+        "limits": "This simulation failure (read_data in fill_drain at cycle 6) refutes the contract for the tested DEPTH=4, WIDTH=8 configuration. The simulation empty_flag passed 14 named test fill_drain and 13 other tests, but that only covers the named tests and cycles; it does not prove empty_flag for all sequences. The BMC and prove checks for read_data and empty_flag are unresolved (solver stopped at another property's counterexample), so they provide no additional coverage. The full_flag has both simulation counterexamples (6 of 14 tests) and formal counterexamples (bmc and prove), confirming a separate full-handling defect."
+      },
+      "usefulness_review": {
+        "reviewer": "Codex assistant, source/trace review; not independent human validation",
+        "accepted": false,
+        "scores": {
+          "requirement": 2,
+          "transaction": 1,
+          "expected_observed": 1,
+          "limits": 2
+        },
+        "note": "Rejected: wr_ptr=4 after four writes is impossible for the two-bit pointer at DEPTH=4; it wraps to zero."
+      }
+    },
+    {
+      "checked_at": "2026-10-03T20:49:10Z",
+      "run_id": "20261001-193038-ver-de51cd",
+      "status": "ok",
+      "detail": null,
+      "calls": [
+        {
+          "task": "explain",
+          "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+          "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+          "at": "2026-10-03T20:49:04Z",
+          "attempts": 1,
+          "request_id": "c7d3cad1d4678e66484f5d2c1a0d08c5",
+          "latency_ms": 5350,
+          "prompt_tokens": 2615,
+          "completion_tokens": 1858,
+          "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+          "status": "ok",
+          "finish_reason": "stop"
+        }
+      ],
+      "citation_check": {
+        "valid": 16,
+        "invalid": [],
+        "uncited_steps": 0,
+        "allowed_cycles": [
+          0,
+          8
+        ]
+      },
+      "explanation": {
+        "summary": "The FIFO writes data even when full, overwriting the oldest entry at cycle 5; the subsequent read at cycle 6 returns the overwritten value (0x65) instead of the expected oldest value (0x21).",
+        "steps": [
+          {
+            "text": "At cycle 5, wr_en=1 and full=1 (count==DEPTH), but do_write = wr_en (line 25) causes a write to mem[wr_ptr] (index 0) with din=0x65, overwriting the oldest entry 0x21; wr_ptr increments to 1 while count stays 4.",
+            "cycles": [
+              5
+            ],
+            "signals": [
+              "wr_en",
+              "din",
+              "full",
+              "count",
+              "wr_ptr",
+              "mem[0]"
+            ]
+          },
+          {
+            "text": "At cycle 6, rd_en=1 and count!=0 triggers a read; dout is assigned mem[rd_ptr] (index 0) which now holds 0x65, so dout becomes 0x65 instead of the expected 0x21.",
+            "cycles": [
+              6
+            ],
+            "signals": [
+              "rd_en",
+              "dout",
+              "rd_ptr",
+              "mem[0]"
+            ]
+          }
+        ],
+        "likely_cause": {
+          "text": "The write enable do_write is not gated by the full flag, allowing writes when the FIFO is full and corrupting the oldest data. The fix is to define do_write as wr_en && !full (or wr_en && (count != DEPTH)).",
+          "lines": [
+            25,
+            36,
+            37,
+            38
+          ]
+        },
+        "next_action": "Change line 25 to 'wire do_write = wr_en && !full;' (or 'wr_en && (count != DEPTH)') and re-run the fill_drain test.",
+        "limits": "This failure refutes the read_data contract for the tested configuration (DEPTH=4, WIDTH=8). The simulation pass for empty_flag (14 tests) does not cover this full-condition overwrite; simulation counterexamples for full_flag (6 tests) and read_data (8 tests) indicate broader issues. Formal checks (bmc/prove) for read_data and empty_flag are unresolved; full_flag has counterexamples. Cover reachability pass only establishes reachability, not correctness."
+      },
+      "usefulness_review": {
+        "reviewer": "Codex assistant, source/trace review; not independent human validation",
+        "accepted": true,
+        "scores": {
+          "requirement": 2,
+          "transaction": 2,
+          "expected_observed": 2,
+          "limits": 2
+        },
+        "note": "Useful for the showcase: identifies the rejected cycle-5 overwrite, cycle-6 0x21/0x65 mismatch, missing write gate, and unresolved formal checks. Pointer/address values are inferred from RTL, not sampled; reviewer checked the two-bit wrap and reset sequence. No independent human or learner review has occurred."
+      }
+    }
+  ],
+  "final_explanation_system_prompt": "You explain a recorded FIFO verification failure to a student who knows RTL basics.\nUse only the evidence provided. The deterministic checker already decided that the design failed; you explain why, you do not re-judge it.\nCite every claim with cycle numbers from the provided table and signal names that exist in the evidence or RTL. Cite RTL line numbers for the likely cause.\nThe normalized trace samples interface signals and reference-queue state, not internal registers or memory addresses. Explain the RTL logic, but do not assert numeric internal-register values or memory indices that are absent from the sampled trace.\nReply with one JSON object only:\n{\"summary\": string (two sentences max), \"steps\": [{\"text\": string, \"cycles\": [int], \"signals\": [string]}], \"likely_cause\": {\"text\": string, \"lines\": [int]}, \"next_action\": string, \"limits\": string}\n\"limits\" must state what this failure and any passing checks do and do not establish.\nA witnessed failure refutes the contract for the tested configuration. Passing simulation checks cover only their named tests; bounded checks cover their stated horizon; an unbounded proof applies only to its named property and assumptions. Reached cover scenarios establish reachability, not correctness. Unresolved obligations are not passes.\nUse the supplied run outcomes for these limits. Do not invent which input conditions passing checks covered or claim that all passing checks excluded full/empty conditions. Other outcomes can come from different traces; do not merge them into the trace being explained.\nIf naming another outcome, identify its exact method/check pair and status. Never group an unresolved formal check with witnessed counterexamples; a simulation failure does not imply that the formal checker found that same failure.",
+  "final_explanation_system_prompt_sha256": "9b6e8934df835f60691a07ebf9ad42e74392d26a465758083770a0fe5d310b79",
+  "repair": {
+    "max_attempts": 3,
+    "parent_frozen": {
+      "contract": "sha256:d8c9a8e739585556ac4f0931dbbbcc14b75d4f197cd000be00d91a1af4a58ce3",
+      "harness": {
+        "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+        "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+        "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+      },
+      "verifier_digest": "7d82f4b2482a24f2",
+      "stimulus_version": "stimulus-v1",
+      "stimulus": {
+        "learner_basic": "sha256:1251c52b29ed1844b0b10990abd1342a374a0bfdd3e5c59a01e434e77946d3f1",
+        "fill_drain": "sha256:08fb777f2a55280f4c87a08ededda1c44620983e78d24fff64064ac5dacd67fe",
+        "write_when_full": "sha256:04c6acd082206ba9a4c07800794d26098aa2b520e823e594f2e594b2829d65bf",
+        "simultaneous": "sha256:dc481895d0ed348e42982fc3a211b4b38178c5c196280238bcdacf8cfbf6ea50",
+        "wraparound": "sha256:545e9e9e1ca64f16b0cc986b453eb8bf8bbf560508a13d7b79dddf51e534643a",
+        "recurrent_reset": "sha256:b22685a91bb333e82d9c092150e3686d8ce5356c3c11b89a7f813358c7440291",
+        "random_s1": "sha256:8bd6ee1b4943fb0e7b773e2e1603d5db1b2fa925b2f8ed5006d931ddffae9dd2",
+        "random_s2": "sha256:4cf2ffe52bdf16b7ffa58ea0d1b2c946ce0ada219ced02edc40981537c564b4d",
+        "random_s3": "sha256:68f7c3a78971c7657450cba5f0b6292d211e1146682d09386ab017b6a6bf8165",
+        "random_s4": "sha256:7293c9d0ea3bfc69d0e9c784eb9e7fb338c243f78df2681b23a1b097979b8b9e",
+        "random_s5": "sha256:c69b2aa263a5185382f67c7d2d0eb543c8931cd4f1f3455a49d6169a878ffa82",
+        "random_s6": "sha256:9663d197ffedbfb6f7949601f1c1e15dc991b74c8e115bbfecbbf96bddee6b36",
+        "random_s7": "sha256:728636019d543950a64a569f69cb58f7c6a62b31eb454ead3d7e0cd12a815cf9",
+        "random_s8": "sha256:213b0afca2a40ffb3358aea6361f79d99472f1261ace1b388d8df920b7f9efd6"
+      },
+      "limits": {
+        "compile_s": 60,
+        "sim_s": 30,
+        "solver_s": 120,
+        "bmc_depth": 24,
+        "cover_depth": 24
+      },
+      "formal_tasks": [
+        "bmc",
+        "prove",
+        "cover"
+      ],
+      "expected_properties": {
+        "assert": 3,
+        "assume": 1,
+        "cover": 12
+      }
+    },
+    "started_at": "2026-10-03T20:44:06Z",
+    "attempts": [
+      {
+        "index": 1,
+        "origin": "model",
+        "status": "passed_unchanged_checks",
+        "started_at": "2026-10-03T20:44:06Z",
+        "calls": [
+          {
+            "task": "repair",
+            "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+            "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+            "at": "2026-10-03T20:44:06Z",
+            "attempts": 1,
+            "request_id": "710f2ece5dc2483219bd475eecd2243f",
+            "latency_ms": 10053,
+            "prompt_tokens": 1489,
+            "completion_tokens": 4000,
+            "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+            "status": "ok",
+            "finish_reason": "length",
+            "schema_error": "no JSON object in response"
+          },
+          {
+            "task": "repair",
+            "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+            "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+            "at": "2026-10-03T20:44:16Z",
+            "attempts": 1,
+            "request_id": "0dc1f2f35c65f0ac26914356cd81b76d",
+            "latency_ms": 9890,
+            "prompt_tokens": 1517,
+            "completion_tokens": 3855,
+            "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+            "status": "ok",
+            "finish_reason": "stop"
+          }
+        ],
+        "rationale": "The write enable signal do_write was not gated by the full flag, causing writes to be accepted even when the FIFO was full. This corrupted the write pointer and memory, leading to incorrect read data (the overwritten value was read instead of the oldest). The fix qualifies do_write with !full so that writes are ignored when full, per the contract.",
+        "diff": "--- a/dut.v\n+++ b/dut.v\n@@ -1,5 +1,3 @@\n-// Countertrace fixture: known-good synchronous FIFO, pointer + occupancy-count style.\n-// Authored for Countertrace (MIT). Supported profile: sync-fifo-v1, WIDTH 8, DEPTH 2 or 4.\n `default_nettype none\n module fifo #(\n     parameter integer DEPTH = 4,\n@@ -22,7 +20,7 @@\n     reg [AW:0]      count;\n \n     wire do_read  = rd_en && (count != 0);\n-    wire do_write = wr_en;\n+    wire do_write = wr_en && !full;\n \n     assign empty = (count == 0);\n     assign full  = (count == DEPTH);\n@@ -49,4 +47,4 @@\n         end\n     end\n endmodule\n-`default_nettype wire\n+`default_nettype wire",
+        "candidate_run_id": "20261003-164426-ver-05e188",
+        "summary": "All 10 obligations resolved under the unchanged checks (3 proved, no counterexample).",
+        "frozen_match": true,
+        "finished_at": "2026-10-03T20:44:35Z"
+      }
+    ],
+    "status": "passed",
+    "finished_at": "2026-10-03T20:44:35Z"
+  },
+  "candidate_run_id": "20261003-164426-ver-05e188",
+  "candidate_obligations": [
+    {
+      "id": "bmc:empty_flag",
+      "check": "empty_flag",
+      "method": "bmc",
+      "log": "batches/dut-formal/out/dut/formal/bmc/logfile.txt",
+      "status": "bounded_pass",
+      "depth": 24,
+      "label": "No counterexample within 24 cycles",
+      "detail": "Bounded model check from reset with the contract assumptions."
+    },
+    {
+      "id": "bmc:full_flag",
+      "check": "full_flag",
+      "method": "bmc",
+      "log": "batches/dut-formal/out/dut/formal/bmc/logfile.txt",
+      "status": "bounded_pass",
+      "depth": 24,
+      "label": "No counterexample within 24 cycles",
+      "detail": "Bounded model check from reset with the contract assumptions."
+    },
+    {
+      "id": "bmc:read_data",
+      "check": "read_data",
+      "method": "bmc",
+      "log": "batches/dut-formal/out/dut/formal/bmc/logfile.txt",
+      "status": "bounded_pass",
+      "depth": 24,
+      "label": "No counterexample within 24 cycles",
+      "detail": "Bounded model check from reset with the contract assumptions."
+    },
+    {
+      "id": "prove:empty_flag",
+      "check": "empty_flag",
+      "method": "prove",
+      "log": "batches/dut-formal/out/dut/formal/prove/logfile.txt",
+      "status": "proved",
+      "detail": "Unbounded proof (abc pdr) for DEPTH=4, WIDTH=8 under the listed assumptions.",
+      "label": "Property proved under these assumptions"
+    },
+    {
+      "id": "prove:full_flag",
+      "check": "full_flag",
+      "method": "prove",
+      "log": "batches/dut-formal/out/dut/formal/prove/logfile.txt",
+      "status": "proved",
+      "detail": "Unbounded proof (abc pdr) for DEPTH=4, WIDTH=8 under the listed assumptions.",
+      "label": "Property proved under these assumptions"
+    },
+    {
+      "id": "prove:read_data",
+      "check": "read_data",
+      "method": "prove",
+      "log": "batches/dut-formal/out/dut/formal/prove/logfile.txt",
+      "status": "proved",
+      "detail": "Unbounded proof (abc pdr) for DEPTH=4, WIDTH=8 under the listed assumptions.",
+      "label": "Property proved under these assumptions"
+    },
+    {
+      "id": "cover:reachability",
+      "check": "reachability",
+      "method": "cover",
+      "status": "bounded_pass",
+      "label": "All 12 scenarios reached within 24 cycles",
+      "detail": "Reachability reduces the risk of vacuous checks; it does not prove the specification complete.",
+      "depth": 24,
+      "log": "batches/dut-formal/out/dut/formal/cover/logfile.txt"
+    },
+    {
+      "id": "simulation:empty_flag",
+      "check": "empty_flag",
+      "method": "simulation",
+      "status": "simulation_passed",
+      "detail": "14 named tests (1386 cycles, seeds random_s1, random_s2, random_s3, random_s4, random_s5, random_s6, random_s7, random_s8).",
+      "tests": [
+        "learner_basic",
+        "fill_drain",
+        "write_when_full",
+        "simultaneous",
+        "wraparound",
+        "recurrent_reset",
+        "random_s1",
+        "random_s2",
+        "random_s3",
+        "random_s4",
+        "random_s5",
+        "random_s6",
+        "random_s7",
+        "random_s8"
+      ],
+      "cycles": 1386,
+      "label": "Simulation passed for these runs"
+    },
+    {
+      "id": "simulation:full_flag",
+      "check": "full_flag",
+      "method": "simulation",
+      "status": "simulation_passed",
+      "detail": "14 named tests (1386 cycles, seeds random_s1, random_s2, random_s3, random_s4, random_s5, random_s6, random_s7, random_s8).",
+      "tests": [
+        "learner_basic",
+        "fill_drain",
+        "write_when_full",
+        "simultaneous",
+        "wraparound",
+        "recurrent_reset",
+        "random_s1",
+        "random_s2",
+        "random_s3",
+        "random_s4",
+        "random_s5",
+        "random_s6",
+        "random_s7",
+        "random_s8"
+      ],
+      "cycles": 1386,
+      "label": "Simulation passed for these runs"
+    },
+    {
+      "id": "simulation:read_data",
+      "check": "read_data",
+      "method": "simulation",
+      "status": "simulation_passed",
+      "detail": "14 named tests (1386 cycles, seeds random_s1, random_s2, random_s3, random_s4, random_s5, random_s6, random_s7, random_s8).",
+      "tests": [
+        "learner_basic",
+        "fill_drain",
+        "write_when_full",
+        "simultaneous",
+        "wraparound",
+        "recurrent_reset",
+        "random_s1",
+        "random_s2",
+        "random_s3",
+        "random_s4",
+        "random_s5",
+        "random_s6",
+        "random_s7",
+        "random_s8"
+      ],
+      "cycles": 1386,
+      "label": "Simulation passed for these runs"
+    }
+  ],
+  "candidate_timings": {
+    "total_s": 8.92
+  },
+  "usage": {
+    "requests": 9,
+    "prompt_tokens": 20045,
+    "completion_tokens": 20572,
+    "public_list_price_estimate_usd": 0.081761,
+    "billing_status": "Account balance, applied credits, expiry, and invoice not verified. Estimate only: $1/$3 per million input/output tokens in official cookbook."
+  },
+  "candidate_bundle_replay": {
+    "date": "2026-10-03",
+    "run_id": "rec-20261003-164426-ver-05e188",
+    "scope": "Same-machine replay, not the required clean-environment replay study",
+    "result": {
+      "matches": true,
+      "differences": [],
+      "recorded": {
+        "obligations": {
+          "bmc:empty_flag": "bounded_pass",
+          "bmc:full_flag": "bounded_pass",
+          "bmc:read_data": "bounded_pass",
+          "prove:empty_flag": "proved",
+          "prove:full_flag": "proved",
+          "prove:read_data": "proved",
+          "cover:reachability": "bounded_pass",
+          "simulation:empty_flag": "simulation_passed",
+          "simulation:full_flag": "simulation_passed",
+          "simulation:read_data": "simulation_passed"
+        },
+        "findings": [],
+        "replay": null
+      },
+      "replayed": {
+        "obligations": {
+          "simulation:empty_flag": "simulation_passed",
+          "simulation:full_flag": "simulation_passed",
+          "simulation:read_data": "simulation_passed",
+          "bmc:empty_flag": "bounded_pass",
+          "bmc:full_flag": "bounded_pass",
+          "bmc:read_data": "bounded_pass",
+          "prove:empty_flag": "proved",
+          "prove:full_flag": "proved",
+          "prove:read_data": "proved",
+          "cover:reachability": "bounded_pass"
+        },
+        "findings": [],
+        "replay": null
+      },
+      "frozen_match": true,
+      "image": {
+        "tag": "countertrace-verifier:7d82f4b2482a24f2",
+        "image_id": "sha256:a121730b676386b0ee65267070e85db6e1ee7e04885ee2efcba3e6d51ee5a017",
+        "verifier_digest": "7d82f4b2482a24f2"
+      }
+    }
+  }
+}

@@ -15,7 +15,7 @@ check: test
 
 # Unit tests and negative controls for trusted parsers; no Docker required.
 test:
-	PYTHONPATH=src $(PYTHON) -m unittest tests.test_contract tests.test_admission tests.test_evidence tests.test_model tests.test_audit tests.test_runner
+	PYTHONPATH=src $(PYTHON) -m unittest tests.test_contract tests.test_admission tests.test_evidence tests.test_model tests.test_audit tests.test_runner tests.test_recording
 
 # Runs real RTL in the isolated verifier image. Requires Docker and `make image`.
 test-integration:

@@ -332,9 +332,13 @@ def interpret(brief: str, contract: Contract) -> dict:
 EXPLAIN_SYSTEM = """You explain a recorded FIFO verification failure to a student who knows RTL basics.
 Use only the evidence provided. The deterministic checker already decided that the design failed; you explain why, you do not re-judge it.
 Cite every claim with cycle numbers from the provided table and signal names that exist in the evidence or RTL. Cite RTL line numbers for the likely cause.
+The normalized trace samples interface signals and reference-queue state, not internal registers or memory addresses. Explain the RTL logic, but do not assert numeric internal-register values or memory indices that are absent from the sampled trace.
 Reply with one JSON object only:
 {"summary": string (two sentences max), "steps": [{"text": string, "cycles": [int], "signals": [string]}], "likely_cause": {"text": string, "lines": [int]}, "next_action": string, "limits": string}
-"limits" must state what this failure and any passing checks do and do not establish."""
+"limits" must state what this failure and any passing checks do and do not establish.
+A witnessed failure refutes the contract for the tested configuration. Passing simulation checks cover only their named tests; bounded checks cover their stated horizon; an unbounded proof applies only to its named property and assumptions. Reached cover scenarios establish reachability, not correctness. Unresolved obligations are not passes.
+Use the supplied run outcomes for these limits. Do not invent which input conditions passing checks covered or claim that all passing checks excluded full/empty conditions. Other outcomes can come from different traces; do not merge them into the trace being explained.
+If naming another outcome, identify its exact method/check pair and status. Never group an unresolved formal check with witnessed counterexamples; a simulation failure does not imply that the formal checker found that same failure."""
 
 
 def numbered(source: str) -> str:
@@ -400,7 +404,7 @@ def validate_explanation(value: dict) -> dict:
     cause = value["likely_cause"]
     return {"summary": str(value["summary"])[:600], "steps": steps[:8],
             "likely_cause": {"text": str(cause["text"])[:600], "lines": [int(x) for x in cause.get("lines", [])][:8]},
-            "next_action": str(value["next_action"])[:400], "limits": str(value["limits"])[:600]}
+            "next_action": str(value["next_action"])[:400], "limits": str(value["limits"])}
 
 
 def primary_finding(state: dict) -> dict | None:
@@ -417,6 +421,8 @@ def explain_run(state: dict, source: str) -> dict:
     rows = state["verification"]["traces"][finding["trace"]]
     start, end = finding["window"]["start"], finding["window"]["end"]
     related = "\n".join(f"- {e['text']}" for e in finding.get("related_events", [])) or "- none"
+    outcomes = [{key: obligation[key] for key in ("id", "method", "status", "detail", "depth", "tests")
+                 if key in obligation} for obligation in state["verification"].get("obligations", [])]
     user = (
         f"Contract row at the failing edge ({finding['requirement_id']}): {finding['requirement_text']}\n"
         f"Failed check: {finding['check']} — {finding['check_text']}\n"
@@ -425,9 +431,12 @@ def explain_run(state: dict, source: str) -> dict:
         f"Deterministic related events:\n{related}\n\n"
         f"Sampling convention: cycle k is a rising edge; queues are oldest first; dout is checked only after an accepted read.\n"
         f"Cycle table (hex data):\n{trace_table(rows, start, end)}\n\nRTL with line numbers:\n{numbered(source)}\n\n"
-        f"Assumptions: {' '.join(ASSUMPTIONS)}"
+        f"Assumptions: {' '.join(ASSUMPTIONS)}\n\n"
+        f"Run outcomes for result scope (may refer to other tests and traces):\n{json.dumps(outcomes)}"
     )
-    result = structured("explain", EXPLAIN_SYSTEM, user, validate_explanation, max_tokens=1800)
+    # Use the configured output cap: reasoning-capable endpoints can exhaust a
+    # smaller task-local limit before producing their final structured answer.
+    result = structured("explain", EXPLAIN_SYSTEM, user, validate_explanation)
     if result["status"] == "ok":
         result["citation_check"] = citation_check(result["result"], rows, start, end, source)
         if result["citation_check"]["invalid"]:

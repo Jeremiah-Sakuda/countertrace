@@ -292,7 +292,7 @@ export function RepairPanel({
   };
 
   return (
-    <Section title="Repair and export" eyebrow="Candidates are checked against the unchanged contract">
+    <Section id="run-repair" title="Repair and export" eyebrow="Candidates are checked against the unchanged contract">
       <div className="stack">
         {!hasFinding && run.state === "complete" && (
           <p className="muted">Repair applies to runs with a counterexample. This run has none from these methods.</p>

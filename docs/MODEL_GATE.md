@@ -1,12 +1,12 @@
 # Authenticated model gate
 
-Status on October 1, 2026: **pending**. The owner is not signed into Nebius, and `NEBIUS_API_KEY` is absent. The check against local showcase run `20261001-193038-ver-de51cd` returned `unavailable` with zero API calls. No model explanation or repair has been evaluated.
+Status on October 3, 2026: **development feasibility demonstrated**. Authenticated Nemotron 3 Ultra produced a useful explanation after six checks/seven requests and a real repair in one candidate/two requests. The explanation review was performed by Codex against source and trace; independent human review remains pending. All failed checks, limitations, usage, and successful results are retained in [STATUS.md](STATUS.md) and [the evidence record](evidence/model-gate-2026-10-03.json). This is not an independent evaluation.
 
 ## Account and configuration
 
 Sign in to [Token Factory](https://tokenfactory.nebius.com/), confirm the account's NVIDIA model catalog, endpoint, quotas, and billing, then put the key directly in the ignored `.env`. Never paste the key into chat or commit it. Use mode 0600 for this file.
 
-The local configuration has these provisional, nonsecret values:
+The authenticated local configuration uses these nonsecret values:
 
 ```dotenv
 NEBIUS_BASE_URL=https://api.tokenfactory.us-central1.nebius.com/v1
@@ -16,7 +16,7 @@ COUNTERTRACE_MODEL_OUTPUT_TOKEN_LIMIT=4096
 COUNTERTRACE_MODEL_SYSTEM_PREFIX=
 ```
 
-The endpoint and model are listed in the [official Nebius cookbook](https://github.com/nebius/token-factory-cookbook/blob/main/models/nemotron/nemotron3-ultra-550b-a55b.md), which lists $1 input and $3 output per million tokens. These are public catalog values, **not confirmed account availability or billing**. Leave the repair model unset to use the same model. Confirm account prices before filling the price fields and an inference spending threshold. A 16,384-input/4,096-output request at those prices is about $0.029 at the caps; retries, interpretation, and repair add requests. This is an estimate, not observed usage.
+The endpoint and model are listed in the [official Nebius cookbook](https://github.com/nebius/token-factory-cookbook/blob/main/models/nemotron/nemotron3-ultra-550b-a55b.md), which lists $1 input and $3 output per million tokens. The endpoint and exact model ID worked with this account on October 3. Prices remain public catalog values, **not confirmed account billing**. Authenticated `/models` also listed `nvidia/nemotron-3-super-120b-a12b`, `nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B`, and `nvidia/Nemotron-3_5-Lightning`; none of those alternatives was tested. Leave the repair model unset to use the same model. Confirm account prices before filling the price fields and an inference spending threshold. A 16,384-input/4,096-output request at those prices is about $0.029 at the caps; retries, interpretation, and repair add requests. This per-request figure is an estimate. The nine observed explanation/repair requests used 20,045 input and 20,572 output tokens (about $0.082 at public prices); applied credits, balance, and expiry are unverified.
 
 Leave the system prefix blank until the selected endpoint's reasoning controls are verified. The Llama-Nemotron `detailed thinking off` prefix is no longer a universal default. Blank uses provider defaults; it does not promise reasoning is disabled. Check finish reason, schema acceptance, citations, latency, and actual usage before accepting these token limits. Do not tune against the held-out implementation.
 
@@ -39,7 +39,7 @@ The result is attached to the run and also saved under `.countertrace/model_chec
 | Expected versus observed | Uses the actual byte values, accepted requests, and queue state. |
 | Limits | Does not treat simulation or a bounded pass as complete correctness. |
 
-For the showcase, confirm the explanation handles the offered write at full occupancy and the overwritten stored item. The formal flag failure is at cycle 5; the simulation data mismatch is at cycle 6. Citation validity alone cannot establish causal correctness. Record scores, reviewer, timestamp, report path, exact model ID, token usage, and latency in a local review note. Mark usefulness accepted only if all four items are correct and no unsupported causal claim remains; retain failed attempts. This is a development gate, not independent user evidence.
+For the showcase, confirm the explanation handles the offered write at full occupancy and the overwritten stored item. The formal flag failure is at cycle 5; the simulation data mismatch is at cycle 6. Citation validity alone cannot establish causal correctness. Record scores, reviewer (including whether human or assistant), timestamp, report path, exact model ID, token usage, and latency in a review note. Distinguish internal RTL deductions from sampled trace observations. Mark usefulness accepted only if all four items are correct and no unsupported causal claim remains; retain failed attempts. This is a development gate, not independent user evidence.
 
 Only after that review:
 

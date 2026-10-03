@@ -44,7 +44,7 @@ export function ObligationsPanel({ runId, obligations, checks }: { runId: string
   const methods = [...ORDER, ...new Set(obligations.map((o) => o.method).filter((m) => !ORDER.includes(m)))];
   const open = obligations.filter((o) => ["unresolved", "tool_error", "not_checked", "unsupported"].includes(o.status));
   return (
-    <Section title="Obligations by method" eyebrow="What each method established">
+    <Section id="run-obligations" title="Obligations by method" eyebrow="What each method established">
       {obligations.length === 0 ? (
         <p className="muted">No obligations have been recorded yet.</p>
       ) : (

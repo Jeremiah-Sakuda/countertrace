@@ -418,10 +418,10 @@ export interface ExplanationResult {
 }
 
 export interface CitationCheck {
-  valid: boolean;
+  valid: number;
   invalid: { step: number | null; kind: string; value: unknown }[];
-  uncited_steps: number[];
-  allowed_cycles: number[];
+  uncited_steps: number;
+  allowed_cycles: [number, number] | null;
 }
 
 export interface Explanation extends ModelResult<ExplanationResult> {

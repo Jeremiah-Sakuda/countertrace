@@ -32,7 +32,7 @@ export function EvidencePanel({ run, requirements }: { run: Run; requirements: R
   const frozen = v.frozen;
 
   return (
-    <Section title="Evidence details" eyebrow="Expandable">
+    <Section id="run-evidence" title="Evidence details" eyebrow="Expandable">
       <div className="stack">
         <Disclosure summary="Coverage counts per contract row" meta={`${coverage.length} rows`}>
           {coverage.length === 0 ? (

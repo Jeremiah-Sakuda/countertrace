@@ -254,6 +254,15 @@ def record(store: RunStore, run_id: str, note: str = "") -> Path:
                     v.get("tool_versions"))
     state["recorded_from"] = run_id
     state["id"] = f"rec-{run_id}"
+    # Recorded links must stay in the public recording namespace. Their live
+    # IDs refer to private local storage that does not ship with a checkout.
+    # Related runs are recorded separately, never published implicitly here.
+    if state.get("parent_id") and not state["parent_id"].startswith("rec-"):
+        state["parent_id"] = f"rec-{state['parent_id']}"
+    for attempt in (state.get("repair") or {}).get("attempts", []):
+        candidate_id = attempt.get("candidate_run_id")
+        if candidate_id and not candidate_id.startswith("rec-"):
+            attempt["candidate_run_id"] = f"rec-{candidate_id}"
     state["recorded"] = True
     state["recorded_at"] = now()
     state["recorded_note"] = note or (

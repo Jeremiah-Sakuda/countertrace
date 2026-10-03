@@ -1,6 +1,6 @@
 # Implementation status
 
-Last updated: October 1, 2026. This page records what has actually run. Everything below uses **development and showcase fixtures authored for this project**; none of it is a held-out evaluation, benchmark, user result, or external review.
+Last updated: October 3, 2026. This page records what has actually run. Everything below uses **development and showcase fixtures authored for this project**; none of it is a held-out evaluation, benchmark, user result, or external review.
 
 ## October 4 feasibility gate
 
@@ -8,10 +8,31 @@ Last updated: October 1, 2026. This page records what has actually run. Everythi
 | --- | --- | --- |
 | Deterministic runner distinguishes a known-good control from a witnessed faulty design | Met on development fixtures | Survey below: 3 controls proved, 7 faults with counterexamples |
 | Counterexample replayed with the specified cycle convention | Met on development fixtures | Every formal counterexample below was reproduced by the independent simulation scoreboard at the same cycle and check; the depth-2 PRD sequence and a depth-4 wraparound fixture pass as unit tests |
-| Useful response from an authenticated Nemotron endpoint | **Not met** | An explicit showcase model check returned `unavailable` with zero calls because `NEBIUS_API_KEY` is missing. The owner is not signed in to Nebius. Account model availability, prices, schema behavior, and usefulness remain unverified. |
+| Useful response from an authenticated Nemotron endpoint | Met on the development showcase, October 3 | Nemotron 3 Ultra explanation accepted after source/trace review by Codex, with all four rubric items scored 2/2. Six checks and seven requests included failures and prompt tuning; independent human review remains pending. See the evidence below. |
 | Verifier image and toolchain pinned | Met | Debian base digest and OSS CAD Suite `2026-09-30` tarball SHA-256 in [verifier/Dockerfile](../verifier/Dockerfile) |
 
-The gate is therefore **not yet passed**: the model response is outstanding.
+The feasibility gate is met on development evidence. This does not establish evaluation performance or authorize the primary repair release. Independent technical review and learner validation remain outstanding.
+
+## October 3 authenticated model evidence
+
+The account catalog accepted authentication and listed Ultra, Super, Nano, and Lightning Nemotron IDs. Calls used `nvidia/Nemotron-3-Ultra-550b-a55b` at the US Central Token Factory endpoint with configured input/output caps of 16,384/4,096 tokens and a blank system prefix.
+
+Six model checks made seven explanation requests on the existing showcase. Preserve these as development prompt iterations, not a one-shot success rate:
+
+| Check (UTC) | Outcome of source/trace review |
+| --- | --- |
+| 20:39:52 | Correct cause; rejected unsupported claim that passing checks excluded full conditions. |
+| 20:42:13 | Both requests exhausted the old internal 1,800-output-token cap before valid JSON. |
+| 20:42:58 | Correct cause; result limits ambiguously grouped unresolved formal checks with witnessed failures. |
+| 20:45:21 | Correct cause; the application cut the limits text at 600 characters. |
+| 20:47:58 | Rejected an impossible internal `wr_ptr=4` claim for a two-bit pointer. |
+| 20:49:10 | Accepted for usefulness: correct overwrite cause, byte values, failing transactions, and method-specific limits; 16 valid citations, zero invalid citations or uncited steps. |
+
+The final check took 5,350 ms and used 2,615 input / 1,858 output tokens. Its numeric internal pointer/address statements are inferred from RTL, not sampled trace observations; the reviewer checked them against reset, pointer width, and the four preceding writes. The added prompt instruction to avoid unobserved internal numeric values was not fully followed. Citation acceptance is therefore not a semantic correctness guarantee. The four 2/2 scores are **Codex assistant review, not independent human or learner evidence**.
+
+The client now supplies actual method/check outcomes, uses the configured output cap, and preserves complete limits text. All six reports, review notes, request metadata, the final prompt/hash, and the repair outcomes are in [the evidence record](evidence/model-gate-2026-10-03.json). Truncated responses retain failure metadata, not full raw generated text.
+
+Across explanation and repair: **9 chat requests, 20,045 input tokens, 20,572 output tokens**. At the [public cookbook prices](https://github.com/nebius/token-factory-cookbook/blob/main/models/nemotron/nemotron3-ultra-550b-a55b.md) of $1/$3 per million input/output tokens, the estimate is **$0.081761**. Actual account pricing, applied credits, balance, and expiry are unverified. The owner reports claiming credits; no top-up or VM was created.
 
 ## Environment of the recorded results
 
@@ -52,24 +73,35 @@ Survivors of the weak set and the requirement each targets, which the set never 
 
 ## Repair
 
-The bounded repair loop, re-admission, interface checks, and frozen-check-set comparison are implemented and exercised by an integration test that **stubs the model** with fixed candidates (rejected interface change → failing candidate → correct candidate). No model-generated repair has been attempted. The primary-versus-diagnosis release decision remains open.
+On October 3, Nemotron 3 Ultra repaired showcase run `20261001-193038-ver-de51cd` in **one candidate and two model requests**; the first request exhausted its 4,000-token task cap before returning valid JSON. The candidate changes the write enable from `wr_en` to `wr_en && !full` (and removes two comments). Total repair wall time was 29.464 seconds; the successful candidate verification took 8.92 seconds on the warm local Docker image.
+
+Candidate `20261003-164426-ver-05e188` passed admission and the identical frozen check set with no integrity issues or findings: three simulation passes, three bounded passes, three unbounded proofs (`empty_flag`, `full_flag`, `read_data`), and one reached cover obligation. Claims apply only to DEPTH=4, WIDTH=8 and the recorded contract, assumptions, and toolchain. The independent checker, not the model, assigned `passed_unchanged_checks`.
+
+The earlier integration test still exercises rejected, failing, and passing candidates using a stub. The new result is one real development repair, not the frozen eight-case evaluation; the primary-versus-diagnosis release decision remains open.
 
 ## Reproducibility
 
-`countertrace bundle <run>` exports a hashed evidence bundle; `countertrace replay <bundle.zip>` re-ran the showcase bundle on the same machine and matched every obligation status and finding with an identical frozen check set. Clean-environment replays (three bundles, twice each) have not been performed.
+`countertrace bundle <run>` exports a hashed evidence bundle; `countertrace replay <bundle.zip>` re-ran the showcase bundle on the same machine and matched every obligation status and finding with an identical frozen check set. On October 3, the recorded real repair candidate bundle also replayed on the same machine: all ten obligation statuses matched, with no findings or frozen-input differences and no model call. Both refreshed bundles passed manifest file-hash validation and retain public parent/candidate relationships, original timings, and model-call metadata (stored on the parent). Clean-environment replays (three bundles, twice each) have not been performed.
 
 ## Tests
 
-- `make check`: 52 unit tests and negative controls, Python/JSON/TOML validation, documentation links, and whitespace checks pass. New tests cover opt-in model directives, attaching a model-check explanation to a local run for recording, rejection of controls/read-only recordings/missing runs, and the worker's non-root UID/GID selection. Model tests still use mocked endpoints.
+- `make check`: 54 unit tests and negative controls, Python/JSON/TOML validation, documentation links, and whitespace checks pass. New regressions preserve long explanation limits and resolve recorded parent/candidate links in a fresh read-only checkout. Automated model tests use mocked endpoints; the live development calls are documented separately above.
+- `npm test` in `apps/web`: the real-recording citation rendering regression passes; TypeScript checking and the production build pass.
 - `make test-integration`: 7 Docker tests running real RTL (proved control, replayed fault, altered harness hash, cancellation, unsupported syntax, stubbed repair loop, weak-set audit). Rerun after the worker identity fix: all seven passed locally in 59.34 seconds.
 
 ## Interface and recorded runs
 
-The web interface builds with no TypeScript errors and was checked in a browser against the local service: contract setup, a live run from acceptance to finding, the showcase finding and cycle table, a clean control, the audit result and learner exercise, bundle download, model-unavailable states, and a 375 px layout. No screen-reader testing has been done. Three runs are recorded in `recorded/` (showcase fault, known-good control, weak-set audit); the recorded showcase bundle replayed with matching outcomes.
+The web interface builds with no TypeScript errors and was checked in a browser against the local service: contract setup, a live run from acceptance to finding, the showcase finding and cycle table, a clean control, the audit result and learner exercise, bundle download, model-unavailable states, and a 375 px layout. No screen-reader testing has been done. Four runs are recorded in `recorded/` (showcase fault with explanation, its real repair candidate, known-good control, weak-set audit). The original showcase bundle replayed with matching outcomes. Both repair relationships now use public recording IDs; recording a parent does not publish candidates automatically. The first real explanation exposed a frontend/backend citation-shape mismatch that blanked the run page. The interface now treats citation counts as counts and uses exact invalid-citation entries instead of interpreting a cycle range as a list. A regression renders the actual saved model response and mixed valid/invalid citations. Browser checks confirmed the full explanation/limits, source citations, cycle-5 focus, and recorded candidate navigation.
+
+## October 3 UI/UX Pro Max review
+
+A separate UI subagent reviewed the existing React interface against the UI/UX Pro Max skill and the persisted design system. Existing semantic result colors, focus rings, responsive grids, and reduced-motion support were retained. Changes add section shortcuts for long verification pages, native cycle buttons with a pressed state, and larger controls/text inputs on narrow screens. Collapsing a full trace after selecting a late cycle now restores a visible cycle as both the keyboard entry point and displayed queue.
+
+Browser checks passed for section-heading focus; citation-to-cycle focus; Tab, ArrowDown, Home, and End; selecting cycle 11 then collapsing to the cycle-6 window; and opening the recorded candidate by keyboard. No page-level horizontal overflow was observed at widths 375, 768, 1024, and 1440 px, or at 812 × 375 landscape. These are focused interaction/responsive checks, not a complete accessibility certification; screen-reader testing and learner sessions remain pending. The UI regression, production build, and `make check` passed after the final edit.
 
 ## Not yet done
 
-Live Nemotron calls and their measured usefulness; Nebius Serverless Jobs (all verification runs locally in Docker); the frozen evaluation suite with an independently authored, held-out implementation; reviewer and learner recruitment; the usability study; clean-environment replays; hosted deployment and judge access; the demonstration video.
+Independent human explanation review; live natural-language interpretation validation; Nebius Serverless Jobs (all verification runs locally in Docker); the frozen evaluation suite with an independently authored, held-out implementation; reviewer and learner recruitment; the usability study; clean-environment replays; hosted deployment and judge access; the demonstration video.
 
 ## October 1 follow-up preparation
 

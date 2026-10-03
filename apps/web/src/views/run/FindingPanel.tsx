@@ -112,7 +112,7 @@ export function TraceBlock({
     if (!inWindow) setShowAll(true);
   }, [focusRequest, finding, showAll]);
 
-  const current = selected ?? rows.find((r) => r.cycle === finding.cycle) ?? rows[0] ?? null;
+  const current = rows.find((r) => r.cycle === selected?.cycle) ?? rows.find((r) => r.cycle === finding.cycle) ?? rows[0] ?? null;
 
   if (total === 0)
     return (
@@ -177,13 +177,13 @@ export function FindingPanel({
   onCite: (cycle: number) => void;
 }) {
   return (
-    <section className="panel finding" aria-labelledby="finding-title">
+    <section className="panel finding" aria-labelledby="run-finding">
       <header className="panel-header">
         <div>
           <p className="eyebrow eyebrow-fail">
             <CircleX size={14} aria-hidden="true" /> Counterexample found · {finding.source === "formal" ? "formal" : "simulation"}
           </p>
-          <h2 id="finding-title" className="panel-title">
+          <h2 id="run-finding" className="panel-title" tabIndex={-1}>
             Violated requirement: {finding.requirement_title}
           </h2>
         </div>

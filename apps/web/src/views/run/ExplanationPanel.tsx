@@ -11,8 +11,6 @@ import { useNow } from "../../lib/hooks";
 function ExplanationBody({ explanation, runId, onCite }: { explanation: Explanation; runId: string; onCite: (cycle: number) => void }) {
   const r = explanation.result;
   const check = explanation.citation_check;
-  const allowed = check ? new Set(check.allowed_cycles) : null;
-  const uncited = new Set(check?.uncited_steps ?? []);
   const [source, setSource] = useState<string | null>(null);
   const [sourceError, setSourceError] = useState<unknown>(null);
   const lines = r?.likely_cause?.lines ?? [];
@@ -36,7 +34,7 @@ function ExplanationBody({ explanation, runId, onCite }: { explanation: Explanat
       {r && (
         <article className="explanation" aria-label="Model-generated explanation">
           <ModelProvenance task="explanation" />
-          {check && !check.valid && (
+          {check && check.invalid.length > 0 && (
             <p className="callout-inline warn">
               <TriangleAlert size={14} aria-hidden="true" /> Some citations do not match the recorded evidence and are flagged below.
             </p>
@@ -49,7 +47,7 @@ function ExplanationBody({ explanation, runId, onCite }: { explanation: Explanat
                 <p>{step.text}</p>
                 <p className="citations">
                   {step.cycles.map((c) => {
-                    const invalid = allowed !== null && !allowed.has(c);
+                    const invalid = check?.invalid.some((citation) => citation.step === i && citation.kind === "cycle" && citation.value === c);
                     return invalid ? (
                       <span key={c} className="cite cite-invalid" title="This cycle is not in the recorded evidence for this finding">
                         <TriangleAlert size={12} aria-hidden="true" /> cycle {c} (invalid citation)
@@ -65,7 +63,7 @@ function ExplanationBody({ explanation, runId, onCite }: { explanation: Explanat
                       {s}
                     </code>
                   ))}
-                  {(uncited.has(i) || (step.cycles.length === 0 && step.signals.length === 0)) && <span className="cite cite-none">no evidence cited</span>}
+                  {step.cycles.length === 0 && step.signals.length === 0 && <span className="cite cite-none">no evidence cited</span>}
                 </p>
               </li>
             ))}
@@ -131,6 +129,7 @@ export function ExplanationPanel({ run, hasFinding, onCite, onUpdated }: { run: 
 
   return (
     <Section
+      id="run-explanation"
       title="Explanation"
       eyebrow="Model-generated · not part of the verdict"
       actions={

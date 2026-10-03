@@ -158,6 +158,16 @@ class ModelTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             model.extract_json("no object here")
 
+    def test_explanation_preserves_long_result_limits(self):
+        limits = ("Passing simulations cover named tests only. " * 16
+                  + "Reached cover scenarios establish reachability, not correctness.")
+        explanation = {"summary": "A write while full corrupts the queue.",
+                       "steps": [{"text": "Mismatch.", "cycles": [6], "signals": ["dout"]}],
+                       "likely_cause": {"text": "Missing full gate.", "lines": [25]},
+                       "next_action": "Gate writes.", "limits": limits}
+        self.assertGreater(len(limits), 600)
+        self.assertEqual(model.validate_explanation(explanation)["limits"], limits)
+
 
 if __name__ == "__main__":
     unittest.main()
