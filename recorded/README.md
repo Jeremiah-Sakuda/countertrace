@@ -7,3 +7,5 @@ Keep the current four curated runs (about 9 MiB: showcase fault, its repaired ca
 The October 3 refresh contains a reviewed Ultra explanation and one successful real repair. Failed explanation checks and request metadata are preserved in [the development evidence record](../docs/evidence/model-gate-2026-10-03.json), not represented as a benchmark.
 
 Before replacing the showcase, run `countertrace model-check --run-id <local-run-id>` and complete the usefulness review in [MODEL_GATE.md](../docs/MODEL_GATE.md). Recording copies the explanation attached to the local run. A model-unavailable response is not an explanation; keep the current recording until there is a reviewed result. Parent/candidate links use recording IDs; record each intended public relative explicitly. Recording never auto-publishes a private related run. Keep private runs and held-out labels out of this directory.
+
+Raw files under each recording’s `batches/` preserve tool output byte for byte. Git attributes disable newline conversion and whitespace linting only for these generated artifacts; source and documentation checks remain enabled.
