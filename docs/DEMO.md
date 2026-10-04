@@ -1,3 +1,5 @@
+> The recording script is now [docs/submission/DEMO_SCRIPT.md](submission/DEMO_SCRIPT.md). This file keeps the original storyboard and its status notes.
+
 # Demonstration storyboard (draft)
 
 A 2:45 plan following the PRD's timing table. Every screen must show actual evidence; label recorded runs and any edited waits. Replace bracketed items only with observed results.

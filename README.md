@@ -25,11 +25,11 @@ Every model call is a runtime call from the control service to the Nebius Token 
 
 | Task | Model | Role and safeguards |
 | --- | --- | --- |
-| Brief interpretation, check-set proposals | `nvidia/nemotron-3-super-120b-a12b` | Flags conflicts between a plain-English brief and the fixed contract (cannot change it); proposes supplemental checks only from reviewed templates. Reasoning off by default for these tasks: 1.7–3.7 s per brief across development and eval-v2 briefs (7.1–11.4 s with reasoning on in eval-v1). |
+| Brief interpretation, check-set proposals | `nvidia/nemotron-3-super-120b-a12b` | Flags conflicts between a plain-English brief and the fixed contract (cannot change it); proposes supplemental checks only from reviewed templates. Reasoning off by default for these tasks: 1.7 to 3.7 s per brief across development and eval-v2 briefs (7.1 to 11.4 s with reasoning on in eval-v1). |
 | Failure explanation | `nvidia/Nemotron-3-Ultra-550b-a55b` | Explains the recorded failing cycles for a learner; every cited cycle, signal, and RTL line is checked against the trace and source. Never changes the verdict. |
 | Repair agent | `nvidia/Nemotron-3-Ultra-550b-a55b` | Proposes exact-match RTL edits; each candidate is re-admitted and re-verified (simulation, bounded model checking, unbounded proof, reachability) against the frozen check set, up to three attempts. |
 
-Responses are schema-validated with one bounded retry; input/output token caps are required; per-call usage is logged and an inference-spend threshold stops new calls. Token Factory made the agent loop practical: routing quick calls to Super kept interpretation interactive, while Ultra handled trace reasoning and repairs. Verification runs on CPU in a pinned Docker image; Nebius Serverless Jobs are not used (see [feedback](docs/SUBMISSION.md#feedback-on-nebius-and-nvidia-tools)).
+Responses are schema-validated with one bounded retry; input/output token caps are required; per-call usage is logged and an inference-spend threshold stops new calls. Routing quick calls to Super with reasoning off kept interpretation interactive (1.7 to 3.7 s per brief), while Ultra handled trace reasoning and repairs. Verification runs on CPU in a pinned Docker image; Nebius Serverless Jobs are not used (see [feedback](docs/submission/FEEDBACK.md)).
 
 ## Related work and what is different
 
@@ -94,7 +94,7 @@ evaluation/         Evaluation protocol; held-out cases stay local until frozen
 
 ## Documents
 
-- [Product requirements](docs/PRD.md) · [Implementation status](docs/STATUS.md) · [Milestones](docs/ROADMAP.md) · [Evaluation eval-v1](evaluation/results/eval-v1/REPORT.md) · [eval-v2](evaluation/results/eval-v2/REPORT.md) · [Repair ablation](evaluation/results/eval-v2-ablation/REPORT.md) · [Submission draft](docs/SUBMISSION.md) · [Release decision](docs/RELEASE_DECISION.md)
+- [Product requirements](docs/PRD.md) · [Implementation status](docs/STATUS.md) · [Milestones](docs/ROADMAP.md) · [Evaluation eval-v1](evaluation/results/eval-v1/REPORT.md) · [eval-v2](evaluation/results/eval-v2/REPORT.md) · [Repair ablation](evaluation/results/eval-v2-ablation/REPORT.md) · [Submission materials](docs/submission/README.md) · [Release decision](docs/RELEASE_DECISION.md)
 - [Architecture](docs/ARCHITECTURE.md) · [Control service API](docs/API.md) · [Development](docs/DEVELOPMENT.md) · [Deployment plan](docs/DEPLOYMENT.md)
 - [Model gate](docs/MODEL_GATE.md) · [Evaluation protocol](evaluation/README.md) · [Study protocol](evaluation/STUDY.md) · [Release decision](docs/RELEASE_DECISION.md)
 - [Hackathon fit review](docs/reviews/hackathon-fit.md) · [Third-party notices](THIRD_PARTY_NOTICES.md)
