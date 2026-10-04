@@ -414,4 +414,55 @@ code { font-size: .84em; padding: 2px 4px; background: var(--color-muted); borde
   .repair-payoff-label { grid-column: 1/-1; }
   .probable-origin-line { font-size: 1.05rem; }
 }
+/* Code renders literally: no programming ligatures, so Verilog <=, !=, ==, ->, and diff +++ keep their characters. */
+code,pre,kbd,samp,textarea,.mono,.code,.code-input,.json,.waveform,.diff-line,.case-facts strong,.case-signal strong,.case-focus-source,.cycle-select,.cycle-link,.slot-val,.queue-cell,.picker-meta,.gallery-meta,.disclosure-meta,.eyebrow,.tag {
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "calt" 0;
+}
+/* Cycle table: an unchecked dout is a quiet dash, not a repeated stale value. */
+.dim-dash { color: var(--color-muted-foreground); }
+/* Repair loop timeline */
+.loop { display: grid; gap: 10px; padding: 18px 20px; background: var(--color-card); border: 1px solid #ccd1ba; border-left: 3px solid var(--color-foreground); }
+.loop-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+.loop-group { display: grid; gap: 0; }
+.loop-step { position: relative; display: grid; grid-template-columns: 20px minmax(0,1fr); gap: 10px; align-items: start; padding: 8px 0 8px; font-size: .86rem; }
+.loop-step p { min-width: 0; overflow-wrap: anywhere; }
+.loop-icon { margin-top: 3px; }
+.loop-group:not(:last-child) .loop-step:last-child::after,.loop-group .loop-step:not(:last-child)::after { content: ''; position: absolute; left: 9px; top: 28px; bottom: -6px; border-left: 1px dashed var(--color-border); }
+.loop-fail .loop-icon { color: var(--tone-fail); }
+.loop-sim .loop-icon { color: var(--tone-sim); }
+.loop-neutral .loop-icon,.loop-running .loop-icon { color: var(--color-muted-foreground); }
+.loop-toolerror .loop-icon { color: var(--tone-toolerror); }
+.loop-feedback { padding-left: 22px; grid-template-columns: 20px minmax(0,1fr); color: var(--color-soft-foreground); font-size: .8rem; }
+.loop-feedback .loop-icon { color: var(--color-accent); }
+.loop-group .loop-feedback::after { left: 31px !important; }
+.loop-detail { color: var(--color-soft-foreground); }
+.loop-link { white-space: nowrap; font-size: .8rem; }
+.loop-provenance { display: flex; gap: 8px; align-items: flex-start; padding: 12px 14px; background: #f7efe3; border: 1px solid #d6bea6; border-left: 3px solid var(--color-accent); font-size: .86rem; }
+.loop-provenance svg { flex: none; margin-top: 3px; color: var(--color-accent); }
+.progress-note { display: grid; gap: 8px; padding: 16px 18px; border: 1px solid var(--color-border-subtle); background: #faf9f3; }
+.progress-headline { font: 500 1.25rem/1.3 var(--font-heading); }
+.progress-pair { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 0; }
+.progress-pair dt { font-size: .7rem; color: var(--color-muted-foreground); }
+.progress-pair dd { margin: 2px 0 0; font-size: .78rem; overflow-wrap: anywhere; }
+.exercise-grade { margin: 8px 0; }
+.unresolved-reason { font-weight: 400; }
+/* Small screens: brand and the runtime toggle share one row, run status sits under the navigation. */
+@media(max-width:759px) {
+  .site-header { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 10px 12px; padding: 14px 16px 12px; }
+  .site-header-inner { grid-column: 1; grid-row: 1; }
+  .brand-name { font-size: 1.5rem; gap: 10px; }
+  .brand-name svg { width: 32px; height: 32px; }
+  .brand-caption { margin-top: 3px; }
+  .site-nav { grid-column: 1/-1; grid-row: 2; }
+  .site-nav a { min-height: 44px; }
+  .rail-bottom { display: contents; }
+  .service-details { grid-column: 2; grid-row: 1; position: relative; justify-self: end; }
+  .service-details summary { min-height: 44px; padding: 12px 2px; line-height: 20px; }
+  .service-details[open] .header-status { position: absolute; right: 0; top: 100%; z-index: 20; width: min(340px,calc(100vw - 32px)); padding: 12px; background: var(--color-card); border: 1px solid var(--color-border); box-shadow: 0 6px 18px #25282422; }
+  .run-context { grid-column: 1/-1; grid-row: 3; gap: 5px; }
+  .loop,.progress-note { padding: 14px; }
+  .loop-feedback { padding-left: 12px; }
+  .loop-group .loop-feedback::after { left: 21px !important; }
+}
 @media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }.spin { animation: none; } }

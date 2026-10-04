@@ -1,7 +1,7 @@
 {
  "id": "rec-20261004-010137-ver-dd43e0",
  "kind": "verification",
- "title": "eval-v2 F6",
+ "title": "Two bugs: reads while empty, and empty ignores the wrap bit",
  "example_id": null,
  "origin": "evaluation",
  "parent_id": null,
@@ -50692,5 +50692,6 @@
   "yosys": "Yosys 0.69+158 (git sha1 a1a0ad7d4-dirty, Release, GNU /usr/bin/aarch64-linux-gnu-g++ 15.2.0)",
   "python": "Python 3.11.2",
   "oss_cad_suite": "2026-09-30"
- }
+ },
+ "title_original": "eval-v2 F6"
 }

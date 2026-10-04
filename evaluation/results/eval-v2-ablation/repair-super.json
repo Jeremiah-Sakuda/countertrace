@@ -1,0 +1,849 @@
+{
+  "suite": "eval-v2",
+  "started_at": "2026-10-04T05:20:59Z",
+  "model_ids": {
+    "explain": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "repair": "nvidia/nemotron-3-super-120b-a12b",
+    "interpret": "nvidia/nemotron-3-super-120b-a12b"
+  },
+  "prompt_sha256": {
+    "interpret": "sha256:b426c60c4a0c245eda05ae89e54f95cff100273720042aaa8ad0e2e941149eef",
+    "explain": "sha256:9b6e8934df835f60691a07ebf9ad42e74392d26a465758083770a0fe5d310b79",
+    "repair": "sha256:b9dea4ba311d8d99b0ea81773630603245a5da4131e4a72018e65e1616c26b08",
+    "propose_checks": "sha256:0eb0bc9c56f70598df638266c88145dc4118a4f9f7c31ea5ab0237bb808cdb16"
+  },
+  "cases": [
+    {
+      "id": "C1",
+      "impl": "regflags",
+      "depth": 4,
+      "expected": "correct",
+      "category": null,
+      "class": null,
+      "summary": null,
+      "held_out": true,
+      "diagnosis": {
+        "run_id": "20261004-012059-ver-fec779",
+        "state": "complete",
+        "headline": "no_counterexample",
+        "obligations": {
+          "simulation:empty_flag": "simulation_passed",
+          "simulation:full_flag": "simulation_passed",
+          "simulation:read_data": "simulation_passed",
+          "bmc:empty_flag": "bounded_pass",
+          "bmc:full_flag": "bounded_pass",
+          "bmc:read_data": "bounded_pass",
+          "prove:empty_flag": "proved",
+          "prove:full_flag": "proved",
+          "prove:read_data": "proved",
+          "cover:reachability": "bounded_pass"
+        },
+        "findings": [],
+        "formal_replay": null,
+        "integrity": [],
+        "timings": {
+          "total_s": 10.35
+        },
+        "outcome": "no_counterexample"
+      }
+    },
+    {
+      "id": "C2",
+      "impl": "regflags",
+      "depth": 2,
+      "expected": "correct",
+      "category": null,
+      "class": null,
+      "summary": null,
+      "held_out": true,
+      "diagnosis": {
+        "run_id": "20261004-012110-ver-86f3e2",
+        "state": "complete",
+        "headline": "no_counterexample",
+        "obligations": {
+          "bmc:empty_flag": "bounded_pass",
+          "bmc:full_flag": "bounded_pass",
+          "bmc:read_data": "bounded_pass",
+          "prove:empty_flag": "proved",
+          "prove:full_flag": "proved",
+          "prove:read_data": "proved",
+          "cover:reachability": "bounded_pass",
+          "simulation:empty_flag": "simulation_passed",
+          "simulation:full_flag": "simulation_passed",
+          "simulation:read_data": "simulation_passed"
+        },
+        "findings": [],
+        "formal_replay": null,
+        "integrity": [],
+        "timings": {
+          "total_s": 3.64
+        },
+        "outcome": "no_counterexample"
+      }
+    },
+    {
+      "id": "C3",
+      "impl": "billdmar",
+      "depth": 4,
+      "expected": "correct",
+      "category": null,
+      "class": null,
+      "summary": null,
+      "held_out": false,
+      "diagnosis": {
+        "run_id": "20261004-012113-ver-d5ad57",
+        "state": "complete",
+        "headline": "no_counterexample",
+        "obligations": {
+          "simulation:empty_flag": "simulation_passed",
+          "simulation:full_flag": "simulation_passed",
+          "simulation:read_data": "simulation_passed",
+          "bmc:empty_flag": "bounded_pass",
+          "bmc:full_flag": "bounded_pass",
+          "bmc:read_data": "bounded_pass",
+          "prove:empty_flag": "proved",
+          "prove:full_flag": "proved",
+          "prove:read_data": "proved",
+          "cover:reachability": "bounded_pass"
+        },
+        "findings": [],
+        "formal_replay": null,
+        "integrity": [],
+        "timings": {
+          "total_s": 12.14
+        },
+        "outcome": "no_counterexample"
+      }
+    },
+    {
+      "id": "C4",
+      "impl": "wrapbit",
+      "depth": 2,
+      "expected": "correct",
+      "category": null,
+      "class": null,
+      "summary": null,
+      "held_out": false,
+      "diagnosis": {
+        "run_id": "20261004-012126-ver-0acb09",
+        "state": "complete",
+        "headline": "no_counterexample",
+        "obligations": {
+          "bmc:empty_flag": "bounded_pass",
+          "bmc:full_flag": "bounded_pass",
+          "bmc:read_data": "bounded_pass",
+          "prove:empty_flag": "proved",
+          "prove:full_flag": "proved",
+          "prove:read_data": "proved",
+          "cover:reachability": "bounded_pass",
+          "simulation:empty_flag": "simulation_passed",
+          "simulation:full_flag": "simulation_passed",
+          "simulation:read_data": "simulation_passed"
+        },
+        "findings": [],
+        "formal_replay": null,
+        "integrity": [],
+        "timings": {
+          "total_s": 3.64
+        },
+        "outcome": "no_counterexample"
+      }
+    },
+    {
+      "id": "F1",
+      "impl": "regflags",
+      "depth": 4,
+      "expected": "faulty",
+      "category": "simultaneous",
+      "class": "both_mid",
+      "summary": "Flag updates written as independent if-statements: a simultaneous read and write at occupancy 1 sets empty.",
+      "held_out": true,
+      "diagnosis": {
+        "run_id": "20261004-012129-ver-2ca08d",
+        "state": "complete",
+        "headline": "counterexample",
+        "obligations": {
+          "bmc:empty_flag": "counterexample",
+          "bmc:full_flag": "unresolved",
+          "bmc:read_data": "unresolved",
+          "prove:empty_flag": "counterexample",
+          "prove:full_flag": "unresolved",
+          "prove:read_data": "unresolved",
+          "cover:reachability": "bounded_pass",
+          "simulation:empty_flag": "counterexample",
+          "simulation:full_flag": "simulation_passed",
+          "simulation:read_data": "simulation_passed"
+        },
+        "findings": [
+          {
+            "source": "simulation",
+            "test": "random_s3",
+            "cycle": 2,
+            "check": "empty_flag",
+            "requirement_id": "both_mid"
+          },
+          {
+            "source": "formal",
+            "test": "formal:bmc",
+            "cycle": 2,
+            "check": "empty_flag",
+            "requirement_id": "both_mid"
+          }
+        ],
+        "formal_replay": "reproduced",
+        "integrity": [],
+        "timings": {
+          "first_finding_s": 3.59,
+          "total_s": 6.97
+        },
+        "outcome": "reproduced"
+      },
+      "repair": {
+        "status": "passed",
+        "wall_s": 32.81,
+        "attempts": [
+          {
+            "index": 1,
+            "status": "passed_unchanged_checks",
+            "summary": "All 10 obligations resolved under the unchanged checks (3 proved, no counterexample).",
+            "candidate_run_id": "20261004-012158-ver-57a616",
+            "frozen_match": true,
+            "rationale": "Fix flag updates during simultaneous read/write when not empty/full.",
+            "diff": "--- a/dut.v\n+++ b/dut.v\n@@ -46,11 +46,14 @@\n                 dout <= ram[rp];\n                 rp   <= rp_next;\n             end\n-            if (push) begin\n+            if (push && pop) begin\n+                // both: occupancy unchanged\n+                full_r  <= full_r;\n+                empty_r <= empty_r;\n+            end else if (push) begin\n                 empty_r <= 1'b0;\n                 full_r  <= (wp_next == rp);\n-            end\n-            if (pop) begin\n+            end else if (pop) begin\n                 full_r  <= 1'b0;\n                 empty_r <= (rp_next == wp);\n             end\n",
+            "diagnostics": null,
+            "calls": [
+              {
+                "task": "repair",
+                "model_id": "nvidia/nemotron-3-super-120b-a12b",
+                "latency_ms": 20085,
+                "prompt_tokens": 1314,
+                "completion_tokens": 4096,
+                "status": "ok",
+                "schema_error": "Expecting ',' delimiter: line 1 column 859 (char 858)",
+                "finish_reason": "length"
+              },
+              {
+                "task": "repair",
+                "model_id": "nvidia/nemotron-3-super-120b-a12b",
+                "latency_ms": 1943,
+                "prompt_tokens": 1341,
+                "completion_tokens": 455,
+                "status": "ok",
+                "schema_error": null,
+                "finish_reason": "stop"
+              }
+            ]
+          }
+        ],
+        "attempts_used": 1,
+        "passed_on_attempt": 1
+      }
+    },
+    {
+      "id": "F2",
+      "impl": "regflags",
+      "depth": 4,
+      "expected": "faulty",
+      "category": "reset",
+      "class": "reset",
+      "summary": "Reset does not clear the registered full flag.",
+      "held_out": true,
+      "diagnosis": {
+        "run_id": "20261004-012209-ver-d219ed",
+        "state": "complete",
+        "headline": "counterexample",
+        "obligations": {
+          "bmc:empty_flag": "unresolved",
+          "bmc:full_flag": "counterexample",
+          "bmc:read_data": "unresolved",
+          "prove:empty_flag": "unresolved",
+          "prove:full_flag": "counterexample",
+          "prove:read_data": "unresolved",
+          "cover:reachability": "bounded_pass",
+          "simulation:empty_flag": "simulation_passed",
+          "simulation:full_flag": "counterexample",
+          "simulation:read_data": "simulation_passed"
+        },
+        "findings": [
+          {
+            "source": "simulation",
+            "test": "fill_drain",
+            "cycle": 0,
+            "check": "full_flag",
+            "requirement_id": "reset"
+          },
+          {
+            "source": "formal",
+            "test": "formal:bmc",
+            "cycle": 0,
+            "check": "full_flag",
+            "requirement_id": "reset"
+          }
+        ],
+        "formal_replay": "reproduced",
+        "integrity": [],
+        "timings": {
+          "first_finding_s": 3.61,
+          "total_s": 7.0
+        },
+        "outcome": "reproduced"
+      },
+      "repair": {
+        "status": "passed",
+        "wall_s": 18.16,
+        "attempts": [
+          {
+            "index": 1,
+            "status": "passed_unchanged_checks",
+            "summary": "All 10 obligations resolved under the unchanged checks (3 proved, no counterexample).",
+            "candidate_run_id": "20261004-012224-ver-6833e2",
+            "frozen_match": true,
+            "rationale": "Reset must deassert full flag; currently full_r is not cleared in the reset block, causing full to retain its previous value after reset. Adding full_r <= 1'b0; ensures empty=true and full=false after reset while preserving other behavior.",
+            "diff": "--- a/dut.v\n+++ b/dut.v\n@@ -36,6 +36,7 @@\n             wp      <= 0;\n             rp      <= 0;\n             empty_r <= 1'b1;\n+            full_r  <= 1'b0;\n         end else begin\n             if (push) begin\n                 ram[wp] <= din;\n",
+            "diagnostics": null,
+            "calls": [
+              {
+                "task": "repair",
+                "model_id": "nvidia/nemotron-3-super-120b-a12b",
+                "latency_ms": 7669,
+                "prompt_tokens": 1245,
+                "completion_tokens": 1472,
+                "status": "ok",
+                "schema_error": null,
+                "finish_reason": "stop"
+              }
+            ]
+          }
+        ],
+        "attempts_used": 1,
+        "passed_on_attempt": 1
+      }
+    },
+    {
+      "id": "F3",
+      "impl": "regflags",
+      "depth": 4,
+      "expected": "faulty",
+      "category": "flags_boundaries",
+      "class": "write_not_full",
+      "summary": "full is computed from the current write pointer instead of the next one.",
+      "held_out": true,
+      "diagnosis": {
+        "run_id": "20261004-012234-ver-f3f0e9",
+        "state": "complete",
+        "headline": "counterexample",
+        "obligations": {
+          "bmc:empty_flag": "unresolved",
+          "bmc:full_flag": "counterexample",
+          "bmc:read_data": "unresolved",
+          "prove:empty_flag": "unresolved",
+          "prove:full_flag": "counterexample",
+          "prove:read_data": "unresolved",
+          "cover:reachability": "bounded_pass",
+          "simulation:empty_flag": "simulation_passed",
+          "simulation:full_flag": "counterexample",
+          "simulation:read_data": "simulation_passed"
+        },
+        "findings": [
+          {
+            "source": "simulation",
+            "test": "fill_drain",
+            "cycle": 1,
+            "check": "full_flag",
+            "requirement_id": "write_not_full"
+          },
+          {
+            "source": "formal",
+            "test": "formal:bmc",
+            "cycle": 1,
+            "check": "full_flag",
+            "requirement_id": "write_not_full"
+          }
+        ],
+        "formal_replay": "reproduced",
+        "integrity": [],
+        "timings": {
+          "first_finding_s": 3.35,
+          "total_s": 6.47
+        },
+        "outcome": "reproduced"
+      },
+      "repair": {
+        "status": "passed",
+        "wall_s": 23.72,
+        "attempts": [
+          {
+            "index": 1,
+            "status": "passed_unchanged_checks",
+            "summary": "All 10 obligations resolved under the unchanged checks (3 proved, no counterexample).",
+            "candidate_run_id": "20261004-012252-ver-a5cfb2",
+            "frozen_match": true,
+            "rationale": "The full flag was incorrectly set because it compared the current write pointer (before increment) with the read pointer after a write-only operation. The fix uses the updated pointer values (wp_next, rp_next) when setting the full and empty flags for push-only, pop-only, and simultaneous push/pop cases.",
+            "diff": "--- a/dut.v\n+++ b/dut.v\n@@ -49,11 +49,15 @@\n             case ({push, pop})\n                 2'b10: begin\n                     empty_r <= 1'b0;\n-                    full_r  <= (wp == rp);\n+                    full_r  <= (wp_next == rp);\n                 end\n                 2'b01: begin\n                     full_r  <= 1'b0;\n                     empty_r <= (rp_next == wp);\n+                end\n+                2'b11: begin\n+                    full_r  <= (wp_next == rp_next);\n+                    empty_r <= (rp_next == wp_next);\n                 end\n                 default: begin\n                 end\n",
+            "diagnostics": null,
+            "calls": [
+              {
+                "task": "repair",
+                "model_id": "nvidia/nemotron-3-super-120b-a12b",
+                "latency_ms": 11413,
+                "prompt_tokens": 1289,
+                "completion_tokens": 2514,
+                "status": "ok",
+                "schema_error": null,
+                "finish_reason": "stop"
+              }
+            ]
+          }
+        ],
+        "attempts_used": 1,
+        "passed_on_attempt": 1
+      }
+    },
+    {
+      "id": "F4",
+      "impl": "regflags",
+      "depth": 4,
+      "expected": "faulty",
+      "category": "ordering_wraparound",
+      "class": "wraparound",
+      "summary": "The storage array is declared one entry short, so the last slot is lost at wraparound.",
+      "held_out": true,
+      "diagnosis": {
+        "run_id": "20261004-012305-ver-ba20a2",
+        "state": "complete",
+        "headline": "counterexample",
+        "obligations": {
+          "bmc:empty_flag": "tool_error",
+          "bmc:full_flag": "tool_error",
+          "bmc:read_data": "tool_error",
+          "prove:empty_flag": "tool_error",
+          "prove:full_flag": "tool_error",
+          "prove:read_data": "tool_error",
+          "cover:reachability": "bounded_pass",
+          "simulation:empty_flag": "simulation_passed",
+          "simulation:full_flag": "simulation_passed",
+          "simulation:read_data": "counterexample"
+        },
+        "findings": [
+          {
+            "source": "simulation",
+            "test": "learner_basic",
+            "cycle": 8,
+            "check": "read_data",
+            "requirement_id": "read_not_empty"
+          }
+        ],
+        "formal_replay": null,
+        "integrity": [],
+        "timings": {
+          "first_finding_s": 3.6,
+          "total_s": 3.62
+        },
+        "outcome": "reproduced"
+      },
+      "repair": {
+        "status": "passed",
+        "wall_s": 32.79,
+        "attempts": [
+          {
+            "index": 1,
+            "status": "passed_unchanged_checks",
+            "summary": "All 10 obligations resolved under the unchanged checks (3 proved, no counterexample).",
+            "candidate_run_id": "20261004-012331-ver-eaa173",
+            "frozen_match": true,
+            "rationale": "Fix RAM size and update conditions for correct data retrieval.",
+            "diff": "--- a/dut.v\n+++ b/dut.v\n@@ -17,7 +17,7 @@\n );\n     localparam integer AW = $clog2(DEPTH);\n \n-    reg [WIDTH-1:0] ram [0:DEPTH-2];\n+    reg [WIDTH-1:0] ram [0:DEPTH-1];\n     reg [AW-1:0]    wp;\n     reg [AW-1:0]    rp;\n     reg             full_r;\n",
+            "diagnostics": null,
+            "calls": [
+              {
+                "task": "repair",
+                "model_id": "nvidia/nemotron-3-super-120b-a12b",
+                "latency_ms": 21435,
+                "prompt_tokens": 1648,
+                "completion_tokens": 4096,
+                "status": "ok",
+                "schema_error": "no JSON object in response",
+                "finish_reason": "length"
+              },
+              {
+                "task": "repair",
+                "model_id": "nvidia/nemotron-3-super-120b-a12b",
+                "latency_ms": 1295,
+                "prompt_tokens": 1675,
+                "completion_tokens": 281,
+                "status": "ok",
+                "schema_error": null,
+                "finish_reason": "stop"
+              }
+            ]
+          }
+        ],
+        "attempts_used": 1,
+        "passed_on_attempt": 1
+      }
+    },
+    {
+      "id": "F5",
+      "impl": "count",
+      "depth": 4,
+      "expected": "faulty",
+      "category": "flags_boundaries",
+      "class": "write_not_full",
+      "summary": "Two bugs: full asserts one word early, and reset does not clear the read pointer.",
+      "held_out": false,
+      "diagnosis": {
+        "run_id": "20261004-012341-ver-28695d",
+        "state": "complete",
+        "headline": "counterexample",
+        "obligations": {
+          "bmc:empty_flag": "unresolved",
+          "bmc:full_flag": "unresolved",
+          "bmc:read_data": "counterexample",
+          "prove:empty_flag": "unresolved",
+          "prove:full_flag": "unresolved",
+          "prove:read_data": "counterexample",
+          "cover:reachability": "bounded_pass",
+          "simulation:empty_flag": "simulation_passed",
+          "simulation:full_flag": "counterexample",
+          "simulation:read_data": "counterexample"
+        },
+        "findings": [
+          {
+            "source": "simulation",
+            "test": "random_s1",
+            "cycle": 2,
+            "check": "read_data",
+            "requirement_id": "read_not_empty"
+          },
+          {
+            "source": "formal",
+            "test": "formal:bmc",
+            "cycle": 2,
+            "check": "read_data",
+            "requirement_id": "both_mid"
+          }
+        ],
+        "formal_replay": "reproduced",
+        "integrity": [],
+        "timings": {
+          "first_finding_s": 3.37,
+          "total_s": 6.48
+        },
+        "outcome": "reproduced"
+      },
+      "repair": {
+        "status": "passed",
+        "wall_s": 17.62,
+        "attempts": [
+          {
+            "index": 1,
+            "status": "passed_unchanged_checks",
+            "summary": "All 10 obligations resolved under the unchanged checks (3 proved, no counterexample).",
+            "candidate_run_id": "20261004-012400-ver-d00286",
+            "frozen_match": true,
+            "rationale": "The reset omitted rd_ptr initialization, causing rd_ptr to hold an unknown value after reset. When a read occurs, dout reads from mem[rd_ptr] yielding garbage data (observed 0x4d). Adding rd_ptr reset fixes read_data. Additionally, the full flag was incorrectly computed as count >= DEPTH-1, causing early full detection; correcting to count == DEPTH ensures proper full/empty flags per contract.",
+            "diff": "--- a/dut.v\n+++ b/dut.v\n@@ -25,11 +25,12 @@\n     wire do_write = wr_en && (count != DEPTH);\n \n     assign empty = (count == 0);\n-    assign full  = (count >= DEPTH - 1);\n+    assign full  = (count == DEPTH);\n \n     always @(posedge clk) begin\n         if (rst) begin\n             wr_ptr <= 0;\n+            rd_ptr <= 0;\n             count  <= 0;\n         end else begin\n             if (do_write) begin\n",
+            "diagnostics": null,
+            "calls": [
+              {
+                "task": "repair",
+                "model_id": "nvidia/nemotron-3-super-120b-a12b",
+                "latency_ms": 12440,
+                "prompt_tokens": 1252,
+                "completion_tokens": 2302,
+                "status": "ok",
+                "schema_error": null,
+                "finish_reason": "stop"
+              }
+            ]
+          }
+        ],
+        "attempts_used": 1,
+        "passed_on_attempt": 1
+      }
+    },
+    {
+      "id": "F6",
+      "impl": "wrapbit",
+      "depth": 4,
+      "expected": "faulty",
+      "category": "flags_boundaries",
+      "class": "read_empty",
+      "summary": "Two bugs: empty ignores the wrap bit, and a read while empty is not ignored.",
+      "held_out": false,
+      "diagnosis": {
+        "run_id": "20261004-012405-ver-69a197",
+        "state": "complete",
+        "headline": "counterexample",
+        "obligations": {
+          "bmc:empty_flag": "counterexample",
+          "bmc:full_flag": "unresolved",
+          "bmc:read_data": "unresolved",
+          "prove:empty_flag": "counterexample",
+          "prove:full_flag": "unresolved",
+          "prove:read_data": "unresolved",
+          "cover:reachability": "bounded_pass",
+          "simulation:empty_flag": "counterexample",
+          "simulation:full_flag": "simulation_passed",
+          "simulation:read_data": "simulation_passed"
+        },
+        "findings": [
+          {
+            "source": "simulation",
+            "test": "random_s2",
+            "cycle": 1,
+            "check": "empty_flag",
+            "requirement_id": "both_empty"
+          },
+          {
+            "source": "formal",
+            "test": "formal:bmc",
+            "cycle": 1,
+            "check": "empty_flag",
+            "requirement_id": "both_empty"
+          }
+        ],
+        "formal_replay": "reproduced",
+        "integrity": [],
+        "timings": {
+          "first_finding_s": 3.38,
+          "total_s": 6.77
+        },
+        "outcome": "reproduced"
+      },
+      "repair": {
+        "status": "passed",
+        "wall_s": 46.08,
+        "attempts": [
+          {
+            "index": 1,
+            "status": "failed_checks",
+            "summary": "Counterexample: empty_flag at cycle 4 (Write requested while not full) in fill_drain.",
+            "candidate_run_id": "20261004-012422-ver-ab37c0",
+            "frozen_match": true,
+            "rationale": "The bug was that the read enable signal was not gated by the empty condition, causing a read to occur even when the FIFO was empty (both_empty case). This led to incorrect empty flag and dout values. By gating the read with !empty, reads are ignored when empty, writes proceed as specified, and dout is only updated on accepted reads.",
+            "diff": "--- a/dut.v\n+++ b/dut.v\n@@ -24,7 +24,7 @@\n     assign empty = (head[AW-1:0] == tail[AW-1:0]);\n     assign full  = (head[AW] != tail[AW]) && (head[AW-1:0] == tail[AW-1:0]);\n \n-    wire take = rd_en;\n+    wire take = rd_en && !empty;\n     wire put  = wr_en && !full;\n \n     always @(posedge clk) begin\n",
+            "diagnostics": null,
+            "calls": [
+              {
+                "task": "repair",
+                "model_id": "nvidia/nemotron-3-super-120b-a12b",
+                "latency_ms": 10313,
+                "prompt_tokens": 1169,
+                "completion_tokens": 1762,
+                "status": "ok",
+                "schema_error": null,
+                "finish_reason": "stop"
+              }
+            ]
+          },
+          {
+            "index": 2,
+            "status": "passed_unchanged_checks",
+            "summary": "All 10 obligations resolved under the unchanged checks (3 proved, no counterexample).",
+            "candidate_run_id": "20261004-012447-ver-725f0a",
+            "frozen_match": true,
+            "rationale": "The empty flag incorrectly ignored the wrap bit, causing it to assert true when head and tail had equal low bits but different wrap bits (i.e., when the FIFO was full after wrapping). Changing empty to compare the full pointers (head == tail) restores correct empty/full detection while keeping the original full condition, which already correctly distinguishes full using wrap bit and index equality.",
+            "diff": "--- a/dut.v\n+++ b/dut.v\n@@ -21,10 +21,10 @@\n     reg [AW:0]      head;   // read pointer with wrap bit\n     reg [AW:0]      tail;   // write pointer with wrap bit\n \n-    assign empty = (head[AW-1:0] == tail[AW-1:0]);\n+    assign empty = (head == tail);\n     assign full  = (head[AW] != tail[AW]) && (head[AW-1:0] == tail[AW-1:0]);\n \n-    wire take = rd_en;\n+    wire take = rd_en && !empty;\n     wire put  = wr_en && !full;\n \n     always @(posedge clk) begin\n",
+            "diagnostics": null,
+            "calls": [
+              {
+                "task": "repair",
+                "model_id": "nvidia/nemotron-3-super-120b-a12b",
+                "latency_ms": 17965,
+                "prompt_tokens": 1554,
+                "completion_tokens": 3659,
+                "status": "ok",
+                "schema_error": null,
+                "finish_reason": "stop"
+              }
+            ]
+          }
+        ],
+        "attempts_used": 2,
+        "passed_on_attempt": 2
+      }
+    },
+    {
+      "id": "F7",
+      "impl": "billdmar",
+      "depth": 4,
+      "expected": "faulty",
+      "category": "flags_boundaries",
+      "class": "reset",
+      "summary": "full ignores the wrap bit, so it is also asserted when the FIFO is empty.",
+      "held_out": false,
+      "diagnosis": {
+        "run_id": "20261004-012458-ver-227435",
+        "state": "complete",
+        "headline": "counterexample",
+        "obligations": {
+          "bmc:empty_flag": "unresolved",
+          "bmc:full_flag": "counterexample",
+          "bmc:read_data": "unresolved",
+          "prove:empty_flag": "unresolved",
+          "prove:full_flag": "counterexample",
+          "prove:read_data": "unresolved",
+          "cover:reachability": "bounded_pass",
+          "simulation:empty_flag": "simulation_passed",
+          "simulation:full_flag": "counterexample",
+          "simulation:read_data": "simulation_passed"
+        },
+        "findings": [
+          {
+            "source": "simulation",
+            "test": "fill_drain",
+            "cycle": 0,
+            "check": "full_flag",
+            "requirement_id": "reset"
+          },
+          {
+            "source": "formal",
+            "test": "formal:bmc",
+            "cycle": 0,
+            "check": "full_flag",
+            "requirement_id": "reset"
+          }
+        ],
+        "formal_replay": "reproduced",
+        "integrity": [],
+        "timings": {
+          "first_finding_s": 4.61,
+          "total_s": 8.25
+        },
+        "outcome": "reproduced"
+      },
+      "repair": {
+        "status": "passed",
+        "wall_s": 15.9,
+        "attempts": [
+          {
+            "index": 1,
+            "status": "passed_unchanged_checks",
+            "summary": "All 10 obligations resolved under the unchanged checks (3 proved, no counterexample).",
+            "candidate_run_id": "20261004-012511-ver-7cb092",
+            "frozen_match": true,
+            "rationale": "The full flag was incorrectly computed, ignoring the MSB wrap bit. This caused full to be true when wptr and rptr were equal (empty state). After reset, both pointers are zero, making empty true and full true, violating the contract. Correcting the full expression to use the extra-MSB method resolves the mismatch.",
+            "diff": "--- a/dut.v\n+++ b/dut.v\n@@ -93,7 +93,7 @@\n     // Empty / full / count : combinationally derived from the pointers only.\n     //--------------------------------------------------------------------------\n     assign empty = (wptr == rptr);\n-    assign full  = (wptr[ADDR_WIDTH-1:0] == rptr[ADDR_WIDTH-1:0]);\n+    assign full  = (wptr[ADDR_WIDTH] != rptr[ADDR_WIDTH]) && (wptr[ADDR_WIDTH-1:0] == rptr[ADDR_WIDTH-1:0]);\n \n     // count = wptr - rptr in (ADDR_WIDTH+1)-bit unsigned arithmetic. This wraps\n     // correctly and yields 0..DEPTH inclusive.\n",
+            "diagnostics": null,
+            "calls": [
+              {
+                "task": "repair",
+                "model_id": "nvidia/nemotron-3-super-120b-a12b",
+                "latency_ms": 3899,
+                "prompt_tokens": 2541,
+                "completion_tokens": 698,
+                "status": "ok",
+                "schema_error": null,
+                "finish_reason": "stop"
+              }
+            ]
+          }
+        ],
+        "attempts_used": 1,
+        "passed_on_attempt": 1
+      }
+    },
+    {
+      "id": "F8",
+      "impl": "billdmar",
+      "depth": 4,
+      "expected": "faulty",
+      "category": "ordering_wraparound",
+      "class": "read_not_empty",
+      "summary": "Reads return the slot after the head.",
+      "held_out": false,
+      "diagnosis": {
+        "run_id": "20261004-012522-ver-df8563",
+        "state": "complete",
+        "headline": "counterexample",
+        "obligations": {
+          "bmc:empty_flag": "unresolved",
+          "bmc:full_flag": "unresolved",
+          "bmc:read_data": "counterexample",
+          "prove:empty_flag": "unresolved",
+          "prove:full_flag": "unresolved",
+          "prove:read_data": "counterexample",
+          "cover:reachability": "bounded_pass",
+          "simulation:empty_flag": "simulation_passed",
+          "simulation:full_flag": "simulation_passed",
+          "simulation:read_data": "counterexample"
+        },
+        "findings": [
+          {
+            "source": "simulation",
+            "test": "random_s1",
+            "cycle": 2,
+            "check": "read_data",
+            "requirement_id": "read_not_empty"
+          },
+          {
+            "source": "formal",
+            "test": "formal:bmc",
+            "cycle": 2,
+            "check": "read_data",
+            "requirement_id": "read_not_empty"
+          }
+        ],
+        "formal_replay": "reproduced",
+        "integrity": [],
+        "timings": {
+          "first_finding_s": 3.88,
+          "total_s": 8.01
+        },
+        "outcome": "reproduced"
+      },
+      "repair": {
+        "status": "passed",
+        "wall_s": 19.01,
+        "attempts": [
+          {
+            "index": 1,
+            "status": "passed_unchanged_checks",
+            "summary": "All 10 obligations resolved under the unchanged checks (3 proved, no counterexample).",
+            "candidate_run_id": "20261004-012537-ver-035f60",
+            "frozen_match": true,
+            "rationale": "The read port incorrectly fetched mem[raddr+1] instead of mem[raddr], causing the read data to be the word after the intended one (or uninitialized). Fixing the address to use raddr yields correct FIFO behavior.",
+            "diff": "--- a/dut.v\n+++ b/dut.v\n@@ -134,7 +134,7 @@\n             rd_data <= '0;\n         end else begin\n             if (do_read) begin\n-                rd_data <= mem[raddr + 1'b1];\n+                rd_data <= mem[raddr];\n                 rptr    <= rptr + 1'b1;\n             end\n         end\n",
+            "diagnostics": null,
+            "calls": [
+              {
+                "task": "repair",
+                "model_id": "nvidia/nemotron-3-super-120b-a12b",
+                "latency_ms": 6810,
+                "prompt_tokens": 2643,
+                "completion_tokens": 1262,
+                "status": "ok",
+                "schema_error": null,
+                "finish_reason": "stop"
+              }
+            ]
+          }
+        ],
+        "attempts_used": 1,
+        "passed_on_attempt": 1
+      }
+    }
+  ],
+  "briefs": null,
+  "finished_at": "2026-10-04T05:25:50Z",
+  "summary": {
+    "diagnosis_reproduced": "8 / 8",
+    "categories_reproduced": [
+      "flags_boundaries",
+      "ordering_wraparound",
+      "reset",
+      "simultaneous"
+    ],
+    "controls_false_alarms": "0 / 4",
+    "controls_inconclusive": 0,
+    "explanations_ok": "0 / 8",
+    "repair_all_cases": "8 / 8",
+    "repair_attempted_cases": "8 / 8",
+    "repair_first_attempt": 7,
+    "interpretation": null,
+    "model_requests": 11,
+    "prompt_tokens": 17671,
+    "completion_tokens": 22597
+  }
+}

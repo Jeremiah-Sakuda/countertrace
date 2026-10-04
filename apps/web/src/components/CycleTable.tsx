@@ -113,6 +113,14 @@ function Cell({ col, row, requirements }: { col: ColumnKey; row: CycleRow; requi
         </td>
       );
     case "dout":
+      if (!row.dout_checked && !bad.includes("read_data"))
+        // No accepted read: the contract does not check dout here, so the cell stays quiet instead of repeating the stale value.
+        return (
+          <td className="mono pair unchecked dout-unchecked" title={`dout not checked (no accepted read); the port showed ${hex(row.observed.dout)}`}>
+            <span aria-hidden="true" className="dim-dash">—</span>
+            <span className="sr-only">dout not checked</span>
+          </td>
+        );
       return <Pair signal="dout" expected={row.dout_checked ? hex(row.expected.dout) : null} observed={hex(row.observed.dout)} bad={bad.includes("read_data")} />;
     case "empty":
       return <Pair signal="empty" expected={bit(row.expected.empty)} observed={bit(row.observed.empty)} bad={bad.includes("empty_flag")} />;
@@ -216,7 +224,8 @@ export function CycleTable({
   return (
     <div className="stack-sm">
     <p className="caption-hint muted small">
-      Select a cycle to inspect its queue. Use ↑ / ↓, Home, or End to move between cycles. Queues are shown oldest first.
+      Select a cycle to inspect its queue. Use ↑ / ↓, Home, or End to move between cycles. Queues are shown oldest first. A dash in the
+      dout column means no read was accepted, so dout is not checked on that cycle.
       {narrow ? <> Outputs come first on small screens; <span className="scroll-hint">scroll sideways for inputs and the queue →</span></> : null}
     </p>
     <TableScroll label={caption}>

@@ -1,5 +1,5 @@
 import { ArrowRight, ClipboardCheck, History, Server } from "lucide-react";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { api } from "../api/client";
 import type { RecordedRunSummary, Run, RunSummary, Verdict } from "../api/types";
 import { Disclosure, ErrorNotice, Loading, Section, TableScroll } from "../components/common";
@@ -113,11 +113,40 @@ function RecordedList({ items }: { items: RecordedRunSummary[] }) {
 
 const PAGE = 12;
 
-function LocalList({ items }: { items: RunSummary[] }) {
+/**
+ * Evaluation-suite runs and everything descended from them (repair candidates, candidates of candidates).
+ * `all` includes recorded runs so a parent outside this list still resolves.
+ */
+export function evaluationIds(all: RunSummary[]): Set<string> {
+  const byId = new Map(all.map((r) => [r.id, r]));
+  const memo = new Map<string, boolean>();
+  const isEval = (id: string, seen: Set<string>): boolean => {
+    const known = memo.get(id);
+    if (known !== undefined) return known;
+    const r = byId.get(id);
+    let result = false;
+    if (r) {
+      if (r.origin === "evaluation") result = true;
+      else if (r.parent_id && !seen.has(r.parent_id)) result = isEval(r.parent_id, new Set(seen).add(id));
+    }
+    memo.set(id, result);
+    return result;
+  };
+  return new Set(all.filter((r) => isEval(r.id, new Set())).map((r) => r.id));
+}
+
+function LocalList({ items, all }: { items: RunSummary[]; all: RunSummary[] }) {
   const [showEvaluation, setShowEvaluation] = useState(false);
   const [limit, setLimit] = useState(PAGE);
-  const evaluation = items.filter((r) => r.origin === "evaluation").length;
-  const visible = showEvaluation ? items : items.filter((r) => r.origin !== "evaluation");
+  const hidden = useMemo(() => evaluationIds(all), [all]);
+  const evaluation = items.filter((r) => hidden.has(r.id)).length;
+  const roots = items.filter((r) => r.origin === "evaluation").length;
+  const descendants = evaluation - roots;
+  const hiddenText =
+    roots === 0
+      ? `${descendants} repair candidate${descendants === 1 ? "" : "s"} of evaluation runs hidden`
+      : `${roots} evaluation run${roots === 1 ? "" : "s"}${descendants > 0 ? ` and ${descendants} of their repair candidate${descendants === 1 ? "" : "s"}` : ""} hidden`;
+  const visible = showEvaluation ? items : items.filter((r) => !hidden.has(r.id));
   const shown = visible.slice(0, limit);
   const moreRef = useRef<HTMLTableRowElement>(null);
   const [focusFrom, setFocusFrom] = useState<number | null>(null);
@@ -140,17 +169,17 @@ function LocalList({ items }: { items: RunSummary[] }) {
       <div className="ledger-controls">
         <p className="muted small" aria-live="polite">
           Showing {shown.length} of {visible.length} run{visible.length === 1 ? "" : "s"}
-          {!showEvaluation && evaluation > 0 ? ` · ${evaluation} evaluation run${evaluation === 1 ? "" : "s"} hidden` : ""}
+          {!showEvaluation && evaluation > 0 ? ` · ${hiddenText}` : ""}
         </p>
         {evaluation > 0 && (
           <label className="check-row ledger-toggle">
             <input type="checkbox" checked={showEvaluation} onChange={(e) => { setShowEvaluation(e.target.checked); setLimit(PAGE); }} />
-            <span>Show evaluation runs ({evaluation})</span>
+            <span>Show evaluation runs{descendants > 0 ? " and their repair candidates" : ""} ({evaluation})</span>
           </label>
         )}
       </div>
       {shown.length === 0 ? (
-        <p className="muted">Only evaluation runs exist on this server. Turn on “Show evaluation runs” to list them.</p>
+        <p className="muted">Only evaluation runs and their repair candidates exist on this server. Turn on the checkbox above to list them.</p>
       ) : (
         <TableScroll label="Runs on this server">
           <table className="data-table">
@@ -252,7 +281,7 @@ export function RunsView() {
         <p className="muted small">New executions and repair candidates stay here, separate from the bundled case files. Newest first.</p>
         {runs.status === "loading" && <Loading label="Loading runs" />}
         {runs.status === "error" && <ErrorNotice error={runs.error} title="Runs unavailable" onRetry={runs.reload} />}
-        {runs.status === "ok" && <LocalList items={local} />}
+        {runs.status === "ok" && <LocalList items={local} all={runs.data} />}
       </Section>
     </div>
   );

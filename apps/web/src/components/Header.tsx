@@ -11,6 +11,8 @@ export interface RunContextInfo {
   recorded: boolean;
   unresolved: number | null;
   state: string;
+  /** Why obligations stayed unresolved, when every unresolved obligation records the same cause. */
+  unresolvedReason?: string | null;
 }
 
 function VerifierPill({ status }: { status: AsyncState<Status> }) {
@@ -118,8 +120,13 @@ export function Header({ status, route, run }: { status: AsyncState<Status>; rou
           <div className="run-context">
             <Badge tone="neutral" icon={run.recorded ? History : Radio}>{run.recorded ? "Recorded run" : "Run on this server"}</Badge>
             {run.kind === "verification" && <span role="status" aria-atomic="true" className="unresolved-count">
-              <Badge tone={run.unresolved ? "unresolved" : "neutral"} icon={CircleHelp}>
+              <Badge
+                tone={run.unresolved ? "unresolved" : "neutral"}
+                icon={CircleHelp}
+                title={run.unresolved && run.unresolvedReason ? `Not established: the ${run.unresolvedReason}. These obligations are open, not a second failure.` : undefined}
+              >
                 {run.unresolved === null ? "Unresolved: pending" : `${run.unresolved} unresolved obligation${run.unresolved === 1 ? "" : "s"}`}
+                {run.unresolved && run.unresolvedReason ? <span className="unresolved-reason">: {run.unresolvedReason}</span> : null}
               </Badge>
             </span>}
           </div>

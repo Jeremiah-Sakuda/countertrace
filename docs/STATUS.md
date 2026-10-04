@@ -31,7 +31,7 @@ All cases, labels, and briefs were authored by the coding assistant after the fr
 **Follow-ups, validated on development cases only (not eval-v1):**
 
 - *Edit-based repair.* All eval-v1 repair failures were `finish_reason: length` on full-file rewrites, and full-file repairs dropped comments including the external author's header. Repairs are now exact-match find/replace edits applied by the host. Five development faults: 5/5 passed on the first candidate with one-line diffs and comments intact.
-- *Model routing.* Interpretation and check proposals use Nemotron 3 Super; explanation and repair use Ultra. On six development briefs Ultra, Super, and Nano were each 6/6; Super took 4.7–9 s versus 9.5–72 s on Ultra, and 1.7–2.9 s with reasoning off ([raw reports](evidence/2026-10-04-development/)).
+- *Model routing.* Interpretation and check proposals use Nemotron 3 Super; explanation and repair use Ultra. On six development briefs Ultra, Super, and Nano were each 6/6; Super took 4.7–9 s versus 9.5–72 s on Ultra, and 1.7–2.9 s with reasoning off (1.9–3.3 s after the flags topic; 2.3–3.7 s on eval-v2 briefs) ([raw reports](evidence/2026-10-04-development/)).
 - *Explanation prompt.* Now states the exact configuration after one development explanation misstated DEPTH. Three further development faults were explained correctly.
 - *Spend control.* Prices ($1/$3 per million, Ultra list) and a $20 inference threshold are configured in the local `.env`; account balance and credit expiry remain unverified.
 - *Recorded showcase refreshed.* `rec-20261004-003607-ver-4cc749` holds a one-request Ultra explanation (18 valid citations, reviewed by the assistant against the trace) and a first-candidate one-line repair (`rec-20261004-003622-ver-d88ef8`) that passed all ten unchanged obligations. The October 1/3 showcase pair was retired from `recorded/`; its evidence remains in [the model-gate record](evidence/model-gate-2026-10-03.json).
@@ -121,13 +121,13 @@ The earlier integration test still exercises rejected, failing, and passing cand
 
 ## Tests
 
-- `make check`: 60 unit tests (54 on October 3) and negative controls, Python/JSON/TOML validation, documentation links, and whitespace checks pass. New regressions preserve long explanation limits and resolve recorded parent/candidate links in a fresh read-only checkout. Automated model tests use mocked endpoints; the live development calls are documented separately above.
+- `make check`: 69 unit tests (54 on October 3) and negative controls, Python/JSON/TOML validation, documentation links, and whitespace checks pass. New regressions preserve long explanation limits and resolve recorded parent/candidate links in a fresh read-only checkout. Automated model tests use mocked endpoints; the live development calls are documented separately above.
 - `npm test` in `apps/web`: the real-recording citation rendering regression passes; TypeScript checking and the production build pass.
 - `make test-integration`: 7 Docker tests running real RTL (proved control, replayed fault, altered harness hash, cancellation, unsupported syntax, stubbed repair loop, weak-set audit). Rerun after the worker identity fix: all seven passed locally in 59.34 seconds.
 
 ## Interface and recorded runs
 
-The web interface builds with no TypeScript errors and was checked in a browser against the local service: contract setup, a live run from acceptance to finding, the showcase finding and cycle table, a clean control, the audit result and learner exercise, bundle download, model-unavailable states, and a 375 px layout. No screen-reader testing has been done. Four runs are recorded in `recorded/` (October 4 showcase fault with explanation, its one-line repair candidate, known-good control, weak-set audit). The original showcase bundle replayed with matching outcomes. Both repair relationships now use public recording IDs; recording a parent does not publish candidates automatically. The first real explanation exposed a frontend/backend citation-shape mismatch that blanked the run page. The interface now treats citation counts as counts and uses exact invalid-citation entries instead of interpreting a cycle range as a list. A regression renders the actual saved model response and mixed valid/invalid citations. Browser checks confirmed the full explanation/limits, source citations, cycle-5 focus, and recorded candidate navigation.
+The web interface builds with no TypeScript errors and was checked in a browser against the local service: contract setup, a live run from acceptance to finding, the showcase finding and cycle table, a clean control, the audit result and learner exercise, bundle download, model-unavailable states, and a 375 px layout. No screen-reader testing has been done. Seven runs are recorded in `recorded/`: the October 4 showcase fault with explanation and its one-line repair candidate, the eval-v2 two-bug case with its rejected and accepted candidates, the known-good control, and the weak-set audit. The original showcase bundle replayed with matching outcomes. Both repair relationships now use public recording IDs; recording a parent does not publish candidates automatically. The first real explanation exposed a frontend/backend citation-shape mismatch that blanked the run page. The interface now treats citation counts as counts and uses exact invalid-citation entries instead of interpreting a cycle range as a list. A regression renders the actual saved model response and mixed valid/invalid citations. Browser checks confirmed the full explanation/limits, source citations, cycle-5 focus, and recorded candidate navigation.
 
 ## October 3 UI/UX Pro Max review
 
@@ -149,7 +149,7 @@ Browser checks confirmed exact-contract acceptance enables execution; the mobile
 
 ## Not yet done
 
-Independent human review of explanations and evaluation labels; reviewer and learner recruitment; the usability study and audit-transfer question; a second evaluation with fresh cases for the edit-based repair; Nebius Serverless Jobs (all verification runs locally in Docker); hosted deployment and judge access; the demonstration video.
+Independent human review of explanations and evaluation labels; reviewer and learner recruitment; the usability study and audit-transfer question; evaluation on real learner-written bugs (all evaluated bugs so far are seeded); selectable contract policies such as fall-through reads; Nebius Serverless Jobs (all verification runs locally in Docker); hosted deployment and judge access; the release decision; the demonstration video.
 
 ## October 1 follow-up preparation
 

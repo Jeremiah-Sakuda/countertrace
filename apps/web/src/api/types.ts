@@ -456,6 +456,15 @@ export interface RepairAttempt {
   frozen_match?: boolean | null;
   summary: string;
   calls?: ModelCall[];
+  /** Newer runs: this attempt's own first counterexample, fed into the next proposal. */
+  feedback?: RepairFeedback | null;
+}
+
+export interface RepairFeedback {
+  test: string;
+  cycle: number;
+  check: string;
+  requirement_id?: string | null;
 }
 
 export interface Repair {

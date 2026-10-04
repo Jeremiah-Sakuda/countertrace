@@ -1,7 +1,7 @@
 {
  "id": "rec-20261004-010200-ver-42e87f",
  "kind": "verification",
- "title": "eval-v2 F6 \u2014 candidate 1",
+ "title": "Two bugs \u2014 repair candidate 1 (rejected)",
  "example_id": null,
  "origin": "model_repair",
  "parent_id": "rec-20261004-010137-ver-dd43e0",
@@ -51892,5 +51892,6 @@
   "yosys": "Yosys 0.69+158 (git sha1 a1a0ad7d4-dirty, Release, GNU /usr/bin/aarch64-linux-gnu-g++ 15.2.0)",
   "python": "Python 3.11.2",
   "oss_cad_suite": "2026-09-30"
- }
+ },
+ "title_original": "eval-v2 F6 \u2014 candidate 1"
 }

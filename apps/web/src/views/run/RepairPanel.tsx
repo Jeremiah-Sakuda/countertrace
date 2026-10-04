@@ -4,6 +4,7 @@ import {
   CircleCheck,
   CircleHelp,
   CircleX,
+  CornerDownRight,
   Download,
   Equal,
   LoaderCircle,
@@ -110,7 +111,83 @@ function Attempt({ attempt, max }: { attempt: RepairAttempt; max: number }) {
   );
 }
 
-function RepairState({ repair }: { repair: Repair }) {
+/** One line per attempt, in the loop's own words: what happened, and which counterexample went into the next proposal. */
+function attemptOutcome(attempt: RepairAttempt, obligations: number): string {
+  switch (attempt.status) {
+    case "failed_checks":
+      return "rejected by the unchanged checks";
+    case "passed_unchanged_checks":
+      return obligations > 0 && attempt.frozen_match !== false ? `passed all ${obligations} unchanged obligations` : "passed the unchanged checks";
+    case "admission_rejected":
+      return "rejected at admission, so it never ran";
+    case "interface_changed":
+      return "changed the interface, so it is not comparable";
+    case "model_error":
+      return "the model returned no usable candidate";
+    case "verifying":
+      return "running against the unchanged checks";
+    default:
+      return "ended with an error; nothing was established";
+  }
+}
+
+export function AttemptTimeline({ repair, obligations }: { repair: Repair; obligations: number }) {
+  const attempts = [...repair.attempts].sort((a, b) => a.index - b.index);
+  if (attempts.length === 0) return null;
+  return (
+    <div className="loop">
+      <h3 className="subhead">How the repair loop went</h3>
+      <ol className="loop-steps">
+        {attempts.map((a, i) => {
+          const spec = ATTEMPT[a.status] ?? ATTEMPT.error;
+          const Icon = spec.icon;
+          const next = attempts[i + 1];
+          // A passing attempt's summary repeats its outcome; failing ones carry the counterexample, which is worth reading.
+          const detail = a.status === "passed_unchanged_checks" ? null : a.summary;
+          return (
+            <li key={a.index} className="loop-group">
+              <div className={`loop-step loop-${spec.tone}`}>
+                <Icon size={16} aria-hidden="true" className={a.status === "verifying" ? "spin loop-icon" : "loop-icon"} />
+                <p>
+                  <strong>
+                    Attempt {a.index} — {attemptOutcome(a, obligations)}
+                  </strong>
+                  {detail ? <span className="loop-detail">: {detail}</span> : null}
+                  {a.candidate_run_id && (
+                    <>
+                      {" "}
+                      <a href={href.run(a.candidate_run_id)} className="loop-link">
+                        Open candidate {a.index}
+                        <span className="sr-only"> run</span>
+                      </a>
+                    </>
+                  )}
+                </p>
+              </div>
+              {a.feedback && (
+                <div className="loop-step loop-feedback">
+                  <CornerDownRight size={16} aria-hidden="true" className="loop-icon" />
+                  <p>
+                    Counterexample fed back{next ? ` into attempt ${next.index}` : ""}: <code>{a.feedback.check}</code> at cycle {a.feedback.cycle} (
+                    <span className="mono">{a.feedback.test}</span>)
+                  </p>
+                </div>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+      {attempts.some((a) => a.feedback) && (
+        <p className="muted small">
+          Each failing candidate's first counterexample is recorded with the attempt and given to the next proposal. The checks, contract, and
+          tools stay frozen throughout.
+        </p>
+      )}
+    </div>
+  );
+}
+
+function RepairState({ repair, obligations }: { repair: Repair; obligations: number }) {
   const spec = REPAIR[repair.status] ?? REPAIR.error;
   return (
     <div className="stack">
@@ -131,8 +208,9 @@ function RepairState({ repair }: { repair: Repair }) {
           identical to this run's. That applies to this contract, these parameters, and these methods only.
         </p>
       )}
+      <AttemptTimeline repair={repair} obligations={obligations} />
       {repair.attempts.length > 0 && (
-        <ol className="attempts">
+        <ol className="attempts" aria-label="Attempt details">
           {repair.attempts.map((a) => (
             <Attempt key={a.index} attempt={a} max={repair.max_attempts} />
           ))}
@@ -310,7 +388,7 @@ export function RepairPanel({
         )}
         {hasFinding && run.recorded && <p className="muted small">Recorded runs are read-only. Start a live run of this example to request or check a repair.</p>}
         {error ? <ErrorNotice error={error} title="Repair request failed" /> : null}
-        <div aria-live="polite">{repair && <RepairState repair={repair} />}</div>
+        <div aria-live="polite">{repair && <RepairState repair={repair} obligations={run.verification?.obligations.length ?? 0} />}</div>
         {hasFinding &&
           !run.recorded &&
           (uploads ? (

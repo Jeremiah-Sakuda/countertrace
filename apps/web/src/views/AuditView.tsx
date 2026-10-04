@@ -97,7 +97,13 @@ function SupplementalCell({ m }: { m: Mutant }) {
           Killed by the set
         </Badge>
         <p className="muted small">
-          by {m.supplemental.by.map((b) => <code key={b}>{b}</code>)}
+          by{" "}
+          {m.supplemental.by.map((b, i) => (
+            <span key={b}>
+              {i > 0 ? ", " : ""}
+              <code>{b}</code>
+            </span>
+          ))}
           {m.supplemental.first_cycle !== null ? ` at cycle ${m.supplemental.first_cycle}` : ""}
         </p>
       </>
@@ -188,6 +194,28 @@ export function exerciseAnswer(audit: Audit): string[] {
   return Object.entries(audit.requirements).filter(([, r]) => !r.covered_by_set && r.surviving_faults.length > 0).map(([id]) => id);
 }
 
+/** Feedback for a multi-select answer: which choices were right, which correct ones were missed, and which were wrong. */
+export function gradeExercise(answer: string[], chosen: string[]): { correct: string[]; missed: string[]; wrong: string[] } {
+  return {
+    correct: chosen.filter((id) => answer.includes(id)),
+    missed: answer.filter((id) => !chosen.includes(id)),
+    wrong: chosen.filter((id) => !answer.includes(id)),
+  };
+}
+
+function NameList({ ids, titles }: { ids: string[]; titles: Record<string, string> }) {
+  return (
+    <>
+      {ids.map((id, i) => (
+        <span key={id}>
+          {i > 0 ? (i === ids.length - 1 ? " and " : ", ") : ""}
+          <strong>{titles[id] ?? id}</strong>
+        </span>
+      ))}
+    </>
+  );
+}
+
 function Exercise({
   audit,
   requirementTitles,
@@ -201,39 +229,54 @@ function Exercise({
 }) {
   const answer = useMemo(() => exerciseAnswer(audit), [audit]);
   const options = Object.keys(requirementTitles);
-  const [choice, setChoice] = useState<string>("");
+  const [chosen, setChosen] = useState<string[]>([]);
   const [skipped, setSkipped] = useState(false);
   const setRevealed = (value: boolean) => onReveal(value);
   if (answer.length === 0 || options.length === 0) return null;
-  const correct = answer.includes(choice);
+  const titles: Record<string, string> = {};
+  for (const id of answer) titles[id] = requirementTitles[id] ?? audit.requirements[id]?.title ?? id;
+  for (const id of options) titles[id] = requirementTitles[id] ?? id;
+  const grade = gradeExercise(answer, chosen);
+  const allRight = grade.missed.length === 0 && grade.wrong.length === 0;
+  const toggle = (id: string, on: boolean) => setChosen((list) => (on ? [...list.filter((x) => x !== id), id] : list.filter((x) => x !== id)));
+  const ordered = (ids: string[]) => options.filter((id) => ids.includes(id)).concat(ids.filter((id) => !options.includes(id)));
   return (
     <Section title="Learner exercise" eyebrow="Answer first: the requirement analysis below stays hidden until you do">
       <form
         className="exercise"
         onSubmit={(e) => {
           e.preventDefault();
-          if (choice) setRevealed(true);
+          if (chosen.length) setRevealed(true);
         }}
       >
         <fieldset>
           <legend>
-            <GraduationCap size={16} aria-hidden="true" /> Which requirement is this check set missing?
+            <GraduationCap size={16} aria-hidden="true" /> Which requirements is this check set missing?
           </legend>
-          <p className="muted small">
+          <p className="muted small" id="exercise-hint">
             {audit.summary.supplemental_survived} valid seeded faults survived this check set. Use the seeded-fault tables below as evidence:
-            which contract condition do the survivors target that the set never checks?
+            which contract conditions do the survivors target that the set never checks? Select every one that applies; more than one can be
+            correct.
           </p>
           <div className="options">
             {options.map((id) => (
               <label key={id} className="option">
-                <input type="radio" name="missing-req" value={id} checked={choice === id} onChange={() => setChoice(id)} disabled={revealed} />
-                <span>{requirementTitles[id]}</span>
+                <input
+                  type="checkbox"
+                  name="missing-req"
+                  aria-label={titles[id]}
+                  aria-describedby="exercise-hint"
+                  checked={chosen.includes(id)}
+                  onChange={(e) => toggle(id, e.target.checked)}
+                  disabled={revealed}
+                />
+                <span aria-hidden="true">{titles[id]}</span>
               </label>
             ))}
           </div>
         </fieldset>
         <div className="action-row">
-          <button type="submit" className="btn btn-primary" disabled={!choice || revealed}>
+          <button type="submit" className="btn btn-primary" disabled={chosen.length === 0 || revealed}>
             Check my answer
           </button>
           {!revealed && (
@@ -255,7 +298,7 @@ function Exercise({
               onClick={() => {
                 setRevealed(false);
                 setSkipped(false);
-                setChoice("");
+                setChosen([]);
               }}
             >
               Try again
@@ -263,17 +306,40 @@ function Exercise({
           )}
         </div>
         {revealed && (
-          <div role="status" className={`exercise-result ${correct ? "ok" : "bad"}`}>
+          <div role="status" className={`exercise-result ${!skipped && allRight ? "ok" : "bad"}`}>
+            {skipped ? (
+              <p>
+                <GraduationCap size={16} aria-hidden="true" /> <strong>The answer.</strong>
+              </p>
+            ) : (
+              <>
+                <p>
+                  {allRight ? <CircleCheck size={16} aria-hidden="true" /> : <CircleX size={16} aria-hidden="true" />}{" "}
+                  <strong>{allRight ? "All correct." : grade.correct.length > 0 ? "Partly right." : "Not quite."}</strong>
+                </p>
+                <ul className="plain-list exercise-grade">
+                  {grade.correct.length > 0 && (
+                    <li>
+                      Correct: <NameList ids={ordered(grade.correct)} titles={titles} />.
+                    </li>
+                  )}
+                  {grade.missed.length > 0 && (
+                    <li>
+                      Missed: <NameList ids={ordered(grade.missed)} titles={titles} />. The set never checks {grade.missed.length === 1 ? "it" : "them"}, and valid
+                      faults survive there.
+                    </li>
+                  )}
+                  {grade.wrong.length > 0 && (
+                    <li>
+                      Not missing: <NameList ids={ordered(grade.wrong)} titles={titles} />. The set checks{" "}
+                      {grade.wrong.length === 1 ? "it" : "them"}, or no valid fault survives there.
+                    </li>
+                  )}
+                </ul>
+              </>
+            )}
             <p>
-              {skipped ? <GraduationCap size={16} aria-hidden="true" /> : correct ? <CircleCheck size={16} aria-hidden="true" /> : <CircleX size={16} aria-hidden="true" />}{" "}
-              <strong>{skipped ? "The answer." : correct ? "Correct." : "Not quite."}</strong> The set does not cover{" "}
-              {answer.map((id, i) => (
-                <span key={id}>
-                  {i > 0 ? ", " : ""}
-                  <strong>{requirementTitles[id] ?? audit.requirements[id]?.title ?? id}</strong>
-                </span>
-              ))}
-              , and valid faults survive there:{" "}
+              The set does not cover <NameList ids={ordered(answer)} titles={titles} />, and valid faults survive there:{" "}
               {answer.flatMap((id) => audit.requirements[id]?.surviving_faults ?? []).map((f, i) => (
                 <span key={f}>
                   {i > 0 ? ", " : ""}
@@ -619,7 +685,7 @@ export function AuditView({ profile }: { profile: AsyncState<Profile> }) {
       <header className="notebook-hero">
         <div>
           <p className="eyebrow">The second question / Check-quality audit</p>
-          <h1>What did your<br /><em>checks miss?</em></h1>
+          <h1>What does this<br /><em>check set miss?</em></h1>
           <p className="lede">
             Seed known faults into a correct FIFO. See which ones a supplemental check set catches, and which requirements it never looks at.
           </p>

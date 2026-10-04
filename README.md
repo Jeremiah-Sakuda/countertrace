@@ -2,7 +2,7 @@
 
 Countertrace helps FPGA learners expose FIFO bugs, understand the exact failing sequence, and validate a proposed RTL repair against unchanged checks.
 
-**Status: working local build with a first frozen evaluation.** On October 4, a pre-registered suite of 4 controls and 8 seeded faults (half derived from an independently authored FIFO held out of prompt development) gave: diagnosis 8/8 across four defect classes with 0/4 false alarms, Nemotron repairs passing unchanged checks in 7/8 cases, and conflict detection 4/4 with 4/4 compatible briefs accepted ([report](evaluation/results/eval-v1/REPORT.md)). A second pre-registered run on fresh, harder cases (multi-line and two-bug defects, a new held-out FIFO) with the current repair agent gave diagnosis 8/8, 0/4 false alarms, repairs 8/8 including three cases where a rejected candidate's counterexample led to an accepted fix, and conflicts 3/4 with 4/4 compatible ([report](evaluation/results/eval-v2/REPORT.md)). The cases and labels were authored by the developer's coding assistant and have not been externally reviewed; no user study or hosted deployment exists yet. See [implementation status](docs/STATUS.md) for exactly what ran.
+**Status: working local build with a first frozen evaluation.** On October 4, a pre-registered suite of 4 controls and 8 seeded faults (half derived from an independently authored FIFO held out of prompt development) gave: diagnosis 8/8 across four defect classes with 0/4 false alarms, Nemotron repairs passing unchanged checks in 7/8 cases, and conflict detection 4/4 with 4/4 compatible briefs accepted ([report](evaluation/results/eval-v1/REPORT.md)). A second pre-registered run on fresh, harder cases (multi-line and two-bug defects, a new held-out FIFO) with the current repair agent gave diagnosis 8/8, 0/4 false alarms, repairs 8/8 including three cases where a rejected candidate's counterexample led to an accepted fix, conflicts 3/4 with 4/4 compatible, and 6/8 explanations with only valid citations (assistant review found one partly wrong and one incomplete root cause) ([report](evaluation/results/eval-v2/REPORT.md)). The cases and labels were authored by the developer's coding assistant and have not been externally reviewed; no user study or hosted deployment exists yet. See [implementation status](docs/STATUS.md) for exactly what ran.
 
 Built for the [Nebius x NVIDIA Global AI Hackathon](https://nebiusglobalaihackathon.devpost.com/), targeting Coding and Agentic Engineering. Submission: October 30, 2026, 1:00 p.m. EDT. Judge access must remain available through December 15.
 
@@ -25,7 +25,7 @@ Every model call is a runtime call from the control service to the Nebius Token 
 
 | Task | Model | Role and safeguards |
 | --- | --- | --- |
-| Brief interpretation, check-set proposals | `nvidia/nemotron-3-super-120b-a12b` | Flags conflicts between a plain-English brief and the fixed contract (cannot change it); proposes supplemental checks only from reviewed templates. Reasoning off by default for these tasks: 1.7–2.9 s per development brief (7.1–11.4 s with reasoning on in eval-v1). |
+| Brief interpretation, check-set proposals | `nvidia/nemotron-3-super-120b-a12b` | Flags conflicts between a plain-English brief and the fixed contract (cannot change it); proposes supplemental checks only from reviewed templates. Reasoning off by default for these tasks: 1.7–3.7 s per brief across development and eval-v2 briefs (7.1–11.4 s with reasoning on in eval-v1). |
 | Failure explanation | `nvidia/Nemotron-3-Ultra-550b-a55b` | Explains the recorded failing cycles for a learner; every cited cycle, signal, and RTL line is checked against the trace and source. Never changes the verdict. |
 | Repair agent | `nvidia/Nemotron-3-Ultra-550b-a55b` | Proposes exact-match RTL edits; each candidate is re-admitted and re-verified (simulation, bounded model checking, unbounded proof, reachability) against the frozen check set, up to three attempts. |
 
@@ -94,7 +94,7 @@ evaluation/         Evaluation protocol; held-out cases stay local until frozen
 
 ## Documents
 
-- [Product requirements](docs/PRD.md) · [Implementation status](docs/STATUS.md) · [Milestones](docs/ROADMAP.md) · [Evaluation eval-v1](evaluation/results/eval-v1/REPORT.md) · [Submission draft](docs/SUBMISSION.md) · [Release decision](docs/RELEASE_DECISION.md)
+- [Product requirements](docs/PRD.md) · [Implementation status](docs/STATUS.md) · [Milestones](docs/ROADMAP.md) · [Evaluation eval-v1](evaluation/results/eval-v1/REPORT.md) · [eval-v2](evaluation/results/eval-v2/REPORT.md) · [Repair ablation](evaluation/results/eval-v2-ablation/REPORT.md) · [Submission draft](docs/SUBMISSION.md) · [Release decision](docs/RELEASE_DECISION.md)
 - [Architecture](docs/ARCHITECTURE.md) · [Control service API](docs/API.md) · [Development](docs/DEVELOPMENT.md) · [Deployment plan](docs/DEPLOYMENT.md)
 - [Model gate](docs/MODEL_GATE.md) · [Evaluation protocol](evaluation/README.md) · [Study protocol](evaluation/STUDY.md) · [Release decision](docs/RELEASE_DECISION.md)
 - [Hackathon fit review](docs/reviews/hackathon-fit.md) · [Third-party notices](THIRD_PARTY_NOTICES.md)

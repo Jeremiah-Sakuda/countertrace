@@ -23,6 +23,18 @@ export function isActive(run: Run): boolean {
   return run.state === "queued" || run.state === "running" || run.repair?.status === "running";
 }
 
+/**
+ * A short cause for the unresolved count, read from the obligations themselves: only when the run has a counterexample and every
+ * unresolved obligation records that the solver stopped at another property's counterexample.
+ */
+function unresolvedReason(run: Run): string | null {
+  const v = run.verification;
+  if (!v || v.findings.length === 0) return null;
+  const open = v.obligations.filter((o) => o.status === "unresolved");
+  if (open.length === 0) return null;
+  return open.every((o) => /stopped at another property'?s counterexample/i.test(o.detail ?? "")) ? "solver stopped at the first counterexample" : null;
+}
+
 function announcement(run: Run): string {
   const stages = run.verification?.stages ?? run.audit?.stages ?? [];
   const runningStages = stages.filter((s) => s.status === "running").map((s) => STAGE_LABELS[s.id] ?? s.id);
@@ -281,6 +293,7 @@ export function RunView({
       // While the run is active the count is not final, so show it as pending rather than a misleading zero.
       unresolved: run.state === "queued" || run.state === "running" ? null : run.verdict?.unresolved ?? run.verification?.unresolved_count ?? null,
       state: run.state,
+      unresolvedReason: unresolvedReason(run),
     });
   }, [run, onContext]);
   useEffect(() => () => onContext(null), [onContext]);

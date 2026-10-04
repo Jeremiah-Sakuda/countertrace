@@ -49,6 +49,7 @@ A second pre-registered evaluation ([eval-v2](../evaluation/results/eval-v2/REPO
 | Bugs found / false alarms | 8 / 8 and 0 / 4 |
 | Repairs that passed the unchanged checks | 8 / 8 (5 first candidate; 3 needed a second or third after a rejected candidate's counterexample was fed back) |
 | Conflicting / compatible briefs | 3 / 4 and 4 / 4 (the miss, "assert full one entry early", led to a new flag-meaning topic) |
+| Explanations with only valid citations | 6 / 8 (assistant review: 6 fully correct causes, 1 partly wrong, 1 incomplete) |
 | Model cost | about $0.24 (32 requests) |
 
 In one two-bug case the first candidate fixed one bug and was rejected by the unchanged checks; the counterexample it produced led the next candidate to fix both. That run is included as a recorded example. The evaluation cases were written by the developer's coding assistant and have not yet been reviewed independently.
@@ -70,7 +71,7 @@ All model calls are runtime calls to the Nebius Token Factory OpenAI-compatible 
 
 | Task | Model | Why this tier |
 | --- | --- | --- |
-| Brief interpretation, check-set proposals | `nvidia/nemotron-3-super-120b-a12b` | Interactive, reasoning off: 1.7–2.9 s per development brief (Ultra with reasoning took up to 72 s; all tiers were 6/6 on these briefs) |
+| Brief interpretation, check-set proposals | `nvidia/nemotron-3-super-120b-a12b` | Interactive, reasoning off: 1.7–3.7 s per brief on development and eval-v2 briefs (Ultra with reasoning took up to 72 s; all tiers were 6/6 on the development briefs) |
 | Failure explanation | `nvidia/Nemotron-3-Ultra-550b-a55b` | Needs careful reasoning over trace tables and RTL |
 | Repair proposals | `nvidia/Nemotron-3-Ultra-550b-a55b` | Must reason about a failing transaction and keep the interface intact |
 
@@ -101,12 +102,12 @@ One synchronous FIFO profile (8-bit, depth 2 or 4). Bundled examples only in the
 
 Observed during development on October 3–4, 2026:
 
-1. **Reasoning tokens exhaust structured-output budgets.** Nemotron 3 Ultra spent the entire `max_tokens` budget before emitting the required JSON on several requests (development: two explanation requests at 1,800 tokens, one repair at 4,000, one explanation at 4,096; evaluation: 12 repair requests at 4,000 and 2 explanation requests at 4,096). We found that `chat_template_kwargs: {"enable_thinking": false}` works on Token Factory for Nemotron 3 and now retry cut-off replies that way, but it is not documented in the catalog or cookbook. Suggestion: document the switch and a per-request reasoning budget, and make `finish_reason` distinguish reasoning exhaustion. The Llama-Nemotron "detailed thinking off" convention does not carry over.
-2. **Latency variance on Ultra.** Two brief-interpretation requests of about 500 input and 1,700–1,800 output tokens took 66 s and 72 s; four similar requests minutes later took 9.5–16 s. Nemotron 3 Super handled the same task in 4.7–9 s with identical results on our development briefs, and 1.7–2.9 s with reasoning off. Suggestion: publish expected latency ranges per model and surface queueing time in response headers.
+1. **Reasoning tokens exhaust structured-output budgets.** Nemotron 3 Ultra spent the entire `max_tokens` budget before emitting the required JSON on several requests (development: two explanation requests at 1,800 tokens, one repair at 4,000, one explanation at 4,096; eval-v1: 12 repair requests at 4,000 and 2 explanation requests at 4,096; eval-v2: 4 repair requests at 4,096, all recovered by retrying with reasoning off). We found that `chat_template_kwargs: {"enable_thinking": false}` works on Token Factory for Nemotron 3 and now retry cut-off replies that way, but it is not documented in the catalog or cookbook. Suggestion: document the switch and a per-request reasoning budget, and make `finish_reason` distinguish reasoning exhaustion. The Llama-Nemotron "detailed thinking off" convention does not carry over.
+2. **Latency variance on Ultra.** Two brief-interpretation requests of about 500 input and 1,700–1,800 output tokens took 66 s and 72 s; four similar requests minutes later took 9.5–16 s. Nemotron 3 Super handled the same task in 4.7–9 s with identical results on our development briefs, and 1.7–3.3 s with reasoning off. Suggestion: publish expected latency ranges per model and surface queueing time in response headers.
 3. **Inconsistent model ID casing.** The catalog lists `nvidia/Nemotron-3-Ultra-550b-a55b`, `nvidia/nemotron-3-super-120b-a12b`, and `nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B`. Consistent naming would prevent configuration errors.
 4. **Pricing and credits are hard to see programmatically.** We estimated spend from cookbook list prices ($1/$3 per million tokens for Ultra) because the API exposes no price or remaining-credit information, and we could not confirm how hackathon credits apply. A balance/usage endpoint would let applications enforce real budgets.
 5. **Serverless Jobs fit for interactive verification (documentation only).** The documented multi-minute startup and one-hour minimum timeout make per-run Jobs a poor fit for a 120-second interactive target, so verification runs on a CPU host with Docker. A warm-pool or sub-minute job mode would make Jobs usable for interactive agent loops. We did not run Jobs, so this is based on the documentation.
-6. **Instruction following.** Nemotron 3 Ultra followed the citation format well (7 of 8 evaluation explanations had only valid citations; one cited `queue` as a signal) but did not fully follow an instruction to avoid stating unobserved internal register values.
+6. **Instruction following.** Nemotron 3 Ultra followed the citation format well (7 of 8 eval-v1 and 6 of 8 eval-v2 explanations had only valid citations; the others cited non-signals such as `queue`), but citation validity is lexical: one eval-v2 explanation made a partly wrong root-cause claim and another described only one of two bugs. It also did not fully follow an instruction to avoid stating unobserved internal register values.
 
 ## Video
 

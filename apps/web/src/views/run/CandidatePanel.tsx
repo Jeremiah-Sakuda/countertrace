@@ -1,11 +1,11 @@
-import { ArrowLeft, ArrowRight, CircleX, Equal, Wrench } from "lucide-react";
+import { ArrowLeft, ArrowRight, CircleX, CornerDownRight, Equal, MoveRight, Wrench } from "lucide-react";
 import { api } from "../../api/client";
-import type { Obligation, Run } from "../../api/types";
+import type { Finding, Obligation, Run } from "../../api/types";
 import { DiffView } from "../../components/CodeView";
 import { Disclosure, ErrorNotice, Loading, Section, TableScroll } from "../../components/common";
 import { ModelProvenance } from "../../components/ModelResult";
 import { ObligationBadge } from "../../components/StatusBadge";
-import { allResolvedWithoutFinding, countStatus, passedAttempt } from "../../lib/evidence";
+import { allResolvedWithoutFinding, countStatus, passedAttempt, primaryFinding } from "../../lib/evidence";
 import { METHOD_LABELS } from "../../lib/format";
 import { useAsync } from "../../lib/hooks";
 import { href } from "../../lib/route";
@@ -15,8 +15,15 @@ export function CandidatePanel({ run }: { run: Run }) {
   const parentId = run.parent_id;
   const parent = useAsync(() => (parentId ? api.run(parentId) : Promise.resolve(null)), [parentId]);
   if (!parentId) return null;
+  const attempt = parent.status === "ok" ? parent.data?.repair?.attempts.find((a) => a.candidate_run_id === run.id) : undefined;
+  const rejected = attempt !== undefined && attempt.status !== "passed_unchanged_checks" && attempt.status !== "verifying";
   return (
-    <Section id="run-candidate" title="What this repair changed" eyebrow="Repair candidate · checked against the parent's frozen contract and checks" className="candidate-panel">
+    <Section
+      id="run-candidate"
+      title={rejected ? "What this rejected candidate changed" : "What this repair changed"}
+      eyebrow="Repair candidate · checked against the parent's frozen contract and checks"
+      className="candidate-panel"
+    >
       <p>
         <a href={href.run(parentId)} className="inline-link">
           <ArrowLeft size={14} aria-hidden="true" /> Back to the failing run
@@ -38,6 +45,10 @@ function CandidateComparison({ run, parent }: { run: Run; parent: Run }) {
   const byId = (list: Obligation[], id: string) => list.find((o) => o.id === id);
   const changed = ids.filter((id) => byId(before, id)?.status !== byId(after, id)?.status).length;
   const active = run.state === "queued" || run.state === "running";
+  const accepted = attempt?.status === "passed_unchanged_checks";
+  const previous = attempt ? parent.repair?.attempts.find((a) => a.index === attempt.index - 1) : undefined;
+  const mine = primaryFinding(run);
+  const theirs = primaryFinding(parent);
 
   return (
     <div className="stack">
@@ -47,6 +58,21 @@ function CandidateComparison({ run, parent }: { run: Run; parent: Run }) {
             Attempt {attempt.index} of {parent.repair?.max_attempts ?? 3} on <strong>{parent.title}</strong>
             {attempt.origin === "user" ? ", edited by you." : ", proposed by Nemotron."} {attempt.summary}
           </p>
+          {previous?.feedback && (
+            <p className="loop-provenance">
+              <CornerDownRight size={16} aria-hidden="true" />
+              <span>
+                Proposed after{" "}
+                {previous.candidate_run_id ? (
+                  <a href={href.run(previous.candidate_run_id)}>candidate {previous.index}'s counterexample</a>
+                ) : (
+                  <>candidate {previous.index}'s counterexample</>
+                )}{" "}
+                (<code>{previous.feedback.check}</code> at cycle {previous.feedback.cycle}, <span className="mono">{previous.feedback.test}</span>)
+                {attempt.origin === "model" ? ", which was given to the model with the unchanged contract." : "."}
+              </span>
+            </p>
+          )}
           {attempt.frozen_match !== undefined && attempt.frozen_match !== null && (
             <p className={attempt.frozen_match ? "frozen ok" : "frozen bad"}>
               {attempt.frozen_match ? <Equal size={14} aria-hidden="true" /> : <CircleX size={14} aria-hidden="true" />}
@@ -57,7 +83,7 @@ function CandidateComparison({ run, parent }: { run: Run; parent: Run }) {
           )}
           {attempt.diff ? (
             <div className="stack-sm">
-              <h3 className="subhead">The accepted change to dut.v</h3>
+              <h3 className="subhead">{accepted ? "The accepted change to dut.v" : "The proposed change to dut.v"}</h3>
               <DiffView diff={attempt.diff} label={`Diff for repair attempt ${attempt.index}`} />
             </div>
           ) : (
@@ -75,6 +101,8 @@ function CandidateComparison({ run, parent }: { run: Run; parent: Run }) {
           <Wrench size={14} aria-hidden="true" /> The parent run does not list an attempt for this candidate, so no diff can be shown.
         </p>
       )}
+
+      {!active && attempt?.status === "failed_checks" && theirs && <PartialProgress parent={theirs} candidate={mine} />}
 
       <h3 className="subhead">Same obligations, before and after</h3>
       <p className="muted small">
@@ -125,6 +153,44 @@ function CandidateComparison({ run, parent }: { run: Run; parent: Run }) {
   );
 }
 
+function findingText(f: Finding): string {
+  return `${f.check} at cycle ${f.cycle} in ${f.test}`;
+}
+
+/**
+ * A rejected candidate can still make progress: the first mismatch can move later even when the same obligations fail.
+ * Both findings are read from the runs; no judgement of the change is implied beyond the cycle numbers.
+ */
+function PartialProgress({ parent, candidate }: { parent: Finding; candidate: Finding | undefined }) {
+  let headline: string;
+  if (!candidate) headline = "This candidate recorded no counterexample trace";
+  else if (candidate.cycle > parent.cycle) headline = `First mismatch moved from cycle ${parent.cycle} to cycle ${candidate.cycle}`;
+  else if (candidate.cycle < parent.cycle) headline = `First mismatch moved earlier, from cycle ${parent.cycle} to cycle ${candidate.cycle}`;
+  else if (candidate.test === parent.test && candidate.check === parent.check) headline = `First mismatch unchanged at cycle ${parent.cycle}`;
+  else headline = `First mismatch still at cycle ${parent.cycle}, on a different check or test`;
+  return (
+    <div className="progress-note">
+      <h3 className="subhead">Progress against the parent</h3>
+      <p className="progress-headline">{headline}</p>
+      <dl className="progress-pair">
+        <div>
+          <dt>Parent's first mismatch</dt>
+          <dd className="mono">{findingText(parent)}</dd>
+        </div>
+        <MoveRight size={16} aria-hidden="true" className="compare-arrow" />
+        <div>
+          <dt>This candidate's first mismatch</dt>
+          <dd className="mono">{candidate ? findingText(candidate) : "none recorded"}</dd>
+        </div>
+      </dl>
+      <p className="muted small">
+        A partial fix can remove one bug and still leave the same obligations failing on another, so the before-and-after table below may show
+        no status changes even when the first mismatch moved. The candidate was rejected because at least one unchanged obligation still fails.
+      </p>
+    </div>
+  );
+}
+
 /** On a failing run's hero: the payoff when a repair candidate passed. */
 export function RepairPayoff({ run }: { run: Run }) {
   const attempt = passedAttempt(run);
@@ -135,6 +201,7 @@ export function RepairPayoff({ run }: { run: Run }) {
   const total = c?.verification?.obligations.length ?? 0;
   const proofs = countStatus(c?.verification?.obligations, "proved");
   const confirmed = c && allResolvedWithoutFinding(c);
+  const earlier = (run.repair?.attempts ?? []).filter((a) => a.index < attempt.index && a.status !== "passed_unchanged_checks").length;
   return (
     <a className="repair-payoff" href={href.run(candidateId)}>
       <span className="repair-payoff-label">Repair</span>
@@ -142,6 +209,7 @@ export function RepairPayoff({ run }: { run: Run }) {
         {confirmed
           ? `Candidate ${attempt.index} passed all ${total} unchanged obligations${proofs ? `, ${proofs} proved` : ""}`
           : `Candidate ${attempt.index} passed the unchanged checks`}
+        {earlier > 0 ? `, after ${earlier} failed attempt${earlier === 1 ? "" : "s"}` : ""}
       </span>
       <ArrowRight size={16} aria-hidden="true" />
     </a>

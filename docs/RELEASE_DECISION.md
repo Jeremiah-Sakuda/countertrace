@@ -23,6 +23,6 @@ Both profiles still require the PRD's diagnosis, explanation, audit, reproducibi
 - Evidence manifest: [freeze](../evaluation/freeze-2026-10-04.json), [cases](../evaluation/cases-frozen-eval-v1.json), [results](../evaluation/results/eval-v1/results.json).
 - Repair successes / all 8 cases / attempted cases: 7 / 8 / 8 (eval-v1, full-file format). Edit-based format: 5/5 on development cases only.
 - Scope of formal claims: development proofs exist; reviewer and release evaluation pending.
-- Remaining release blockers and owners: independent evaluation, reviewer/learners, hosted access/funding, clean replays, and final video.
+- Remaining release blockers and owners (owner unless noted): the release decision itself; external review of eval labels and learner sessions; hosted access and funding through December 15; the final video. Clean-environment replays and the frozen evaluations are done (eval-v1, eval-v2).
 
 If diagnosis is selected, remove repair controls from the judged journey and repair promises from the README, submission, and video; retain developer experiments clearly labeled. Use a second held-out counterexample and replay for the replacement video segment. Update [STATUS.md](STATUS.md), [DEMO.md](DEMO.md), and the [roadmap](ROADMAP.md) with the actual decision. No release decision or future reminder is scheduled by this document.
