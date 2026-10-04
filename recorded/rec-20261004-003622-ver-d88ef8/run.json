@@ -1,7 +1,7 @@
 {
  "id": "rec-20261004-003622-ver-d88ef8",
  "kind": "verification",
- "title": "Queue that overwrites when full \u2014 candidate 1",
+ "title": "Queue that overwrites when full: candidate 1",
  "example_id": null,
  "origin": "model_repair",
  "parent_id": "rec-20261004-003607-ver-4cc749",

@@ -1,7 +1,7 @@
 {
  "id": "rec-20261004-010214-ver-b5bcad",
  "kind": "verification",
- "title": "Two bugs \u2014 repair candidate 2 (accepted)",
+ "title": "Two bugs: repair candidate 2 (accepted)",
  "example_id": null,
  "origin": "model_repair",
  "parent_id": "rec-20261004-010137-ver-dd43e0",
@@ -48458,5 +48458,5 @@
   "python": "Python 3.11.2",
   "oss_cad_suite": "2026-09-30"
  },
- "title_original": "eval-v2 F6 \u2014 candidate 2"
+ "title_original": "eval-v2 F6, candidate 2"
 }

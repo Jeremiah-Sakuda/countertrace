@@ -37,9 +37,9 @@ AI coding assistants add a second problem. Ask one to fix the RTL and it will re
 Countertrace takes a small synchronous FIFO (8-bit words, depth 2 or 4) and walks it through five steps.
 
 1. **Contract.** It shows the exact behavior the FIFO will be held to, cycle by cycle, including simultaneous reads and writes, full and empty boundaries, and reset. If you describe your intent in plain English, Nemotron 3 Super compares it with the contract and flags conflicts, such as "accept the write when full if a read frees a slot," instead of quietly changing the rules.
-2. **Diagnosis.** The RTL runs in an isolated container with no network: Verilator simulation of 14 to 15 directed and seeded tests, plus SymbiYosys bounded model checking, an unbounded proof, and reachability checks. Two independently written references, a Python model and a formal monitor, judge the results. The first failure appears as a cycle table with the inputs, what the contract accepts, the expected queue, and what the design actually output, followed by a deterministic "probable origin" line. In the showcase: you wrote 0x21 at cycle 1, the design wrote 0x65 over it at cycle 5 while full, and the read at cycle 6 returned 0x65.
+2. **Diagnosis.** The RTL runs in an isolated container with no network: Verilator simulation of 14 to 15 directed and seeded tests, plus SymbiYosys bounded model checking, an unbounded proof, and reachability checks. Two separately written references, a Python model and a formal monitor, judge the results. The first failure appears as a cycle table with the inputs, what the contract accepts, the expected queue, and what the design actually output, followed by a deterministic "probable origin" line. In the showcase: you wrote 0x21 at cycle 1, the design wrote 0x65 over it at cycle 5 while full, and the read at cycle 6 returned 0x65.
 3. **Explanation.** Nemotron 3 Ultra explains the recorded failure for a student. Every cycle, signal, and line of RTL it cites is checked against the trace and the source, and bad citations are flagged in the interface. The explanation never changes the verdict.
-4. **Repair agent.** Nemotron 3 Ultra proposes a patch as a short list of exact edits. Countertrace re-checks the patch for forbidden constructs, runs it as a new verification against the same frozen contract, harness, stimulus, and limits (all compared by hash), and accepts it only if every check passes, including the unbounded proofs. If a candidate fails, its own counterexample goes back to the model for the next attempt, up to three attempts. In one recorded case with two bugs, the first patch fixed one, failed the checks at cycle 4, and the second patch fixed both.
+4. **Repair agent.** Nemotron 3 Ultra proposes a patch as a short list of exact edits. Countertrace re-checks the patch for forbidden constructs, runs it as a new verification against the same frozen contract, harness, stimulus, and limits (all compared by hash), and accepts it only if every check passes, including the unbounded proofs. If a candidate fails, its own counterexample goes back to the model for the next attempt, up to three attempts. In one recorded case with two bugs, the first patch moved the first failure from cycle 1 to cycle 4 but still failed; that counterexample went back to the model, and the second patch passed every check.
 5. **Check-quality audit.** It seeds known bugs into a correct FIFO and scores a named set of learner-style checks against them. A deliberately weak set misses 3 of 6 real bugs, and each miss points to the requirement those checks never exercise.
 
 Every run exports an evidence bundle with hashes, and `countertrace replay` reruns the deterministic checks with no model call. Results keep their method in the wording: "Simulation passed for these runs," "No counterexample within 23 cycles," "Property proved under these assumptions." There is no overall "verified" badge.
@@ -47,11 +47,11 @@ Every run exports an evidence bundle with hashes, and `countertrace replay` reru
 ## How I built it
 
 - **Control service:** Python, standard library only. It owns run state, the queue, model calls, and every command line.
-- **Verifier:** a Docker image pinned by digest, with OSS CAD Suite 2026-09-30 pinned by SHA-256 (Verilator 5.053, Yosys 0.69, SymbiYosys, ABC, Yices). RTL runs with no network, a read-only root, dropped capabilities, and no credentials. The worker only records raw artifacts; the host parses them.
+- **Verifier:** a Docker image built from a digest-pinned Debian base, with OSS CAD Suite 2026-09-30 pinned by SHA-256 (Verilator 5.053, Yosys 0.69, SymbiYosys, ABC, Yices). RTL runs with no network, a read-only root, dropped capabilities, and no credentials. The worker only records raw artifacts; the host parses them.
 - **Trusted checks:** a hand-written SystemVerilog monitor with three assertions and twelve reachability covers, and a separate Python reference queue. Both follow one cycle convention, and formal counterexamples are replayed in simulation to confirm the two engines agree.
-- **Admission gate:** a single ordered lexical pass rejects anything that could tamper with the checks: assertions or assumptions in the design, system tasks, delays, extra event controls, hidden ports, hierarchical references, and more. Every model patch goes through the same gate.
+- **Admission gate:** a single ordered lexical pass rejects the known ways to tamper with the checks: assertions or assumptions in the design, system tasks, delays, extra event controls, hidden ports, hierarchical references, and more. The elaborated netlist is the final authority: after Yosys elaborates the design, the host checks the ports, that no input is tied, aliased, or driven inside the design, and that the only properties are the monitor's. Every model patch goes through the same gate.
 - **Interface:** React and TypeScript. It shows the cycle table, citations you can click to jump to a cycle, the repair timeline, a candidate diff with before-and-after checks, and the audit exercise.
-- **Testing:** 73 unit tests and negative controls, 7 Docker integration tests, and a CI job that rebuilds the image on fresh runners and replays three recorded evidence bundles.
+- **Testing:** 80 unit tests and negative controls, 8 Docker integration tests, and a CI job that rebuilds the image on fresh runners and replays three recorded evidence bundles.
 
 ### How Nemotron and Token Factory are used
 
@@ -59,7 +59,7 @@ All model calls are runtime calls to the Nebius Token Factory OpenAI-compatible 
 
 | Task | Model | Notes |
 | --- | --- | --- |
-| Brief interpretation, check-set proposals | Nemotron 3 Super, reasoning off | 1.7 to 3.7 s per brief |
+| Brief interpretation | Nemotron 3 Super, reasoning off | 1.7 to 3.7 s per brief |
 | Failure explanation | Nemotron 3 Ultra | about 6 s for the showcase, 18 checked citations |
 | Repair proposals | Nemotron 3 Ultra | up to three attempts, counterexample fed back |
 

@@ -21,7 +21,7 @@ Seven segments. Narration totals about 330 words, roughly 2:15 of speech, which 
 
 **Screen:** Tab 1, showcase run hero. Hover over "Expected 0x21 → Observed 0x65", then the "Probable origin: cycle 5" line.
 
-**Narration:** "This queue passes its author's tests. Countertrace found a real bug: the byte written at cycle one is gone, and the read at cycle six returns a different byte."
+**Narration:** "This queue passes its author's tests. This copy has a seeded bug, and Countertrace pins it down: the byte written at cycle one is gone, and the read at cycle six returns a different byte."
 
 ### 2. The contract and Nemotron 3 Super (0:15 to 0:38)
 
@@ -39,7 +39,7 @@ Seven segments. Narration totals about 330 words, roughly 2:15 of speech, which 
 
 **Screen:** Tab 1. Scroll to the explanation. Click the "cycle 5" citation and let it jump to the row. Scroll to Repair: the one-line diff `wr_en && !full`. Click through to the candidate and show "3 proved · 0 counterexamples · frozen hashes match." Then Tab 4: show the repair timeline with "candidate 1 rejected", "counterexample fed back: empty_flag at cycle 4", and "candidate 2 passed".
 
-**Narration:** "Nemotron 3 Ultra explains the failure for a student, and every cycle and signal it cites is checked against the trace. Then it proposes a patch: one line. Countertrace reruns the identical checks, compared by hash, and accepts the fix only because the proofs pass. When a patch fails, its own counterexample goes back to the model. In this design with two bugs, the first patch fixed one, failed at cycle four, and the second fixed both."
+**Narration:** "Nemotron 3 Ultra explains the failure for a student, and every cycle and signal it cites is checked against the trace. Then it proposes a patch: one line. Countertrace reruns the identical checks, compared by hash, and accepts the fix only because the proofs pass. When a patch fails, its own counterexample goes back to the model. In this design with two bugs, the first patch still failed at cycle four, and the second passed every check."
 
 ### 5. Auditing the learner's checks (1:40 to 2:00)
 
@@ -55,7 +55,7 @@ Seven segments. Narration totals about 330 words, roughly 2:15 of speech, which 
 
 ### 7. Results and how the models are used (2:15 to 2:45)
 
-**Screen:** A simple slide or the README results table: eval-v1 and eval-v2 side by side (8 of 8 bugs found, 0 false alarms, repairs 7 of 8 and 8 of 8). Then the model routing table. End on the repository URL.
+**Screen:** A simple slide with the results table from the Devpost write-up: eval-v1 and eval-v2 side by side (8 of 8 bugs found, 0 false alarms, repairs 7 of 8 and 8 of 8). Then the model routing table. End on the repository URL.
 
 **Narration:** "In two frozen evaluations, Countertrace found every seeded bug with no false alarms, and Nemotron's repairs passed the unchanged checks in seven of eight and then eight of eight cases. Every model call goes through Nebius Token Factory, while verification runs in CPU containers: Super with reasoning off for fast calls, Ultra for explanations and repairs. Nemotron proposes every fix, and checks it cannot change decide whether it counts."
 
