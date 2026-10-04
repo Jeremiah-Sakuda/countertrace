@@ -25,7 +25,7 @@ Students and junior FPGA developers write small queues (FIFOs) that pass their o
 5. **Check-quality audit.** Countertrace seeds reviewed bugs into a correct FIFO and shows which ones a named set of learner-style checks misses, and which requirement each miss points to. The independent core still catches every real bug.
 6. **Evidence.** Every run exports a hashed bundle; `countertrace replay` re-runs the deterministic checks with no model call.
 
-Results keep their method: "Simulation passed for these runs", "No counterexample within 24 cycles", "Property proved under these assumptions", "Counterexample found", "Unresolved". There is no overall "verified" badge.
+Results keep their method: "Simulation passed for these runs", "No counterexample within 23 cycles", "Property proved under these assumptions", "Counterexample found", "Unresolved", "Tool error". There is no overall "verified" badge.
 
 ### Results so far
 
@@ -47,7 +47,7 @@ A second pre-registered evaluation ([eval-v2](../evaluation/results/eval-v2/REPO
 | Measure | eval-v2 |
 | --- | --- |
 | Bugs found / false alarms | 8 / 8 and 0 / 4 |
-| Repairs that passed the unchanged checks | 8 / 8 (5 first candidate; 3 needed a second or third after a rejected candidate's counterexample was fed back) |
+| Repairs that passed the unchanged checks | 8 / 8 (5 first candidate; 3 needed a second or third; a feedback-off ablation failed only the two-bug case) |
 | Conflicting / compatible briefs | 3 / 4 and 4 / 4 (the miss, "assert full one entry early", led to a new flag-meaning topic) |
 | Explanations with only valid citations | 6 / 8 (assistant review: 6 fully correct causes, 1 partly wrong, 1 incomplete) |
 | Model cost | about $0.24 (32 requests) |
@@ -96,13 +96,13 @@ One synchronous FIFO profile (8-bit, depth 2 or 4). Bundled examples only in the
 5. Open **Contract setup**, pick an example, accept the contract, and run it live (about 10–25 s on a laptop). Try the known-good control for comparison.
 6. Open **Check-quality audit** and run `weak-learner-v1` to see which seeded bugs a typical learner check set misses.
 7. Live Nemotron calls need your own Token Factory key in `.env`; the hosted demo will not require one.
-8. `countertrace replay <bundle.zip>` re-runs any exported evidence bundle without a model call.
+8. `countertrace bundle rec-20261004-003607-ver-4cc749` exports the showcase's evidence bundle; `countertrace replay <that zip>` re-runs its deterministic checks without a model call.
 
 ## Feedback on Nebius and NVIDIA tools
 
 Observed during development on October 3–4, 2026:
 
-1. **Reasoning tokens exhaust structured-output budgets.** Nemotron 3 Ultra spent the entire `max_tokens` budget before emitting the required JSON on several requests (development: two explanation requests at 1,800 tokens, one repair at 4,000, one explanation at 4,096; eval-v1: 12 repair requests at 4,000 and 2 explanation requests at 4,096; eval-v2: 4 repair requests at 4,096, all recovered by retrying with reasoning off). We found that `chat_template_kwargs: {"enable_thinking": false}` works on Token Factory for Nemotron 3 and now retry cut-off replies that way, but it is not documented in the catalog or cookbook. Suggestion: document the switch and a per-request reasoning budget, and make `finish_reason` distinguish reasoning exhaustion. The Llama-Nemotron "detailed thinking off" convention does not carry over.
+1. **Reasoning tokens exhaust structured-output budgets.** Nemotron 3 Ultra spent the entire `max_tokens` budget before emitting the required JSON on several requests (development: two explanation requests at 1,800 tokens, one repair at 4,000, one explanation and one repair at 4,096; eval-v1: 12 repair requests at 4,000 and 2 explanation requests at 4,096; eval-v2: 4 repair requests at 4,096, all recovered by retrying with reasoning off). We found that `chat_template_kwargs: {"enable_thinking": false}` works on Token Factory for Nemotron 3 and now retry cut-off replies that way, but it is not documented in the catalog or cookbook. Suggestion: document the switch and a per-request reasoning budget, and make `finish_reason` distinguish reasoning exhaustion. The Llama-Nemotron "detailed thinking off" convention does not carry over.
 2. **Latency variance on Ultra.** Two brief-interpretation requests of about 500 input and 1,700–1,800 output tokens took 66 s and 72 s; four similar requests minutes later took 9.5–16 s. Nemotron 3 Super handled the same task in 4.7–9 s with identical results on our development briefs, and 1.7–3.3 s with reasoning off. Suggestion: publish expected latency ranges per model and surface queueing time in response headers.
 3. **Inconsistent model ID casing.** The catalog lists `nvidia/Nemotron-3-Ultra-550b-a55b`, `nvidia/nemotron-3-super-120b-a12b`, and `nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B`. Consistent naming would prevent configuration errors.
 4. **Pricing and credits are hard to see programmatically.** We estimated spend from cookbook list prices ($1/$3 per million tokens for Ultra) because the API exposes no price or remaining-credit information, and we could not confirm how hackathon credits apply. A balance/usage endpoint would let applications enforce real budgets.

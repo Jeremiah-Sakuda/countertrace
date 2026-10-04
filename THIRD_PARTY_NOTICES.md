@@ -24,7 +24,7 @@ The pinned tool versions observed in each run are recorded in its evidence manif
 
 ## Web interface dependencies
 
-The web interface in `apps/web` depends on npm packages (React, Vite, TypeScript, lucide-react, and their transitive dependencies) under their own licenses, listed in `apps/web/package-lock.json`. The production build bundles React and lucide-react (MIT and ISC). Fonts JetBrains Mono and IBM Plex Sans are loaded from Google Fonts under the SIL Open Font License 1.1.
+The web interface in `apps/web` depends on npm packages (React, Vite, TypeScript, lucide-react, and their transitive dependencies) under their own licenses, listed in `apps/web/package-lock.json`. The production build bundles React and lucide-react (MIT and ISC). Fonts Newsreader, DM Sans, and JetBrains Mono are loaded from Google Fonts under the SIL Open Font License 1.1.
 
 ## Design guidance
 

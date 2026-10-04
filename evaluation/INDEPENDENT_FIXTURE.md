@@ -1,4 +1,8 @@
-# Independently authored FIFO: admission pending
+# Independently authored FIFO
+
+**Update, October 4, 2026:** the candidate below was admitted through a validated interface mapping (active-low `rst_n` mapped to the contract's reset, `wr_data`/`rd_data` renamed, three extra status outputs left unchecked), published unmodified in [fixtures/independent/billdmar](../fixtures/independent/billdmar/), proved against all three core properties at depth 4, and used in [eval-v1](results/eval-v1/REPORT.md) (four faults, held out of prompt development) and [eval-v2](results/eval-v2/REPORT.md) (two faults). The compatibility review was done by the coding assistant, not an independent reviewer. The text below is the original October 1 acquisition record.
+
+## Original record (admission pending)
 
 The current count-based and wrap-bit FIFOs share an author. Different implementations or depths from that author do not meet the PRD's independently authored requirement.
 

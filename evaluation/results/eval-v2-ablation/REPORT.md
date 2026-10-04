@@ -4,10 +4,10 @@ Question from an internal review: does the choice of Nemotron tier, or feeding a
 
 | Configuration | Passed unchanged checks | Passed on first candidate | Candidates | Requests | Replies cut off at output limit | Input / output tokens | Median request latency |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Nemotron 3 Ultra, feedback on (eval-v2) | **8/8** | 5 | 12 | 16 | 4 | 25,335 / 38,008 | 8.3 s |
+| Nemotron 3 Ultra, feedback on (eval-v2) | **8/8** | 5 | 12 | 16 | 4 | 25,335 / 38,008 | 6.7 s |
 | Nemotron 3 Super, feedback on | **8/8** | 7 | 9 | 11 | 2 | 17,671 / 22,597 | 10.3 s |
-| Nemotron 3 Nano, feedback on | 6/8 | 5 | 13 | 20 | 6 | 30,090 / 48,468 | 17.1 s |
-| Nemotron 3 Ultra, feedback **off** | 7/8 | 7 | 10 | 12 | 2 | 18,849 / 27,136 | 6.3 s |
+| Nemotron 3 Nano, feedback on | 6/8 | 5 | 13 | 20 | 6 | 30,090 / 48,468 | 16.7 s |
+| Nemotron 3 Ultra, feedback **off** | 7/8 | 7 | 10 | 12 | 2 | 18,849 / 27,136 | 6.2 s |
 
 ## What this shows
 

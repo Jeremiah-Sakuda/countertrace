@@ -22,7 +22,7 @@ Infrastructure rates are the published rates effective October 1, 2026, before t
 
 Use the hackathon credits first; do not treat a cash top-up as a prerequisite. The [hackathon resources](https://nebiusglobalaihackathon.devpost.com/resources) offer a $25 Token Factory promo and a further $25 through the Builders Program. The owner reports claiming credits, but balance, application, and expiry remain unverified. The October 3 model experiments used about $0.082 at public rates; this is not confirmed invoiced spend. No top-up or hosting purchase has been made. Confirm whether Token Factory and Cloud have separate balances and where hackathon credits apply. Delaying VM creation reduces compute cost; storage is still charged while a VM is stopped. The owner has asked for a recommendation and has not yet authorized a dollar limit.
 
-The current `COUNTERTRACE_DEPLOYMENT_SPEND_LIMIT_USD` is an inference-ledger threshold, not a hard total deployment cap. In-flight calls can exceed it; it excludes compute and storage. Configure account billing alerts and record an operating owner before public access. Verify spending and credit validity cover the entire judging window.
+The current `COUNTERTRACE_DEPLOYMENT_SPEND_LIMIT_USD` is an inference-ledger threshold, not a hard total deployment cap. Each in-flight call reserves its worst-case cost, so concurrent calls cannot jointly exceed it; it excludes compute and storage. Configure account billing alerts and record an operating owner before public access. Verify spending and credit validity cover the entire judging window.
 
 ## Steps
 

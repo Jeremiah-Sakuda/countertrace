@@ -1,6 +1,6 @@
 # Evaluation protocol
 
-No evaluation cases have been admitted or frozen, and no participants or outcomes are established yet. One external FIFO candidate is quarantined locally; see [independent fixture review](INDEPENDENT_FIXTURE.md). Follow the [PRD](../docs/PRD.md); this checklist prevents accidental claims from scaffold or showcase data. Recruitment drafts, session instructions, and scoring are in [STUDY.md](STUDY.md).
+Two engineering evaluations have been frozen and run: [eval-v1](results/eval-v1/REPORT.md) and [eval-v2](results/eval-v2/REPORT.md), plus a [repair ablation](results/eval-v2-ablation/REPORT.md). Their cases and labels were authored by the developer's coding assistant and have not been externally reviewed. No participants or learning outcomes are established yet. The independently authored FIFO is admitted through a validated interface mapping; see [independent fixture review](INDEPENDENT_FIXTURE.md). Follow the [PRD](../docs/PRD.md); this checklist prevents accidental claims from scaffold or showcase data. Recruitment drafts, session instructions, and scoring are in [STUDY.md](STUDY.md).
 
 ## Freeze before measuring
 

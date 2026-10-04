@@ -4,6 +4,8 @@ The second pre-registered run, measuring the repair agent as it now ships (exact
 
 ## Protocol
 
+Pre-registration is evidenced by same-repository git commits (configuration freeze, then case hash, then results). There is no external timestamp, so the ordering cannot be verified independently of this repository; future freezes should be anchored by pushing a tag before running.
+
 - Configuration frozen first: [freeze-eval-v2.json](../../freeze-eval-v2.json) (code `3d33fe5`, freeze `efda152`). Nemotron 3 Ultra for explanation and repair (reasoning on), Nemotron 3 Super for interpretation (reasoning off), prompt hashes, budgets, verifier digest `7d82f4b2482a24f2` (unchanged since eval-v1).
 - Cases frozen next: [cases-frozen-eval-v2.json](../../cases-frozen-eval-v2.json) records SHA-256 `2a3ba86b…09b9`, matching [suite.original.json](suite.original.json). [suite.json](suite.json) only moves the new FIFO to its published path, [fifo_regflags.v](fifo_regflags.v).
 - New for v2: a registered-flags FIFO written for this evaluation and never used in prompt development; two multi-line bugs and two cases with two independent bugs; subtler briefs.

@@ -4,6 +4,8 @@ One pre-registered run of the frozen suite. All outcomes are reported, including
 
 ## Protocol
 
+Pre-registration is evidenced by same-repository git commits (configuration freeze, then case hash, then results). There is no external timestamp, so the ordering cannot be verified independently of this repository; future freezes should be anchored by pushing a tag before running.
+
 - Configuration frozen first: [freeze-2026-10-04.json](../../freeze-2026-10-04.json) (commit `ee3b5de`): Nemotron 3 Ultra for explanation and repair, Nemotron 3 Super for interpretation, prompt hashes, token caps (16,384 in / 4,096 out; 4,000 for repair), three repair attempts, verifier digest `7d82f4b2482a24f2`, harness and stimulus hashes, scoring rules.
 - The independent FIFO ([William Mar, MIT](../../../fixtures/independent/billdmar/)) was held out of prompt development and first read after the freeze. Interface mappings (`c1cd37f`) were added afterwards so it could be admitted; prompts, models, budgets, harness, worker, stimulus, and scoring did not change.
 - Cases frozen before running: [cases-frozen-eval-v1.json](../../cases-frozen-eval-v1.json) records SHA-256 `586fa989…a736`, which matches [suite.original.json](suite.original.json). [suite.json](suite.json) only updates the independent FIFO's path to its published location.

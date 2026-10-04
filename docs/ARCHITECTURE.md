@@ -55,4 +55,4 @@ A supplemental check set names the frozen-suite tests it observes and the review
 
 ## Not yet implemented
 
-Hosted deployment, Nebius Serverless Jobs, model-proposed supplemental checks, a port-name mapping, depth 8, public uploads, and per-visitor run limits beyond the single active-run queue.
+Hosted deployment, Nebius Serverless Jobs, depth 8, non-ANSI port headers, selectable contract policies (for example fall-through reads), public uploads, and concurrent verification runs beyond the single active-run queue. Interface mappings, model-proposed supplemental checks, and per-visitor limits are implemented.
