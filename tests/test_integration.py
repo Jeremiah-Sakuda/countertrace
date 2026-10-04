@@ -96,8 +96,8 @@ class RepairLoopTest(unittest.TestCase):
             ])
             seen = []
 
-            def propose(source, finding, rows, previous):
-                seen.append((finding["requirement_id"], finding["cycle"], [a["status"] for a in previous]))
+            def propose(source, finding, rows, previous, finding_source="current"):
+                seen.append((finding["requirement_id"], finding["cycle"], [a["status"] for a in previous], finding_source))
                 return next(proposals)
 
             with mock.patch.object(model, "propose_repair", side_effect=propose):
@@ -115,6 +115,7 @@ class RepairLoopTest(unittest.TestCase):
             self.assertEqual(seen[2][0], "both_full")
             self.assertNotEqual(seen[0][:2], seen[2][:2])
             self.assertEqual(seen[2][2], ["admission_rejected", "failed_checks"])
+            self.assertEqual(seen[2][3], "current")  # the finding came from the RTL being repaired
 
 
 

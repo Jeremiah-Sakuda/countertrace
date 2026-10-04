@@ -87,12 +87,13 @@ def run_loop(store, run_id: str) -> None:
     finding = model.primary_finding(parent)
     rows = parent["verification"]["traces"][finding["trace"]]
     current = original
+    finding_source = "current"  # whether the finding came from the RTL now being repaired
     attempts: list[dict] = []
     for index in range(1, MAX_ATTEMPTS + 1):
         attempt = {"index": index, "origin": "model", "status": "proposing", "started_at": now()}
         attempts.append(attempt)
         update(store, run_id, lambda s: s["repair"]["attempts"].append(dict(attempt)))
-        proposal = model.propose_repair(current, finding, rows, attempts[:-1])
+        proposal = model.propose_repair(current, finding, rows, attempts[:-1], finding_source)
         attempt["calls"] = proposal.get("calls")
         if proposal["status"] != "ok":
             attempt.update(status="model_error", summary=proposal.get("detail", proposal["status"]))
@@ -113,6 +114,7 @@ def run_loop(store, run_id: str) -> None:
                     # Feed the candidate's own counterexample to the next proposal.
                     child = store.load(attempt["candidate_run_id"])
                     child_finding = model.primary_finding(child)
+                    finding_source = "current" if child_finding else "earlier"
                     if child_finding:
                         finding = child_finding
                         rows = child["verification"]["traces"][child_finding["trace"]]

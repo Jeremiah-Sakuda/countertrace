@@ -40,6 +40,7 @@ class App:
         self.status_cache: tuple[float, dict] | None = None
         self.visitor_runs: dict[str, str] = {}
         self.visitor_calls: dict[str, list[float]] = {}
+        self.run_owner: dict[str, str] = {}
         self.visitor_lock = threading.Lock()
 
     # -- per-visitor limits ---------------------------------------------------
@@ -57,15 +58,25 @@ class App:
     def note_run(self, visitor: str, run_id: str) -> None:
         with self.visitor_lock:
             self.visitor_runs[visitor] = run_id
+            self.run_owner[run_id] = visitor
 
-    def claim_model_call(self, visitor: str) -> None:
+    def claim_model_call(self, visitor: str, units: int = 1) -> None:
+        """Count model requests per visitor per hour. A repair counts as its worst case."""
         with self.visitor_lock:
             now = time.monotonic()
             calls = [t for t in self.visitor_calls.get(visitor, []) if now - t < 3600]
-            if len(calls) >= MODEL_CALLS_PER_HOUR:
+            if len(calls) + units > MODEL_CALLS_PER_HOUR:
                 raise PermissionError("Model request limit reached for this hour. Recorded evidence remains available.")
-            calls.append(now)
+            calls.extend([now] * units)
             self.visitor_calls[visitor] = calls
+
+    def require_owner(self, visitor: str, run_id: str) -> None:
+        """Only the visitor who started a run may cancel it (local runs: only from this machine)."""
+        with self.visitor_lock:
+            owner = self.run_owner.get(run_id)
+        local = visitor in ("127.0.0.1", "::1") and os.environ.get("COUNTERTRACE_TRUST_PROXY", "").lower() != "true"
+        if owner != visitor and not (owner is None and local):
+            raise PermissionError("Only the visitor who started this run can cancel it.")
 
     def require_live(self, run_id: str) -> None:
         if re.fullmatch(r"[\w-]{1,64}", run_id) and (RECORDED / run_id).is_dir():
@@ -109,8 +120,10 @@ class App:
         item = catalog.example(example_id)
         contract = Contract(depth=item["depth"])
         summary = next(e for e in self.examples() if e["id"] == example_id)
+        recorded = RECORDED / "interpretations" / f"{example_id}.json"
         return {**summary, "source": catalog.example_source(item), "contract": contract.document(),
-                "contract_hash": contract.digest()}
+                "contract_hash": contract.digest(),
+                "recorded_interpretation": json.loads(recorded.read_text()) if recorded.is_file() else None}
 
     def profile(self) -> dict:
         timing = json.loads((catalog.FIXTURES / "timing" / "depth2_prd_sequence.json").read_text())
@@ -337,6 +350,7 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_json(app.interpret(body))
         if m := re.fullmatch(r"/api/runs/([\w-]+)/cancel", path):
             app.require_live(m.group(1))
+            app.require_owner(visitor, m.group(1))
             return self.send_json({"cancelled": app.store.cancel(m.group(1))})
         if m := re.fullmatch(r"/api/runs/([\w-]+)/explain", path):
             app.require_live(m.group(1))
@@ -344,7 +358,9 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_json(app.explain(m.group(1)))
         if m := re.fullmatch(r"/api/runs/([\w-]+)/repair", path):
             app.require_live(m.group(1))
-            app.claim_model_call(visitor)
+            from countertrace import repair
+
+            app.claim_model_call(visitor, units=repair.MAX_ATTEMPTS * 2)  # each attempt may retry once
             return self.send_json(app.repair(m.group(1)))
         if m := re.fullmatch(r"/api/runs/([\w-]+)/candidates", path):
             if not uploads_enabled():

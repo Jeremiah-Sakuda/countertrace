@@ -222,6 +222,8 @@ class ModelTest(unittest.TestCase):
         decisions = [{"topic": t, "brief_says": None, "status": "matches", "note": ""} for t in model.INTERPRET_TOPICS]
         good = reply(json.dumps({"summary": "", "decisions": decisions}))
         failures = [error.HTTPError("u", 503, "busy", {}, io.BytesIO(b"busy")) for _ in range(3)]
+        for failure in failures:
+            self.addCleanup(failure.close)
         env = {**CONFIG, "NEBIUS_FAST_MODEL_ID": "", "COUNTERTRACE_FALLBACK_MODEL_ID": "nvidia/backup"}
         with mock.patch.dict(os.environ, env), mock.patch.object(model.time, "sleep"), \
                 mock.patch.object(model.request, "urlopen", side_effect=failures + [good]) as call:

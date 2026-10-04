@@ -83,6 +83,13 @@ class AdmissionTest(unittest.TestCase):
             with self.subTest(name):
                 self.assert_rejected(self.mutate("assign empty", body), code)
 
+    def test_variable_declaration_initializers_are_rejected_like_initial(self):
+        self.assert_rejected(self.mutate("reg [AW:0]      count;", "reg [AW:0]      count = 0;"), "construct")
+        self.assert_rejected(self.mutate("reg [AW:0]      count;", "logic [AW:0]    count = '0;"), "construct")
+        # Continuous net declarations and localparams stay legal.
+        result = admit(self.mutate("assign empty", "wire never = 1'b0;\n    localparam integer TWO = 2;\n    assign empty"))
+        self.assertTrue(result.accepted, [d.message for d in result.diagnostics])
+
     def test_hidden_continuation_port_is_seen(self):
         source = self.mutate("input  wire             rd_en,", "input  wire             rd_en, bypass,")
         self.assert_rejected(source, "interface")

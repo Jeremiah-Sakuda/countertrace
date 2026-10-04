@@ -174,6 +174,15 @@ def parse_ports(header: str) -> tuple[dict[str, dict], list[str]]:
     return ports, problems
 
 
+def _statements(body: str):
+    """Yield (offset, text) for each ';'-terminated chunk of a module body."""
+    start = 0
+    for i, ch in enumerate(body):
+        if ch == ";":
+            yield start, body[start:i]
+            start = i + 1
+
+
 def line_of(text: str, index: int) -> int:
     return text.count("\n", 0, index) + 1
 
@@ -283,6 +292,10 @@ def admit(source: bytes | str, mapping: dict | None = None) -> Admission:
                             alternative="Declare them as unused outputs in an interface mapping, if they are outputs."))
         clock = mapping["ports"]["clk"] if mapping else "clk"
         body = code[(header_end + 2) if header_end >= 0 else len(code):]
+        for chunk_start, chunk in _statements(body):
+            if re.search(r"(?:^|\bbegin\b|\bend\b)\s*(?:reg|logic|integer|bit|int|byte|shortint|longint)\b[^=;]*=(?!=)", chunk):
+                diag(Diagnostic("construct", "Variable declaration initializers act like initial blocks; set values in reset instead.",
+                                line_of(code, header_end + 2 + chunk_start)))
         for name, port in result.ports.items():
             redeclared = re.search(rf"\b(?:wire|reg|logic|integer|genvar|tri|supply0|supply1)\b[^;]*?\b{name}\b\s*(?:\[[^\]]*\]\s*)?(?:=|;|,)", body)
             if redeclared and re.search(rf"\b{name}\b", redeclared.group().split("=")[0]):

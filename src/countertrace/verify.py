@@ -343,8 +343,8 @@ class Verification:
                 reached = [l for l in COVER_LABELS if covers.get(l, {}).get("reached")]
                 if status == "PASS" and len(reached) == len(COVER_LABELS):
                     self.obligation(id="cover:reachability", check="reachability", method="cover", status="bounded_pass",
-                                    label=f"All {len(COVER_LABELS)} scenarios reached within {self.limits['cover_depth']} cycles",
-                                    detail="Reachability reduces the risk of vacuous checks; it does not prove the specification complete.",
+                                    label=f"All {len(COVER_LABELS)} input scenarios reachable within {self.limits['cover_depth']} solver steps",
+                                    detail="Environment reachability: the covers observe the inputs and the reference queue (not the DUT), showing the assumptions do not rule out any contract scenario. They reduce the risk of vacuous checks; they do not prove the specification complete.",
                                     depth=self.limits["cover_depth"], log=log_ref)
                 else:
                     missing = [l for l in COVER_LABELS if l not in reached]

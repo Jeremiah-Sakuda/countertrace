@@ -250,7 +250,8 @@ def chat(task: str, system: str, user: str, max_tokens: int | None = None, model
         return _reserved_call(cfg, task, system, user, max_tokens, model, temperature, thinking)
     except ModelError as exc:
         fallback = os.environ.get("COUNTERTRACE_FALLBACK_MODEL_ID", "").strip() or cfg["fast_model_id"]
-        transient = exc.meta.get("status") == "network_error" or str(exc).startswith("HTTP 5")
+        transient = (exc.meta.get("status") == "network_error" or str(exc).startswith("HTTP 5")
+                     or str(exc).startswith("HTTP 429"))
         if not (transient and fallback and fallback != model):
             raise
         content, meta = _reserved_call(cfg, task, system, user, max_tokens, fallback, temperature, thinking)
@@ -600,17 +601,23 @@ def validate_repair(value: dict, current: str) -> dict:
 
 
 @guarded
-def propose_repair(source: str, finding: dict, rows: list[dict], previous: list[dict]) -> dict:
+def propose_repair(source: str, finding: dict, rows: list[dict], previous: list[dict],
+                   finding_source: str = "current") -> dict:
     cfg = config()
     start, end = finding["window"]["start"], finding["window"]["end"]
     history = "\n".join(
         f"- Attempt {a['index']}: {a['status']}. {a.get('summary', '')}"
         + (f"\n  Diff it applied:\n{a['diff'][:1500]}" if a.get("diff") else "") for a in previous) or "- none"
     contract_text = "\n".join(f"- {r['title']}: {r['text']}" for r in REQUIREMENTS.values())
+    if finding_source == "current":
+        origin = ("The current RTL below is what failed; the finding and trace are from verifying it"
+                  f"{' (a previous candidate)' if previous else ''}.\n")
+    else:
+        origin = ("The finding and trace below come from an earlier version of the RTL; the latest candidate failed "
+                  "without a new counterexample (see Previous attempts), and the current RTL below includes its changes.\n")
     user = (
         f"Contract requirements:\n{contract_text}\nChecks: {json.dumps(CHECKS)}\n\n"
-        f"The current RTL below is what failed; the finding and trace are from verifying it"
-        f"{' (a previous candidate)' if previous else ''}.\n"
+        + origin +
         f"Failing clause ({finding['requirement_id']}): {finding['requirement_text']}\n"
         f"First mismatch: cycle {finding['cycle']}, check {finding['check']}; expected {json.dumps(finding['expected'])}, "
         f"observed {json.dumps(finding['observed'])}.\n"
