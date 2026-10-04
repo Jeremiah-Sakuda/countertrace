@@ -115,6 +115,13 @@ class ModelTest(unittest.TestCase):
         ledger = (Path(self.tmp.name) / "model_usage.jsonl").read_text()
         self.assertNotIn("test-key-not-real", ledger)
 
+    def test_interpretation_routes_to_fast_model(self):
+        decisions = [{"topic": t, "brief_says": None, "status": "matches", "note": ""} for t in model.INTERPRET_TOPICS]
+        with mock.patch.dict(os.environ, {**CONFIG, "NEBIUS_FAST_MODEL_ID": "nvidia/fast"}), \
+                mock.patch.object(model.request, "urlopen", return_value=reply(json.dumps({"summary": "", "decisions": decisions}))) as call:
+            model.interpret("A FIFO.", Contract(depth=4))
+        self.assertEqual(json.loads(call.call_args[0][0].data)["model"], "nvidia/fast")
+
     def test_schema_failure_retries_then_reports(self):
         with mock.patch.dict(os.environ, CONFIG), \
                 mock.patch.object(model.request, "urlopen", side_effect=[reply("not json"), reply('{"summary": 1}')]):

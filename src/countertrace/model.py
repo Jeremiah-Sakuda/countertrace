@@ -80,6 +80,8 @@ def config() -> dict:
         "base_url": os.environ.get("NEBIUS_BASE_URL", "").strip().rstrip("/"),
         "model_id": os.environ.get("NEBIUS_MODEL_ID", "").strip(),
         "repair_model_id": os.environ.get("NEBIUS_REPAIR_MODEL_ID", "").strip(),
+        # Optional faster tier for interactive interpretation and check proposals.
+        "fast_model_id": os.environ.get("NEBIUS_FAST_MODEL_ID", "").strip(),
         "input_limit": env_int("COUNTERTRACE_MODEL_INPUT_TOKEN_LIMIT"),
         "output_limit": env_int("COUNTERTRACE_MODEL_OUTPUT_TOKEN_LIMIT"),
         "spend_limit": env_float("COUNTERTRACE_DEPLOYMENT_SPEND_LIMIT_USD"),
@@ -115,6 +117,7 @@ def public_config() -> dict:
         "reason": unavailable_reason(cfg),
         "model_id": cfg["model_id"] or None,
         "repair_model_id": cfg["repair_model_id"] or cfg["model_id"] or None,
+        "fast_model_id": cfg["fast_model_id"] or cfg["model_id"] or None,
         "endpoint_host": urlsplit(cfg["base_url"]).hostname if cfg["base_url"] else None,
         "input_token_limit": cfg["input_limit"],
         "output_token_limit": cfg["output_limit"],
@@ -320,7 +323,9 @@ def interpret(brief: str, contract: Contract) -> dict:
     topics = "\n".join(f"- {k}: {v}" for k, v in INTERPRET_TOPICS.items())
     user = (f"Contract profile {contract.profile} v{contract.version}, DEPTH={contract.depth}, WIDTH={contract.width}.\n"
             f"Topics and the contract's fixed behavior:\n{topics}\n\nBrief:\n\"\"\"\n{brief}\n\"\"\"")
-    result = structured("interpret", INTERPRET_SYSTEM, user, validate_interpretation, max_tokens=1600)
+    # Configured output cap: reasoning endpoints can exhaust a small task-local limit.
+    result = structured("interpret", INTERPRET_SYSTEM, user, validate_interpretation,
+                        model_id=config()["fast_model_id"] or None)
     if result["status"] == "ok":
         decisions = result["result"]["decisions"]
         result["blocking"] = [d["topic"] for d in decisions if d["status"] in ("conflict", "unsupported")]
@@ -516,7 +521,7 @@ def propose_check_set(description: str, contract: Contract, tests: list[str]) ->
     user = (f"Check templates: {json.dumps(CHECKS)}\nContract rows:\n{rows}\nNamed stimulus tests: {', '.join(tests)}\n\n"
             f"Student's description of what their testbench checks:\n\"\"\"\n{description}\n\"\"\"")
     return structured("propose_checks", CHECKS_SYSTEM, user,
-                      lambda v: validate_check_proposal(v, tests), max_tokens=1500)
+                      lambda v: validate_check_proposal(v, tests), model_id=config()["fast_model_id"] or None)
 
 
 # -- feasibility check ------------------------------------------------------------

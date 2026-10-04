@@ -1,0 +1,19 @@
+{
+  "version": "briefs-dev-v1",
+  "split": "development",
+  "note": "Development briefs for checking and tuning interpretation. Authored for Countertrace by the coding assistant; not independently authored. Labels are the author's reading of the contract profile.",
+  "briefs": [
+    {"id": "dev-uart-rx", "depth": 4, "expected_blocking": false,
+     "text": "A 4-entry, 8-bit FIFO for a UART receive path. Bytes must come out in the order they arrived. When the FIFO is full, new bytes are dropped rather than overwriting stored ones. Reset clears the FIFO."},
+    {"id": "dev-plain", "depth": 4, "expected_blocking": false,
+     "text": "A 4-entry, 8-bit synchronous FIFO with synchronous active-high reset. Writes when full and reads when empty are ignored."},
+    {"id": "dev-exchange-when-full", "depth": 4, "expected_blocking": true, "expected_topics": ["simultaneous_full"],
+     "text": "A 4-entry FIFO. If it is full and a read and write arrive together, it should still accept the write because the read frees a slot."},
+    {"id": "dev-async-reset", "depth": 2, "expected_blocking": true, "expected_topics": ["reset_kind"],
+     "text": "Two-entry byte FIFO between two blocks on the same clock. The reset is asynchronous so the FIFO clears immediately when rst rises, without waiting for a clock edge."},
+    {"id": "dev-fwft", "depth": 4, "expected_blocking": true, "expected_topics": ["read_latency"],
+     "text": "A 4-deep FIFO of bytes in first-word fall-through mode: the oldest byte is already visible on dout whenever the FIFO is not empty, and rd_en just acknowledges it."},
+    {"id": "dev-streaming", "depth": 4, "expected_blocking": false,
+     "text": "A 4-entry streaming FIFO where reads and writes often happen in the same cycle. Order must be preserved, including when both happen together while partially full."}
+  ]
+}
