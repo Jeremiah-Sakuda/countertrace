@@ -429,6 +429,8 @@ def explain_run(state: dict, source: str) -> dict:
     outcomes = [{key: obligation[key] for key in ("id", "method", "status", "detail", "depth", "tests")
                  if key in obligation} for obligation in state["verification"].get("obligations", [])]
     user = (
+        f"Configuration under test: DEPTH={state['depth']}, WIDTH=8. State this configuration exactly; "
+        f"results apply to no other configuration.\n"
         f"Contract row at the failing edge ({finding['requirement_id']}): {finding['requirement_text']}\n"
         f"Failed check: {finding['check']} — {finding['check_text']}\n"
         f"First observed mismatch: cycle {finding['cycle']} in test {finding['test']} ({finding['source']}).\n"
