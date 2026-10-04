@@ -96,7 +96,7 @@ class RepairLoopTest(unittest.TestCase):
             ])
             seen = []
 
-            def propose(source, finding, rows, previous, finding_source="current"):
+            def propose(source, finding, rows, previous, finding_source="current", include_outcomes=True):
                 seen.append((finding["requirement_id"], finding["cycle"], [a["status"] for a in previous], finding_source))
                 return next(proposals)
 

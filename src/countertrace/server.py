@@ -44,16 +44,29 @@ class App:
         self.visitor_lock = threading.Lock()
 
     # -- per-visitor limits ---------------------------------------------------
+    PENDING = "__pending__"
+
     def claim_run_slot(self, visitor: str) -> None:
+        """Atomically reserve the visitor's single run slot; release it if creation fails."""
         with self.visitor_lock:
             run_id = self.visitor_runs.get(visitor)
-            if run_id:
+            if run_id == self.PENDING:
+                active = True
+            elif run_id:
                 try:
                     active = self.store.load(run_id).get("state") in ("queued", "running")
                 except KeyError:
                     active = False
-                if active:
-                    raise PermissionError("You already have a run in progress. Wait for it or cancel it first.")
+            else:
+                active = False
+            if active:
+                raise PermissionError("You already have a run in progress. Wait for it or cancel it first.")
+            self.visitor_runs[visitor] = self.PENDING
+
+    def release_run_slot(self, visitor: str) -> None:
+        with self.visitor_lock:
+            if self.visitor_runs.get(visitor) == self.PENDING:
+                del self.visitor_runs[visitor]
 
     def note_run(self, visitor: str, run_id: str) -> None:
         with self.visitor_lock:
@@ -153,6 +166,12 @@ class App:
     # -- actions --------------------------------------------------------------
     def create_run(self, body: dict, visitor: str) -> dict:
         self.claim_run_slot(visitor)
+        try:
+            return self._create_run(body, visitor)
+        finally:
+            self.release_run_slot(visitor)  # no-op once note_run recorded the real run
+
+    def _create_run(self, body: dict, visitor: str) -> dict:
         if body.get("example_id"):
             item = catalog.example(body["example_id"])
             contract_hash = Contract(depth=item["depth"]).digest()
@@ -181,11 +200,14 @@ class App:
 
     def create_audit(self, body: dict, visitor: str) -> dict:
         self.claim_run_slot(visitor)
-        state = self.store.create_audit(check_set=str(body.get("check_set", "weak-learner-v1")),
-                                        depth=int(body.get("depth", 4)))
-        self.note_run(visitor, state["id"])
-        self.store.start(state["id"])
-        return state
+        try:
+            state = self.store.create_audit(check_set=str(body.get("check_set", "weak-learner-v1")),
+                                            depth=int(body.get("depth", 4)))
+            self.note_run(visitor, state["id"])
+            self.store.start(state["id"])
+            return state
+        finally:
+            self.release_run_slot(visitor)
 
     def interpret(self, body: dict) -> dict:
         from countertrace import model

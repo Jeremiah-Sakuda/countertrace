@@ -45,7 +45,7 @@ Seven segments. Narration totals about 330 words, roughly 2:15 of speech, which 
 
 **Screen:** Tab 5. Show the headline "3 of 6 real bugs slip past this check set." Tick an answer in the exercise and reveal the missing requirements.
 
-**Narration:** "Countertrace can also grade a student's checks instead of their design. A typical first testbench misses three of six seeded bugs, and each miss points to the requirement it never drives, like a write while full."
+**Narration:** "Countertrace can also grade a student's checks instead of their design. A deliberately weak, learner-style check set misses three of six seeded bugs, and each miss points to the requirement it never drives, like a write while full."
 
 ### 6. Evidence anyone can rerun (2:00 to 2:15)
 
@@ -57,7 +57,7 @@ Seven segments. Narration totals about 330 words, roughly 2:15 of speech, which 
 
 **Screen:** A simple slide or the README results table: eval-v1 and eval-v2 side by side (8 of 8 bugs found, 0 false alarms, repairs 7 of 8 and 8 of 8). Then the model routing table. End on the repository URL.
 
-**Narration:** "In two frozen evaluations, Countertrace found every seeded bug with no false alarms, and Nemotron's repairs passed the unchanged checks in seven of eight and then eight of eight cases. Everything runs through Nebius Token Factory: Super with reasoning off for fast calls, Ultra for explanations and repairs. Nemotron proposes every fix, and checks it cannot change decide whether it counts."
+**Narration:** "In two frozen evaluations, Countertrace found every seeded bug with no false alarms, and Nemotron's repairs passed the unchanged checks in seven of eight and then eight of eight cases. Every model call goes through Nebius Token Factory, while verification runs in CPU containers: Super with reasoning off for fast calls, Ultra for explanations and repairs. Nemotron proposes every fix, and checks it cannot change decide whether it counts."
 
 ## After recording
 

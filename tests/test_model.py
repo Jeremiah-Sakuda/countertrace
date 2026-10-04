@@ -232,6 +232,33 @@ class ModelTest(unittest.TestCase):
         self.assertEqual(json.loads(call.call_args[0][0].data)["model"], "nvidia/backup")
         self.assertEqual(result["calls"][0]["fallback_from"], "nvidia/test-nemotron")
 
+    def test_system_prefix_counts_toward_the_input_limit(self):
+        env = {**CONFIG, "COUNTERTRACE_MODEL_INPUT_TOKEN_LIMIT": "2000", "COUNTERTRACE_MODEL_SYSTEM_PREFIX": "x" * 7000}
+        with mock.patch.dict(os.environ, env), mock.patch.object(model.request, "urlopen") as call:
+            result = model.interpret("A FIFO.", Contract(depth=4))
+        self.assertEqual(result["status"], "input_too_large")
+        call.assert_not_called()
+
+    def test_feedback_off_hides_why_earlier_candidates_failed(self):
+        finding = {"window": {"start": 0, "end": 0}, "requirement_id": "write_full", "requirement_text": "Ignore the write.",
+                   "cycle": 6, "check": "read_data", "expected": {}, "observed": {}, "related_events": []}
+        rows = [{"cycle": 0, "rst": 1, "wr_en": 0, "rd_en": 0, "din": 0, "row": "reset", "accepted": {"reset": True, "read": False, "write": False},
+                 "pre_queue": None, "post_queue": [], "expected": {"dout": None, "empty": True, "full": False},
+                 "observed": {"dout": 0, "empty": True, "full": False}, "dout_checked": False, "mismatches": []}]
+        previous = [{"index": 1, "status": "failed_checks", "summary": "Counterexample: empty_flag at cycle 4 in fill_drain.", "diff": "-a\n+b\n"}]
+        sent = []
+        def fake_structured(task, system, user, validate, **kwargs):
+            sent.append(user)
+            return {"status": "ok", "result": None, "calls": []}
+        with mock.patch.dict(os.environ, CONFIG), mock.patch.object(model, "structured", side_effect=fake_structured):
+            model.propose_repair("module m; endmodule", finding, rows, previous, "earlier", include_outcomes=False)
+            model.propose_repair("module m; endmodule", finding, rows, previous, "current", include_outcomes=True)
+        hidden, shown = sent
+        self.assertNotIn("cycle 4", hidden)
+        self.assertIn("Attempt 1: rejected.", hidden)
+        self.assertIn("come from an earlier version", hidden)
+        self.assertIn("cycle 4", shown)
+
     def test_extract_json_handles_fences_and_reasoning(self):
         self.assertEqual(model.extract_json('<think>x</think>```json\n{"a": 1}\n```'), {"a": 1})
         with self.assertRaises(ValueError):

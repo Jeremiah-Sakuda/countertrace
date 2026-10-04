@@ -27,6 +27,33 @@ class ServerRulesTest(unittest.TestCase):
             with self.assertRaises(PermissionError):
                 self.app.require_owner("10.0.0.3", "cli-run")
 
+    def test_concurrent_claims_from_one_visitor_get_one_slot(self):
+        import threading
+
+        self.app.store = mock.Mock()
+        results, barrier = [], threading.Barrier(8)
+
+        def claim():
+            barrier.wait()
+            try:
+                self.app.claim_run_slot("v")
+                results.append("ok")
+            except PermissionError:
+                results.append("refused")
+
+        threads = [threading.Thread(target=claim) for _ in range(8)]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+        self.assertEqual(results.count("ok"), 1)
+
+    def test_failed_creation_releases_the_slot(self):
+        self.app.store = mock.Mock()
+        with self.assertRaises(ValueError):
+            self.app.create_run({}, "v")  # neither example_id nor source
+        self.app.claim_run_slot("v")  # the slot is free again
+
     def test_repair_counts_its_worst_case_against_the_quota(self):
         with mock.patch.object(server, "MODEL_CALLS_PER_HOUR", 12):
             self.app.claim_model_call("v", units=6)

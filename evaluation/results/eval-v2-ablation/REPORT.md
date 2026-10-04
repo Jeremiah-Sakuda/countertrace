@@ -7,11 +7,11 @@ Question from an internal review: does the choice of Nemotron tier, or feeding a
 | Nemotron 3 Ultra, feedback on (eval-v2) | **8/8** | 5 | 12 | 16 | 4 | 25,335 / 38,008 | 6.7 s |
 | Nemotron 3 Super, feedback on | **8/8** | 7 | 9 | 11 | 2 | 17,671 / 22,597 | 10.3 s |
 | Nemotron 3 Nano, feedback on | 6/8 | 5 | 13 | 20 | 6 | 30,090 / 48,468 | 16.7 s |
-| Nemotron 3 Ultra, feedback **off** | 7/8 | 7 | 10 | 12 | 2 | 18,849 / 27,136 | 6.2 s |
+| Nemotron 3 Ultra, reduced feedback (see note) | 7/8 | 7 | 10 | 12 | 2 | 18,849 / 27,136 | 6.2 s |
 
 ## What this shows
 
-- **Feedback mattered where it should.** Without feedback, Ultra failed only F6, the two-bug case: its three candidates each fixed one bug, and each was rejected without learning why. With feedback, the same case passed on the second candidate, after the first candidate's new counterexample (empty_flag at cycle 4) was supplied. This is a single case, not a rate.
+- **The reduced-feedback run is exploratory, not a clean control.** A later internal review found that the "feedback off" switch stopped refreshing the trace but still passed each rejected candidate's summary, which names its failing check and cycle, and it labeled the old trace as if it came from the current RTL. In that run Ultra failed only F6, the two-bug case, repeating the same one-bug fix three times. With full feedback, F6 passed on the second candidate. This is an observation from one case; it does not establish that feedback caused the fix. The switch was corrected on October 4 (the model now learns only that earlier candidates were rejected) and has not been rerun.
 - **Super matched Ultra on this suite** at about 60% of Ultra's output tokens. Nano repaired 6/8; it hit the output limit more often, and two of its failures included schema errors.
 - **First-candidate counts are within run-to-run variance.** The two Ultra runs differ only in feedback, which cannot affect a first candidate, yet they passed 5 and 7 cases first time. Treat first-candidate differences of one or two cases as noise at n = 8.
 - **No configuration produced a false acceptance.** Every passed candidate cleared the identical frozen check set, including three unbounded proofs. Every failure was a rejected or unparseable candidate.

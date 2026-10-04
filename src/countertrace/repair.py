@@ -88,12 +88,16 @@ def run_loop(store, run_id: str) -> None:
     rows = parent["verification"]["traces"][finding["trace"]]
     current = original
     finding_source = "current"  # whether the finding came from the RTL now being repaired
+    # COUNTERTRACE_REPAIR_FEEDBACK=off exists only for ablation studies. Off means the
+    # model learns only that earlier candidates were rejected, never why.
+    feedback_on = os.environ.get("COUNTERTRACE_REPAIR_FEEDBACK", "on") != "off"
     attempts: list[dict] = []
     for index in range(1, MAX_ATTEMPTS + 1):
         attempt = {"index": index, "origin": "model", "status": "proposing", "started_at": now()}
         attempts.append(attempt)
         update(store, run_id, lambda s: s["repair"]["attempts"].append(dict(attempt)))
-        proposal = model.propose_repair(current, finding, rows, attempts[:-1], finding_source)
+        proposal = model.propose_repair(current, finding, rows, attempts[:-1], finding_source,
+                                        include_outcomes=feedback_on)
         attempt["calls"] = proposal.get("calls")
         if proposal["status"] != "ok":
             attempt.update(status="model_error", summary=proposal.get("detail", proposal["status"]))
@@ -109,16 +113,20 @@ def run_loop(store, run_id: str) -> None:
             else:
                 verify_candidate(store, parent, candidate, attempt, "model_repair")
                 current = candidate
-                # COUNTERTRACE_REPAIR_FEEDBACK=off exists only for ablation studies.
-                if attempt["status"] == "failed_checks" and os.environ.get("COUNTERTRACE_REPAIR_FEEDBACK", "on") != "off":
+                child_finding = None
+                if feedback_on and attempt["status"] == "failed_checks":
+                    child_finding = model.primary_finding(store.load(attempt["candidate_run_id"]))
+                if child_finding:
                     # Feed the candidate's own counterexample to the next proposal.
                     child = store.load(attempt["candidate_run_id"])
-                    child_finding = model.primary_finding(child)
-                    finding_source = "current" if child_finding else "earlier"
-                    if child_finding:
-                        finding = child_finding
-                        rows = child["verification"]["traces"][child_finding["trace"]]
-                        attempt["feedback"] = {k: child_finding[k] for k in ("test", "cycle", "check", "requirement_id")}
+                    finding = child_finding
+                    rows = child["verification"]["traces"][child_finding["trace"]]
+                    attempt["feedback"] = {k: child_finding[k] for k in ("test", "cycle", "check", "requirement_id")}
+                    finding_source = "current"
+                elif attempt["status"] != "passed_unchanged_checks":
+                    # The RTL advanced but the finding did not come from it (failure
+                    # without a counterexample, an error, or feedback switched off).
+                    finding_source = "earlier"
         attempt["finished_at"] = now()
         update(store, run_id, lambda s: s["repair"]["attempts"].__setitem__(index - 1, dict(attempt)))
         if attempt["status"] == "passed_unchanged_checks":

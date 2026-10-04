@@ -77,7 +77,9 @@ I froze the model configuration and prompts first, committed a hash of the test 
 | Conflicting briefs flagged | 4 of 4 | 3 of 4 |
 | Compatible briefs accepted | 4 of 4 | 4 of 4 |
 
-eval-v1 included an MIT-licensed FIFO by another author that I never used while writing prompts. eval-v2 used fresh cases, including multi-line bugs and designs with two bugs. A follow-up ablation on eval-v2 found that Nemotron 3 Super repaired 8 of 8 as well, Nano repaired 6 of 8, and Ultra without the counterexample feedback repaired 7 of 8, failing only the two-bug case that the feedback had solved. Each evaluation cost under half a dollar at list prices.
+eval-v1 included an MIT-licensed FIFO by another author that I never used while writing prompts. eval-v2 used fresh cases, including multi-line bugs and designs with two bugs. A follow-up comparison on eval-v2 found that Nemotron 3 Super repaired 8 of 8 as well and Nano repaired 6 of 8. Each evaluation cost under half a dollar at list prices.
+
+These are single runs on cases and labels I wrote with my coding assistant; no outside reviewer or user study was involved.
 
 ## Challenges I ran into
 
@@ -95,9 +97,9 @@ eval-v1 included an MIT-licensed FIFO by another author that I never used while 
 
 ## What I learned
 
-- Smaller Nemotron tiers were good enough for more of this work than I expected. Super matched Ultra on interpretation and on repair for this suite, at a fraction of the latency.
+- Smaller Nemotron tiers were good enough for more of this work than I expected. Super matched Ultra on interpretation, in a fraction of the time, and also repaired all eight eval-v2 cases, using fewer output tokens than Ultra (its repair requests were not faster).
 - The deterministic evidence matters as much as the model output. The "probable origin" line comes from the trace, not the model, and it is often the most useful sentence on the page.
-- Citation checks catch made-up references but not wrong reasoning. One explanation cited only real cycles and signals and still described only one of two bugs, so the interface treats explanations as help, not as proof.
+- Citation checks catch references to cycles and signals that do not exist, but they cannot tell whether the reasoning is right. Two eval-v2 explanations had a partly wrong or incomplete root cause, so the interface treats explanations as help, not as proof.
 
 ## What's next for Countertrace
 

@@ -226,6 +226,11 @@ _RESERVED = {"usd": 0.0}
 _RESERVE_LOCK = threading.Lock()
 
 
+def full_system(cfg: dict, system: str) -> str:
+    """The exact system message sent, used for both size checks and spend reservation."""
+    return f"{cfg['system_prefix']}\n\n{system}".strip()
+
+
 def price_for(cfg: dict, model: str) -> tuple[float, float] | None:
     per_model = model_prices(cfg).get(model)
     if per_model:
@@ -264,7 +269,7 @@ def _reserved_call(cfg, task, system, user, max_tokens, model, temperature, thin
     price = price_for(cfg, model)
     if cfg["spend_limit"] is not None and price is not None:
         out_cap = min(max_tokens or cfg["output_limit"] or 0, cfg["output_limit"] or 0)
-        worst = estimate_tokens(system + user) / 1e6 * price[0] + out_cap / 1e6 * price[1]
+        worst = estimate_tokens(full_system(cfg, system) + user) / 1e6 * price[0] + out_cap / 1e6 * price[1]
         with _RESERVE_LOCK:
             spent = spend_summary(cfg)["estimated_cost_usd"] or 0.0
             if spent + _RESERVED["usd"] + worst > cfg["spend_limit"]:
@@ -288,13 +293,13 @@ def _chat(task: str, system: str, user: str, max_tokens: int | None, model_id: s
     spend = spend_summary(cfg)
     if cfg["spend_limit"] is not None and (spend["estimated_cost_usd"] or 0) >= cfg["spend_limit"]:
         raise ModelError("unavailable", "Deployment spend limit reached.")
-    prompt_estimate = estimate_tokens(system + user)
+    prompt_estimate = estimate_tokens(full_system(cfg, system) + user)
     if prompt_estimate > cfg["input_limit"]:
         raise ModelError("input_too_large", f"Estimated {prompt_estimate} input tokens exceeds the configured limit.")
     model = model_id or cfg["model_id"]
     payload = {
         "model": model,
-        "messages": [{"role": "system", "content": f"{cfg['system_prefix']}\n\n{system}".strip()},
+        "messages": [{"role": "system", "content": full_system(cfg, system)},
                      {"role": "user", "content": user}],
         "max_tokens": min(max_tokens or cfg["output_limit"], cfg["output_limit"]),
         "temperature": temperature,
@@ -602,19 +607,24 @@ def validate_repair(value: dict, current: str) -> dict:
 
 @guarded
 def propose_repair(source: str, finding: dict, rows: list[dict], previous: list[dict],
-                   finding_source: str = "current") -> dict:
+                   finding_source: str = "current", include_outcomes: bool = True) -> dict:
     cfg = config()
     start, end = finding["window"]["start"], finding["window"]["end"]
+    def outcome(a: dict) -> str:
+        if include_outcomes:
+            return f"{a['status']}. {a.get('summary', '')}"
+        return "rejected." if a["status"] != "passed_unchanged_checks" else "passed."
+
     history = "\n".join(
-        f"- Attempt {a['index']}: {a['status']}. {a.get('summary', '')}"
+        f"- Attempt {a['index']}: {outcome(a)}"
         + (f"\n  Diff it applied:\n{a['diff'][:1500]}" if a.get("diff") else "") for a in previous) or "- none"
     contract_text = "\n".join(f"- {r['title']}: {r['text']}" for r in REQUIREMENTS.values())
     if finding_source == "current":
         origin = ("The current RTL below is what failed; the finding and trace are from verifying it"
                   f"{' (a previous candidate)' if previous else ''}.\n")
     else:
-        origin = ("The finding and trace below come from an earlier version of the RTL; the latest candidate failed "
-                  "without a new counterexample (see Previous attempts), and the current RTL below includes its changes.\n")
+        origin = ("The finding and trace below come from an earlier version of the RTL. The current RTL below "
+                  "includes later changes that were also rejected; no counterexample from it is provided.\n")
     user = (
         f"Contract requirements:\n{contract_text}\nChecks: {json.dumps(CHECKS)}\n\n"
         + origin +
