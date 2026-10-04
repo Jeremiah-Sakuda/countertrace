@@ -31,6 +31,17 @@ Every model call is a runtime call from the control service to the Nebius Token 
 
 Responses are schema-validated with one bounded retry; input/output token caps are required; per-call usage is logged and an inference-spend threshold stops new calls. Token Factory made the agent loop practical: routing quick calls to Super kept interpretation interactive, while Ultra handled trace reasoning and repairs. Verification runs on CPU in a pinned Docker image; Nebius Serverless Jobs are not used (see [feedback](docs/SUBMISSION.md#feedback-on-nebius-and-nvidia-tools)).
 
+## Related work and what is different
+
+LLM-assisted hardware design and repair is an active area. RTLFixer uses LLM agents with compiler feedback to fix Verilog errors; AutoChip iterates LLM-generated Verilog with compiler and simulation feedback; NVIDIA's VerilogEval and ChipNeMo benchmark and adapt LLMs for hardware design, and FVEval evaluates LLMs on formal-verification tasks; Veri-Sure and recent open-source LLM-driven formal verification studies combine generation or repair with formal checks. Mutation testing of checks (for example YosysHQ MCY) is also established.
+
+Countertrace does not claim a new repair algorithm. Its contribution is the combination aimed at learners:
+
+1. **The checks cannot move.** A repair counts only if a separate run with hash-identical contract, harness, stimulus, limits, and formal tasks resolves every obligation, including unbounded proofs. The model never grades its own fix, and the loop feeds each failed candidate's own counterexample back to the model.
+2. **Cycle-level evidence a learner can follow.** Two independent references (a Python reference queue and a SystemVerilog formal monitor) agree on one sampling convention; the first mismatch is shown with deterministic "related events", and model explanations are checked citation by citation against that trace.
+3. **Intent before verification.** A plain-English brief is compared with the fixed contract and conflicts are surfaced instead of silently changing the rules.
+4. **Auditing the learner's checks, not the design.** Seeded faults score a named check set; the independent core decides which faults are real, and each miss points to the requirement the set never drives.
+
 ## Quick start
 
 Requires Python 3.11+, Git, Docker (on macOS, a running colima or Docker Desktop VM that shares your home directory), and Node 20+ for the web interface. HDL tools are not installed on the host; they run only inside the pinned verifier image.

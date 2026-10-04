@@ -42,6 +42,17 @@ First frozen evaluation (October 4, 2026, one run; [report](../evaluation/result
 
 The one failed repair ran out of output tokens rewriting a whole file. Repairs are now exact-match edits; on five development bugs (not the evaluation suite) all five passed on the first candidate with one-line diffs. The evaluation cases were written by the developer's coding assistant and have not yet been reviewed independently.
 
+### Related work and what is different
+
+LLM-assisted hardware design and repair is an active area. RTLFixer uses LLM agents with compiler feedback to fix Verilog errors; AutoChip iterates LLM-generated Verilog with compiler and simulation feedback; NVIDIA's VerilogEval and ChipNeMo benchmark and adapt LLMs for hardware design, and FVEval evaluates LLMs on formal-verification tasks; Veri-Sure and recent open-source LLM-driven formal verification studies combine generation or repair with formal checks. Mutation testing of checks (for example YosysHQ MCY) is also established.
+
+Countertrace does not claim a new repair algorithm. Its contribution is the combination aimed at learners:
+
+1. **The checks cannot move.** A repair counts only if a separate run with hash-identical contract, harness, stimulus, limits, and formal tasks resolves every obligation, including unbounded proofs. The model never grades its own fix, and the loop feeds each failed candidate's own counterexample back to the model.
+2. **Cycle-level evidence a learner can follow.** Two independent references (a Python reference queue and a SystemVerilog formal monitor) agree on one sampling convention; the first mismatch is shown with deterministic "related events", and model explanations are checked citation by citation against that trace.
+3. **Intent before verification.** A plain-English brief is compared with the fixed contract and conflicts are surfaced instead of silently changing the rules.
+4. **Auditing the learner's checks, not the design.** Seeded faults score a named check set; the independent core decides which faults are real, and each miss points to the requirement the set never drives.
+
 ### How NVIDIA Nemotron and Nebius Token Factory are used
 
 All model calls are runtime calls to the Nebius Token Factory OpenAI-compatible API from the control service:
