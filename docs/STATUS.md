@@ -2,6 +2,18 @@
 
 Last updated: October 4, 2026. This page records what has actually run. The October 4 section reports the first frozen evaluation (eval-v1), which includes an independently authored FIFO held out of prompt development. Everything else uses **development and showcase fixtures authored for this project**. No user study or external review has happened.
 
+## October 4 (later): review fixes and eval-v2
+
+An internal review found an admission bypass, repair-loop gaps, and documentation errors. Fixed and verified:
+
+- **Admission bypass closed.** Code hidden by `// /*` … `// */` passed the old two-regex comment stripper; one ordered lexical pass now handles comments and strings, with regression tests.
+- **Repair agent.** A failed candidate's own counterexample and diff drive the next proposal. Replies cut off at the output limit retry with Nemotron 3 reasoning off (`chat_template_kwargs: {"enable_thinking": false}`, verified on Token Factory). Interactive tasks default to reasoning off: Super interpretation 1.7–3.3 s on development briefs.
+- **Soundness.** Frozen check sets record the formal tasks that ran; the audit path applies admission, port, and property-inventory checks; the formal stage reports an error when its tasks error.
+- **eval-v2** ([report](../evaluation/results/eval-v2/REPORT.md)), pre-registered on fresh cases including a new held-out registered-flags FIFO, multi-line bugs, and two-bug cases: diagnosis 8/8, 0/4 false alarms, **repair 8/8** (5 first candidate; F1, F2, and F6 show verify→fail→fix iterations driven by fed-back counterexamples), interpretation 3/4 conflicts and 4/4 compatible, about $0.24. The one interpretation miss led to a new `flags` topic, validated only on development briefs.
+- **Recorded iteration.** `rec-20261004-010137-ver-dd43e0` (eval-v2 F6) shows candidate 1 rejected by the unchanged checks and candidate 2 accepted.
+- **Interface.** Concrete landing hero with a data-driven showcase tour, probable-origin line derived from the trace, candidate diff and before/after obligations, runs ledger cleanup, audit exercise before the answer, readable screen-reader labels, mobile cycle table (browser-checked at desktop and 375 px; no screen-reader testing).
+- **Setup.** Make targets use `.venv` and stop on Python below 3.11; `.env.example` carries the documented endpoint, model IDs, caps, and prices.
+
 ## October 4: first frozen evaluation and follow-ups
 
 **Evaluation eval-v1** ([report](../evaluation/results/eval-v1/REPORT.md), [raw results](../evaluation/results/eval-v1/results.json)). The configuration was frozen first (models, prompt hashes, budgets, verifier digest, stimulus, scoring), then the cases (SHA-256 committed before the run). Four controls and eight faulty cases span two Countertrace implementations and one independently authored MIT FIFO by William Mar, admitted through a validated interface mapping and held out of prompt development. One run:

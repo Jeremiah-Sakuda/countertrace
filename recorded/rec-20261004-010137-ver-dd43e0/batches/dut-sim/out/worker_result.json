@@ -1,0 +1,319 @@
+{
+  "schema": "countertrace-worker-result/1",
+  "job_id": "e72144600414",
+  "tool_versions": {
+    "verilator": "Verilator 5.053 devel rev v5.052-258-ga419e9157 (mod)",
+    "yosys": "Yosys 0.69+158 (git sha1 a1a0ad7d4-dirty, Release, GNU /usr/bin/aarch64-linux-gnu-g++ 15.2.0)",
+    "python": "Python 3.11.2",
+    "oss_cad_suite": "2026-09-30"
+  },
+  "harness_hashes": {
+    "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+    "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+    "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+  },
+  "steps": [
+    {
+      "id": "dut:ports",
+      "argv": [
+        "yosys",
+        "-q",
+        "-p",
+        "read_verilog -sv dut.v; hierarchy -top fifo -chparam DEPTH 4 -chparam WIDTH 8; proc; write_json /out/dut/ports.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.015,
+      "log": "dut/logs/ports.log",
+      "log_truncated": false
+    },
+    {
+      "id": "dut:properties",
+      "argv": [
+        "yosys",
+        "-p",
+        "read -formal -D CT_DUT=fifo dut.v; read -formal -D CT_DUT=fifo ct_formal_top.sv; chparam -set DEPTH 4 -set WIDTH 8 ct_formal_top; prep -top ct_formal_top; write_json /out/dut/properties.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.018,
+      "log": "dut/logs/properties.log",
+      "log_truncated": false
+    },
+    {
+      "id": "dut:compile",
+      "argv": [
+        "verilator",
+        "--binary",
+        "--timing",
+        "--trace",
+        "-Wno-fatal",
+        "-Wno-lint",
+        "-Wno-style",
+        "--x-assign",
+        "unique",
+        "--x-initial",
+        "unique",
+        "-DCT_DUT=fifo",
+        "-GDEPTH=4",
+        "-GWIDTH=8",
+        "--top-module",
+        "ct_sim_top",
+        "--Mdir",
+        "/tmp/work/dut/obj",
+        "-j",
+        "2",
+        "ct_sim_top.sv",
+        "dut.v"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 3.184,
+      "log": "dut/logs/compile.log",
+      "log_truncated": false
+    },
+    {
+      "id": "dut:sim:learner_basic",
+      "argv": [
+        "/tmp/work/dut/obj/Vct_sim_top",
+        "+stim=/job/stimulus/learner_basic.txt",
+        "+trace=/out/dut/sim/learner_basic.trace",
+        "+vcd=/out/dut/sim/learner_basic.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "dut/logs/sim_learner_basic.log",
+      "log_truncated": false
+    },
+    {
+      "id": "dut:sim:fill_drain",
+      "argv": [
+        "/tmp/work/dut/obj/Vct_sim_top",
+        "+stim=/job/stimulus/fill_drain.txt",
+        "+trace=/out/dut/sim/fill_drain.trace",
+        "+vcd=/out/dut/sim/fill_drain.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "dut/logs/sim_fill_drain.log",
+      "log_truncated": false
+    },
+    {
+      "id": "dut:sim:write_when_full",
+      "argv": [
+        "/tmp/work/dut/obj/Vct_sim_top",
+        "+stim=/job/stimulus/write_when_full.txt",
+        "+trace=/out/dut/sim/write_when_full.trace",
+        "+vcd=/out/dut/sim/write_when_full.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "dut/logs/sim_write_when_full.log",
+      "log_truncated": false
+    },
+    {
+      "id": "dut:sim:simultaneous",
+      "argv": [
+        "/tmp/work/dut/obj/Vct_sim_top",
+        "+stim=/job/stimulus/simultaneous.txt",
+        "+trace=/out/dut/sim/simultaneous.trace",
+        "+vcd=/out/dut/sim/simultaneous.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.001,
+      "log": "dut/logs/sim_simultaneous.log",
+      "log_truncated": false
+    },
+    {
+      "id": "dut:sim:wraparound",
+      "argv": [
+        "/tmp/work/dut/obj/Vct_sim_top",
+        "+stim=/job/stimulus/wraparound.txt",
+        "+trace=/out/dut/sim/wraparound.trace",
+        "+vcd=/out/dut/sim/wraparound.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "dut/logs/sim_wraparound.log",
+      "log_truncated": false
+    },
+    {
+      "id": "dut:sim:recurrent_reset",
+      "argv": [
+        "/tmp/work/dut/obj/Vct_sim_top",
+        "+stim=/job/stimulus/recurrent_reset.txt",
+        "+trace=/out/dut/sim/recurrent_reset.trace",
+        "+vcd=/out/dut/sim/recurrent_reset.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "dut/logs/sim_recurrent_reset.log",
+      "log_truncated": false
+    },
+    {
+      "id": "dut:sim:random_s1",
+      "argv": [
+        "/tmp/work/dut/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s1.txt",
+        "+trace=/out/dut/sim/random_s1.trace",
+        "+vcd=/out/dut/sim/random_s1.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "dut/logs/sim_random_s1.log",
+      "log_truncated": false
+    },
+    {
+      "id": "dut:sim:random_s2",
+      "argv": [
+        "/tmp/work/dut/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s2.txt",
+        "+trace=/out/dut/sim/random_s2.trace",
+        "+vcd=/out/dut/sim/random_s2.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "dut/logs/sim_random_s2.log",
+      "log_truncated": false
+    },
+    {
+      "id": "dut:sim:random_s3",
+      "argv": [
+        "/tmp/work/dut/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s3.txt",
+        "+trace=/out/dut/sim/random_s3.trace",
+        "+vcd=/out/dut/sim/random_s3.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "dut/logs/sim_random_s3.log",
+      "log_truncated": false
+    },
+    {
+      "id": "dut:sim:random_s4",
+      "argv": [
+        "/tmp/work/dut/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s4.txt",
+        "+trace=/out/dut/sim/random_s4.trace",
+        "+vcd=/out/dut/sim/random_s4.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "dut/logs/sim_random_s4.log",
+      "log_truncated": false
+    },
+    {
+      "id": "dut:sim:random_s5",
+      "argv": [
+        "/tmp/work/dut/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s5.txt",
+        "+trace=/out/dut/sim/random_s5.trace",
+        "+vcd=/out/dut/sim/random_s5.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "dut/logs/sim_random_s5.log",
+      "log_truncated": false
+    },
+    {
+      "id": "dut:sim:random_s6",
+      "argv": [
+        "/tmp/work/dut/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s6.txt",
+        "+trace=/out/dut/sim/random_s6.trace",
+        "+vcd=/out/dut/sim/random_s6.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "dut/logs/sim_random_s6.log",
+      "log_truncated": false
+    },
+    {
+      "id": "dut:sim:random_s7",
+      "argv": [
+        "/tmp/work/dut/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s7.txt",
+        "+trace=/out/dut/sim/random_s7.trace",
+        "+vcd=/out/dut/sim/random_s7.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "dut/logs/sim_random_s7.log",
+      "log_truncated": false
+    },
+    {
+      "id": "dut:sim:random_s8",
+      "argv": [
+        "/tmp/work/dut/obj/Vct_sim_top",
+        "+stim=/job/stimulus/random_s8.txt",
+        "+trace=/out/dut/sim/random_s8.trace",
+        "+vcd=/out/dut/sim/random_s8.vcd",
+        "+verilator+rand+reset+2",
+        "+verilator+seed+1"
+      ],
+      "timeout_s": 30,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.002,
+      "log": "dut/logs/sim_random_s8.log",
+      "log_truncated": false
+    }
+  ],
+  "deadline_reached": false,
+  "duration_s": 3.28
+}

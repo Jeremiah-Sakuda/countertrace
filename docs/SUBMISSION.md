@@ -40,7 +40,18 @@ First frozen evaluation (October 4, 2026, one run; [report](../evaluation/result
 | Explanations with only valid citations | 7 / 8 (one cited a non-signal) |
 | Model cost for the whole evaluation | about $0.40 at list prices (37 requests) |
 
-The one failed repair ran out of output tokens rewriting a whole file. Repairs are now exact-match edits; on five development bugs (not the evaluation suite) all five passed on the first candidate with one-line diffs. The evaluation cases were written by the developer's coding assistant and have not yet been reviewed independently.
+The one failed repair ran out of output tokens rewriting a whole file. Repairs are now exact-match edits, a failed candidate's own counterexample is fed back to the model, and replies cut off at the output limit retry with reasoning off.
+
+A second pre-registered evaluation ([eval-v2](../evaluation/results/eval-v2/REPORT.md)) tested that agent on fresh, harder cases: a new FIFO never used in prompt development, multi-line bugs, and designs with two independent bugs.
+
+| Measure | eval-v2 |
+| --- | --- |
+| Bugs found / false alarms | 8 / 8 and 0 / 4 |
+| Repairs that passed the unchanged checks | 8 / 8 (5 first candidate; 3 needed a second or third after a rejected candidate's counterexample was fed back) |
+| Conflicting / compatible briefs | 3 / 4 and 4 / 4 (the miss, "assert full one entry early", led to a new flag-meaning topic) |
+| Model cost | about $0.24 (32 requests) |
+
+In one two-bug case the first candidate fixed one bug and was rejected by the unchanged checks; the counterexample it produced led the next candidate to fix both. That run is included as a recorded example. The evaluation cases were written by the developer's coding assistant and have not yet been reviewed independently.
 
 ### Related work and what is different
 
