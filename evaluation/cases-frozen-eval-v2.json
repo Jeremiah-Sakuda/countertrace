@@ -1,0 +1,16 @@
+{
+  "suite": "eval-v2",
+  "frozen_at": "2026-10-04",
+  "suite_sha256": "sha256:2a3ba86b87215691072187f84d78621852b37476671480f9f34e5d227e5709b9",
+  "regflags_rtl_sha256": "sha256:ef0de4ba8ce530658bcaafe557d7d55cb8c11d10da945b5ca784a06e8128d658",
+  "configuration_freeze": "evaluation/freeze-eval-v2.json (code commit 3d33fe5, freeze commit efda152)",
+  "composition": {
+    "controls": 4,
+    "faulty": 8,
+    "shapes": "4 single-line, 2 multi-line, 2 cases with two independent faults",
+    "implementations": "a new registered-flags FIFO held out of prompt development (Countertrace, written for this evaluation), the independent William Mar FIFO, and the two original Countertrace FIFOs",
+    "briefs": "4 conflicting and 4 compatible, with subtler wording than eval-v1"
+  },
+  "authorship": "All cases, labels, and briefs were authored by the coding assistant after the freeze. No external review.",
+  "publication": "Published with the results after the run."
+}
