@@ -2,6 +2,14 @@
 
 Last updated: October 4, 2026. This page records what has actually run. The October 4 section reports the first frozen evaluation (eval-v1), which includes an independently authored FIFO held out of prompt development. Everything else uses **development and showcase fixtures authored for this project**. No user study or external review has happened.
 
+## October 4 (latest): admission hardening and repair ablation
+
+- **Admission hardening** after a judge admitted five constructs in real pipeline runs (none produced a false pass; the second engine or a tool error caught each): clock-name shadowing and port redeclaration, hidden continuation ports (`input wire a, b`), delays, non-edge or qualified event controls, `wait`, `edge`, `defparam`, `inout`, hierarchical references, and assignments to inputs are now rejected, and the elaborated DUT ports are checked against an interface mapping. Negative-control tests cover each.
+- **Bounded-check label** now states 23 cycles for 24 solver steps.
+- **Repair ablation** ([report](../evaluation/results/eval-v2-ablation/REPORT.md)) on the frozen eval-v2 suite: Super 8/8, Nano 6/8, Ultra without counterexample feedback 7/8, failing only the two-bug case that feedback solved.
+- **Cost control:** worst-case spend reservation per in-flight call and one fallback to the fast tier on network or 5xx errors, both tested.
+- **Interface:** repair timeline with the fed-back counterexample, honest rejected-candidate wording, code ligatures off, ledger and audit-exercise fixes.
+
 ## October 4 (later): review fixes and eval-v2
 
 An internal review found an admission bypass, repair-loop gaps, and documentation errors. Fixed and verified:
