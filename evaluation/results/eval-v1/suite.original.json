@@ -1,0 +1,63 @@
+{
+  "version": "eval-v1",
+  "authored": "2026-10-04, after the configuration freeze ee3b5de, by the coding assistant. Not externally reviewed. Labels are the author's reading of sync-fifo-v1.",
+  "implementations": {
+    "billdmar": {"path": "evaluation/holdout/billdmar-sync-fifo/sync_fifo.sv", "mapping": "evaluation/holdout/billdmar-sync-fifo/interface_map.json",
+                 "author": "William Mar (MIT)", "held_out": true, "note": "Never used for prompt development; same wrap-bit technique as fifo_wrapbit.v but separately authored."},
+    "count": {"path": "fixtures/rtl/fifo_count.v", "mapping": null, "author": "Countertrace", "held_out": false},
+    "wrapbit": {"path": "fixtures/rtl/fifo_wrapbit.v", "mapping": null, "author": "Countertrace", "held_out": false}
+  },
+  "cases": [
+    {"id": "C1", "impl": "billdmar", "depth": 4, "expected": "correct"},
+    {"id": "C2", "impl": "count", "depth": 2, "expected": "correct", "note": "development control reused"},
+    {"id": "C3", "impl": "count", "depth": 4, "expected": "correct", "note": "development control reused"},
+    {"id": "C4", "impl": "wrapbit", "depth": 4, "expected": "correct", "note": "development control reused"},
+    {"id": "E1", "impl": "billdmar", "depth": 4, "expected": "faulty", "category": "reset", "class": "reset",
+     "summary": "Reset clears the write pointer and read data but not the read pointer.",
+     "edits": [{"find": "            rptr    <= '0;\n            rd_data <= '0;", "replace": "            rd_data <= '0;"}]},
+    {"id": "E2", "impl": "billdmar", "depth": 4, "expected": "faulty", "category": "simultaneous", "class": "both_full",
+     "summary": "A write while full is accepted when a read arrives in the same cycle.",
+     "edits": [{"find": "    wire do_write = wr_en && !full;", "replace": "    wire do_write = wr_en && (!full || rd_en);"}]},
+    {"id": "E3", "impl": "billdmar", "depth": 4, "expected": "faulty", "category": "ordering_wraparound", "class": "wraparound",
+     "summary": "The write pointer's wrap bit never toggles.",
+     "edits": [{"find": "                wptr       <= wptr + 1'b1;", "replace": "                wptr[ADDR_WIDTH-1:0] <= wptr[ADDR_WIDTH-1:0] + 1'b1;"}]},
+    {"id": "E4", "impl": "billdmar", "depth": 4, "expected": "faulty", "category": "flags_boundaries", "class": "read_empty",
+     "summary": "A read while empty is not ignored and advances the read pointer.",
+     "edits": [{"find": "    wire do_read  = rd_en && !empty;", "replace": "    wire do_read  = rd_en;"}]},
+    {"id": "E5", "impl": "count", "depth": 4, "expected": "faulty", "category": "simultaneous", "class": "both_mid",
+     "summary": "A simultaneous read and write increments the occupancy count.",
+     "edits": [{"find": "                2'b01:   count <= count - 1'b1;", "replace": "                2'b01:   count <= count - 1'b1;\n                2'b11:   count <= count + 1'b1;"}]},
+    {"id": "E6", "impl": "count", "depth": 2, "expected": "faulty", "category": "flags_boundaries", "class": "write_not_full",
+     "summary": "empty stays asserted while one word is stored.",
+     "edits": [{"find": "    assign empty = (count == 0);", "replace": "    assign empty = (count <= 1);"}]},
+    {"id": "E7", "impl": "wrapbit", "depth": 4, "expected": "faulty", "category": "reset", "class": "reset",
+     "summary": "Reset does not win over a simultaneous write.",
+     "edits": [{"find": "        if (rst)\n            tail <= 0;", "replace": "        if (rst && !wr_en)\n            tail <= 0;"}]},
+    {"id": "E8", "impl": "wrapbit", "depth": 4, "expected": "faulty", "category": "ordering_wraparound", "class": "read_not_empty",
+     "summary": "Writes go to bit-reversed slots, so reads return words out of order.",
+     "edits": [{"find": "            storage[tail[AW-1:0]] <= din;", "replace": "            storage[{tail[0], tail[AW-1:1]}] <= din;"}]}
+  ],
+  "briefs": {
+    "version": "briefs-eval-v1",
+    "split": "evaluation",
+    "note": "Authored by the coding assistant after the configuration freeze; not independently authored.",
+    "briefs": [
+      {"id": "B1", "depth": 4, "expected_blocking": true, "expected_topics": ["depth"],
+       "text": "An 8-entry, 8-bit synchronous FIFO for buffering ADC samples. Writes when full are dropped and reads when empty are ignored."},
+      {"id": "B2", "depth": 4, "expected_blocking": true, "expected_topics": ["write_when_full"],
+       "text": "A 4-entry log buffer. When it is full, a new write should replace the oldest byte so the most recent bytes are always kept."},
+      {"id": "B3", "depth": 2, "expected_blocking": true, "expected_topics": ["simultaneous_empty", "read_when_empty", "read_latency"],
+       "text": "A 2-entry FIFO. When it is empty and a byte is written while a read is requested, the read should return that same byte immediately so data passes straight through."},
+      {"id": "B4", "depth": 4, "expected_blocking": true, "expected_topics": ["width"],
+       "text": "A 4-deep FIFO carrying 16-bit audio samples from an I2S receiver to a DSP block, with synchronous reset."},
+      {"id": "B5", "depth": 2, "expected_blocking": false,
+       "text": "A depth-2 handshake buffer between a parser and an ALU, 8-bit data, with a synchronous reset that may be asserted at any time to flush it."},
+      {"id": "B6", "depth": 4, "expected_blocking": false,
+       "text": "A 4-byte FIFO for an SPI transmitter. Software may try to push when it is full; those pushes are lost. Pops when it is empty do nothing."},
+      {"id": "B7", "depth": 4, "expected_blocking": false,
+       "text": "A small 4-deep byte queue. If a push and a pop happen in the same cycle while it is partially full, both take effect and the number of stored bytes stays the same."},
+      {"id": "B8", "depth": 2, "expected_blocking": false,
+       "text": "A two-entry byte FIFO. When it is full and both a read and a write are requested, only the read happens. Reset clears it."}
+    ]
+  }
+}

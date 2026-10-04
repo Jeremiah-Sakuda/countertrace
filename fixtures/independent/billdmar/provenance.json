@@ -1,0 +1,22 @@
+{
+  "repository": "billdmar/fifo-verification-suite",
+  "revision": "07da90c68d6d43c245d3ead9e5894d8398390f34",
+  "license": "MIT",
+  "state": "admitted_with_validated_interface_mapping; used as the held-out implementation in eval-v1 (2026-10-04)",
+  "files": [
+    {
+      "path": "rtl/sync_fifo.sv",
+      "git_blob_sha": "2c251adae654b2ee19f8820dfab501fe55d339eb",
+      "sha256": "7f360f186f3194d6ba9ac9017e343124b8a41b547615257c0300d530adc6ca65",
+      "bytes": 6757
+    },
+    {
+      "path": "LICENSE",
+      "git_blob_sha": "f25de3a666062f99290c468a2c337448ae2abe1d",
+      "sha256": "fbe71839f7e00220bbeaa84b8378255d71315e51cb4c3edb098c0ac45755b66b",
+      "bytes": 1068
+    }
+  ],
+  "exposure": "Held out of prompt development. Source first read on 2026-10-04 after the configuration freeze (ee3b5de) to assess contract compatibility; four evaluation faults were derived from it. Published unmodified under its MIT license.",
+  "compatibility_review": "Assistant review (not independent): synchronous active-low reset (mapped), registered reads, ignores writes when full including simultaneous reads, ignores reads when empty; DEPTH >= 4 only. Extra outputs almost_full, almost_empty, count are not checked by sync-fifo-v1. Uses the same wrap-bit pointer technique as fixtures/rtl/fifo_wrapbit.v; no shared code."
+}

@@ -1,0 +1,8 @@
+{
+  "module": "sync_fifo",
+  "parameters": {"DEPTH": "DEPTH", "WIDTH": "DATA_WIDTH"},
+  "ports": {"clk": "clk", "rst": "rst_n", "wr_en": "wr_en", "rd_en": "rd_en",
+            "din": "wr_data", "dout": "rd_data", "full": "full", "empty": "empty"},
+  "reset_active_low": true,
+  "unused_outputs": ["almost_full", "almost_empty", "count"]
+}
