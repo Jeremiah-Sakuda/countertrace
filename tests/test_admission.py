@@ -50,6 +50,29 @@ class AdmissionTest(unittest.TestCase):
         self.assert_rejected(self.mutate("input  wire [WIDTH-1:0] din", "input  wire [7:0] din"), "interface")
         self.assert_rejected(self.mutate("parameter integer DEPTH = 4,", ""), "interface")
 
+    def test_comment_and_string_tricks_cannot_hide_code(self):
+        """Regression: `// /*` ... `// */` once hid live code from a two-pass regex stripper."""
+        hidden = {
+            "line comment opening a block": '    // /*\n    initial begin $system("id"); end\n    // */',
+            "string containing //": '    wire [7:0] s = "//"; initial $finish;',
+            "block containing //": "    /* // */ initial $finish;",
+            "escaped quote in string": '    wire s = "a\\" // "; initial $finish;',
+        }
+        for name, body in hidden.items():
+            with self.subTest(name):
+                self.assert_rejected(self.mutate("assign empty", body.lstrip() + "\n    assign empty"), "system_task")
+        self.assert_rejected(self.mutate("assign empty", "/* never closed\n    assign empty"), "lexical")
+        self.assert_rejected(self.mutate("assign empty", 'wire s = "abc;\n    assign empty'), "lexical")
+
+    def test_independent_fifo_admitted_only_with_its_mapping(self):
+        import json
+        from pathlib import Path
+
+        root = Path(__file__).resolve().parents[1] / "fixtures" / "independent" / "billdmar"
+        source = (root / "sync_fifo.sv").read_bytes()
+        self.assertTrue(admit(source, json.loads((root / "interface_map.json").read_text())).accepted)
+        self.assertFalse(admit(source).accepted)
+
     def test_rejects_multiple_modules(self):
         self.assert_rejected(base_source("fifo_count.v") + "\nmodule other; endmodule\n", "structure")
 

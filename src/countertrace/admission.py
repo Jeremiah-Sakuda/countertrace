@@ -77,10 +77,50 @@ class Admission:
         }
 
 
+class LexError(ValueError):
+    pass
+
+
 def strip_comments(text: str) -> str:
-    """Remove comments while preserving line numbers; string literals are rejected separately."""
-    text = re.sub(r"/\*.*?\*/", lambda m: "\n" * m.group().count("\n"), text, flags=re.S)
-    return re.sub(r"//[^\n]*", "", text)
+    """Blank comments and string contents in one left-to-right pass, as a compiler reads them.
+
+    Comments, strings, and their delimiters are recognized in source order, so
+    `// /*` cannot open a block comment and a `"//"` string cannot hide code.
+    Newlines are preserved for line numbers; string delimiters are kept and
+    their contents replaced by spaces. Raises LexError on an unterminated
+    block comment or string.
+    """
+    out: list[str] = []
+    i, n = 0, len(text)
+    while i < n:
+        c = text[i]
+        two = text[i:i + 2]
+        if two == "//":
+            j = text.find("\n", i)
+            j = n if j < 0 else j
+            out.append(" " * (j - i))
+            i = j
+        elif two == "/*":
+            j = text.find("*/", i + 2)
+            if j < 0:
+                raise LexError("Unterminated block comment.")
+            chunk = text[i:j + 2]
+            out.append("".join("\n" if ch == "\n" else " " for ch in chunk))
+            i = j + 2
+        elif c == '"':
+            j = i + 1
+            while j < n and text[j] != '"':
+                if text[j] == "\n":
+                    raise LexError("Unterminated string literal.")
+                j += 2 if text[j] == "\\" else 1
+            if j >= n:
+                raise LexError("Unterminated string literal.")
+            out.append('"' + " " * (j - i - 1) + '"')
+            i = j + 1
+        else:
+            out.append(c)
+            i += 1
+    return "".join(out)
 
 
 def line_of(text: str, index: int) -> int:
@@ -107,14 +147,15 @@ def admit(source: bytes | str, mapping: dict | None = None) -> Admission:
         diag(Diagnostic("size", f"Source has {nonblank} nonblank lines; the limit is {MAX_NONBLANK_LINES}."))
         return result
 
-    code = strip_comments(text)
-    # String literals are only meaningful as severity-task messages; blank their
-    # contents so message text is never scanned as code.
-    code = re.sub(r'"(?:[^"\\\n]|\\.)*"', lambda m: '"' + " " * (len(m.group()) - 2) + '"', code)
-    if code.count('"') % 2:
-        diag(Diagnostic("string", "Unterminated string literal."))
-    if "/*" in code or "*/" in code:
-        diag(Diagnostic("comment", "Unbalanced block comment."))
+    # One ordered lexical pass: comments are blanked and string contents (only
+    # meaningful as severity-task messages) are never scanned as code.
+    try:
+        code = strip_comments(text)
+    except LexError as exc:
+        diag(Diagnostic("lexical", str(exc)))
+        return result
+    if "*/" in code:
+        diag(Diagnostic("comment", "Stray end of block comment."))
     for match in PROHIBITED_ATTRIBUTES.finditer(code):
         diag(Diagnostic("attribute", "Attributes such as (* anyconst *) or (* keep *) are not accepted.",
                         line_of(code, match.start())))
