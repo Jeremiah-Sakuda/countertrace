@@ -1,0 +1,145 @@
+{
+  "schema": "countertrace-evaluation-freeze/1",
+  "evaluation": "eval-v2",
+  "frozen_at": "2026-10-04T04:56:38Z",
+  "code_commit": "3d33fe5198e4feba90c6511f43bfb3a495fe8993",
+  "purpose": "Measure the shipped repair agent (exact-match edits, counterexample feedback, reasoning-off retry on length) and interpretation with reasoning off, on fresh cases including multi-line and two-fault bugs and subtler briefs.",
+  "note": "Frozen before any eval-v2 fault or brief was written. The registered-flags implementation was written and verified as a control before this freeze; its faults were not.",
+  "models": {
+    "explain": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "repair": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "interpret": "nvidia/nemotron-3-super-120b-a12b",
+    "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+    "system_prefix": "",
+    "temperature": 0.2,
+    "thinking_off_tasks": [
+      "interpret",
+      "propose_checks"
+    ]
+  },
+  "prompt_sha256": {
+    "interpret": "sha256:b426c60c4a0c245eda05ae89e54f95cff100273720042aaa8ad0e2e941149eef",
+    "explain": "sha256:9b6e8934df835f60691a07ebf9ad42e74392d26a465758083770a0fe5d310b79",
+    "repair": "sha256:b9dea4ba311d8d99b0ea81773630603245a5da4131e4a72018e65e1616c26b08",
+    "propose_checks": "sha256:0eb0bc9c56f70598df638266c88145dc4118a4f9f7c31ea5ab0237bb808cdb16"
+  },
+  "budgets": {
+    "input_token_limit": 16384,
+    "output_token_limit": 4096,
+    "repair_attempts": 3,
+    "max_repair_edits": 8,
+    "schema_retries_per_task": 1,
+    "length_retry": "reasoning off",
+    "http_retries": 2
+  },
+  "verifier": {
+    "verifier_digest": "7d82f4b2482a24f2",
+    "harness": {
+      "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+      "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+      "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+    },
+    "limits": {
+      "compile_s": 60,
+      "sim_s": 30,
+      "solver_s": 120,
+      "bmc_depth": 24,
+      "cover_depth": 24
+    }
+  },
+  "check_sets": {
+    "depth2": {
+      "contract": "sha256:d754b625566820cb1aa948d9a5bab7f6e3d68fd4bcd37144afddb19a8980bbdb",
+      "harness": {
+        "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+        "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+        "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+      },
+      "verifier_digest": "7d82f4b2482a24f2",
+      "stimulus_version": "stimulus-v1",
+      "stimulus": {
+        "prd_sequence": "sha256:6e24e8543dc6069aaceecfaac8efcdea4a82046a9c6f5e8156a046f3e09046dc",
+        "learner_basic": "sha256:62d59baf9c10292a7fc441371045bc65f2a4e9ebaaeb745f47ca46b299ff2634",
+        "fill_drain": "sha256:c658fc6600709cbaa62d61eecb9d9984518ea7a79ff99e91fcfd19a3b2bb307b",
+        "write_when_full": "sha256:6c8378297a62cd6d8cd065200ef435c554101e014da1426a85c7373ffdf3c2f2",
+        "simultaneous": "sha256:1f02f165784b0791cd99966a8c19e5b0fce6093d7d3c8364f1279cf14760c44c",
+        "wraparound": "sha256:bc8bffb33d37e763f1f424594e6b1460e1aaab8faab98dc513f39da0e57757bb",
+        "recurrent_reset": "sha256:4e7a137b322d60f7468f34c4084020bc4830431748a854b3dbc45c28b1242b3e",
+        "random_s1": "sha256:58e9d630fc26b26910a18d410b3d04a0df122c3916e502b8aa6ffa11b8379323",
+        "random_s2": "sha256:1dd6d104d7ab4ea98c6f6ec632a623ed9c075cb26c64acfc5cd27bfd338a671b",
+        "random_s3": "sha256:eb263ad0bc3f151c0e3407822f012218601c9930c4176db865b6eb4967c39184",
+        "random_s4": "sha256:ab8b1ec4a913ed6edd6d96e10c0c996663c59597dd6d16d3aaf06fe5ea075a4c",
+        "random_s5": "sha256:38023d77a475104b7dd5e536af655fd9cfa2473708bfd3f935a86fef86f4353d",
+        "random_s6": "sha256:d125e095c6d429af92ed3420259c8a5420d2622e60db796c12385b6cf46d8195",
+        "random_s7": "sha256:ade0c9e25af578130575bf02299e3da48d4cd419644730b311afed1b6e574ac7",
+        "random_s8": "sha256:043c370ac656b227af53cbea13d3faa594ecf57cad75bc327bd2dfecf1213c06"
+      },
+      "limits": {
+        "compile_s": 60,
+        "sim_s": 30,
+        "solver_s": 120,
+        "bmc_depth": 24,
+        "cover_depth": 24
+      },
+      "formal_tasks": [
+        "bmc",
+        "prove",
+        "cover"
+      ],
+      "expected_properties": {
+        "assert": 3,
+        "assume": 1,
+        "cover": 12
+      }
+    },
+    "depth4": {
+      "contract": "sha256:d8c9a8e739585556ac4f0931dbbbcc14b75d4f197cd000be00d91a1af4a58ce3",
+      "harness": {
+        "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+        "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+        "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+      },
+      "verifier_digest": "7d82f4b2482a24f2",
+      "stimulus_version": "stimulus-v1",
+      "stimulus": {
+        "learner_basic": "sha256:1251c52b29ed1844b0b10990abd1342a374a0bfdd3e5c59a01e434e77946d3f1",
+        "fill_drain": "sha256:08fb777f2a55280f4c87a08ededda1c44620983e78d24fff64064ac5dacd67fe",
+        "write_when_full": "sha256:04c6acd082206ba9a4c07800794d26098aa2b520e823e594f2e594b2829d65bf",
+        "simultaneous": "sha256:dc481895d0ed348e42982fc3a211b4b38178c5c196280238bcdacf8cfbf6ea50",
+        "wraparound": "sha256:545e9e9e1ca64f16b0cc986b453eb8bf8bbf560508a13d7b79dddf51e534643a",
+        "recurrent_reset": "sha256:b22685a91bb333e82d9c092150e3686d8ce5356c3c11b89a7f813358c7440291",
+        "random_s1": "sha256:8bd6ee1b4943fb0e7b773e2e1603d5db1b2fa925b2f8ed5006d931ddffae9dd2",
+        "random_s2": "sha256:4cf2ffe52bdf16b7ffa58ea0d1b2c946ce0ada219ced02edc40981537c564b4d",
+        "random_s3": "sha256:68f7c3a78971c7657450cba5f0b6292d211e1146682d09386ab017b6a6bf8165",
+        "random_s4": "sha256:7293c9d0ea3bfc69d0e9c784eb9e7fb338c243f78df2681b23a1b097979b8b9e",
+        "random_s5": "sha256:c69b2aa263a5185382f67c7d2d0eb543c8931cd4f1f3455a49d6169a878ffa82",
+        "random_s6": "sha256:9663d197ffedbfb6f7949601f1c1e15dc991b74c8e115bbfecbbf96bddee6b36",
+        "random_s7": "sha256:728636019d543950a64a569f69cb58f7c6a62b31eb454ead3d7e0cd12a815cf9",
+        "random_s8": "sha256:213b0afca2a40ffb3358aea6361f79d99472f1261ace1b388d8df920b7f9efd6"
+      },
+      "limits": {
+        "compile_s": 60,
+        "sim_s": 30,
+        "solver_s": 120,
+        "bmc_depth": 24,
+        "cover_depth": 24
+      },
+      "formal_tasks": [
+        "bmc",
+        "prove",
+        "cover"
+      ],
+      "expected_properties": {
+        "assert": 3,
+        "assume": 1,
+        "cover": 12
+      }
+    }
+  },
+  "scoring": {
+    "diagnosis": "A faulty case is reproduced when the core reports a counterexample (simulation or formal) and any formal counterexample replays. A control passes when no counterexample is found; unresolved or tool errors are reported, never counted as passes.",
+    "interpretation": "Conflicting brief: detected when blocking topics are non-empty; topic hit recorded separately. Compatible brief: proceeds when blocking topics are empty.",
+    "explanation": "Status, citation check (valid, invalid, uncited), and an assistant source/trace review scored on the PRD rubric (violated requirement, first failing transaction, expected vs observed, limits): 0/1/2 each. Assistant review is labeled as such.",
+    "repair": "Success only when a candidate passes unchanged checks (identical frozen check set, all obligations resolved without counterexample, error, or unresolved). Report all-case and attempted-repair denominators."
+  }
+}
