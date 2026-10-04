@@ -6,7 +6,8 @@ The second pre-registered run, measuring the repair agent as it now ships (exact
 
 Pre-registration is evidenced by same-repository git commits (configuration freeze, then case hash, then results). There is no external timestamp, so the ordering cannot be verified independently of this repository; future freezes should be anchored by pushing a tag before running.
 
-- Configuration frozen first: [freeze-eval-v2.json](../../freeze-eval-v2.json) (code `3d33fe5`, freeze `efda152`). Nemotron 3 Ultra for explanation and repair (reasoning on), Nemotron 3 Super for interpretation (reasoning off), prompt hashes, budgets, verifier digest `7d82f4b2482a24f2` (unchanged since eval-v1).
+- Configuration frozen first: [freeze-eval-v2.json](../../freeze-eval-v2.json) (code `2ae9a29`, freeze `bde4b48`). Nemotron 3 Ultra for explanation and repair (reasoning on), Nemotron 3 Super for interpretation (reasoning off), prompt hashes, budgets, verifier digest `7d82f4b2482a24f2` (unchanged since eval-v1).
+- Commit IDs: on October 4 the repository history was rewritten to remove internal working notes. Commit order and dates, and every evaluation file, were unchanged. The frozen records keep the original IDs: code commit `3d33fe5` is now `2ae9a29` (`2ae9a296bbe85b400a99e1adbee5a6d6b59107d9`), and freeze commit `efda152` is now `bde4b48`.
 - Cases frozen next: [cases-frozen-eval-v2.json](../../cases-frozen-eval-v2.json) records SHA-256 `2a3ba86b…09b9`, matching [suite.original.json](suite.original.json). [suite.json](suite.json) only moves the new FIFO to its published path, [fifo_regflags.v](fifo_regflags.v).
 - New for v2: a registered-flags FIFO written for this evaluation and never used in prompt development; two multi-line bugs and two cases with two independent bugs; subtler briefs.
 - Raw outcomes: [results.json](results.json).
