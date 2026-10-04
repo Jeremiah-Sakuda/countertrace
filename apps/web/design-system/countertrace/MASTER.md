@@ -18,10 +18,10 @@
 The generated palette proposes green (`#22C55E`) as the accent/CTA color. Countertrace's result semantics forbid that:
 
 - **Green is reserved for individual passing check statuses** (for example an obligation labelled "Property proved under these assumptions"). It is never used for buttons, links, focus, or anything that could read as a universal "verified" badge.
-- **Primary actions and focus use sky `#38BDF8`** (`--color-accent`, `--color-ring`) with `#0F172A` text.
-- **Every status uses words and an icon as well as color**, with the exact PRD labels: counterexample (red `#F87171`), proved (green `#4ADE80`), bounded "No counterexample within N cycles" (teal `#2DD4BF`), "Simulation passed for these runs" (violet `#C4B5FD`), unresolved (amber `#FBBF24`), tool error (orange `#FB923C`, dashed outline), not checked / unsupported (gray `#CBD5E1`).
+- **Owner palette preference (October 3): neutral charcoal surfaces, with warm off-white `#D6D3CC` actions and focus** (`--color-accent`, `--color-ring`) and `#151515` text. Avoid blue page backgrounds and decorative cyan washes; reserve chromatic color for method/result states.
+- **Every status uses words and an icon as well as color**, with the exact PRD labels: counterexample (red `#F87171`), proved (green `#4ADE80`), bounded "No counterexample within N cycles" (teal `#2DD4BF`), "Simulation passed for these runs" (violet `#C4B5FD`), unresolved (amber `#FBBF24`), tool error (orange `#FB923C`, dashed outline), not checked / unsupported (gray `#D4D3CE`).
 - **No overall "verified" banner and no invented progress percentages.** A run without a finding says "No counterexample found by these methods".
-- Status text colors are the lighter tints above so they meet 4.5:1 on the card color `#1B2336`; the destructive `#EF4444` is used for borders and fills only.
+- Status text colors are the lighter tints above so they meet 4.5:1 on the card color `#1D1D1D`; the destructive `#EF4444` is used for borders and fills only.
 
 The implemented tokens live in `src/styles.css` (`:root`).
 
@@ -31,24 +31,24 @@ The implemented tokens live in `src/styles.css` (`:root`).
 
 | Role | Hex | CSS Variable |
 |------|-----|--------------|
-| Primary | `#1E293B` | `--color-primary` |
+| Primary | `#202020` | `--color-primary` |
 | On Primary | `#FFFFFF` | `--color-on-primary` |
-| Secondary | `#334155` | `--color-secondary` |
+| Secondary | `#383837` | `--color-secondary` |
 | On Secondary | `#FFFFFF` | `--color-on-secondary` |
-| Accent/CTA | `#22C55E` | `--color-accent` |
-| On Accent/CTA | `#0F172A` | `--color-on-accent` |
-| Background | `#0F172A` | `--color-background` |
-| Foreground | `#F8FAFC` | `--color-foreground` |
-| Card | `#1B2336` | `--color-card` |
-| Card Foreground | `#F8FAFC` | `--color-card-foreground` |
-| Muted | `#272F42` | `--color-muted` |
-| Muted Foreground | `#94A3B8` | `--color-muted-foreground` |
-| Border | `#475569` | `--color-border` |
+| Accent/CTA | `#D6D3CC` | `--color-accent` |
+| On Accent/CTA | `#151515` | `--color-on-accent` |
+| Background | `#151515` | `--color-background` |
+| Foreground | `#F3F3F1` | `--color-foreground` |
+| Card | `#1D1D1D` | `--color-card` |
+| Card Foreground | `#F3F3F1` | `--color-card-foreground` |
+| Muted | `#2B2B2B` | `--color-muted` |
+| Muted Foreground | `#AAA9A5` | `--color-muted-foreground` |
+| Border | `#555552` | `--color-border` |
 | Destructive | `#EF4444` | `--color-destructive` |
 | On Destructive | `#000000` | `--color-on-destructive` |
 | Ring | `#FFFFFF` | `--color-ring` |
 
-**Color Notes:** Code dark + run green
+**Color Notes:** Neutral charcoal and off-white; semantic result colors only. The owner palette and trust-rule overrides supersede generated component examples below.
 
 ### Typography
 
@@ -95,7 +95,7 @@ The implemented tokens live in `src/styles.css` (`:root`).
 /* Primary Button */
 .btn-primary {
   background: #22C55E;
-  color: #0F172A;
+  color: #151515;
   padding: 12px 24px;
   border-radius: 8px;
   font-weight: 600;
@@ -111,8 +111,8 @@ The implemented tokens live in `src/styles.css` (`:root`).
 /* Secondary Button */
 .btn-secondary {
   background: transparent;
-  color: #F8FAFC;
-  border: 2px solid #1E293B;
+  color: #F3F3F1;
+  border: 2px solid #202020;
   padding: 12px 24px;
   border-radius: 8px;
   font-weight: 600;
@@ -125,7 +125,7 @@ The implemented tokens live in `src/styles.css` (`:root`).
 
 ```css
 .card {
-  background: #0F172A;
+  background: #151515;
   border-radius: 12px;
   padding: 24px;
   box-shadow: var(--shadow-md);
@@ -151,9 +151,9 @@ The implemented tokens live in `src/styles.css` (`:root`).
 }
 
 .input:focus {
-  border-color: #1E293B;
+  border-color: #202020;
   outline: none;
-  box-shadow: 0 0 0 3px #1E293B20;
+  box-shadow: 0 0 0 3px #20202020;
 }
 ```
 

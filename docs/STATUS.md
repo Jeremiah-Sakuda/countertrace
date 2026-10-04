@@ -99,6 +99,10 @@ A separate UI subagent reviewed the existing React interface against the UI/UX P
 
 Browser checks passed for section-heading focus; citation-to-cycle focus; Tab, ArrowDown, Home, and End; selecting cycle 11 then collapsing to the cycle-6 window; and opening the recorded candidate by keyboard. No page-level horizontal overflow was observed at widths 375, 768, 1024, and 1440 px, or at 812 × 375 landscape. Measured text/background contrast was at least 5.21:1 for the reviewed primary, muted, and accent pairings. Reduced-motion handling was reviewed in source, without OS-level emulation. These are focused interaction/responsive checks, not a complete accessibility certification; screen-reader testing and learner sessions remain pending. The UI regression, production build, and `make check` passed after the final edit.
 
+## October 3 palette revision
+
+At the owner's request, blue page, header, card, and code backgrounds were replaced with neutral charcoal, with off-white controls and focus indicators. Semantic result colors remain distinct. The persisted design system records this preference. Browser inspection confirmed body/card colors `#151515` / `#1D1D1D` with no page-level horizontal overflow in the preview. Reviewed foreground, muted, action, and result text contrasts on cards range from 6.09:1 to 15.17:1; muted text on muted surfaces is 6.02:1. `make check` (54 tests) and the production web build pass. No verifier or model behavior changed.
+
 ## Not yet done
 
 Independent human explanation review; live natural-language interpretation validation; Nebius Serverless Jobs (all verification runs locally in Docker); the frozen evaluation suite with an independently authored, held-out implementation; reviewer and learner recruitment; the usability study; clean-environment replays; hosted deployment and judge access; the demonstration video.

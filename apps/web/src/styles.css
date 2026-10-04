@@ -1,26 +1,26 @@
 /*
  * Countertrace design tokens. Source: design-system/countertrace/MASTER.md (Dark Mode OLED, JetBrains Mono + IBM Plex Sans),
  * with the product trust-rule override: green is reserved for individual passing check statuses, never for actions or a
- * universal "verified" badge. Primary actions and focus use the sky accent.
+ * universal "verified" badge. Surfaces use neutral charcoal; primary actions and focus use warm off-white (owner preference, October 3).
  */
 :root {
-  --color-background: #0f172a;
-  --color-foreground: #f8fafc;
-  --color-card: #1b2336;
-  --color-card-raised: #212a3f;
-  --color-muted: #272f42;
-  --color-muted-foreground: #94a3b8;
-  --color-soft-foreground: #cbd5e1;
-  --color-border: #475569;
-  --color-border-subtle: #334155;
-  --color-primary: #1e293b;
-  --color-secondary: #334155;
+  --color-background: #151515;
+  --color-foreground: #f3f3f1;
+  --color-card: #1d1d1d;
+  --color-card-raised: #242424;
+  --color-muted: #2b2b2b;
+  --color-muted-foreground: #aaa9a5;
+  --color-soft-foreground: #d4d3ce;
+  --color-border: #555552;
+  --color-border-subtle: #383837;
+  --color-primary: #202020;
+  --color-secondary: #383837;
 
   /* Action and focus accent: not a status color. */
-  --color-accent: #38bdf8;
-  --color-accent-hover: #7dd3fc;
-  --color-on-accent: #0f172a;
-  --color-ring: #38bdf8;
+  --color-accent: #d6d3cc;
+  --color-accent-hover: #f1eee7;
+  --color-on-accent: #151515;
+  --color-ring: #d6d3cc;
 
   /* Status tones: each also carries an icon and words. Text values meet 4.5:1 on the card color. */
   --tone-fail: #f87171;
@@ -36,10 +36,10 @@
   --tone-unresolved-bg: rgba(251, 191, 36, 0.12);
   --tone-toolerror: #fb923c;
   --tone-toolerror-bg: rgba(251, 146, 60, 0.08);
-  --tone-neutral: #cbd5e1;
-  --tone-neutral-bg: rgba(148, 163, 184, 0.12);
-  --tone-info: #7dd3fc;
-  --tone-info-bg: rgba(56, 189, 248, 0.1);
+  --tone-neutral: #d4d3ce;
+  --tone-neutral-bg: rgba(170, 169, 165, 0.12);
+  --tone-info: #f1eee7;
+  --tone-info-bg: rgba(214, 211, 204, 0.1);
 
   --font-heading: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -508,7 +508,7 @@ code {
   font-size: 0.85rem;
   background: var(--tone-info-bg);
   color: var(--color-accent);
-  border: 1px solid rgba(56, 189, 248, 0.4);
+  border: 1px solid rgba(214, 211, 204, 0.4);
   border-radius: 999px;
   padding: 2px 10px;
   min-height: 28px;
@@ -582,14 +582,14 @@ code {
 .badge-neutral {
   color: var(--tone-neutral);
   background: var(--tone-neutral-bg);
-  border-color: rgba(148, 163, 184, 0.35);
+  border-color: rgba(170, 169, 165, 0.35);
 }
 
 .badge-info,
 .badge-running {
   color: var(--tone-info);
   background: var(--tone-info-bg);
-  border-color: rgba(125, 211, 252, 0.35);
+  border-color: rgba(214, 211, 204, 0.35);
 }
 
 .tag {
@@ -914,11 +914,11 @@ code {
 }
 
 .cycle-table .row-selected > * {
-  background: rgba(56, 189, 248, 0.08);
+  background: rgba(214, 211, 204, 0.08);
 }
 
 .cycle-table .row-flash > * {
-  background: rgba(56, 189, 248, 0.22);
+  background: rgba(214, 211, 204, 0.22);
 }
 
 .first-mark {
@@ -963,7 +963,7 @@ code {
 .unchecked-value {
   color: var(--color-muted-foreground);
   text-decoration: line-through dotted;
-  text-decoration-color: rgba(148, 163, 184, 0.6);
+  text-decoration-color: rgba(170, 169, 165, 0.6);
 }
 
 .row-id {
@@ -989,7 +989,7 @@ code {
 
 /* ---- Code views ------------------------------------------------------------------------ */
 .code {
-  background: #0b1222;
+  background: #111111;
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-md);
   overflow: auto;
@@ -1013,7 +1013,7 @@ code {
   width: 3.5em;
   padding-right: 1em;
   text-align: right;
-  color: #64748b;
+  color: #8c8b87;
   user-select: none;
 }
 
@@ -1042,8 +1042,8 @@ code {
 }
 
 .diff-add {
-  background: rgba(56, 189, 248, 0.12);
-  color: #bae6fd;
+  background: rgba(214, 211, 204, 0.12);
+  color: #e7e4de;
 }
 
 .diff-del {
@@ -1062,7 +1062,7 @@ code {
 }
 
 .json {
-  background: #0b1222;
+  background: #111111;
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-md);
   padding: var(--space-sm) var(--space-md);
@@ -1076,7 +1076,7 @@ code {
   font-family: var(--font-mono);
   font-size: 0.85rem;
   line-height: 1.55;
-  background: #0b1222;
+  background: #111111;
   color: var(--color-foreground);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
@@ -1371,7 +1371,7 @@ code {
 }
 
 .stage-running {
-  border-color: rgba(56, 189, 248, 0.6);
+  border-color: rgba(214, 211, 204, 0.6);
 }
 
 .stage-error {
@@ -1577,7 +1577,7 @@ code {
 
 .slot-new {
   border-color: var(--color-accent);
-  background: rgba(56, 189, 248, 0.1);
+  background: rgba(214, 211, 204, 0.1);
 }
 
 .slot-tag {
@@ -1632,13 +1632,13 @@ code {
 }
 
 .wf-bus {
-  fill: rgba(56, 189, 248, 0.08);
+  fill: rgba(214, 211, 204, 0.08);
   stroke: var(--color-accent);
   stroke-width: 1.25;
 }
 
 .wf-dim {
-  stroke: #64748b;
+  stroke: #8c8b87;
   fill: transparent;
   stroke-dasharray: 3 3;
 }
@@ -1662,7 +1662,7 @@ code {
 }
 
 .wf-mark {
-  fill: rgba(56, 189, 248, 0.06);
+  fill: rgba(214, 211, 204, 0.06);
 }
 
 .wf-legend {
