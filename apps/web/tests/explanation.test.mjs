@@ -9,7 +9,7 @@ test("real backend citation metadata renders and preserves citation warnings", a
   const vite = await createServer({ server: { middlewareMode: true, hmr: false, ws: false, watch: null } });
   try {
     const { ExplanationPanel } = await vite.ssrLoadModule("/src/views/run/ExplanationPanel.tsx");
-    const run = JSON.parse(await readFile(new URL("../../../recorded/rec-20261001-193038-ver-de51cd/run.json", import.meta.url), "utf8"));
+    const run = JSON.parse(await readFile(new URL("../../../recorded/rec-20261004-003607-ver-4cc749/run.json", import.meta.url), "utf8"));
     const render = (value) => renderToStaticMarkup(createElement(ExplanationPanel, {
       run: value, hasFinding: true, onCite: () => {}, onUpdated: () => {},
     }));

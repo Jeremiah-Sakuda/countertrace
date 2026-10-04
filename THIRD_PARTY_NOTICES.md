@@ -1,6 +1,12 @@
 # Third party notices
 
-Countertrace source, fixtures, harness, and fault library are new work for this project under the [MIT license](LICENSE). No AKILI code, third-party RTL, tutorial defects, or model weights are included. The PRD and documentation cite research and tool documentation as references; citation is not incorporation.
+Countertrace source, fixtures, harness, and fault library are new work for this project under the [MIT license](LICENSE). No AKILI code, tutorial defects, or model weights are included. One third-party RTL file is included for evaluation (below). The PRD and documentation cite research and tool documentation as references; citation is not incorporation.
+
+## Third-party RTL
+
+| File | Source | License | Modifications |
+| --- | --- | --- | --- |
+| `fixtures/independent/billdmar/sync_fifo.sv` | [billdmar/fifo-verification-suite](https://github.com/billdmar/fifo-verification-suite) `rtl/sync_fifo.sv` at commit `07da90c68d6d43c245d3ead9e5894d8398390f34`, by William Mar | MIT (copy in `fixtures/independent/billdmar/LICENSE`) | None. Evaluation faults are applied as separate edits at run time; a validated interface mapping is stored beside it. |
 
 ## Verification toolchain (not redistributed)
 

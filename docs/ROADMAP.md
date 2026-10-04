@@ -21,7 +21,7 @@ Dates are in 2026. A checked item has evidence in [STATUS.md](STATUS.md); develo
 - [ ] Contract review, a compact trace, grounded explanation, and a readable report form a usable journey.
 - [x] Demonstrate one nontrivial proof, or explicitly select bounded-only scope. (abc pdr proves the flag and data-ordering properties for depth 2 and 4 controls; reachability covers reached. Expert review pending.)
 - [x] Attempt one unchanged-contract repair and measure a CPU verification batch. (October 3: one real candidate passed all ten unchanged obligations; 8.92-second warm candidate verification.)
-- [ ] Measure first useful finding separately from total runtime, with cold/warm conditions stated.
+- [x] Measure first useful finding separately from total runtime, with cold/warm conditions stated. (Warm local Docker: first finding 3.3–12 s, total 3.3–22 s across bundled examples; hosted/cold not measured.)
 - [ ] Observe an early learner session and obtain technical feedback where available.
 - [ ] Make the initial release-profile decision; diagnosis remains the commitment until repair is earned.
 
@@ -29,21 +29,21 @@ Dates are in 2026. A checked item has evidence in [STATUS.md](STATUS.md); develo
 
 - [x] Add immutable comparison inputs, complete regression reruns, and re-admission of generated candidates. (Stubbed negative paths plus one real Ultra candidate on October 3; frozen evaluation pending.)
 - [ ] Add compact mutation canaries, evidence export, cancellation, and honest error states. (Implemented locally; awaiting review and learner feedback.)
-- [ ] Test negative controls and worker isolation.
+- [x] Test negative controls and worker isolation. (Altered harness hash, cancellation, unsupported syntax, zero/DUT-owned properties, truncated or tampered traces; network-less, read-only, capability-dropped worker. No external penetration test.)
 - [ ] Finalize primary versus diagnosis and proof versus bounded-only profiles by October 14.
 
 ## October 15 to 25 — evaluation and usability
 
-- [ ] Freeze evaluation fixtures, baseline, prompts/model choice, budgets, and scoring rubric.
-- [ ] Run the declared engineering and learning comparisons; preserve all outcomes and denominators.
+- [x] Freeze evaluation fixtures, baseline, prompts/model choice, budgets, and scoring rubric. (October 4: [configuration](../evaluation/freeze-2026-10-04.json) then [cases](../evaluation/cases-frozen-eval-v1.json). Baseline comparison not run; see the eval-v1 report.)
+- [ ] Run the declared engineering and learning comparisons; preserve all outcomes and denominators. (Engineering evaluation eval-v1 done October 4, see [report](../evaluation/results/eval-v1/REPORT.md); learning comparisons need participants.)
 - [ ] Run the three-person study, including the separate audit transfer question.
-- [ ] Reproduce three evidence bundles twice in a clean environment.
+- [x] Reproduce three evidence bundles twice in a clean environment. (October 4: two fresh GitHub-hosted x64 runners each built the pinned image and replayed three recorded bundles; all matched. Repeated on every push.)
 - [ ] Simplify confusing evidence and stabilize deployment; no new module family.
 
 ## October 26 to 30 — submission
 
 - [ ] Record the 2:45 demonstration using actual results and the selected release profile.
-- [ ] Finish setup instructions, provenance, sponsor feedback, and public project description.
+- [ ] Finish setup instructions, provenance, sponsor feedback, and public project description. (Drafted in [SUBMISSION.md](SUBMISSION.md); hosted URL and video pending.)
 - [ ] Test the judge route free of charge without the owner's login or a judge-supplied paid API key.
 - [ ] Verify funding, credit expiry, release preservation, and recovery steps through December 15.
 - [ ] Rehearse the submission on October 29 and submit before October 30 at 1:00 p.m. EDT.
