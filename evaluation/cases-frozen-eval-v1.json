@@ -1,0 +1,17 @@
+{
+  "suite": "eval-v1",
+  "frozen_at": "2026-10-04",
+  "suite_sha256": "sha256:586fa989af4c4535c46bcfd1fd1cadc63eb8949905aa55290ee493a9c330a736",
+  "configuration_freeze": "evaluation/freeze-2026-10-04.json (commit ee3b5de); the verifier digest, harness, and stimulus are unchanged since",
+  "post_freeze_code_changes": "Interface mappings (c1cd37f) were added after the configuration freeze so the independent FIFO could be admitted. Prompts, models, budgets, harness, worker, stimulus, and scoring are unchanged.",
+  "composition": {
+    "controls": 4,
+    "faulty": 8,
+    "implementations": "two Countertrace implementations plus one independently authored FIFO (William Mar, MIT, pinned commit 07da90c)",
+    "held_out": "the independent FIFO and the four faults derived from it were never used for prompt development",
+    "categories": ["reset", "flags_boundaries", "simultaneous", "ordering_wraparound"],
+    "briefs": "4 conflicting and 4 compatible, distinct from the development briefs"
+  },
+  "authorship": "All faults, labels, and briefs were authored by the coding assistant after the freeze. No external reviewer has validated them.",
+  "publication": "The suite file stays in ignored evaluation/holdout/ until the evaluation has run; it is then published with the results."
+}
