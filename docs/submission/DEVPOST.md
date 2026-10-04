@@ -82,14 +82,14 @@ eval-v1 included an MIT-licensed FIFO by another author that I never used while 
 ## Challenges I ran into
 
 - **Making simulation and formal checking agree on what a cycle means.** The solver checks outputs one step after each edge, while simulation samples after the edge settles. I wrote the convention down, built both references to it, and replay every formal counterexample in simulation to catch disagreements.
-- **Keeping the model from moving the goalposts.** A patch could add its own assumptions, hide a port, or print fake results. The admission gate, a property inventory parsed from the elaborated netlist, and hash-frozen check sets close those paths. A code review found a bypass using nested comment markers; I fixed it and added regression tests.
+- **Keeping the model from moving the goalposts.** A patch could add its own assumptions, hide a port, or write into the files the checker reads. The admission gate, a property inventory parsed from the elaborated netlist, and hash-frozen check sets close those paths. A code review found a bypass using nested comment markers; I fixed it and added regression tests.
 - **Reasoning tokens eating the JSON budget.** Nemotron 3 Ultra sometimes spent its whole output budget reasoning and never produced the answer. Switching repairs to short exact edits, and retrying with reasoning off, made every such failure recoverable in the second evaluation.
 - **Admitting someone else's FIFO without editing it.** The independent design used an active-low reset and different port names. I added a validated port mapping that generates a fixed wrapper instead of touching the design.
 
 ## Accomplishments that I'm proud of
 
 - Unbounded proofs, in addition to tests, for every correct design in both evaluations, and every repair accepted only after those proofs pass on the same frozen checks.
-- A repair loop that visibly learns from failure: the recorded two-bug case shows a rejected candidate, the counterexample it produced, and the accepted fix that followed.
+- A repair loop that uses its own failures: the recorded two-bug case shows a rejected candidate, the counterexample it produced, and the accepted fix that followed.
 - Evidence anyone can rerun: hashed bundles that replay on a clean machine with no API key.
 - An interface that leads with the failing cycle and the expected and observed values, so a student can see the bug before reading any formal terminology.
 
