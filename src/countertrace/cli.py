@@ -167,7 +167,12 @@ def cmd_serve(args) -> int:
 def cmd_bundle(args) -> int:
     from countertrace import bundle, runs
 
-    store = runs.RunStore()
+    if args.run_id.startswith("rec-"):
+        from countertrace.server import RecordedStore
+
+        store = RecordedStore()
+    else:
+        store = runs.RunStore()
     path = bundle.export(store, args.run_id)
     print(path)
     return 0

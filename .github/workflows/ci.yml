@@ -49,3 +49,32 @@ jobs:
         run: PYTHONPATH=src python -m countertrace build-image
       - name: Integration tests in the isolated verifier
         run: make test-integration PYTHON=python
+
+  clean-replay:
+    # Clean-environment reproducibility: each leg starts from a fresh runner,
+    # builds the pinned image from scratch, exports three recorded bundles, and
+    # replays their deterministic checks without any model call.
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        replay: [1, 2]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.14"
+      - name: Build verifier image
+        run: PYTHONPATH=src python -m countertrace build-image
+      - name: Export and replay recorded bundles
+        run: |
+          set -e
+          for id in rec-20261001-193038-ver-de51cd rec-20261001-193044-ver-f15d50 rec-20261003-164426-ver-05e188; do
+            bundle=$(PYTHONPATH=src python -m countertrace bundle "$id")
+            PYTHONPATH=src python -m countertrace replay "$bundle" | tee "replay-$id.json"
+          done
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: clean-replay-${{ matrix.replay }}
+          path: replay-*.json
