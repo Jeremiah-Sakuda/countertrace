@@ -10,6 +10,7 @@ counterexample, tool error, or unresolved item. All attempts are preserved.
 from __future__ import annotations
 
 import difflib
+import os
 import threading
 
 from countertrace import model
@@ -107,7 +108,8 @@ def run_loop(store, run_id: str) -> None:
             else:
                 verify_candidate(store, parent, candidate, attempt, "model_repair")
                 current = candidate
-                if attempt["status"] == "failed_checks":
+                # COUNTERTRACE_REPAIR_FEEDBACK=off exists only for ablation studies.
+                if attempt["status"] == "failed_checks" and os.environ.get("COUNTERTRACE_REPAIR_FEEDBACK", "on") != "off":
                     # Feed the candidate's own counterexample to the next proposal.
                     child = store.load(attempt["candidate_run_id"])
                     child_finding = model.primary_finding(child)
