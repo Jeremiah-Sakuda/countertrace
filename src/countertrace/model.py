@@ -456,16 +456,35 @@ def explain_run(state: dict, source: str) -> dict:
 REPAIR_SYSTEM = """You repair a synchronous FIFO RTL module so it satisfies a fixed contract.
 Change only the module's internal logic. Keep the module name, parameters, port names, directions, and widths exactly the same.
 Do not add assertions, assumptions, initial blocks, system tasks, compiler directives, attributes, or extra modules.
+Return a minimal patch as exact-match edits. Each "find" must be copied verbatim from the current RTL (including indentation) and must occur exactly once; "replace" is its new text. Keep comments and author headers unchanged. Use as few, short edits as possible.
 Reply with one JSON object only:
-{"rationale": string, "changed_lines": [int], "source": string (the complete repaired module)}"""
+{"rationale": string, "edits": [{"find": string, "replace": string}]}"""
+MAX_REPAIR_EDITS = 8
 
 
-def validate_repair(value: dict) -> dict:
-    source = value["source"]
-    if not isinstance(source, str) or "module" not in source or len(source) > 64 * 1024:
-        raise ValueError("source must be a complete module under 64 KiB")
+def apply_edits(source: str, edits: list) -> str:
+    """Apply exact-match edits; every target must occur exactly once in the current text."""
+    if not isinstance(edits, list) or not 1 <= len(edits) <= MAX_REPAIR_EDITS:
+        raise ValueError(f"edits must be a list of 1 to {MAX_REPAIR_EDITS} items")
+    for i, edit in enumerate(edits):
+        find, replace = edit.get("find"), edit.get("replace")
+        if not isinstance(find, str) or not find.strip() or not isinstance(replace, str):
+            raise ValueError(f"edit {i} needs a non-empty find string and a replace string")
+        count = source.count(find)
+        if count != 1:
+            raise ValueError(f"edit {i}: find text occurs {count} times in the current RTL; copy exactly one occurrence verbatim")
+        source = source.replace(find, replace)
+    return source
+
+
+def validate_repair(value: dict, current: str) -> dict:
+    source = apply_edits(current, value["edits"])
+    if source == current:
+        raise ValueError("the edits do not change the RTL")
+    if len(source) > 64 * 1024:
+        raise ValueError("the patched RTL exceeds 64 KiB")
     return {"rationale": str(value["rationale"])[:800], "source": source,
-            "changed_lines": [int(x) for x in value.get("changed_lines", [])][:40]}
+            "edits": [{"find": e["find"], "replace": e["replace"]} for e in value["edits"]]}
 
 
 @guarded
@@ -484,7 +503,7 @@ def propose_repair(source: str, finding: dict, rows: list[dict], previous: list[
         f"Reproducible trace window:\n{trace_table(rows, start, end)}\n\nPrevious attempts:\n{history}\n\n"
         f"Current RTL:\n{source}"
     )
-    return structured("repair", REPAIR_SYSTEM, user, validate_repair, max_tokens=4000,
+    return structured("repair", REPAIR_SYSTEM, user, lambda v: validate_repair(v, source),
                       model_id=cfg["repair_model_id"] or None)
 
 

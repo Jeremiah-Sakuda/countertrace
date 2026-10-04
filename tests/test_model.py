@@ -160,6 +160,19 @@ class ModelTest(unittest.TestCase):
             with self.assertRaises(ValueError):
                 model.validate_check_proposal(bad, ["fill_drain"])
 
+    def test_repair_edits_are_exact_and_unique(self):
+        rtl = "// Author: Someone\nmodule m;\n    wire a = b;\n    wire c = b;\nendmodule\n"
+        patched = model.validate_repair({"rationale": "r", "edits": [{"find": "wire a = b;", "replace": "wire a = !b;"}]}, rtl)
+        self.assertIn("// Author: Someone", patched["source"])
+        self.assertIn("wire a = !b;", patched["source"])
+        for edits in ([{"find": "= b;", "replace": "= 1;"}],          # ambiguous
+                      [{"find": "wire z = q;", "replace": "x"}],       # absent
+                      [{"find": "", "replace": "x"}],                  # empty
+                      [],                                              # no edits
+                      [{"find": "wire a = b;", "replace": "wire a = b;"}]):  # no change
+            with self.assertRaises(ValueError):
+                model.validate_repair({"rationale": "r", "edits": edits}, rtl)
+
     def test_extract_json_handles_fences_and_reasoning(self):
         self.assertEqual(model.extract_json('<think>x</think>```json\n{"a": 1}\n```'), {"a": 1})
         with self.assertRaises(ValueError):
