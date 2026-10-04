@@ -152,8 +152,14 @@ class App:
             depth = int(body.get("depth", 4))
             if Contract(depth=depth).digest() != body.get("accepted_contract_hash"):
                 raise ValueError("Accept the current contract version before running.")
+            mapping = None
+            if body.get("interface_map"):
+                from countertrace.interface_map import validate
+
+                mapping = validate(body["interface_map"])  # MappingError is a ValueError -> 400
             state = self.store.create_verification(source_text=str(body["source"]), depth=depth,
-                                                   origin="owner_upload", title=str(body.get("title") or "Custom source")[:80])
+                                                   origin="owner_upload", title=str(body.get("title") or "Custom source")[:80],
+                                                   interface_map=mapping)
         else:
             raise ValueError("example_id or source is required")
         self.note_run(visitor, state["id"])

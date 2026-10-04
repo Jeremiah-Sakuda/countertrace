@@ -19,7 +19,7 @@ Real examples of every run shape are in `.countertrace/runs/*/run.json` after ru
 
 | Method and path | Body | Returns |
 | --- | --- | --- |
-| `POST /api/runs` | `{example_id, accepted_contract_hash}`, or `{source, depth, accepted_contract_hash}` when uploads are enabled | 201 run summary. Starts asynchronously. |
+| `POST /api/runs` | `{example_id, accepted_contract_hash}`, or `{source, depth, accepted_contract_hash, interface_map?}` when uploads are enabled | 201 run summary. Starts asynchronously. `interface_map` is the declarative mapping described in `src/countertrace/interface_map.py`; invalid mappings return 400. |
 | `GET /api/runs` | | `[{id, kind, example_id, title, state, created_at, parent_id, recorded, verdict}]`, newest first |
 | `GET /api/runs/{id}` | | Full run state (below). Works for recorded run ids too. Poll while `state` is `queued` or `running`. |
 | `POST /api/runs/{id}/cancel` | | `{cancelled: bool}` |
