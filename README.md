@@ -44,7 +44,7 @@ Countertrace does not claim a new repair algorithm. Its contribution is the comb
 
 ## Quick start
 
-Requires Python 3.11+, Git, Docker (on macOS, a running colima or Docker Desktop VM that shares your home directory), and Node 20+ for the web interface. HDL tools are not installed on the host; they run only inside the pinned verifier image.
+Requires Python 3.11+, Git, Docker (on macOS, a running colima or Docker Desktop VM that shares your home directory), and Node 20.19+ or 22.12+ for the web interface (Vite 8). Docker must use BuildKit (the default in current Docker) so the image picks the right toolchain architecture. HDL tools are not installed on the host; they run only inside the pinned verifier image.
 
 ```sh
 make setup        # needs Python 3.11+; creates .venv and a private .env from .env.example

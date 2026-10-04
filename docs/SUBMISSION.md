@@ -88,7 +88,7 @@ One synchronous FIFO profile (8-bit, depth 2 or 4). Bundled examples only in the
 
 **Hosted demo:** pending (a Nebius VM is planned; see [DEPLOYMENT.md](DEPLOYMENT.md)). Until it exists, judges can run the full test build locally:
 
-1. Install Python 3.11+, Git, Docker, and Node 20+. On macOS, run Docker in a VM that shares your home directory (colima or Docker Desktop).
+1. Install Python 3.11+, Git, Docker (BuildKit, the default), and Node 20.19+ or 22.12+. On macOS, run Docker in a VM that shares your home directory (colima or Docker Desktop).
 2. `git clone https://github.com/Jeremiah-Sakuda/countertrace && cd countertrace && make setup && make image && make web`
 3. `make serve`, then open http://127.0.0.1:8765.
 4. Open **Runs** → the recorded showcase ("Queue that overwrites when full"): the first failing cycle, Nemotron's explanation with clickable cycle citations, and the accepted one-line repair. No API key is needed to inspect recorded evidence.

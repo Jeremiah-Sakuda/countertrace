@@ -24,7 +24,7 @@ For interface work, run `make serve` in one terminal and `cd apps/web && npm run
 
 `verifier/Dockerfile` pins the Debian base by digest and the OSS CAD Suite release tarball by SHA-256. The image tag is a content digest of the Dockerfile, worker, and harness, so changing any of them requires `make image`; a run against a stale image fails its harness-hash integrity check rather than producing results. Each run records the image ID and tool versions.
 
-The first build downloads about 700 MB. Later builds reuse the toolchain layer.
+The first build downloads about 700 MB. Later builds reuse the toolchain layer. Build with BuildKit (the default in current Docker and in CI): it sets `TARGETARCH`, which selects the x64 or arm64 toolchain tarball. The legacy builder leaves it unset, and the Dockerfile then assumes arm64, which fails the checksum on x64 hosts.
 
 The launcher runs the worker with the control service's numeric non-root UID/GID so Linux bind-mounted artifacts remain removable by that service. A root UID or GID is replaced with 10001; worker root is never enabled. Run the hosted service as the dedicated `countertrace` user. Network isolation, read-only mounts, dropped capabilities, and resource limits remain in effect.
 
