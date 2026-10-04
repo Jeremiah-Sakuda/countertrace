@@ -134,6 +134,7 @@ export function TraceBlock({
           </button>
         ) : null}
       </div>
+      {current && <QueueView row={current} depth={depth} />}
       <CycleTable
         rows={rows}
         caption={caption}
@@ -143,7 +144,6 @@ export function TraceBlock({
         onSelect={setSelected}
         selectedCycle={current?.cycle ?? null}
       />
-      {current && <QueueView row={current} depth={depth} />}
       <Disclosure summary="Waveform (drawn from these trace rows)">
         <Waveform rows={rows} markCycle={finding.cycle} />
       </Disclosure>

@@ -2,11 +2,11 @@ import { ArrowLeft, Ban, History, LoaderCircle, Radio, ScanSearch } from "lucide
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "../../api/client";
 import type { Finding, Profile, Run, Status } from "../../api/types";
-import { Callout, ErrorNotice, Loading, Section } from "../../components/common";
+import { Callout, Disclosure, ErrorNotice, Loading, Section } from "../../components/common";
 import type { FocusRequest } from "../../components/CycleTable";
 import type { RunContextInfo } from "../../components/Header";
 import { Badge, ObligationBadge, VerdictBadge } from "../../components/StatusBadge";
-import { elapsedSeconds, formatDateTime, formatDuration, METHOD_LABELS, STAGE_LABELS } from "../../lib/format";
+import { elapsedSeconds, formatDateTime, formatDuration, hex, METHOD_LABELS, STAGE_LABELS } from "../../lib/format";
 import { useNow, usePolling, type AsyncState } from "../../lib/hooks";
 import { href } from "../../lib/route";
 import { AuditResult } from "../AuditView";
@@ -39,64 +39,53 @@ function RunHeader({ run, now, onCancel, cancelling, cancelError }: { run: Run; 
   const active = run.state === "queued" || run.state === "running";
   const total = elapsedSeconds(run.started_at ?? run.created_at, run.finished_at, now);
   const t = run.verification?.timings;
+  const findings = run.verification?.findings ?? [];
+  const finding = findings.find((f) => f.source === "simulation") ?? findings[0];
+  const obligations = run.verification?.obligations ?? [];
+  const signal = finding?.check === "empty_flag" ? "empty" : finding?.check === "full_flag" ? "full" : "dout";
+  const sample = (value: Finding["expected"]) => signal === "dout" ? hex(value.dout) : String(Number(value[signal]));
   return (
     <div className="run-header">
-      <p className="eyebrow">
-        <a href={href.runs()} className="inline-link">
-          <ArrowLeft size={14} aria-hidden="true" /> Runs
-        </a>{" "}
-        · {run.kind === "audit" ? "Check-quality audit" : "Verification run"} · <span className="mono">{run.id}</span>
-      </p>
-      <h1>{run.title}</h1>
-      <div className="run-badges">
-        {run.recorded ? (
-          <Badge tone="neutral" icon={History} size="md">
-            Recorded run
-          </Badge>
-        ) : (
-          <Badge tone="info" icon={Radio} size="md">
-            Live run
-          </Badge>
-        )}
-        {run.kind === "verification" && <VerdictBadge headline={active ? "pending" : run.verdict?.headline ?? (run.state === "failed" ? "tool_error" : "unresolved")} size="md" />}
-        <span className="state-text">
-          State: <strong>{run.state}</strong>
-        </span>
-        {active && !run.recorded && (
-          <button type="button" className="btn btn-danger btn-sm" onClick={onCancel} disabled={cancelling} aria-busy={cancelling}>
-            {cancelling ? <LoaderCircle className="spin" size={14} aria-hidden="true" /> : <Ban size={14} aria-hidden="true" />} Cancel run
-          </button>
-        )}
+      <div className="case-masthead">
+        <a href={href.runs()} className="inline-link"><ArrowLeft size={14} aria-hidden="true" /> Evidence library</a>
+        <span>{run.kind === "audit" ? "Check-quality audit" : "Verification notebook"}</span>
       </div>
-      <p className="run-timing small">
-        {run.recorded ? "Recorded" : "Created"} {formatDateTime(run.created_at)}
-        {run.started_at ? ` · started ${formatDateTime(run.started_at)}` : ""}
-        {run.finished_at ? ` · finished ${formatDateTime(run.finished_at)}` : ""}
-        {total !== null ? ` · ${active ? "elapsed" : "took"} ${formatDuration(total)}` : ""}
-        {t?.first_finding_s != null ? ` · first finding after ${formatDuration(t.first_finding_s)}` : ""}
-        {run.image ? ` · verifier ${run.image.tag}` : ""}
-        {run.depth ? ` · DEPTH ${run.depth}` : ""}
-      </p>
-      {run.recorded && run.recorded_note && <p className="muted small">{run.recorded_note}</p>}
-      {run.parent_id && (
-        <p className="small">
-          Repair candidate for run{" "}
-          <a href={href.run(run.parent_id)} className="mono">
-            {run.parent_id}
-          </a>
-          , checked against its frozen contract and checks.
-        </p>
-      )}
-      {run.state === "cancelled" && (
-        <Callout kind="warn" title="Run cancelled">
-          <p>A cancelled run establishes nothing. Unfinished obligations remain unresolved.</p>
-        </Callout>
-      )}
-      {run.state === "failed" && (
-        <Callout kind="error" title="Run failed" role="alert">
-          <p>{run.error || "The run ended with an error. No result is claimed."}</p>
-        </Callout>
-      )}
+      <div className="case-hero">
+        <div className="case-title">
+          <p className="eyebrow">{run.recorded ? "From the recorded collection" : "Live investigation"}</p>
+          <h1>{run.title}</h1>
+          <div className="run-badges">
+            <Badge tone="neutral" icon={run.recorded ? History : Radio}>{run.recorded ? "Recorded run" : "Live run"}</Badge>
+            {run.kind === "verification" && <VerdictBadge headline={active ? "pending" : run.verdict?.headline ?? (run.state === "failed" ? "tool_error" : "unresolved")} />}
+          </div>
+          <p className="case-caption">{finding ? "A requirement failed. Trace the sequence, inspect the cause, and follow the repair evidence." : "Every result has a method, a set of assumptions, and evidence you can inspect."}</p>
+        </div>
+        {run.kind === "verification" && <aside className={`case-focus ${finding ? "case-focus-failure" : ""}`} aria-label="Run at a glance">
+          <span className="eyebrow">{finding ? "First mismatch in this trace" : active ? "In progress" : "Check obligations"}</span>
+          <div className="case-focus-number">{finding ? String(finding.cycle).padStart(2, "0") : active ? "…" : obligations.length}<span>{finding ? "cycle" : active ? "running" : "checks"}</span></div>
+          {finding ? <div className="case-signal">
+            <span><small>Expected {signal}</small><strong>{sample(finding.expected)}</strong></span>
+            <span aria-hidden="true" className="case-signal-arrow">→</span>
+            <span><small>Observed</small><strong>{sample(finding.observed)}</strong></span>
+          </div> : <p className="small">Results below keep simulation, bounded checks, and proof distinct.</p>}
+          <p className="case-focus-source">{finding ? `${finding.source} / ${finding.test}` : `DEPTH ${run.depth ?? "—"} · WIDTH 8`}</p>
+        </aside>}
+      </div>
+      <div className="case-facts">
+        <span><small>Configuration</small><strong>{run.depth ? `Depth ${run.depth} · 8-bit` : "Supplemental-check audit"}</strong></span>
+        <span><small>{run.recorded ? "Recorded" : "Created"}</small><strong>{formatDateTime(run.created_at)}</strong></span>
+        <span><small>{t?.first_finding_s != null ? "First finding" : "Elapsed verification"}</small><strong>{t?.first_finding_s != null ? formatDuration(t.first_finding_s) : total === null ? "—" : formatDuration(total)}</strong></span>
+        <span><small>Run state</small><strong>{run.state}</strong></span>
+      </div>
+      <Disclosure summary="Run provenance & original timings" className="case-provenance">
+        <p className="mono small wrap-anywhere">{run.id}</p>
+        {run.recorded_note && <p className="small muted">{run.recorded_note}</p>}
+        <p className="run-timing small">{run.started_at ? `Started ${formatDateTime(run.started_at)}` : "Not started"}{run.finished_at ? ` · finished ${formatDateTime(run.finished_at)}` : ""}{total !== null ? ` · ${active ? "elapsed" : "took"} ${formatDuration(total)}` : ""}{run.image ? ` · verifier ${run.image.tag}` : ""}</p>
+      </Disclosure>
+      {run.parent_id && <p className="small">Repair candidate for <a href={href.run(run.parent_id)} className="mono wrap-anywhere">{run.parent_id}</a>, checked against its frozen contract and checks.</p>}
+      {active && !run.recorded && <button type="button" className="btn btn-danger btn-sm" onClick={onCancel} disabled={cancelling} aria-busy={cancelling}>{cancelling ? <LoaderCircle className="spin" size={14} aria-hidden="true" /> : <Ban size={14} aria-hidden="true" />} Cancel run</button>}
+      {run.state === "cancelled" && <Callout kind="warn" title="Run cancelled"><p>A cancelled run establishes nothing. Unfinished obligations remain unresolved.</p></Callout>}
+      {run.state === "failed" && <Callout kind="error" title="Run failed" role="alert"><p>{run.error || "The run ended with an error. No result is claimed."}</p></Callout>}
       {cancelError ? <ErrorNotice error={cancelError} title="Cancel request failed" /> : null}
     </div>
   );
@@ -185,11 +174,11 @@ function VerificationBody({
   return (
     <div className="stack-lg">
       <nav className="run-sections" aria-label="On this run">
-        <span className="run-sections-label">On this run</span>
+        <span className="run-sections-label">Explore the evidence</span>
         <ul>
           {sections.filter((section) => section.id !== "run-finding" || primary || run.state === "complete").map((section) => (
             <li key={section.id}>
-              <button type="button" onClick={() => goToSection(section.id)}>{section.label}</button>
+              <button type="button" onClick={() => goToSection(section.id)}>{section.label}<span aria-hidden="true">↘</span></button>
             </li>
           ))}
         </ul>

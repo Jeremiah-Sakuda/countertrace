@@ -568,13 +568,20 @@ export function AuditView({ profile }: { profile: AsyncState<Profile> }) {
 
   return (
     <div className="stack-lg page-narrow">
-      <div className="intro">
-        <h1>Check-quality audit</h1>
-        <p className="lede">
-          How good is a set of checks? Seed known faults into a correct FIFO and see which ones a supplemental check set catches, and
-          which requirements it never looks at.
-        </p>
-      </div>
+      <header className="notebook-hero">
+        <div>
+          <p className="eyebrow">The second question / Check-quality audit</p>
+          <h1>What did your<br /><em>checks miss?</em></h1>
+          <p className="lede">
+            Seed known faults into a correct FIFO. See which ones a supplemental check set catches, and which requirements it never looks at.
+          </p>
+        </div>
+        <aside className="notebook-hero-aside">
+          <span className="notebook-margin-label">A different kind of evidence</span>
+          <p>A surviving fault reveals a gap in the named check set. Independent core checks decide whether that fault violates the contract.</p>
+          <a className="inline-link" href={href.runs()}>Explore the recorded cases</a>
+        </aside>
+      </header>
       <AuditScopeNote />
       <Section title="Choose a check set">
         {sets.status === "loading" && <Loading label="Loading check sets" />}

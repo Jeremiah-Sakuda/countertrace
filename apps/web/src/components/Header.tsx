@@ -62,54 +62,51 @@ export function Header({ status, route, run }: { status: AsyncState<Status>; rou
   return (
     <header className="site-header">
       <div className="site-header-inner">
-        <div className="brand">
-          <a href={href.setup()} className="brand-name">
-            <svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true">
-              <path d="M3 22h6V10h7v12h7V10h6" fill="none" stroke="currentColor" strokeWidth="2.75" strokeLinejoin="round" />
-            </svg>
-            Countertrace
-          </a>
-          <p className="scope-line">Synchronous FIFO profile sync-fifo-v1 · 8-bit · depth 2 or 4</p>
-        </div>
-        <div className="header-status" aria-label="Service status">
-          <VerifierPill status={status} />
-          <ModelPill status={status} />
-        </div>
+        <a href={href.setup()} className="brand-name" aria-label="Countertrace home">
+          <svg viewBox="0 0 40 40" width="40" height="40" aria-hidden="true">
+            <path d="M5 10h19v8H13v12h22M5 24h6M29 10h6v14" fill="none" stroke="currentColor" strokeWidth="3" />
+            <circle cx="35" cy="30" r="3" fill="currentColor" />
+          </svg>
+          <span>Countertrace<span className="brand-caption">A hardware evidence notebook</span></span>
+        </a>
       </div>
       <nav className="site-nav" aria-label="Primary">
+        <p className="rail-label">The workbench</p>
         <ul>
-          {NAV.map((item) => {
-            const active = item.match(route);
-            return (
-              <li key={item.to}>
-                <a href={item.to} aria-current={active ? "page" : undefined} className={active ? "active" : undefined}>
-                  {item.label}
-                </a>
-              </li>
-            );
-          })}
+          {NAV.map((item, i) => (
+            <li key={item.to}>
+              <a href={item.to} aria-current={item.match(route) ? "page" : undefined} className={item.match(route) ? "active" : undefined}>
+                <span className="nav-index" aria-hidden="true">0{i + 1}</span>
+                <span>{item.label}</span>
+                <span className="nav-arrow" aria-hidden="true">↗</span>
+              </a>
+            </li>
+          ))}
         </ul>
+      </nav>
+      <div className="rail-note">
+        <span className="rail-label">Small circuits. Clear answers.</span>
+        <p>Follow the evidence,<br /><em>one cycle at a time.</em></p>
+        <div className="rail-profile"><span>8-bit words</span><span>Depth 2 or 4</span></div>
+        <code>sync-fifo-v1</code>
+      </div>
+      <div className="rail-bottom">
         {run && (
           <div className="run-context">
-            {run.recorded ? (
-              <Badge tone="neutral" icon={History}>
-                Recorded run
+            <Badge tone="neutral" icon={run.recorded ? History : Radio}>{run.recorded ? "Recorded run" : "Live run"}</Badge>
+            {run.kind === "verification" && <span role="status" aria-atomic="true" className="unresolved-count">
+              <Badge tone={run.unresolved ? "unresolved" : "neutral"} icon={CircleHelp}>
+                {run.unresolved === null ? "Unresolved: pending" : `${run.unresolved} unresolved obligation${run.unresolved === 1 ? "" : "s"}`}
               </Badge>
-            ) : (
-              <Badge tone="info" icon={Radio}>
-                Live run
-              </Badge>
-            )}
-            {run.kind === "verification" && (
-              <span role="status" aria-atomic="true" className="unresolved-count">
-                <Badge tone={run.unresolved ? "unresolved" : "neutral"} icon={CircleHelp}>
-                  {run.unresolved === null ? "Unresolved obligations: pending" : `${run.unresolved} unresolved obligation${run.unresolved === 1 ? "" : "s"}`}
-                </Badge>
-              </span>
-            )}
+            </span>}
           </div>
         )}
-      </nav>
+        <details className="service-details">
+          <summary>Runtime & model</summary>
+          <div className="header-status" aria-label="Service status"><VerifierPill status={status} /><ModelPill status={status} /></div>
+        </details>
+        <p className="rail-edition">COUNTERTRACE / WORKING EDITION</p>
+      </div>
     </header>
   );
 }

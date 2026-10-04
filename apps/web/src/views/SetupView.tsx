@@ -1,4 +1,4 @@
-import { Bot, CircleCheck, CircleHelp, CircleX, FileCheck2, History, LoaderCircle, Play, ShieldAlert, Ban } from "lucide-react";
+import { ArrowUpRight, Bot, CircleCheck, CircleHelp, CircleX, FileCheck2, History, LoaderCircle, Play, ShieldAlert, Ban } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { api } from "../api/client";
 import type { Contract, Decision, Example, ExampleDetail, Interpretation, Profile, RunSummary, Status } from "../api/types";
@@ -17,7 +17,20 @@ function ExamplePicker({ examples, selected }: { examples: Example[]; selected: 
     { split: "development", title: "Development", note: "Examples used while building and tuning the workbench." },
   ];
   return (
-    <nav className="picker" aria-label="Bundled examples">
+    <>
+    <label className="notebook-example-select">
+      <span>Bundled FIFO</span>
+      <select value={selected ?? ""} onChange={(event) => navigate(href.setup(event.target.value), false)}>
+        {groups.map((group) => (
+          <optgroup key={group.split} label={group.title}>
+            {examples.filter((example) => example.split === group.split).map((example) => (
+              <option key={example.id} value={example.id}>{example.title} · depth {example.depth}</option>
+            ))}
+          </optgroup>
+        ))}
+      </select>
+    </label>
+    <nav className="picker notebook-example-index" aria-label="Bundled examples">
       {groups.map((g) => {
         const items = examples.filter((e) => e.split === g.split);
         if (items.length === 0) return null;
@@ -42,7 +55,6 @@ function ExamplePicker({ examples, selected }: { examples: Example[]; selected: 
                       depth {e.depth} · expected {e.expected}
                       <span className="sr-only"> (author's intent, not a result)</span>
                     </span>
-                    {e.fault && <span className="picker-fault">{e.fault.summary}</span>}
                   </a>
                 </li>
               ))}
@@ -54,6 +66,7 @@ function ExamplePicker({ examples, selected }: { examples: Example[]; selected: 
         “Expected faulty/correct” is the example author's intent, not a verification result.
       </p>
     </nav>
+    </>
   );
 }
 
@@ -344,87 +357,91 @@ function ExampleDetailView({ detail, profile, status }: { detail: ExampleDetail;
     previous.status === "ok" ? previous.data.filter((r) => r.example_id === detail.id && r.kind === "verification").slice(0, 5) : [];
 
   return (
-    <div className="stack-lg">
+    <div className="stack-lg notebook-steps">
       <Section
         title={detail.title}
-        eyebrow={`${detail.split === "showcase" ? "Showcase" : "Development"} example · ${detail.id}`}
+        className="notebook-step"
+        eyebrow={<><span className="notebook-step-number">01</span> Inspect the input</>}
         actions={
           <Badge tone="neutral" icon={detail.expected === "faulty" ? CircleX : CircleCheck} title="Author's intent, not a result">
-            Expected {detail.expected} (author's intent, not a result)
+            Expected {detail.expected} · author's intent
           </Badge>
         }
       >
-        <div className="grid-2">
-          <div>
-            <h3 className="subhead">Brief</h3>
-            <blockquote className="brief">{detail.brief}</blockquote>
-            {detail.fault && (
-              <div className="fault-note">
-                <h3 className="subhead">Seeded fault (author's description)</h3>
-                <p>{detail.fault.summary}</p>
-                <p className="muted small">
-                  Intended consequence: {detail.fault.intended_consequence} · category <code>{detail.fault.category}</code> · class{" "}
-                  <code>{detail.fault.class}</code>
-                </p>
-              </div>
-            )}
-            <p className="muted small">
-              Base design <code>{detail.base}</code> · DEPTH {detail.depth}
-            </p>
-          </div>
-          <div>
-            <h3 className="subhead">RTL source (read-only)</h3>
-            <CodeView source={detail.source} label={`RTL source for ${detail.title}`} maxHeight={360} />
-          </div>
+        <div className="notebook-specimen-meta">
+          <span>{detail.split === "showcase" ? "Showcase" : "Development"} example</span>
+          <span className="mono">{detail.id}</span>
+          <span>{detail.depth} words × {detail.contract.parameters.WIDTH} bits</span>
         </div>
-      </Section>
-
-      <Section title={`Contract v${version} for DEPTH ${detail.depth}`} eyebrow="Exact contract you accept">
-        <ContractView contract={detail.contract} hash={detail.contract_hash} />
-      </Section>
-
-      <Section title="Depth-2 timing example" eyebrow="Specified expectations (not executed results)">
-        {profile.status === "ok" ? (
-          <TimingExampleTable profile={profile.data} />
-        ) : profile.status === "loading" ? (
-          <Loading label="Loading timing example" />
-        ) : (
-          <ErrorNotice error={profile.error} title="Timing example unavailable" />
+        <blockquote className="notebook-brief">{detail.brief}</blockquote>
+        {detail.fault && (
+          <div className="notebook-margin-note">
+            <h3 className="subhead">The seeded fault</h3>
+            <p>{detail.fault.summary}</p>
+            <p className="muted small">This is the author's description. The verifier must establish the actual behavior.</p>
+          </div>
         )}
+        <Disclosure summary="Inspect the RTL source" meta={<span className="mono">dut.v · read-only</span>}>
+          <CodeView source={detail.source} label={`RTL source for ${detail.title}`} maxHeight={400} />
+          <p className="muted small">Base design <code>{detail.base}</code> · DEPTH {detail.depth}</p>
+          {detail.fault && (
+            <p className="muted small">
+              Intended consequence: {detail.fault.intended_consequence} · category <code>{detail.fault.category}</code> · class <code>{detail.fault.class}</code>
+            </p>
+          )}
+        </Disclosure>
       </Section>
 
       <Section
-        title="Interpret the brief"
-        eyebrow="Optional · model-assisted"
-        actions={
+        title="Agree on what correct means."
+        className="notebook-step"
+        eyebrow={<><span className="notebook-step-number">02</span> Review the contract</>}
+      >
+        <p className="prose">This run checks contract v{version}, with {detail.contract.parameters.WIDTH}-bit words and a depth of {detail.depth}. These are three of its requirements; open the full reference before accepting.</p>
+        <dl className="notebook-contract-summary">
+          {["reset", "write_full", "read_not_empty"].map((key) => {
+            const requirement = detail.contract.requirements[key];
+            return requirement ? <div key={key}><dt>{requirement.title}</dt><dd>{requirement.text}</dd></div> : null;
+          })}
+        </dl>
+        <Disclosure summary="Read the complete contract" meta={`v${version} · ${shortHash(detail.contract_hash)}`}>
+          <h3 className="subhead">Exact requirements, ports, checks, and assumptions</h3>
+          <ContractView contract={detail.contract} hash={detail.contract_hash} />
+        </Disclosure>
+        <Disclosure summary="Walk through a depth-2 timing example" meta="Specified expectations">
+          <p className="muted small">These expectations illustrate the sampling convention. They are not executed results.</p>
+          {profile.status === "ok" ? (
+            <TimingExampleTable profile={profile.data} />
+          ) : profile.status === "loading" ? (
+            <Loading label="Loading timing example" />
+          ) : (
+            <ErrorNotice error={profile.error} title="Timing example unavailable" />
+          )}
+        </Disclosure>
+        <Disclosure summary="Ask Nemotron to interpret the brief" meta="Optional">
+          <p className="prose">Compare the brief with the fixed contract to surface matches, conflicts, and open decisions. The model cannot change the contract.</p>
+          {status.status === "ok" && <p className="muted small">{status.data.data_notice}</p>}
           <button type="button" className="btn btn-secondary" onClick={interpret} disabled={interp.busy} aria-busy={interp.busy}>
             {interp.busy ? <LoaderCircle className="spin" size={16} aria-hidden="true" /> : <Bot size={16} aria-hidden="true" />}
             {interp.busy ? "Interpreting…" : "Interpret brief with Nemotron"}
           </button>
-        }
-      >
-        <p className="muted">
-          Nemotron compares the brief with the fixed contract and lists matches, conflicts, open decisions, and unsupported requests. It
-          cannot change the contract.
-        </p>
-        <div aria-live="polite">
-          {interp.error ? <ErrorNotice error={interp.error} title="Interpretation request failed" /> : null}
-          {interp.result && <InterpretationView result={interp.result} />}
-        </div>
+          <div aria-live="polite">
+            {interp.error ? <ErrorNotice error={interp.error} title="Interpretation request failed" /> : null}
+            {interp.result && <InterpretationView result={interp.result} />}
+          </div>
+        </Disclosure>
       </Section>
 
-      <Section title="Accept and run" eyebrow="Live run in the isolated verifier">
-        {status.status === "ok" && (
-          <Callout kind="info" title="Data processing">
-            <p>{status.data.data_notice}</p>
-          </Callout>
-        )}
+      <Section
+        title="Let the evidence answer."
+        className="notebook-step notebook-launch"
+        eyebrow={<><span className="notebook-step-number">03</span> Accept & run</>}
+      >
+        <p className="prose">Accept this exact contract, then run simulation and formal checks in the isolated verifier. The result will show what each method established and what remains unresolved.</p>
         {needsAck && (
           <label className="check-row">
             <input type="checkbox" checked={ackConflict} onChange={(e) => setAckConflict(e.target.checked)} />
-            <span>
-              I understand verification checks contract v{version}, which conflicts with the brief on: {blocking.join(", ")}.
-            </span>
+            <span>I understand verification checks contract v{version}, which conflicts with the brief on: {blocking.join(", ")}.</span>
           </label>
         )}
         <div className="action-row">
@@ -446,31 +463,25 @@ function ExampleDetailView({ detail, profile, status }: { detail: ExampleDetail;
         {!isAccepted && <p className="muted small">Accept the exact contract version before running. A later contract change creates a new baseline.</p>}
         {!verifierReady && status.status === "ok" && (
           <Callout kind="warn" title="Verifier not ready">
-            <p>Docker and the verifier image are required for a live run. Recorded runs remain inspectable.</p>
+            <p>Docker and the verifier image are required for a live run. <a href={href.runs()}>Recorded case files</a> remain inspectable.</p>
           </Callout>
         )}
+        {status.status === "ok" && <p className="muted small">{status.data.data_notice}</p>}
         {launch.error ? <ErrorNotice error={launch.error} title="Could not start the run" /> : null}
         {priorRuns.length > 0 && (
-          <div className="prior-runs">
-            <h3 className="subhead">Earlier runs of this example</h3>
-            <ul className="link-list">
+          <Disclosure summary="Earlier runs of this example" meta={`${priorRuns.length} recent runs`}>
+            <ul className="link-list prior-runs">
               {priorRuns.map((r) => (
                 <li key={r.id}>
                   <a href={href.run(r.id)}>
-                    <span className="mono small">{formatDateTime(r.created_at)}</span>
-                    <VerdictBadge headline={r.state === "complete" ? r.verdict?.headline : "pending"} />
-                    {r.recorded ? (
-                      <Badge tone="neutral" icon={History}>
-                        Recorded
-                      </Badge>
-                    ) : (
-                      <span className="muted small">{r.state}</span>
-                    )}
+                    <span className="mono small">{formatDateTime(r.created_at)}</span>{" "}
+                    <VerdictBadge headline={r.state === "complete" ? r.verdict?.headline : "pending"} />{" "}
+                    {r.recorded ? <Badge tone="neutral" icon={History}>Recorded</Badge> : <span className="muted small">{r.state}</span>}
                   </a>
                 </li>
               ))}
             </ul>
-          </div>
+          </Disclosure>
         )}
       </Section>
     </div>
@@ -496,28 +507,39 @@ export function SetupView({
   const detail = useAsync(() => (selectedId ? api.example(selectedId) : Promise.resolve(null)), [selectedId]);
 
   return (
-    <div className="setup-layout">
-      <aside className="setup-aside">
-        <h2 className="aside-title">Examples</h2>
-        {examples.status === "loading" && <Loading label="Loading examples" />}
-        {examples.status === "error" && <ErrorNotice error={examples.error} title="Examples unavailable" onRetry={examples.reload} />}
-        {examples.status === "ok" &&
-          (examples.data.length === 0 ? <p className="muted">No bundled examples are available.</p> : <ExamplePicker examples={examples.data} selected={selectedId} />)}
-      </aside>
-      <div className="setup-main">
-        <div className="intro">
-          <h1>Contract setup</h1>
-          <p className="lede">
-            Pick a bundled FIFO, review the exact contract it will be checked against, then accept that version and run. Countertrace
-            shows the first failing cycle sequence and which method found it; it never labels a design “verified”.
-          </p>
+    <div className="notebook-setup">
+      <header className="notebook-hero">
+        <div>
+          <p className="eyebrow">The workbench / Contract setup</p>
+          <h1>Start with a question.<br /><em>Follow the evidence.</em></h1>
+          <p className="lede">A small queue. An exact contract. A sequence you can inspect. Choose a FIFO and find out what its checks actually establish.</p>
         </div>
-        {!selectedId && examples.status === "ok" && <p className="muted">Select an example.</p>}
-        {detail.status === "loading" && selectedId && <Loading label="Loading example" />}
-        {detail.status === "error" && <ErrorNotice error={detail.error} title={`Example ${selectedId} unavailable`} onRetry={detail.reload} />}
-        {detail.status === "ok" && detail.data && <ExampleDetailView key={detail.data.id} detail={detail.data} profile={profile} status={status} />}
+        <aside className="notebook-hero-aside" aria-label="Start with recorded evidence">
+          <span className="notebook-margin-label">First time here?</span>
+          <p>Open a recorded case file to explore a real failure, its explanation, and the checked repair.</p>
+          <a className="inline-link" href={href.runs()}>Browse the case files <ArrowUpRight size={16} aria-hidden="true" /></a>
+        </aside>
+      </header>
+      <ol className="notebook-workflow" aria-label="Verification workflow">
+        <li><span>01</span><div><strong>Inspect the input</strong><p>Choose a bundled FIFO.</p></div></li>
+        <li><span>02</span><div><strong>Review the contract</strong><p>Make the required behavior explicit.</p></div></li>
+        <li><span>03</span><div><strong>Accept & run</strong><p>Inspect findings and their limits.</p></div></li>
+      </ol>
+      <div className="notebook-setup-layout">
+        <aside className="notebook-example-sidebar">
+          <h2 className="aside-title">Choose your example</h2>
+          {examples.status === "loading" && <Loading label="Loading examples" />}
+          {examples.status === "error" && <ErrorNotice error={examples.error} title="Examples unavailable" onRetry={examples.reload} />}
+          {examples.status === "ok" &&
+            (examples.data.length === 0 ? <p className="muted">No bundled examples are available.</p> : <ExamplePicker examples={examples.data} selected={selectedId} />)}
+        </aside>
+        <div className="notebook-setup-main">
+          {!selectedId && examples.status === "ok" && <p className="muted">Select an example.</p>}
+          {detail.status === "loading" && selectedId && <Loading label="Loading example" />}
+          {detail.status === "error" && <ErrorNotice error={detail.error} title={`Example ${selectedId} unavailable`} onRetry={detail.reload} />}
+          {detail.status === "ok" && detail.data && <ExampleDetailView key={detail.data.id} detail={detail.data} profile={profile} status={status} />}
+        </div>
       </div>
     </div>
   );
 }
-

@@ -32,9 +32,9 @@ Every view handles loading, error, and empty states. Endpoints that are missing 
 
 ## Design rules
 
-The design system is persisted in [`design-system/countertrace/MASTER.md`](design-system/countertrace/MASTER.md) (dark OLED technical style, JetBrains Mono headings, IBM Plex Sans body). Its trust-rule overrides apply:
+The design system is persisted in [`design-system/countertrace/MASTER.md`](design-system/countertrace/MASTER.md): an editorial evidence notebook with warm paper, ink, rust actions, a pale sage navigation rail, Newsreader headings, DM Sans body, and JetBrains Mono data. Setup has numbered review steps and a compact example selector on small screens; recorded runs use case cards; run details lead with an actual failing-cycle summary and a reference queue before the table. Runtime details and provenance remain available in labelled disclosures. Its evidence rules apply:
 
-- Green appears only on individual passing check statuses. Actions and focus use the sky accent.
+- Green result text appears only on individual passing check statuses. Actions and focus use rust; pale sage surfaces are neutral structure, never a success claim.
 - Every status carries an icon and the exact PRD wording, so color is never the only signal.
 - No progress percentages, no universal "verified" badge, and no queue or waveform events that are not in the recorded trace.
 - Visible focus rings, keyboard-navigable cycle rows (arrow keys, Home, End) and citations, `aria-live` run-state announcements, `prefers-reduced-motion` support, and layouts down to 375 px wide without horizontal page scroll.

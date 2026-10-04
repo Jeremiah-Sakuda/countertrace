@@ -1,245 +1,56 @@
-# Design System Master File
+# Countertrace design system
 
-> **LOGIC:** When building a specific page, first check `design-system/pages/[page-name].md`.
-> If that file exists, its rules **override** this Master file.
-> If not, strictly follow the rules below.
+**Direction:** Evidence notebook · October 3, 2026
 
----
+The owner requested a complete creative redesign after rejecting the blue and charcoal dashboard treatments. The interface now draws on editorial layouts and laboratory notebooks: warm paper, ink, rust, a pale sage navigation rail, serif headlines, numbered workflows, and precise data tables. This replaces the earlier generated dark developer-tool preset. UI/UX Pro Max's Editorial Grid / Magazine and Minimalism & Swiss Style guidance informed the layout; Countertrace's evidence rules remain authoritative.
 
-**Project:** Countertrace
-**Generated:** 2026-10-01 19:08:18
-**Category:** Developer Tool / IDE
-**Design Dials:** Variance 4/10 (Balanced / Modern) | Motion 3/10 (Subtle) | Density 7/10 (Standard)
+## Evidence semantics
 
----
+- The model proposes explanations or repairs. Independent tools assign results.
+- Keep recorded and live runs visibly distinct. Preserve original dates, timings, provenance, and limits behind clearly labelled disclosures.
+- Green status text denotes individual proved properties only. Actions and focus use rust. Pale sage surfaces are neutral visual structure, never a success claim.
+- Status badges include words and icons. Preserve separate counterexample, simulation, bounded-check, proof, unresolved, tool-error, and unchecked states.
+- Never show an overall “verified” badge, invented progress percentage, or inferred result. The no-finding headline remains “No counterexample found by these methods.”
+- The run overview displays the selected finding's actual cycle, signal, expected value, observed value, and trace source. Its cycle is local to that trace, not the earliest cycle across unrelated tests.
+- Queue views show the independent reference queue, not invented DUT internals. Source citations, method-specific obligations, hashes, logs, and exports remain available.
 
-## Countertrace trust-rule overrides (take precedence over everything below)
+## Visual tokens
 
-The generated palette proposes green (`#22C55E`) as the accent/CTA color. Countertrace's result semantics forbid that:
+The implemented source of truth is `src/styles.css`.
 
-- **Green is reserved for individual passing check statuses** (for example an obligation labelled "Property proved under these assumptions"). It is never used for buttons, links, focus, or anything that could read as a universal "verified" badge.
-- **Owner palette preference (October 3): neutral charcoal surfaces, with warm off-white `#D6D3CC` actions and focus** (`--color-accent`, `--color-ring`) and `#151515` text. Avoid blue page backgrounds and decorative cyan washes; reserve chromatic color for method/result states.
-- **Every status uses words and an icon as well as color**, with the exact PRD labels: counterexample (red `#F87171`), proved (green `#4ADE80`), bounded "No counterexample within N cycles" (teal `#2DD4BF`), "Simulation passed for these runs" (violet `#C4B5FD`), unresolved (amber `#FBBF24`), tool error (orange `#FB923C`, dashed outline), not checked / unsupported (gray `#D4D3CE`).
-- **No overall "verified" banner and no invented progress percentages.** A run without a finding says "No counterexample found by these methods".
-- Status text colors are the lighter tints above so they meet 4.5:1 on the card color `#1D1D1D`; the destructive `#EF4444` is used for borders and fills only.
+| Role | Color |
+| --- | --- |
+| Page paper | `#F5F2EB` |
+| Card paper | `#FFFDF8` |
+| Navigation rail | `#E9EBDF` |
+| Ink | `#252824` |
+| Secondary text | `#484C43` |
+| Muted text | `#66695F` |
+| Rust action / focus | `#9A3D20` |
+| Rust hover | `#742B17` |
+| Rule | `#D8D9CB` |
+| Control border | `#A7AA9C` |
+| Counterexample | `#A32C29` on `#FAE9E2` |
+| Proved | `#27633B` on `#E9F0E4` |
+| Bounded | `#206467` on `#E8F1ED` |
+| Simulation | `#62438A` on `#F0EAF5` |
+| Unresolved | `#80550F` on `#F6EDCE` |
+| Tool error | `#953E16` on `#F9EADE` |
 
-The implemented tokens live in `src/styles.css` (`:root`).
+Use Newsreader for editorial headings and short explanatory statements, DM Sans for body and controls, and JetBrains Mono for values, IDs, source, and small labels. System serif, sans, and monospace fallbacks remain usable if font delivery is unavailable. Avoid decorative gradients, glass effects, blue background washes, giant rounded cards, and synthetic charts.
 
-## Global Rules
+## Layout and interaction
 
-### Color Palette
+- Desktop at 1100 px and above: a 232 px navigation rail, numbered destinations, expandable runtime/model details, and persistent run context. Short viewports can scroll the rail.
+- Smaller screens: compact horizontal navigation. At widths below 950 px the setup examples use a labelled native select, keeping the chosen input close to its contract.
+- Setup: an editorial introduction, three-step workflow, example index, input specimen, contract review, and acceptance before execution. Optional model interpretation is a disclosure.
+- Runs: a collection of recorded case cards followed by a live-run ledger. Counts derive from each recorded verdict. Recording notes and original metadata remain available on each card.
+- Run detail: case title and result, a sourced failing-cycle card, compact facts, provenance disclosure, section shortcuts, reference queue, trace, explanation, repair, and method-specific evidence.
+- Audit: a matching editorial entry, explicit check-set selection, real mutation classifications, and learner exercise. Do not equate its score with design confidence.
+- Use thin rules, small 3–5 px radii, measured spacing, and restrained shadows. Data visualizations must represent actual trace values.
 
-| Role | Hex | CSS Variable |
-|------|-----|--------------|
-| Primary | `#202020` | `--color-primary` |
-| On Primary | `#FFFFFF` | `--color-on-primary` |
-| Secondary | `#383837` | `--color-secondary` |
-| On Secondary | `#FFFFFF` | `--color-on-secondary` |
-| Accent/CTA | `#D6D3CC` | `--color-accent` |
-| On Accent/CTA | `#151515` | `--color-on-accent` |
-| Background | `#151515` | `--color-background` |
-| Foreground | `#F3F3F1` | `--color-foreground` |
-| Card | `#1D1D1D` | `--color-card` |
-| Card Foreground | `#F3F3F1` | `--color-card-foreground` |
-| Muted | `#2B2B2B` | `--color-muted` |
-| Muted Foreground | `#AAA9A5` | `--color-muted-foreground` |
-| Border | `#555552` | `--color-border` |
-| Destructive | `#EF4444` | `--color-destructive` |
-| On Destructive | `#000000` | `--color-on-destructive` |
-| Ring | `#FFFFFF` | `--color-ring` |
+## Accessibility and verification
 
-**Color Notes:** Neutral charcoal and off-white; semantic result colors only. The owner palette and trust-rule overrides supersede generated component examples below.
+Keep the skip link, landmark and heading structure, visible rust focus outlines, native controls and disclosures, `aria-current` navigation, and pressed-state cycle buttons. Cycle selection supports arrows, Home, and End. Section jumps transfer focus; citation jumps reveal and focus their cycle. Collapsing a trace preserves a visible selection. Touch controls are at least 44 px on narrow screens; text inputs use 16 px text. Wide evidence tables scroll within labelled regions, not the page. Reduced-motion preferences disable animation and smooth scrolling.
 
-### Typography
-
-- **Heading Font:** JetBrains Mono
-- **Body Font:** IBM Plex Sans
-- **Mood:** code, developer, technical, precise, functional, hacker
-- **Google Fonts:** [JetBrains Mono + IBM Plex Sans](https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap)
-
-**CSS Import:**
-```css
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
-```
-
-### Spacing Variables
-
-*Density: 7/10 — Standard*
-
-| Token | Value | Usage |
-|-------|-------|-------|
-| `--space-xs` | `4px` / `0.25rem` | Tight gaps |
-| `--space-sm` | `8px` / `0.5rem` | Icon gaps, inline spacing |
-| `--space-md` | `16px` / `1rem` | Standard padding |
-| `--space-lg` | `24px` / `1.5rem` | Section padding |
-| `--space-xl` | `32px` / `2rem` | Large gaps |
-| `--space-2xl` | `48px` / `3rem` | Section margins |
-| `--space-3xl` | `64px` / `4rem` | Hero padding |
-
-### Shadow Depths
-
-| Level | Value | Usage |
-|-------|-------|-------|
-| `--shadow-sm` | `0 1px 2px rgba(0,0,0,0.05)` | Subtle lift |
-| `--shadow-md` | `0 4px 6px rgba(0,0,0,0.1)` | Cards, buttons |
-| `--shadow-lg` | `0 10px 15px rgba(0,0,0,0.1)` | Modals, dropdowns |
-| `--shadow-xl` | `0 20px 25px rgba(0,0,0,0.15)` | Hero images, featured cards |
-
----
-
-## Component Specs
-
-### Buttons
-
-```css
-/* Primary Button */
-.btn-primary {
-  background: #22C55E;
-  color: #151515;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  transition: all 200ms ease;
-  cursor: pointer;
-}
-
-.btn-primary:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
-}
-
-/* Secondary Button */
-.btn-secondary {
-  background: transparent;
-  color: #F3F3F1;
-  border: 2px solid #202020;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  transition: all 200ms ease;
-  cursor: pointer;
-}
-```
-
-### Cards
-
-```css
-.card {
-  background: #151515;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: var(--shadow-md);
-  transition: all 200ms ease;
-  cursor: pointer;
-}
-
-.card:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
-}
-```
-
-### Inputs
-
-```css
-.input {
-  padding: 12px 16px;
-  border: 1px solid #E2E8F0;
-  border-radius: 8px;
-  font-size: 16px;
-  transition: border-color 200ms ease;
-}
-
-.input:focus {
-  border-color: #202020;
-  outline: none;
-  box-shadow: 0 0 0 3px #20202020;
-}
-```
-
-### Modals
-
-```css
-.modal-overlay {
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-}
-
-.modal {
-  background: white;
-  border-radius: 16px;
-  padding: 32px;
-  box-shadow: var(--shadow-xl);
-  max-width: 500px;
-  width: 90%;
-}
-```
-
----
-
-## Style Guidelines
-
-**Style:** Dark Mode (OLED)
-
-**Keywords:** Dark theme, low light, high contrast, deep black, midnight blue, eye-friendly, OLED, night mode, power efficient
-
-**Best For:** Night-mode apps, coding platforms, entertainment, eye-strain prevention, OLED devices, low-light
-
-**Key Effects:** Minimal glow (text-shadow: 0 0 10px), dark-to-light transitions, low white emission, high readability, visible focus
-
-### Page Pattern
-
-**Pattern Name:** FAQ/Documentation Landing
-
-- **Conversion Strategy:** Reduce support tickets. Track search analytics. Show related articles. Contact escalation path.
-- **CTA Placement:** Search bar prominent + Contact CTA for unresolved questions
-- **Section Order:** Hero with search bar > Popular categories > FAQ accordion > Contact/support CTA
-
----
-
-## Motion
-
-**Scroll Reveal** (Subtle) — Trigger: scroll (viewport enter) | Duration: 300-400ms | Easing: `power1.out`
-
-```js
-gsap.from(el, { opacity: 0, y: 12, duration: 0.35, ease: 'power1.out', scrollTrigger: { trigger: el, start: 'top 90%', toggleActions: 'play none none reverse' } });
-```
-
-**Framework notes:** Requires the ScrollTrigger plugin registered once via gsap.registerPlugin(ScrollTrigger); Use matchMedia('(prefers-reduced-motion: reduce)') to skip non-essential motion and render the final state immediately
-
-- ✅ Keep the y offset small (8-16px) so it reads as a fade, not a slide
-- ❌ Don't reveal below-the-fold content needed for SEO/crawlers as invisible-by-default without a no-JS fallback
-- ⚡ toggleActions 'play none none reverse' avoids re-triggering on every scroll direction change
-
----
-
-## Anti-Patterns (Do NOT Use)
-
-- ❌ Light mode default
-- ❌ Slow performance
-
-### Additional Forbidden Patterns
-
-- ❌ **Emojis as icons** — Use SVG icons (Heroicons, Lucide, Simple Icons)
-- ❌ **Missing cursor:pointer** — All clickable elements must have cursor:pointer
-- ❌ **Layout-shifting hovers** — Avoid scale transforms that shift layout
-- ❌ **Low contrast text** — Maintain 4.5:1 minimum contrast ratio
-- ❌ **Instant state changes** — Always use transitions (150-300ms)
-- ❌ **Invisible focus states** — Focus states must be visible for a11y
-
----
-
-## Pre-Delivery Checklist
-
-Before delivering any UI code, verify:
-
-- [ ] No emojis used as icons (use SVG instead)
-- [ ] All icons from consistent icon set (Heroicons/Lucide)
-- [ ] `cursor-pointer` on all clickable elements
-- [ ] Hover states with smooth transitions (150-300ms)
-- [ ] Light mode: text contrast 4.5:1 minimum
-- [ ] Focus states visible for keyboard navigation
-- [ ] `prefers-reduced-motion` respected
-- [ ] Responsive: 375px, 768px, 1024px, 1440px
-- [ ] No content hidden behind fixed navbars
-- [ ] No horizontal scroll on mobile
+Check desktop, tablet, phone, and short landscape layouts after structural changes, along with actual data, acceptance state, citations, and parent/candidate links. Run `make check`, the web regression tests, and the production build. Record observed checks in `docs/STATUS.md`; do not claim screen-reader or learner validation without performing it.
