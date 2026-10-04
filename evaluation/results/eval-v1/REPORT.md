@@ -32,11 +32,11 @@ Controls: the independent FIFO (depth 4), `fifo_count` (depth 2 and 4), and `fif
 | E7 | Countertrace | reset | empty_flag @0 | passed on attempt 1 |
 | E8 | Countertrace | ordering/wraparound | read_data @3 | passed on attempt 1 |
 
-Every passing repair reverses its seeded fault exactly and passed all ten unchanged obligations, including three unbounded proofs, with an identical frozen check set.
+Every passing repair reverses its seeded fault and passed all ten unchanged obligations, including three unbounded proofs, with an identical frozen check set. The E6 candidate also added `dout <= 0` to reset (allowed by the contract), and all full-file candidates deleted header comments.
 
 ## Failures and issues found
 
-1. **Output exhaustion caused every repair failure.** All 11 failed repair requests ended with `finish_reason: length`. The full-file response format is long for the 146-line independent FIFO. E4's miss is entirely this.
+1. **Output exhaustion caused every repair failure.** All 12 repair requests that failed schema validation ended with `finish_reason: length` (E1 ×4, E4 ×6, and one each inside E3's and E5's successful attempts). Two explanation requests (E3, E4) also hit the 4,096-token limit and succeeded on retry. The full-file response format is long for the 146-line independent FIFO. E4's miss is entirely this.
 2. **Full-file repairs drop comments**, including the independent author's header. Attribution must survive a repair.
 3. One explanation cited a non-signal (`queue`); several explanations state internal pointer values inferred from RTL rather than sampled.
 

@@ -12,14 +12,14 @@ Last updated: October 4, 2026. This page records what has actually run. The Octo
 | Honest conclusions | 0 false alarms on 4 controls | 0/4; all four controls proved for all three core properties |
 | Repair | ≥5/8 within three candidates | 7/8 (6 on the first candidate); the one failure was output exhaustion |
 | Interpretation | ≥3/4 conflicts, ≥3/4 compatible | 4/4 and 4/4 on Nemotron 3 Super |
-| Explanation citations | Actual signals and cycles | 8/8 valid; one invalid citation in one explanation; assistant review 2/2 on all rubric items |
+| Explanation citations | Actual signals and cycles | 8/8 schema-valid; 7/8 with only valid citations (E6 cited `queue`); assistant review 2/2 on all rubric items |
 
 All cases, labels, and briefs were authored by the coding assistant after the freeze, and explanation review was by the assistant, so this is not independent validation. 37 requests, about $0.40 at list prices.
 
 **Follow-ups, validated on development cases only (not eval-v1):**
 
 - *Edit-based repair.* All eval-v1 repair failures were `finish_reason: length` on full-file rewrites, and full-file repairs dropped comments including the external author's header. Repairs are now exact-match find/replace edits applied by the host. Five development faults: 5/5 passed on the first candidate with one-line diffs and comments intact.
-- *Model routing.* Interpretation and check proposals use Nemotron 3 Super; explanation and repair use Ultra. On six development briefs Ultra, Super, and Nano were each 6/6; Super took 4.7–9 s versus 9.5–72 s on Ultra.
+- *Model routing.* Interpretation and check proposals use Nemotron 3 Super; explanation and repair use Ultra. On six development briefs Ultra, Super, and Nano were each 6/6; Super took 4.7–9 s versus 9.5–72 s on Ultra, and 1.7–2.9 s with reasoning off ([raw reports](evidence/2026-10-04-development/)).
 - *Explanation prompt.* Now states the exact configuration after one development explanation misstated DEPTH. Three further development faults were explained correctly.
 - *Spend control.* Prices ($1/$3 per million, Ultra list) and a $20 inference threshold are configured in the local `.env`; account balance and credit expiry remain unverified.
 - *Recorded showcase refreshed.* `rec-20261004-003607-ver-4cc749` holds a one-request Ultra explanation (18 valid citations, reviewed by the assistant against the trace) and a first-candidate one-line repair (`rec-20261004-003622-ver-d88ef8`) that passed all ten unchanged obligations. The October 1/3 showcase pair was retired from `recorded/`; its evidence remains in [the model-gate record](evidence/model-gate-2026-10-03.json).
@@ -105,7 +105,7 @@ The earlier integration test still exercises rejected, failing, and passing cand
 
 ## Reproducibility
 
-`countertrace bundle <run>` exports a hashed evidence bundle; `countertrace replay <bundle.zip>` re-ran the showcase bundle on the same machine and matched every obligation status and finding with an identical frozen check set. On October 3, the recorded real repair candidate bundle also replayed on the same machine: all ten obligation statuses matched, with no findings or frozen-input differences and no model call. Both refreshed bundles passed manifest file-hash validation and retain public parent/candidate relationships, original timings, and model-call metadata (stored on the parent). Clean-environment replays (three bundles, twice each) have not been performed.
+`countertrace bundle <run>` exports a hashed evidence bundle; `countertrace replay <bundle.zip>` re-ran the showcase bundle on the same machine and matched every obligation status and finding with an identical frozen check set. On October 3, the recorded real repair candidate bundle also replayed on the same machine: all ten obligation statuses matched, with no findings or frozen-input differences and no model call. Both refreshed bundles passed manifest file-hash validation and retain public parent/candidate relationships, original timings, and model-call metadata (stored on the parent). On October 4, clean-environment replays ran on two fresh GitHub-hosted x64 runners (three bundles each, six of six matched); the job repeats on every push.
 
 ## Tests
 

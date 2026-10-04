@@ -2,7 +2,7 @@
 
 Countertrace helps FPGA learners expose FIFO bugs, understand the exact failing sequence, and validate a proposed RTL repair against unchanged checks.
 
-**Status: working local build with a first frozen evaluation.** On October 4, a pre-registered suite of 4 controls and 8 seeded faults (half derived from an independently authored FIFO held out of prompt development) gave: diagnosis 8/8 across four defect classes with 0/4 false alarms, Nemotron repairs passing unchanged checks in 7/8 cases (6 on the first try), and conflict detection 4/4 with 4/4 compatible briefs accepted ([report](evaluation/results/eval-v1/REPORT.md)). The cases and labels were authored by the developer's coding assistant and have not been externally reviewed; no user study or hosted deployment exists yet. See [implementation status](docs/STATUS.md) for exactly what ran.
+**Status: working local build with a first frozen evaluation.** On October 4, a pre-registered suite of 4 controls and 8 seeded faults (half derived from an independently authored FIFO held out of prompt development) gave: diagnosis 8/8 across four defect classes with 0/4 false alarms, Nemotron repairs passing unchanged checks in 7/8 cases (6 on the first try, using the earlier whole-file repair format; the current edit-based format is validated on development cases only), and conflict detection 4/4 with 4/4 compatible briefs accepted ([report](evaluation/results/eval-v1/REPORT.md)). The cases and labels were authored by the developer's coding assistant and have not been externally reviewed; no user study or hosted deployment exists yet. See [implementation status](docs/STATUS.md) for exactly what ran.
 
 Built for the [Nebius x NVIDIA Global AI Hackathon](https://nebiusglobalaihackathon.devpost.com/), targeting Coding and Agentic Engineering. Submission: October 30, 2026, 1:00 p.m. EDT. Judge access must remain available through December 15.
 
@@ -25,7 +25,7 @@ Every model call is a runtime call from the control service to the Nebius Token 
 
 | Task | Model | Role and safeguards |
 | --- | --- | --- |
-| Brief interpretation, check-set proposals | `nvidia/nemotron-3-super-120b-a12b` | Flags conflicts between a plain-English brief and the fixed contract (cannot change it); proposes supplemental checks only from reviewed templates. Interactive tier: 4.7–11 s per brief. |
+| Brief interpretation, check-set proposals | `nvidia/nemotron-3-super-120b-a12b` | Flags conflicts between a plain-English brief and the fixed contract (cannot change it); proposes supplemental checks only from reviewed templates. Reasoning off by default for these tasks: 1.7–2.9 s per development brief (7.1–11.4 s with reasoning on in eval-v1). |
 | Failure explanation | `nvidia/Nemotron-3-Ultra-550b-a55b` | Explains the recorded failing cycles for a learner; every cited cycle, signal, and RTL line is checked against the trace and source. Never changes the verdict. |
 | Repair agent | `nvidia/Nemotron-3-Ultra-550b-a55b` | Proposes exact-match RTL edits; each candidate is re-admitted and re-verified (simulation, bounded model checking, unbounded proof, reachability) against the frozen check set, up to three attempts. |
 
@@ -36,7 +36,7 @@ Responses are schema-validated with one bounded retry; input/output token caps a
 Requires Python 3.11+, Git, Docker (on macOS, a running colima or Docker Desktop VM that shares your home directory), and Node 20+ for the web interface. HDL tools are not installed on the host; they run only inside the pinned verifier image.
 
 ```sh
-make setup        # .venv, editable install, private .env from .env.example
+make setup        # needs Python 3.11+; creates .venv and a private .env from .env.example
 make image        # builds the pinned verifier image (~700 MB tool download, checksum-verified)
 make test         # unit tests and negative controls, no Docker
 make test-integration
@@ -44,7 +44,7 @@ make web          # builds apps/web
 make serve        # http://127.0.0.1:8765
 ```
 
-Command line:
+Command line (after `source .venv/bin/activate`, or prefix commands with `.venv/bin/`):
 
 ```sh
 countertrace verify --example showcase-overwrite-when-full

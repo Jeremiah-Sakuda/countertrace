@@ -1,6 +1,6 @@
 # Devpost submission draft
 
-Draft text for the Devpost form. Every number links to evidence in the repository. Replace nothing with unmeasured claims.
+Draft text for the Devpost form. Every number is backed by a committed record: [eval-v1 results](../evaluation/results/eval-v1/results.json), [development evidence](evidence/2026-10-04-development/), and [STATUS](STATUS.md). Replace nothing with unmeasured claims.
 
 ## Project name and tagline
 
@@ -48,7 +48,7 @@ All model calls are runtime calls to the Nebius Token Factory OpenAI-compatible 
 
 | Task | Model | Why this tier |
 | --- | --- | --- |
-| Brief interpretation, check-set proposals | `nvidia/nemotron-3-super-120b-a12b` | Interactive; 4.7–9 s on development briefs versus up to 72 s on Ultra, with the same accuracy there |
+| Brief interpretation, check-set proposals | `nvidia/nemotron-3-super-120b-a12b` | Interactive, reasoning off: 1.7–2.9 s per development brief (Ultra with reasoning took up to 72 s; all tiers were 6/6 on these briefs) |
 | Failure explanation | `nvidia/Nemotron-3-Ultra-550b-a55b` | Needs careful reasoning over trace tables and RTL |
 | Repair proposals | `nvidia/Nemotron-3-Ultra-550b-a55b` | Must reason about a failing transaction and keep the interface intact |
 
@@ -79,12 +79,12 @@ One synchronous FIFO profile (8-bit, depth 2 or 4). Bundled examples only in the
 
 Observed during development on October 3–4, 2026:
 
-1. **Reasoning tokens exhaust structured-output budgets.** Nemotron 3 Ultra spent the entire `max_tokens` budget before emitting the required JSON on several requests (two explanation requests at 1,800 tokens, one repair at 4,000, one explanation at 4,096). Suggestion: a documented per-request reasoning budget or reasoning-off switch for Nemotron 3 on Token Factory, and a `finish_reason` that distinguishes reasoning exhaustion. The Llama-Nemotron "detailed thinking off" convention does not carry over, and this is not obvious from the catalog.
-2. **Latency variance on Ultra.** Two brief-interpretation requests of about 500 input and 1,700–1,800 output tokens took 66 s and 72 s; four similar requests minutes later took 9.5–16 s. Nemotron 3 Super handled the same task in 4.7–9 s with identical results on our development briefs. Suggestion: publish expected latency ranges per model and surface queueing time in response headers.
+1. **Reasoning tokens exhaust structured-output budgets.** Nemotron 3 Ultra spent the entire `max_tokens` budget before emitting the required JSON on several requests (development: two explanation requests at 1,800 tokens, one repair at 4,000, one explanation at 4,096; evaluation: 12 repair requests at 4,000 and 2 explanation requests at 4,096). We found that `chat_template_kwargs: {"enable_thinking": false}` works on Token Factory for Nemotron 3 and now retry cut-off replies that way, but it is not documented in the catalog or cookbook. Suggestion: document the switch and a per-request reasoning budget, and make `finish_reason` distinguish reasoning exhaustion. The Llama-Nemotron "detailed thinking off" convention does not carry over.
+2. **Latency variance on Ultra.** Two brief-interpretation requests of about 500 input and 1,700–1,800 output tokens took 66 s and 72 s; four similar requests minutes later took 9.5–16 s. Nemotron 3 Super handled the same task in 4.7–9 s with identical results on our development briefs, and 1.7–2.9 s with reasoning off. Suggestion: publish expected latency ranges per model and surface queueing time in response headers.
 3. **Inconsistent model ID casing.** The catalog lists `nvidia/Nemotron-3-Ultra-550b-a55b`, `nvidia/nemotron-3-super-120b-a12b`, and `nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B`. Consistent naming would prevent configuration errors.
 4. **Pricing and credits are hard to see programmatically.** We estimated spend from cookbook list prices ($1/$3 per million tokens for Ultra) because the API exposes no price or remaining-credit information, and we could not confirm how hackathon credits apply. A balance/usage endpoint would let applications enforce real budgets.
 5. **Serverless Jobs fit for interactive verification (documentation only).** The documented multi-minute startup and one-hour minimum timeout make per-run Jobs a poor fit for a 120-second interactive target, so verification runs on a CPU host with Docker. A warm-pool or sub-minute job mode would make Jobs usable for interactive agent loops. We did not run Jobs, so this is based on the documentation.
-6. **Instruction following.** Nemotron 3 Ultra followed the citation format reliably (no invalid citations in the reviewed explanations) but did not fully follow an instruction to avoid stating unobserved internal register values.
+6. **Instruction following.** Nemotron 3 Ultra followed the citation format well (7 of 8 evaluation explanations had only valid citations; one cited `queue` as a signal) but did not fully follow an instruction to avoid stating unobserved internal register values.
 
 ## Video
 

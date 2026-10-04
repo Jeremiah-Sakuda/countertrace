@@ -1,9 +1,12 @@
-PYTHON ?= python3
+# Use the project virtualenv once `make setup` has created it.
+PYTHON ?= $(shell [ -x .venv/bin/python ] && echo .venv/bin/python || echo python3)
 VENV_PYTHON := .venv/bin/python
+PYTHON_GUARD = $(PYTHON) -c 'import sys; sys.exit("Countertrace needs Python 3.11 or newer; found " + sys.version.split()[0] + ". Run: make setup PYTHON=python3.12") if sys.version_info < (3, 11) else None'
 
 .PHONY: setup check test test-integration doctor image serve web
 
 setup:
+	@$(PYTHON_GUARD)
 	$(PYTHON) -m venv .venv
 	$(VENV_PYTHON) -m pip install --editable .
 	$(VENV_PYTHON) -c 'from pathlib import Path; p = Path(".env"); p.exists() or p.write_bytes(Path(".env.example").read_bytes())'
@@ -15,6 +18,7 @@ check: test
 
 # Unit tests and negative controls for trusted parsers; no Docker required.
 test:
+	@$(PYTHON_GUARD)
 	PYTHONPATH=src $(PYTHON) -m unittest tests.test_contract tests.test_admission tests.test_evidence tests.test_model tests.test_audit tests.test_runner tests.test_recording tests.test_interface_map
 
 # Runs real RTL in the isolated verifier image. Requires Docker and `make image`.
