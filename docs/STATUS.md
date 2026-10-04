@@ -2,6 +2,14 @@
 
 Last updated: October 4, 2026. This page records what has actually run. The October 4 section reports the first frozen evaluation (eval-v1), which includes an independently authored FIFO held out of prompt development. Everything else uses **development and showcase fixtures authored for this project**. No user study or external review has happened.
 
+## October 4: repair-loop and quota review
+
+An internal review of commit `088840d` recorded the open findings below.
+
+Verified open findings: the feedback-off ablation retains failure summaries and stale trace attribution; an optional system prefix is omitted from token-cap/reservation estimates; and concurrent requests can bypass the per-visitor active-run check. These findings do not establish a false hardware acceptance. The new submission drafts also need latency, citation-example, platform-role, and evaluation-caveat corrections. Free access to live model features and the public video remain submission gaps; a working test build is allowed, and Nebius Cloud hosting is optional. Learner/external review is a score-strengthening opportunity, not an official hackathon entry requirement; the PRD's separate internal acceptance targets still need consistent treatment in release decisions.
+
+The current UI was inspected in a browser at 1280 × 720. Fresh `make check` (73 tests), the web regression, TypeScript checking, and production build passed. GitHub CI for `088840d` passed all jobs, including Docker integration and two clean-replay jobs. Only review documentation changed; no new paid inference or product fixes were performed in this pass.
+
 ## October 4 (final): review fixes
 
 Fixes: repair prompts no longer attribute an old finding to a new candidate; 429 errors fall back a tier; only a run's starter can cancel it; a repair counts as six requests against the hourly quota; covers are labeled environment reachability; variable declaration initializers are rejected; recorded Super interpretations for two examples are visible without a key; claim corrections (feedback causation, bounded label, stale documents); interface fixes (recorded interpretation, neutral unresolved note with a gloss, proved-count hero, page titles, accept feedback, ticking elapsed time, audit exercise that no longer reveals its answer). `make check` passes 73 tests; integration passes 7/7.
