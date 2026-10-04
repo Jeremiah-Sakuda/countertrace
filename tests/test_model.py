@@ -204,6 +204,32 @@ class ModelTest(unittest.TestCase):
         self.assertEqual(spend["estimated_cost_usd"], 1.25)
         self.assertEqual(spend["models_at_default_price"], ["big"])
 
+    def test_spend_threshold_blocks_calls_including_worst_case_reservation(self):
+        ledger = Path(self.tmp.name) / "model_usage.jsonl"
+        env = {**CONFIG, "COUNTERTRACE_MODEL_PRICE_INPUT_PER_MTOK_USD": "1", "COUNTERTRACE_MODEL_PRICE_OUTPUT_PER_MTOK_USD": "3",
+               "COUNTERTRACE_DEPLOYMENT_SPEND_LIMIT_USD": "1"}
+        ledger.write_text(json.dumps({"model_id": "nvidia/test-nemotron", "prompt_tokens": 0, "completion_tokens": 332_000}) + "\n")
+        with mock.patch.dict(os.environ, env), mock.patch.object(model.request, "urlopen") as call:
+            # $0.996 spent (under $1), but adding this call's worst case (2,000 output tokens, about $0.007) would exceed it.
+            result = model.interpret("A FIFO.", Contract(depth=4))
+        self.assertEqual(result["status"], "unavailable")
+        self.assertIn("spend limit", result["detail"])
+        call.assert_not_called()
+
+    def test_server_errors_fall_back_to_the_fast_tier(self):
+        from urllib import error
+
+        decisions = [{"topic": t, "brief_says": None, "status": "matches", "note": ""} for t in model.INTERPRET_TOPICS]
+        good = reply(json.dumps({"summary": "", "decisions": decisions}))
+        failures = [error.HTTPError("u", 503, "busy", {}, io.BytesIO(b"busy")) for _ in range(3)]
+        env = {**CONFIG, "NEBIUS_FAST_MODEL_ID": "", "COUNTERTRACE_FALLBACK_MODEL_ID": "nvidia/backup"}
+        with mock.patch.dict(os.environ, env), mock.patch.object(model.time, "sleep"), \
+                mock.patch.object(model.request, "urlopen", side_effect=failures + [good]) as call:
+            result = model.interpret("A FIFO.", Contract(depth=4))
+        self.assertEqual(result["status"], "ok")
+        self.assertEqual(json.loads(call.call_args[0][0].data)["model"], "nvidia/backup")
+        self.assertEqual(result["calls"][0]["fallback_from"], "nvidia/test-nemotron")
+
     def test_extract_json_handles_fences_and_reasoning(self):
         self.assertEqual(model.extract_json('<think>x</think>```json\n{"a": 1}\n```'), {"a": 1})
         with self.assertRaises(ValueError):

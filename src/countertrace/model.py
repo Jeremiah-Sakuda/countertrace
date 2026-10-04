@@ -222,10 +222,60 @@ def thinking_default(task: str) -> bool:
     return task not in off
 
 
+_RESERVED = {"usd": 0.0}
+_RESERVE_LOCK = threading.Lock()
+
+
+def price_for(cfg: dict, model: str) -> tuple[float, float] | None:
+    per_model = model_prices(cfg).get(model)
+    if per_model:
+        return per_model
+    if cfg["price_in"] is not None and cfg["price_out"] is not None:
+        return cfg["price_in"], cfg["price_out"]
+    return None
+
+
 def chat(task: str, system: str, user: str, max_tokens: int | None = None, model_id: str | None = None,
          temperature: float = 0.2, thinking: bool | None = None) -> tuple[str, dict]:
-    with _CONCURRENCY:  # bound simultaneous inference calls across all visitors
-        return _chat(task, system, user, max_tokens, model_id, temperature, thinking)
+    """One model call with a worst-case spend reservation and a one-step tier fallback.
+
+    The reservation covers the estimated input plus the full output cap, so
+    concurrent calls cannot jointly overshoot the threshold. On a network or
+    5xx failure the call is retried once on COUNTERTRACE_FALLBACK_MODEL_ID
+    (default: the fast tier); the fallback is recorded in the call metadata.
+    """
+    cfg = config()
+    model = model_id or cfg["model_id"]
+    try:
+        return _reserved_call(cfg, task, system, user, max_tokens, model, temperature, thinking)
+    except ModelError as exc:
+        fallback = os.environ.get("COUNTERTRACE_FALLBACK_MODEL_ID", "").strip() or cfg["fast_model_id"]
+        transient = exc.meta.get("status") == "network_error" or str(exc).startswith("HTTP 5")
+        if not (transient and fallback and fallback != model):
+            raise
+        content, meta = _reserved_call(cfg, task, system, user, max_tokens, fallback, temperature, thinking)
+        meta["fallback_from"] = model
+        return content, meta
+
+
+def _reserved_call(cfg, task, system, user, max_tokens, model, temperature, thinking):
+    worst = 0.0
+    price = price_for(cfg, model)
+    if cfg["spend_limit"] is not None and price is not None:
+        out_cap = min(max_tokens or cfg["output_limit"] or 0, cfg["output_limit"] or 0)
+        worst = estimate_tokens(system + user) / 1e6 * price[0] + out_cap / 1e6 * price[1]
+        with _RESERVE_LOCK:
+            spent = spend_summary(cfg)["estimated_cost_usd"] or 0.0
+            if spent + _RESERVED["usd"] + worst > cfg["spend_limit"]:
+                raise ModelError("unavailable", "Deployment spend limit reached (including in-flight reservations).")
+            _RESERVED["usd"] += worst
+    try:
+        with _CONCURRENCY:  # bound simultaneous inference calls across all visitors
+            return _chat(task, system, user, max_tokens, model, temperature, thinking)
+    finally:
+        if worst:
+            with _RESERVE_LOCK:
+                _RESERVED["usd"] -= worst
 
 
 def _chat(task: str, system: str, user: str, max_tokens: int | None, model_id: str | None,
