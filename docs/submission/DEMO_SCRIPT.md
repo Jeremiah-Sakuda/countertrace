@@ -33,7 +33,7 @@ Seven segments. Narration totals about 330 words, roughly 2:15 of speech, which 
 
 **Screen:** Press Run. Show the stages for two or three seconds, then cut (put a small "sped up" caption on the cut). Land on the finding: the cycle table with cycle 6 highlighted and the reference queue. Then open the formal panel and show "Reproduced in simulation."
 
-**Narration:** "The design runs in an isolated container: Verilator simulation, then bounded and unbounded formal checks with SymbiYosys, judged by two independent references. About ten seconds later, the cycle table shows exactly where it breaks. At cycle five the design writes while full, which the contract says to ignore. The formal counterexample replays in simulation, so both engines agree."
+**Narration:** "The design runs in an isolated container: Verilator simulation, then bounded and unbounded formal checks with SymbiYosys, judged by two separately written references. Seconds later, the cycle table shows exactly where it breaks. At cycle five the design writes while full, which the contract says to ignore. The formal counterexample replays in simulation, so both engines agree."
 
 ### 4. Explanation and repair with Nemotron 3 Ultra (1:05 to 1:40)
 

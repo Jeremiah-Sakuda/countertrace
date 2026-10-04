@@ -6,29 +6,23 @@ Last updated: October 4, 2026. This page records what has actually run. The Octo
 
 An internal review found that a design could tie one of its own input bits through a concatenation (`assign {spare, din[7]} = ...`), which the lexical gate missed. With a seeded bit-7 bug, formal then reported bounded pass and proved because the design constrained its own stimulus; simulation failed with a Verilator error, so it could not have become an accepted repair, but the formal results alone were unsound. Fixed: the host now checks the elaborated netlist and fails integrity when any input bit is a constant, aliases another input, or is driven by a cell, for both canonical and mapped designs. Observed: a nested-brace variant that still passes the lexical gate now ends with every obligation a tool error and two integrity notes; the bundled survey and the mapped independent FIFO are unchanged. The lexical gate also now catches input bits in a concatenation, escaped identifiers, `typedef`, `var`, `time`, `real`, `checker`, `let`, wired nets, and initializers in labeled generate blocks, and no longer reads two `always @(*)` blocks as an attribute. `make check` passes 80 unit tests; `make test-integration` passes 8/8.
 
-Claim corrections from the same pass: test counts, "separately written" references, the digest-pinned base image, the two-bug case (the first candidate moved the first failure from cycle 1 to cycle 4; it did not change any obligation result), check-set proposals removed from the routing tables (implemented but not exercised in a recorded run), the seeded showcase bug in the demo script, TESTING timing and what works without a key, and recorded titles without em dashes.
+Claim corrections: test counts, "separately written" references, the digest-pinned base image, the two-bug case (the first candidate moved the first failure from cycle 1 to cycle 4; it did not change any obligation result), check-set proposals removed from the routing tables (implemented but not exercised in a recorded run), the seeded showcase bug in the demo script, TESTING timing and what works without a key, and recorded titles without em dashes.
 
-## October 4: repair-loop and quota review
+## October 4: repair-loop and quota fixes
 
-An internal review of commit `088840d` recorded the open findings below.
+Fixed in `aa745b3`: the feedback-off switch now hides failure details from the model (it learns only that a candidate was rejected) and no longer attributes an old trace to a new candidate; the optional system prefix is counted in token-cap and spend-reservation estimates; and a visitor's run slot is claimed atomically, so concurrent requests cannot start two runs. None of these produced a false hardware acceptance. GitHub CI for `088840d` passed all jobs, including Docker integration and two clean-replay jobs.
 
-Verified findings at the time (fixed in `aa745b3`): the feedback-off ablation retains failure summaries and stale trace attribution; an optional system prefix is omitted from token-cap/reservation estimates; and concurrent requests can bypass the per-visitor active-run check. These findings do not establish a false hardware acceptance. The new submission drafts also need latency, citation-example, platform-role, and evaluation-caveat corrections. Free access to live model features and the public video remain submission gaps; a working test build is allowed, and Nebius Cloud hosting is optional. Learner/external review is a score-strengthening opportunity, not an official hackathon entry requirement; the PRD's separate internal acceptance targets still need consistent treatment in release decisions.
+Earlier fixes the same day: repair prompts no longer attribute an old finding to a new candidate; 429 errors fall back a tier; only a run's starter can cancel it; a repair counts as six requests against the hourly quota; covers are labeled environment reachability; variable declaration initializers are rejected; recorded Super interpretations for two examples are visible without a key; claim corrections (feedback causation, bounded label, stale documents); interface fixes (recorded interpretation, neutral unresolved note with a gloss, proved-count hero, page titles, accept feedback, ticking elapsed time, audit exercise that no longer reveals its answer).
 
-The current UI was inspected in a browser at 1280 × 720. Fresh `make check` (73 tests), the web regression, TypeScript checking, and production build passed. GitHub CI for `088840d` passed all jobs, including Docker integration and two clean-replay jobs. Only review documentation changed; no new paid inference or product fixes were performed in this pass.
+## October 4: admission hardening and repair ablation
 
-## October 4 (final): review fixes
-
-Fixes: repair prompts no longer attribute an old finding to a new candidate; 429 errors fall back a tier; only a run's starter can cancel it; a repair counts as six requests against the hourly quota; covers are labeled environment reachability; variable declaration initializers are rejected; recorded Super interpretations for two examples are visible without a key; claim corrections (feedback causation, bounded label, stale documents); interface fixes (recorded interpretation, neutral unresolved note with a gloss, proved-count hero, page titles, accept feedback, ticking elapsed time, audit exercise that no longer reveals its answer). `make check` passes 73 tests; integration passes 7/7.
-
-## October 4 (latest): admission hardening and repair ablation
-
-- **Admission hardening** after a judge admitted five constructs in real pipeline runs (none produced a false pass; the second engine or a tool error caught each): clock-name shadowing and port redeclaration, hidden continuation ports (`input wire a, b`), delays, non-edge or qualified event controls, `wait`, `edge`, `defparam`, `inout`, hierarchical references, and assignments to inputs are now rejected, and the elaborated DUT ports are checked against an interface mapping. Negative-control tests cover each.
+- **Admission hardening** after five constructs were admitted in real pipeline runs (none produced a false pass; the second engine or a tool error caught each): clock-name shadowing and port redeclaration, hidden continuation ports (`input wire a, b`), delays, non-edge or qualified event controls, `wait`, `edge`, `defparam`, `inout`, hierarchical references, and assignments to inputs are now rejected, and the elaborated DUT ports are checked against an interface mapping. Negative-control tests cover each.
 - **Bounded-check label** now states 23 cycles for 24 solver steps.
 - **Repair ablation** ([report](../evaluation/results/eval-v2-ablation/REPORT.md)) on the frozen eval-v2 suite: Super 8/8, Nano 6/8, Ultra without counterexample feedback 7/8, failing only the two-bug case that feedback solved.
 - **Cost control:** worst-case spend reservation per in-flight call and one fallback to the fast tier on network or 5xx errors, both tested.
 - **Interface:** repair timeline with the fed-back counterexample, honest rejected-candidate wording, code ligatures off, ledger and audit-exercise fixes.
 
-## October 4 (later): review fixes and eval-v2
+## October 4: review fixes and eval-v2
 
 An internal review found an admission bypass, repair-loop gaps, and documentation errors. Fixed and verified:
 
