@@ -52,6 +52,16 @@ PROHIBITED_KEYWORDS = {
     "edge": "Dual-edge event controls are not supported; use posedge clk.",
     "defparam": "defparam is not supported; use the module's parameters.",
     "inout": "Bidirectional ports are not supported.",
+    "typedef": "Type definitions are outside the supported subset.",
+    "var": "var declarations are outside the supported subset; use reg or logic.",
+    "time": "time variables are not supported.",
+    "realtime": "realtime variables are not supported.",
+    "real": "real variables are not supported.",
+    "checker": "checker blocks are outside the supported subset.",
+    "let": "let declarations are outside the supported subset.",
+    "wor": "Wired-OR nets are not supported.",
+    "wand": "Wired-AND nets are not supported.",
+    "trireg": "Charge-storage nets are not supported.",
 }
 PROHIBITED_ATTRIBUTES = re.compile(r"\(\*.*?\*\)", re.S)
 
@@ -216,7 +226,12 @@ def admit(source: bytes | str, mapping: dict | None = None) -> Admission:
         return result
     if "*/" in code:
         diag(Diagnostic("comment", "Stray end of block comment."))
-    for match in PROHIBITED_ATTRIBUTES.finditer(code):
+    if "\\" in code:
+        diag(Diagnostic("construct", "Escaped identifiers (starting with a backslash) are not supported.",
+                        line_of(code, code.index("\\"))))
+    # `@(*)` is an event control, not an attribute; blank it (same length) first.
+    attr_code = re.sub(r"@\s*\(\s*\*\s*\)", lambda m: "@" + re.sub(r"\S", " ", m.group()[1:]), code)
+    for match in PROHIBITED_ATTRIBUTES.finditer(attr_code):
         diag(Diagnostic("attribute", "Attributes such as (* anyconst *) or (* keep *) are not accepted.",
                         line_of(code, match.start())))
     for match in re.finditer(r"`\s*([A-Za-z_]\w*)", code):
@@ -293,7 +308,7 @@ def admit(source: bytes | str, mapping: dict | None = None) -> Admission:
         clock = mapping["ports"]["clk"] if mapping else "clk"
         body = code[(header_end + 2) if header_end >= 0 else len(code):]
         for chunk_start, chunk in _statements(body):
-            if re.search(r"(?:^|\bbegin\b|\bend\b)\s*(?:reg|logic|integer|bit|int|byte|shortint|longint)\b[^=;]*=(?!=)", chunk):
+            if re.search(r"(?:^|\b(?:begin|end)\b(?:\s*:\s*[A-Za-z_]\w*)?)\s*(?:reg|logic|integer|bit|int|byte|shortint|longint)\b[^=;]*=(?!=)", chunk):
                 diag(Diagnostic("construct", "Variable declaration initializers act like initial blocks; set values in reset instead.",
                                 line_of(code, header_end + 2 + chunk_start)))
         for name, port in result.ports.items():
@@ -301,7 +316,8 @@ def admit(source: bytes | str, mapping: dict | None = None) -> Admission:
             if redeclared and re.search(rf"\b{name}\b", redeclared.group().split("=")[0]):
                 diag(Diagnostic("interface", f"Port {name} is redeclared inside the module body.", line_of(code, header_end + 2 + redeclared.start())))
             if port["direction"] == "input":
-                driven = re.search(rf"(?:\bassign\s+{name}\b|(?<![.\w]){name}\s*(?:\[[^\]]*\]\s*)?(?:<=|=)(?!=))", body)
+                driven = re.search(rf"(?:\bassign\s+{name}\b|(?<![.\w]){name}\s*(?:\[[^\]]*\]\s*)?(?:<=|=)(?!=)"
+                                   rf"|\{{[^{{}};]*(?<![.\w]){name}\b[^{{}};]*\}}\s*(?:<=|=)(?!=))", body)
                 if driven:
                     diag(Diagnostic("interface", f"Input port {name} is assigned inside the module.", line_of(code, header_end + 2 + driven.start())))
         for match in re.finditer(r"@", code):
@@ -328,7 +344,7 @@ def check_ports_json(ports_json: dict, module: str, width: int) -> list[Diagnost
     """Validate the Yosys-elaborated interface written by the worker."""
     problems = []
     modules = ports_json.get("modules", {})
-    from countertrace.interface_map import elaborated_name_matches
+    from countertrace.interface_map import elaborated_name_matches, input_drive_problems
 
     mod = next((m for name, m in modules.items() if elaborated_name_matches(name, module)), None)
     if mod is None:
@@ -344,4 +360,5 @@ def check_ports_json(ports_json: dict, module: str, width: int) -> list[Diagnost
         port = ports.get(name)
         if port and (port.get("direction") != direction or len(port.get("bits", [])) != bits):
             problems.append(Diagnostic("elaboration", f"Elaborated port {name} is not a {bits}-bit {direction}."))
+    problems.extend(Diagnostic("elaboration", message) for message in input_drive_problems(mod))
     return problems

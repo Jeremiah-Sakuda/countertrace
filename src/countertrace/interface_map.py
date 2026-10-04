@@ -106,6 +106,37 @@ def elaborated_name_matches(name: str, module: str) -> bool:
             or name.startswith(f"$paramod\\{module}\\"))
 
 
+def input_drive_problems(module: dict) -> list[str]:
+    """Inputs must stay free nets after elaboration.
+
+    The netlist is the authority here, not the lexical gate: an input bit that
+    became a constant, aliases another input, or is driven by a cell was
+    assigned inside the design, which would let it constrain its own stimulus.
+    """
+    ports = module.get("ports", {})
+    driven = set()
+    for cell in module.get("cells", {}).values():
+        for pin, direction in cell.get("port_directions", {}).items():
+            if direction != "input":
+                driven.update(b for b in cell.get("connections", {}).get(pin, []) if isinstance(b, int))
+    seen: dict[int, str] = {}
+    problems = []
+    for name, port in sorted(ports.items()):
+        if port.get("direction") != "input":
+            continue
+        for index, bit in enumerate(port.get("bits", [])):
+            where = f"{name}[{index}]" if len(port["bits"]) > 1 else name
+            if not isinstance(bit, int):
+                problems.append(f"Input {where} is tied to a constant inside the design.")
+            elif bit in seen:
+                problems.append(f"Input {where} is connected to input {seen[bit]} inside the design.")
+            elif bit in driven:
+                problems.append(f"Input {where} is driven inside the design.")
+            if isinstance(bit, int):
+                seen.setdefault(bit, where)
+    return problems
+
+
 def check_dut_ports(netlist: dict, mapping: dict, width: int) -> list[str]:
     """Check the elaborated DUT module (not only the wrapper) against the mapping."""
     m = validate(mapping)
@@ -131,4 +162,5 @@ def check_dut_ports(netlist: dict, mapping: dict, width: int) -> list[str]:
         port = ports.get(m["ports"][canonical])
         if port and len(port.get("bits", [])) != 1:
             problems.append(f"Elaborated DUT port {m['ports'][canonical]} is not one bit.")
+    problems.extend(input_drive_problems(dut))
     return problems

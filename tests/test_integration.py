@@ -63,6 +63,19 @@ class IntegrationTest(unittest.TestCase):
         self.assertNotIn("proved", statuses(state).values())
         self.assertNotIn("simulation_passed", statuses(state).values())
 
+    def test_design_that_drives_its_own_input_never_passes(self):
+        """A tied input bit once constrained the formal stimulus and was reported proved.
+
+        Nested braces slip past the lexical gate on purpose; the elaborated netlist must catch it.
+        """
+        source = catalog.base_source("fifo_count.v").replace(
+            "assign empty", "wire spare;\n    assign {{spare}, din[7]} = 2'b00;\n    assign empty")
+        state = verify(source, 2)
+        self.assertTrue(any("din[7] is tied to a constant" in p for p in state["integrity"]), state["integrity"])
+        self.assertNotIn("proved", statuses(state).values())
+        self.assertNotIn("bounded_pass", statuses(state).values())
+        self.assertNotIn("simulation_passed", statuses(state).values())
+
     def test_cancellation_never_passes(self):
         cancel = threading.Event()
         cancel.set()

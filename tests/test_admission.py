@@ -83,6 +83,30 @@ class AdmissionTest(unittest.TestCase):
             with self.subTest(name):
                 self.assert_rejected(self.mutate("assign empty", body), code)
 
+    def test_rejects_input_drives_and_lexical_holes(self):
+        """These were once admitted; the elaborated netlist check is the authority for inputs."""
+        cases = {
+            "input bit in a continuous concatenation": ("wire spare;\n    assign {spare, din[7]} = 2'b00;\n    assign empty", "interface"),
+            "input bit in a procedural concatenation": ("reg spare;\n    always @(*) {spare, din[7]} = 2'b00;\n    assign empty", "interface"),
+            "escaped hierarchical reference": ("wire peek = ct_formal_top.\\ref_count ;\n    assign empty", "construct"),
+            "typedef initializer": ("typedef logic [1:0] t2;\n    t2 q = 2'b01;\n    assign empty", "construct"),
+            "var initializer": ("var logic q = 1'b1;\n    assign empty", "construct"),
+            "time initializer": ("time t = 5;\n    assign empty", "construct"),
+            "labeled generate initializer": ("if (1) begin : g reg x = 1'b1; end\n    assign empty", "construct"),
+            "checker": ("checker c; endchecker\n    assign empty", "construct"),
+            "let": ("let f(a) = a;\n    assign empty", "construct"),
+            "wired-or net": ("wor w;\n    assign empty", "construct"),
+        }
+        for name, (body, code) in cases.items():
+            with self.subTest(name):
+                self.assert_rejected(self.mutate("assign empty", body), code)
+
+    def test_combinational_event_controls_are_not_attributes(self):
+        body = "reg a1, a2;\n    always @(*) a1 = wr_en;\n    always @ ( * ) a2 = rd_en;\n    assign empty"
+        result = admit(self.mutate("assign empty", body))
+        self.assertTrue(result.accepted, [d.message for d in result.diagnostics])
+        self.assert_rejected(self.mutate("assign empty", "always @(*) a1 = wr_en;\n    (* keep *) wire k;\n    assign empty"), "attribute")
+
     def test_variable_declaration_initializers_are_rejected_like_initial(self):
         self.assert_rejected(self.mutate("reg [AW:0]      count;", "reg [AW:0]      count = 0;"), "construct")
         self.assert_rejected(self.mutate("reg [AW:0]      count;", "logic [AW:0]    count = '0;"), "construct")
@@ -118,13 +142,34 @@ class AdmissionTest(unittest.TestCase):
         good = {"modules": {"$paramod\\fifo\\DEPTH=4": {"ports": {
             "clk": {"direction": "input", "bits": [2]}, "rst": {"direction": "input", "bits": [3]},
             "wr_en": {"direction": "input", "bits": [4]}, "rd_en": {"direction": "input", "bits": [5]},
-            "din": {"direction": "input", "bits": list(range(8))}, "dout": {"direction": "output", "bits": list(range(8))},
-            "full": {"direction": "output", "bits": [6]}, "empty": {"direction": "output", "bits": [7]}}}}}
+            "din": {"direction": "input", "bits": list(range(6, 14))}, "dout": {"direction": "output", "bits": list(range(20, 28))},
+            "full": {"direction": "output", "bits": [30]}, "empty": {"direction": "output", "bits": [31]}}}}}
         self.assertEqual(check_ports_json(good, "fifo", 8), [])
         bad = {"modules": {"fifo": {"ports": {**good["modules"]["$paramod\\fifo\\DEPTH=4"]["ports"],
                                               "dout": {"direction": "output", "bits": [1]}}}}}
         self.assertTrue(check_ports_json(bad, "fifo", 8))
         self.assertTrue(check_ports_json({"modules": {}}, "fifo", 8))
+
+    def test_elaborated_inputs_must_be_free_nets(self):
+        """Input bits tied to constants, aliased to other inputs, or driven by cells are rejected."""
+        def netlist(din_bits, cells=None):
+            ports = {"clk": {"direction": "input", "bits": [2]}, "rst": {"direction": "input", "bits": [3]},
+                     "wr_en": {"direction": "input", "bits": [4]}, "rd_en": {"direction": "input", "bits": [5]},
+                     "din": {"direction": "input", "bits": din_bits},
+                     "dout": {"direction": "output", "bits": list(range(20, 28))},
+                     "full": {"direction": "output", "bits": [30]}, "empty": {"direction": "output", "bits": [31]}}
+            return {"modules": {"fifo": {"ports": ports, "cells": cells or {}}}}
+
+        free = list(range(6, 14))
+        self.assertEqual(check_ports_json(netlist(free), "fifo", 8), [])
+        tied = check_ports_json(netlist(free[:7] + ["0"]), "fifo", 8)
+        self.assertEqual([d.message for d in tied], ["Input din[7] is tied to a constant inside the design."])
+        aliased = check_ports_json(netlist(free[:7] + [4]), "fifo", 8)
+        self.assertTrue(any("connected to input" in d.message for d in aliased))
+        cell = {"$and": {"type": "$and", "port_directions": {"A": "input", "B": "input", "Y": "output"},
+                         "connections": {"A": [2], "B": [3], "Y": [13]}}}
+        driven = check_ports_json(netlist(free, cell), "fifo", 8)
+        self.assertEqual([d.message for d in driven], ["Input din[7] is driven inside the design."])
 
 
 if __name__ == "__main__":
