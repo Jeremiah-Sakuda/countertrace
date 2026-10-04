@@ -211,7 +211,12 @@ class Verification:
             if not ports_path.is_file():
                 problems.append(f"{kind}: elaborated interface was not produced")
             else:
-                for d in check_ports_json(json.loads(ports_path.read_text()),
+                netlist = json.loads(ports_path.read_text())
+                if self.interface_map:
+                    from countertrace.interface_map import check_dut_ports
+
+                    problems.extend(f"{kind}: {p}" for p in check_dut_ports(netlist, self.interface_map, self.contract.width))
+                for d in check_ports_json(netlist,
                                           WRAPPER if self.interface_map else self.state["admission"]["module"],
                                           self.contract.width):
                     problems.append(f"{kind}: {d.message}")
@@ -360,8 +365,10 @@ class Verification:
                                     detail=f"Solver step {fstep} (application cycle {fstep - 1}); trace {rel}/{task}/trace.vcd")
                 elif status == "PASS" and task == "bmc":
                     self.obligation(**common, status="bounded_pass", depth=depth,
-                                    label=f"No counterexample within {depth} cycles",
-                                    detail="Bounded model check from reset with the contract assumptions.")
+                                    label=f"No counterexample within {depth - 1} cycles",
+                                    cycles_checked=depth - 1,
+                                    detail=f"Bounded model check from reset with the contract assumptions: {depth} solver "
+                                           f"steps check application cycles 0-{depth - 2} (outputs are checked one step after each edge).")
                 elif status == "PASS" and task == "prove":
                     self.obligation(**common, status="proved",
                                     detail=f"Unbounded proof (abc pdr) for DEPTH={self.contract.depth}, WIDTH={self.contract.width} under the listed assumptions.")

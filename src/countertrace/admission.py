@@ -47,6 +47,11 @@ PROHIBITED_KEYWORDS = {
     "primitive": "User-defined primitives are not supported.",
     "config": "Configurations are not supported.",
     "library": "Library declarations are not supported.",
+    "iff": "Qualified event controls are not supported; use posedge clk with an if statement.",
+    "wait": "wait statements are not synthesizable and are not supported.",
+    "edge": "Dual-edge event controls are not supported; use posedge clk.",
+    "defparam": "defparam is not supported; use the module's parameters.",
+    "inout": "Bidirectional ports are not supported.",
 }
 PROHIBITED_ATTRIBUTES = re.compile(r"\(\*.*?\*\)", re.S)
 
@@ -121,6 +126,52 @@ def strip_comments(text: str) -> str:
             out.append(c)
             i += 1
     return "".join(out)
+
+
+def parse_ports(header: str) -> tuple[dict[str, dict], list[str]]:
+    """Parse an ANSI port list, including continuation names (`input wire a, b`)."""
+    text = header.strip()
+    if text.startswith("#"):
+        depth, i = 0, text.index("(")
+        for i in range(i, len(text)):
+            depth += {"(": 1, ")": -1}.get(text[i], 0)
+            if depth == 0:
+                break
+        text = text[i + 1:]
+    start = text.find("(")
+    if start < 0:
+        return {}, ["The module header has no port list."]
+    body = text[start + 1:]
+    items, depth, current = [], 0, []
+    for ch in body:
+        if ch in "([{":
+            depth += 1
+        elif ch in ")]}":
+            depth -= 1
+        if ch == "," and depth == 0:
+            items.append("".join(current))
+            current = []
+        else:
+            current.append(ch)
+    items.append("".join(current))
+    ports: dict[str, dict] = {}
+    problems: list[str] = []
+    direction = rng = None
+    for item in (i.strip() for i in items):
+        if not item:
+            continue
+        m = re.fullmatch(r"(input|output)\b\s*(?:wire|reg|logic|var)?\s*(?:signed\s*)?(\[[^\]]*\])?\s*([A-Za-z_]\w*)", item)
+        if m:
+            direction, rng, name = m.group(1), m.group(2), m.group(3)
+        elif direction and re.fullmatch(r"[A-Za-z_]\w*", item):
+            name = item  # continuation inherits the previous direction and range
+        else:
+            problems.append(f"Unrecognized port declaration: {item[:60]!r}.")
+            continue
+        if name in ports:
+            problems.append(f"Port {name} is declared twice.")
+        ports[name] = {"direction": direction, "range": rng or None}
+    return ports, problems
 
 
 def line_of(text: str, index: int) -> int:
@@ -202,10 +253,9 @@ def admit(source: bytes | str, mapping: dict | None = None) -> Admission:
             if name not in result.parameters:
                 diag(Diagnostic("interface", f"Parameter {name} ({canonical}) must be declared in the module header.",
                                 alternative="Declare `parameter integer DEPTH = 4, parameter integer WIDTH = 8`."))
-        for direction, rng, name in re.findall(
-            r"\b(input|output)\b\s*(?:wire|reg|logic)?\s*(\[[^\]]*\])?\s*([A-Za-z_]\w*)", header
-        ):
-            result.ports[name] = {"direction": direction, "range": rng or None}
+        result.ports, port_problems = parse_ports(header)
+        for problem in port_problems:
+            diag(Diagnostic("interface", problem))
         if mapping:
             expected = expected_ports(mapping)
         else:
@@ -232,6 +282,23 @@ def admit(source: bytes | str, mapping: dict | None = None) -> Admission:
             diag(Diagnostic("interface", f"Unexpected ports: {', '.join(extra)}.",
                             alternative="Declare them as unused outputs in an interface mapping, if they are outputs."))
         clock = mapping["ports"]["clk"] if mapping else "clk"
+        body = code[(header_end + 2) if header_end >= 0 else len(code):]
+        for name, port in result.ports.items():
+            redeclared = re.search(rf"\b(?:wire|reg|logic|integer|genvar|tri|supply0|supply1)\b[^;]*?\b{name}\b\s*(?:\[[^\]]*\]\s*)?(?:=|;|,)", body)
+            if redeclared and re.search(rf"\b{name}\b", redeclared.group().split("=")[0]):
+                diag(Diagnostic("interface", f"Port {name} is redeclared inside the module body.", line_of(code, header_end + 2 + redeclared.start())))
+            if port["direction"] == "input":
+                driven = re.search(rf"(?:\bassign\s+{name}\b|(?<![.\w]){name}\s*(?:\[[^\]]*\]\s*)?(?:<=|=)(?!=))", body)
+                if driven:
+                    diag(Diagnostic("interface", f"Input port {name} is assigned inside the module.", line_of(code, header_end + 2 + driven.start())))
+        for match in re.finditer(r"@", code):
+            rest = code[match.end():]
+            if not re.match(rf"\s*(?:\*|\(\s*\*\s*\)|\(\s*posedge\s+{clock}\s*\))", rest):
+                diag(Diagnostic("clocking", "Only @(posedge clk) and @* event controls are supported.", line_of(code, match.start())))
+        for match in re.finditer(r"#(?!\s*\()", code):
+            diag(Diagnostic("construct", "Delays (#) are not supported; timing comes from the clock.", line_of(code, match.start())))
+        for match in re.finditer(r"(?<![\w'.])[A-Za-z_]\w*\s*\.\s*[A-Za-z_]\w*", code):
+            diag(Diagnostic("construct", "Hierarchical references are not supported.", line_of(code, match.start())))
         clocks = set(re.findall(r"@\s*\(\s*posedge\s+([A-Za-z_]\w*)", code))
         if clocks - {clock}:
             diag(Diagnostic("clocking", f"Only posedge clk is supported; found {sorted(clocks)}.",
@@ -248,7 +315,9 @@ def check_ports_json(ports_json: dict, module: str, width: int) -> list[Diagnost
     """Validate the Yosys-elaborated interface written by the worker."""
     problems = []
     modules = ports_json.get("modules", {})
-    mod = next((m for name, m in modules.items() if name == module or name.startswith(f"$paramod\\{module}\\")), None)
+    from countertrace.interface_map import elaborated_name_matches
+
+    mod = next((m for name, m in modules.items() if elaborated_name_matches(name, module)), None)
     if mod is None:
         return [Diagnostic("elaboration", f"Module {module} was not found after elaboration.")]
     ports = mod.get("ports", {})

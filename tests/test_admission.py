@@ -64,6 +64,32 @@ class AdmissionTest(unittest.TestCase):
         self.assert_rejected(self.mutate("assign empty", "/* never closed\n    assign empty"), "lexical")
         self.assert_rejected(self.mutate("assign empty", 'wire s = "abc;\n    assign empty'), "lexical")
 
+    def test_rejects_constructs_found_in_review(self):
+        """Each case was admitted before an internal review; none produced a false pass downstream."""
+        cases = {
+            "clock shadowed in a generate block": (
+                "wire clk_inv = ~clk;\n    if (1) begin : g\n        wire clk = clk_inv;\n        always @(posedge clk) begin end\n    end\n    assign empty", "interface"),
+            "delay": ("always @(posedge clk) #1 count <= count;\n    assign empty", "construct"),
+            "level-sensitive event": ("always @(clk) begin end\n    assign empty", "clocking"),
+            "qualified event": ("always @(posedge clk iff wr_en) begin end\n    assign empty", "construct"),
+            "dual edge": ("always @(edge clk) begin end\n    assign empty", "construct"),
+            "wait": ("always @* begin wait (rst); end\n    assign empty", "construct"),
+            "defparam": ("defparam x.DEPTH = 2;\n    assign empty", "construct"),
+            "assign to input": ("assign rst = 1'b0;\n    assign empty", "interface"),
+            "procedural write to input": ("always @(posedge clk) wr_en <= 1'b0;\n    assign empty", "interface"),
+            "upward reference": ("wire peek = ct_formal_top.ref_full;\n    assign empty", "construct"),
+        }
+        for name, (body, code) in cases.items():
+            with self.subTest(name):
+                self.assert_rejected(self.mutate("assign empty", body), code)
+
+    def test_hidden_continuation_port_is_seen(self):
+        source = self.mutate("input  wire             rd_en,", "input  wire             rd_en, bypass,")
+        self.assert_rejected(source, "interface")
+        result = admit(source)
+        self.assertIn("bypass", result.ports)
+        self.assertEqual(result.ports["bypass"]["direction"], "input")
+
     def test_independent_fifo_admitted_only_with_its_mapping(self):
         import json
         from pathlib import Path

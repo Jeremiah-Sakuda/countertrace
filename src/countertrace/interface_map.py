@@ -98,3 +98,37 @@ def load(path) -> dict:
     from pathlib import Path
 
     return validate(json.loads(Path(path).read_text()))
+
+
+def elaborated_name_matches(name: str, module: str) -> bool:
+    """Yosys names parameterized copies `$paramod$<hash>\\name` or `$paramod\\name\\P=V`."""
+    return (name == module or (name.startswith("$paramod") and name.endswith("\\" + module))
+            or name.startswith(f"$paramod\\{module}\\"))
+
+
+def check_dut_ports(netlist: dict, mapping: dict, width: int) -> list[str]:
+    """Check the elaborated DUT module (not only the wrapper) against the mapping."""
+    m = validate(mapping)
+    modules = netlist.get("modules", {})
+    dut = next((mod for name, mod in modules.items() if elaborated_name_matches(name, m["module"])), None)
+    if dut is None:
+        return [f"Elaborated module {m['module']} not found."]
+    ports = dut.get("ports", {})
+    expected = {name: direction for name, (direction, _) in expected_ports(m).items()}
+    problems = []
+    if set(ports) != set(expected):
+        extra, missing = sorted(set(ports) - set(expected)), sorted(set(expected) - set(ports))
+        problems.append(f"Elaborated DUT ports differ from the mapping (extra: {extra}, missing: {missing}).")
+    for name, direction in expected.items():
+        port = ports.get(name)
+        if port and port.get("direction") != direction:
+            problems.append(f"Elaborated DUT port {name} is not an {direction}.")
+    for canonical in ("din", "dout"):
+        port = ports.get(m["ports"][canonical])
+        if port and len(port.get("bits", [])) != width:
+            problems.append(f"Elaborated DUT port {m['ports'][canonical]} is not {width} bits.")
+    for canonical in ("clk", "rst", "wr_en", "rd_en", "full", "empty"):
+        port = ports.get(m["ports"][canonical])
+        if port and len(port.get("bits", [])) != 1:
+            problems.append(f"Elaborated DUT port {m['ports'][canonical]} is not one bit.")
+    return problems
