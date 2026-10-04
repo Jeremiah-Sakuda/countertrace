@@ -2,6 +2,10 @@
 
 Last updated: October 4, 2026. This page records what has actually run. The October 4 section reports the first frozen evaluation (eval-v1), which includes an independently authored FIFO held out of prompt development. Everything else uses **development and showcase fixtures authored for this project**. No user study or external review has happened.
 
+## October 4 (final): review fixes
+
+Fixes: repair prompts no longer attribute an old finding to a new candidate; 429 errors fall back a tier; only a run's starter can cancel it; a repair counts as six requests against the hourly quota; covers are labeled environment reachability; variable declaration initializers are rejected; recorded Super interpretations for two examples are visible without a key; claim corrections (feedback causation, bounded label, stale documents); interface fixes (recorded interpretation, neutral unresolved note with a gloss, proved-count hero, page titles, accept feedback, ticking elapsed time, audit exercise that no longer reveals its answer). `make check` passes 73 tests; integration passes 7/7.
+
 ## October 4 (latest): admission hardening and repair ablation
 
 - **Admission hardening** after a judge admitted five constructs in real pipeline runs (none produced a false pass; the second engine or a tool error caught each): clock-name shadowing and port redeclaration, hidden continuation ports (`input wire a, b`), delays, non-edge or qualified event controls, `wait`, `edge`, `defparam`, `inout`, hierarchical references, and assignments to inputs are now rejected, and the elaborated DUT ports are checked against an interface mapping. Negative-control tests cover each.

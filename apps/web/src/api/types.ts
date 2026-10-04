@@ -116,6 +116,8 @@ export interface ExampleDetail extends Example {
   source: string;
   contract: Contract;
   contract_hash: string;
+  /** A stored model interpretation of this example's brief, shown read-only so it is visible without a model key. */
+  recorded_interpretation?: RecordedInterpretation | null;
 }
 
 // ---- Check sets and recorded runs -----------------------------------------
@@ -392,7 +394,7 @@ export type DecisionStatus = "matches" | "conflict" | "unspecified" | "unsupport
 export interface Decision {
   topic: string;
   contract: string;
-  brief_says: string;
+  brief_says: string | null;
   status: DecisionStatus;
   note: string;
 }
@@ -406,6 +408,14 @@ export interface InterpretationResult {
 export interface Interpretation extends ModelResult<InterpretationResult> {
   blocking?: string[];
   needs_decision?: string[];
+}
+
+export interface RecordedInterpretation extends Interpretation {
+  recorded: true;
+  recorded_at?: string | null;
+  note?: string | null;
+  /** The brief the recording interpreted. */
+  brief?: string | null;
 }
 
 export interface ExplanationStep {

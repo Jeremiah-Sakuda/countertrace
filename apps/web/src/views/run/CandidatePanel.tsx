@@ -162,16 +162,26 @@ function findingText(f: Finding): string {
  * Both findings are read from the runs; no judgement of the change is implied beyond the cycle numbers.
  */
 function PartialProgress({ parent, candidate }: { parent: Finding; candidate: Finding | undefined }) {
+  // Cycle numbers are local to each test, so "moved" is only said when both mismatches are in the same test.
+  const sameTest = candidate !== undefined && candidate.test === parent.test;
   let headline: string;
+  let sub: string | null = null;
   if (!candidate) headline = "This candidate recorded no counterexample trace";
-  else if (candidate.cycle > parent.cycle) headline = `First mismatch moved from cycle ${parent.cycle} to cycle ${candidate.cycle}`;
-  else if (candidate.cycle < parent.cycle) headline = `First mismatch moved earlier, from cycle ${parent.cycle} to cycle ${candidate.cycle}`;
-  else if (candidate.test === parent.test && candidate.check === parent.check) headline = `First mismatch unchanged at cycle ${parent.cycle}`;
-  else headline = `First mismatch still at cycle ${parent.cycle}, on a different check or test`;
+  else if (!sameTest) {
+    headline = `First mismatch is now in ${candidate.test} at cycle ${candidate.cycle}`;
+    sub = `(the parent's was ${parent.test} at cycle ${parent.cycle}); cycle numbers are local to each test.`;
+  }
+  else if (candidate.cycle > parent.cycle) headline = `First mismatch in ${parent.test} moved from cycle ${parent.cycle} to cycle ${candidate.cycle}`;
+  else if (candidate.cycle < parent.cycle) headline = `First mismatch in ${parent.test} moved earlier, from cycle ${parent.cycle} to cycle ${candidate.cycle}`;
+  else if (candidate.check === parent.check) headline = `First mismatch unchanged: ${parent.test}, cycle ${parent.cycle}`;
+  else headline = `First mismatch still at cycle ${parent.cycle} of ${parent.test}, on a different check`;
   return (
     <div className="progress-note">
       <h3 className="subhead">Progress against the parent</h3>
-      <p className="progress-headline">{headline}</p>
+      <p className="progress-headline">
+        {headline}
+        {sub && <span className="progress-sub"> {sub}</span>}
+      </p>
       <dl className="progress-pair">
         <div>
           <dt>Parent's first mismatch</dt>
@@ -185,7 +195,7 @@ function PartialProgress({ parent, candidate }: { parent: Finding; candidate: Fi
       </dl>
       <p className="muted small">
         A partial fix can remove one bug and still leave the same obligations failing on another, so the before-and-after table below may show
-        no status changes even when the first mismatch moved. The candidate was rejected because at least one unchanged obligation still fails.
+        no status changes even when the first mismatch changed. The candidate was rejected because at least one unchanged obligation still fails.
       </p>
     </div>
   );

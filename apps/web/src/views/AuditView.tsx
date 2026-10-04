@@ -1,4 +1,4 @@
-import { Ban, Bot, CircleCheck, CircleHelp, CircleX, Equal, EyeOff, FlaskConical, GraduationCap, LoaderCircle, Play, ScanSearch, ShieldAlert, Wrench, type LucideIcon } from "lucide-react";
+import { Ban, Bot, CircleCheck, CircleHelp, CircleX, Eye, Equal, EyeOff, FlaskConical, GraduationCap, LoaderCircle, Play, ScanSearch, ShieldAlert, Wrench, type LucideIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import { api } from "../api/client";
 import type { Audit, CheckSet, CheckSetProposal, Mutant, MutantClassification, Profile, Run } from "../api/types";
@@ -6,7 +6,7 @@ import { Callout, Disclosure, ErrorNotice, KeyValue, Loading, Section, TableScro
 import { ModelCalls, ModelStatusNotice } from "../components/ModelResult";
 import { Badge, type Tone } from "../components/StatusBadge";
 import { formatDateTime, humanize } from "../lib/format";
-import { useAsync, type AsyncState } from "../lib/hooks";
+import { useAsync, useDocumentTitle, type AsyncState } from "../lib/hooks";
 import { href, navigate } from "../lib/route";
 import { StagesPanel } from "./run/StagesPanel";
 
@@ -51,6 +51,32 @@ function classSpec(cls: MutantClassification): ClassSpec {
   return CLASSIFICATION[cls] ?? { title: `Other: ${cls}`, note: "Classification reported by the backend.", tone: "neutral", icon: CircleHelp };
 }
 
+/**
+ * A check set's description, split so sentences that say what the set never drives can be held back:
+ * they name the requirements the learner exercise asks about.
+ */
+export function splitDescription(description: string): { shown: string; withheld: string } {
+  const sentences = description.match(/[^.!?]+[.!?]+(?:\s+|$)|[^.!?]+$/g) ?? [description];
+  const leaks = (text: string) => /\bnever\b/i.test(text);
+  return {
+    shown: sentences.filter((x) => !leaks(x)).join("").trim(),
+    withheld: sentences.filter(leaks).join("").trim(),
+  };
+}
+
+function CheckSetDescription({ description, revealed, placeholder, className }: { description: string; revealed: boolean; placeholder: string; className?: string }) {
+  const { shown, withheld } = splitDescription(description);
+  if (revealed || !withheld) return <span className={className}>{description}</span>;
+  return (
+    <span className={className}>
+      {shown}{" "}
+      <span className="muted small hidden-answer">
+        <EyeOff size={14} aria-hidden="true" /> {placeholder}
+      </span>
+    </span>
+  );
+}
+
 export function ReviewedBadge({ set }: { set: Pick<CheckSet, "reviewed"> }) {
   if (set.reviewed === false)
     return (
@@ -61,7 +87,7 @@ export function ReviewedBadge({ set }: { set: Pick<CheckSet, "reviewed"> }) {
   return null;
 }
 
-function CoreCell({ m }: { m: Mutant }) {
+function CoreCell({ m, revealed }: { m: Mutant; revealed: boolean }) {
   if (m.core.status === "killed")
     return (
       <>
@@ -71,7 +97,7 @@ function CoreCell({ m }: { m: Mutant }) {
         {m.core.first && (
           <p className="muted small">
             <code>{m.core.first.check}</code> at cycle {m.core.first.cycle} in {m.core.first.test}
-            {m.core.first.requirement_id ? ` · row ${m.core.first.requirement_id}` : ""}
+            {revealed && m.core.first.requirement_id ? ` · row ${m.core.first.requirement_id}` : ""}
           </p>
         )}
       </>
@@ -152,14 +178,22 @@ function MutantTable({ mutants, cls, requirements, revealed }: { mutants: Mutant
                     {m.note && <p className="small muted">{m.note}</p>}
                   </th>
                   <td>
-                    {m.target_requirement ? requirements[m.target_requirement]?.title ?? m.target_requirement : "—"}
+                    {!revealed && m.target_requirement ? (
+                      <span className="muted small hidden-answer">
+                        <EyeOff size={14} aria-hidden="true" /> Hidden until you answer
+                      </span>
+                    ) : m.target_requirement ? (
+                      requirements[m.target_requirement]?.title ?? m.target_requirement
+                    ) : (
+                      "—"
+                    )}
                     <p className="small muted">
                       {humanize(m.category)}
-                      {m.class ? ` · ${m.class}` : ""}
+                      {revealed && m.class ? ` · ${m.class}` : ""}
                     </p>
                   </td>
                   <td>
-                    <CoreCell m={m} />
+                    <CoreCell m={m} revealed={revealed} />
                   </td>
                   <td className="small">{humanize(m.formal.status)}</td>
                   <td>
@@ -201,6 +235,25 @@ export function gradeExercise(answer: string[], chosen: string[]): { correct: st
     missed: answer.filter((id) => !chosen.includes(id)),
     wrong: chosen.filter((id) => !answer.includes(id)),
   };
+}
+
+/** Why a chosen requirement is not one the set is missing, read from the audit's own requirement analysis. */
+export function notMissingReason(audit: Audit, id: string): string {
+  const r = audit.requirements[id];
+  if (r?.covered_by_set) {
+    return r.surviving_faults.length > 0
+      ? "the set checks it (a valid fault still survived there, but the requirement is not missing from the set)"
+      : "the set checks it";
+  }
+  const survivors = r
+    ? r.surviving_faults.length
+    : audit.mutants.filter((m) => m.classification === "valid_fault" && m.supplemental.status === "survived" && m.target_requirement === id).length;
+  if (survivors === 0) {
+    if (r?.exercised_by_set === false) return "the set never drives it, but no valid fault survives there";
+    if (r?.exercised_by_set === true) return "the set drives it without checking it, but no valid fault survives there";
+    return "no valid fault survives there";
+  }
+  return "the set checks it";
 }
 
 function NameList({ ids, titles }: { ids: string[]; titles: Record<string, string> }) {
@@ -331,8 +384,14 @@ function Exercise({
                   )}
                   {grade.wrong.length > 0 && (
                     <li>
-                      Not missing: <NameList ids={ordered(grade.wrong)} titles={titles} />. The set checks{" "}
-                      {grade.wrong.length === 1 ? "it" : "them"}, or no valid fault survives there.
+                      Not missing:
+                      <ul className="plain-list exercise-reasons">
+                        {ordered(grade.wrong).map((id) => (
+                          <li key={id}>
+                            <strong>{titles[id] ?? id}</strong>: {notMissingReason(audit, id)}.
+                          </li>
+                        ))}
+                      </ul>
                     </li>
                   )}
                 </ul>
@@ -393,7 +452,13 @@ function AuditBody({ run, audit, profile, now }: { run: Run; audit: Audit; profi
         <div className="action-row">
           <ReviewedBadge set={audit.check_set} />
         </div>
-        <p className="prose">{audit.check_set.description}</p>
+        <p className="prose">
+          <CheckSetDescription
+            description={audit.check_set.description}
+            revealed={showAnswers}
+            placeholder="The sentence naming what this set never drives is hidden until you answer or skip the learner exercise below."
+          />
+        </p>
         <p className="muted small">Origin: {audit.check_set.origin}</p>
         <KeyValue
           items={[
@@ -542,19 +607,33 @@ function AuditScopeNote() {
 }
 
 function CheckSetCard({ set, selected, onSelect }: { set: CheckSet; selected: boolean; onSelect: () => void }) {
+  const [revealed, setRevealed] = useState(false);
+  const withheld = splitDescription(set.description).withheld;
   return (
     <li>
       <label className={`checkset${selected ? " active" : ""}`}>
         <input type="radio" name="check-set" checked={selected} onChange={onSelect} />
         <span>
           <span className="checkset-title">{set.label}</span> <ReviewedBadge set={set} />
-          <span className="checkset-desc">{set.description}</span>
+          <CheckSetDescription
+            className="checkset-desc"
+            description={set.description}
+            revealed={revealed}
+            placeholder="What it never drives is hidden: the audit's learner exercise asks you to find it."
+          />
           <span className="muted small">
             {set.origin}
             {set.tests && set.tests.length ? ` · observes tests: ${set.tests.join(", ")}` : " · observes all frozen-suite tests"}
           </span>
         </span>
       </label>
+      {withheld && !revealed && (
+        <button type="button" className="btn btn-ghost btn-sm checkset-reveal" onClick={() => setRevealed(true)}>
+          <Eye size={14} aria-hidden="true" /> Show what this set never drives
+          <span className="sr-only">: {set.label}</span>
+          <span className="sr-only"> (reveals the audit exercise's answer)</span>
+        </button>
+      )}
       {selected && (
         <TableScroll label={`Checks in ${set.label}`}>
           <table className="data-table compact">
@@ -658,6 +737,7 @@ function ProposeCheckSet({ depth, onProposed }: { depth: number; onProposed: (se
 }
 
 export function AuditView({ profile }: { profile: AsyncState<Profile> }) {
+  useDocumentTitle("Check-quality audit");
   const sets = useAsync(() => api.checkSets(), []);
   const runs = useAsync(() => api.runs(), []);
   const [chosen, setChosen] = useState<string | null>(null);

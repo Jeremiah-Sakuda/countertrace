@@ -354,6 +354,8 @@ export function RepairPanel({
   const active = run.state === "queued" || run.state === "running";
   const repairRunning = run.repair?.status === "running";
   const uploads = status.status === "ok" && status.data.uploads_enabled;
+  // Nothing to repair: a complete run without a finding or any repair record only offers the export.
+  const exportOnly = !hasFinding && !repair && run.state === "complete";
 
   const start = async () => {
     setBusy(true);
@@ -370,7 +372,11 @@ export function RepairPanel({
   };
 
   return (
-    <Section id="run-repair" title="Repair and export" eyebrow="Candidates are checked against the unchanged contract">
+    <Section
+      id="run-repair"
+      title={exportOnly ? "Export" : "Repair and export"}
+      eyebrow={exportOnly ? "Evidence bundle" : "Candidates are checked against the unchanged contract"}
+    >
       <div className="stack">
         {!hasFinding && run.state === "complete" && (
           <p className="muted">Repair applies to runs with a counterexample. This run has none from these methods.</p>
@@ -402,7 +408,7 @@ export function RepairPanel({
             </Callout>
           ))}
         <div className="export">
-          <h3 className="subhead">Export</h3>
+          {!exportOnly && <h3 className="subhead">Export</h3>}
           <p className="muted small">
             The evidence bundle contains the report and the inputs needed to reproduce the deterministic checks for this run.
           </p>

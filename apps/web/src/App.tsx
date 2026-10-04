@@ -2,12 +2,23 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "./api/client";
 import { Callout } from "./components/common";
 import { Header, type RunContextInfo } from "./components/Header";
-import { useAsync } from "./lib/hooks";
+import { useAsync, useDocumentTitle } from "./lib/hooks";
 import { href, useRoute } from "./lib/route";
 import { AuditView } from "./views/AuditView";
 import { RunsView } from "./views/RunsView";
 import { RunView } from "./views/run/RunView";
 import { SetupView } from "./views/SetupView";
+
+function NotFound({ hash }: { hash: string }) {
+  useDocumentTitle("Page not found");
+  return (
+    <Callout kind="warn" title="Page not found">
+      <p>
+        Nothing lives at <code>{hash}</code>. Go to <a href={href.setup()}>contract setup</a> or the <a href={href.runs()}>runs list</a>.
+      </p>
+    </Callout>
+  );
+}
 
 export function App() {
   const route = useRoute();
@@ -20,6 +31,7 @@ export function App() {
 
   // Move focus to the main region on navigation so keyboard and screen-reader users land on the new view.
   const routeKey = route.name === "run" ? `run:${route.id}` : route.name;
+
   useEffect(() => {
     if (first.current) {
       first.current = false;
@@ -40,13 +52,7 @@ export function App() {
         {route.name === "runs" && <RunsView />}
         {route.name === "run" && <RunView key={route.id} id={route.id} profile={profile} status={status} onContext={onContext} />}
         {route.name === "audit" && <AuditView profile={profile} />}
-        {route.name === "notFound" && (
-          <Callout kind="warn" title="Page not found">
-            <p>
-              Nothing lives at <code>{route.hash}</code>. Go to <a href={href.setup()}>contract setup</a> or the <a href={href.runs()}>runs list</a>.
-            </p>
-          </Callout>
-        )}
+        {route.name === "notFound" && <NotFound hash={route.hash} />}
       </main>
       <footer className="site-footer">
         <p>

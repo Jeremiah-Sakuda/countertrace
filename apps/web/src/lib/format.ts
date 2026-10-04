@@ -90,3 +90,11 @@ export function formatDate(value: string | null | undefined): string {
   if (t === null) return "—";
   return new Date(t).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
 }
+
+/** A readable model name from an endpoint model id, e.g. "nvidia/nemotron-3-super-120b-a12b" -> "Nemotron 3 Super". */
+export function modelName(id: string | null | undefined): string {
+  const match = /nemotron-(\d+)-([a-z]+)/i.exec(id ?? "");
+  if (!match) return "Nemotron";
+  const tier = match[2] ?? "";
+  return `Nemotron ${match[1]} ${tier.charAt(0).toUpperCase()}${tier.slice(1).toLowerCase()}`;
+}

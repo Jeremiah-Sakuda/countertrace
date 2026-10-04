@@ -1,14 +1,14 @@
 import { Bot, CircleCheck, CircleHelp, CircleX, FileCheck2, History, LoaderCircle, Lock, Play, ShieldAlert, Ban, Undo2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { api } from "../api/client";
-import type { Contract, Decision, Example, ExampleDetail, Interpretation, Profile, RunSummary, Status } from "../api/types";
+import type { Contract, Decision, Example, ExampleDetail, Interpretation, Profile, RecordedInterpretation, RunSummary, Status } from "../api/types";
 import { CodeView } from "../components/CodeView";
 import { Callout, Disclosure, ErrorNotice, Hash, Loading, Section, TableScroll } from "../components/common";
 import { ModelCalls, ModelProvenance, ModelStatusNotice } from "../components/ModelResult";
 import { ShowcaseTour } from "../components/ShowcaseTour";
 import { Badge, VerdictBadge } from "../components/StatusBadge";
-import { formatDateTime, hex, shortHash } from "../lib/format";
-import { useAsync, type AsyncState } from "../lib/hooks";
+import { formatDate, formatDateTime, hex, modelName, shortHash } from "../lib/format";
+import { useAsync, useDocumentTitle, type AsyncState } from "../lib/hooks";
 import { href, navigate } from "../lib/route";
 
 // ---------------------------------------------------------------------------------------------
@@ -241,18 +241,67 @@ const DECISION: Record<Decision["status"], { tone: "info" | "fail" | "unresolved
   unsupported: { tone: "neutral", icon: Ban, label: "Unsupported" },
 };
 
-function InterpretationView({ result }: { result: Interpretation }) {
+function InterpretationView({ result, recorded }: { result: Interpretation; recorded?: RecordedInterpretation }) {
   const blocking = new Set(result.blocking ?? []);
   const needs = new Set(result.needs_decision ?? []);
+  const decisions = result.result?.decisions ?? [];
+  const conflicts = decisions.filter((d) => d.status === "conflict").length;
+  const table = result.result && (
+    <TableScroll label="Interpretation decisions">
+      <table className="data-table">
+        <thead>
+          <tr>
+            <th scope="col">Topic</th>
+            <th scope="col">Contract behavior</th>
+            <th scope="col">Brief says</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {decisions.map((d, i) => {
+            const spec = DECISION[d.status] ?? DECISION.unspecified;
+            return (
+              <tr key={i} className={blocking.has(d.topic) ? "row-bad" : needs.has(d.topic) ? "row-warn" : undefined}>
+                <th scope="row">
+                  {d.topic}
+                  {blocking.has(d.topic) && <span className="tag tag-fail">blocking</span>}
+                  {needs.has(d.topic) && <span className="tag tag-warn">needs decision</span>}
+                </th>
+                <td>{d.contract}</td>
+                <td>{d.brief_says ?? <span className="muted">Not mentioned</span>}</td>
+                <td>
+                  <Badge tone={spec.tone} icon={spec.icon}>
+                    {spec.label}
+                  </Badge>
+                  {d.note && <p className="muted small">{d.note}</p>}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </TableScroll>
+  );
   return (
     <div className="stack">
       <ModelStatusNotice result={result} what="Brief interpretation" />
       {result.result && (
         <>
-          <ModelProvenance task="interpretation" />
+          {recorded ? (
+            <p className="model-provenance">
+              <History size={16} aria-hidden="true" />
+              <span>
+                <strong>Recorded model output, read-only.</strong> {modelName(recorded.calls?.[0]?.model_id)} compared this brief with the fixed
+                contract{recorded.recorded_at ? ` on ${formatDate(recorded.recorded_at)}` : ""}. It is not part of any verdict and cannot change
+                the contract.
+              </span>
+            </p>
+          ) : (
+            <ModelProvenance task="interpretation" />
+          )}
           <p className="prose">{result.result.summary}</p>
           {blocking.size > 0 && (
-            <Callout kind="error" icon={ShieldAlert} title="The brief conflicts with this contract" role="alert">
+            <Callout kind="error" icon={ShieldAlert} title="The brief conflicts with this contract" role={recorded ? undefined : "alert"}>
               <p>
                 Blocking topics: <strong>{[...blocking].join(", ")}</strong>. The supported profile cannot change to match. Running
                 verification checks this contract, not the brief's request.
@@ -266,40 +315,13 @@ function InterpretationView({ result }: { result: Interpretation }) {
               </p>
             </Callout>
           )}
-          <TableScroll label="Interpretation decisions">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th scope="col">Topic</th>
-                  <th scope="col">Contract behavior</th>
-                  <th scope="col">Brief says</th>
-                  <th scope="col">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {result.result.decisions.map((d, i) => {
-                  const spec = DECISION[d.status] ?? DECISION.unspecified;
-                  return (
-                    <tr key={i} className={blocking.has(d.topic) ? "row-bad" : needs.has(d.topic) ? "row-warn" : undefined}>
-                      <th scope="row">
-                        {d.topic}
-                        {blocking.has(d.topic) && <span className="tag tag-fail">blocking</span>}
-                        {needs.has(d.topic) && <span className="tag tag-warn">needs decision</span>}
-                      </th>
-                      <td>{d.contract}</td>
-                      <td>{d.brief_says}</td>
-                      <td>
-                        <Badge tone={spec.tone} icon={spec.icon}>
-                          {spec.label}
-                        </Badge>
-                        {d.note && <p className="muted small">{d.note}</p>}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </TableScroll>
+          {recorded ? (
+            <Disclosure summary="Decisions by topic" meta={`${decisions.length} topics · ${conflicts} conflict${conflicts === 1 ? "" : "s"}`}>
+              {table}
+            </Disclosure>
+          ) : (
+            table
+          )}
           {result.result.backend_filled !== undefined && result.result.backend_filled !== null && (
             <Disclosure summary="Fields filled by the backend, not the model">
               <pre className="json">{JSON.stringify(result.result.backend_filled, null, 2)}</pre>
@@ -307,8 +329,32 @@ function InterpretationView({ result }: { result: Interpretation }) {
           )}
         </>
       )}
-      <ModelCalls calls={result.calls} />
+      {recorded ? (
+        result.calls && result.calls.length > 0 && (
+          <Disclosure summary="Recorded model call">
+            <ModelCalls calls={result.calls} />
+          </Disclosure>
+        )
+      ) : (
+        <ModelCalls calls={result.calls} />
+      )}
     </div>
+  );
+}
+
+/** The stored interpretation for this example, visible without a model key. */
+function RecordedInterpretationView({ recorded }: { recorded: RecordedInterpretation }) {
+  const date = recorded.recorded_at ? formatDate(recorded.recorded_at) : null;
+  return (
+    <section className="recorded-interpretation" aria-labelledby="recorded-interpretation-title">
+      <div className="recorded-interpretation-head">
+        <History size={16} aria-hidden="true" />
+        <h3 id="recorded-interpretation-title" className="subhead">
+          Recorded interpretation ({modelName(recorded.calls?.[0]?.model_id)}{date ? `, ${date}` : ""})
+        </h3>
+      </div>
+      <InterpretationView result={recorded} recorded={recorded} />
+    </section>
   );
 }
 
@@ -319,6 +365,7 @@ function ExampleDetailView({ detail, profile, status }: { detail: ExampleDetail;
   const [ackConflict, setAckConflict] = useState(false);
   // Acceptance swaps the accept button for a stamp; move focus to the control that replaced the one the user pressed.
   const [toggled, setToggled] = useState(0);
+  const [accepting, setAccepting] = useState(false);
   const acceptRef = useRef<HTMLButtonElement>(null);
   const withdrawRef = useRef<HTMLButtonElement>(null);
   const [launch, setLaunch] = useState<{ busy: boolean; error: unknown }>({ busy: false, error: null });
@@ -328,6 +375,7 @@ function ExampleDetailView({ detail, profile, status }: { detail: ExampleDetail;
     setInterp({ busy: false, result: null, error: null });
     setAccepted(null);
     setAckConflict(false);
+    setAccepting(false);
     setLaunch({ busy: false, error: null });
   }, [detail.id]);
 
@@ -337,7 +385,11 @@ function ExampleDetailView({ detail, profile, status }: { detail: ExampleDetail;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [toggled]);
 
-  const blocking = interp.result?.blocking ?? [];
+  // A recorded interpretation counts only when it read this exact brief; a live result replaces it.
+  const recorded = detail.recorded_interpretation && (!detail.recorded_interpretation.brief || detail.recorded_interpretation.brief === detail.brief)
+    ? detail.recorded_interpretation
+    : null;
+  const blocking = (interp.result ?? recorded)?.blocking ?? [];
   const needsAck = blocking.length > 0;
   const version = detail.contract.version;
   const isAccepted = accepted === detail.contract_hash;
@@ -351,6 +403,18 @@ function ExampleDetailView({ detail, profile, status }: { detail: ExampleDetail;
     } catch (error) {
       setInterp({ busy: false, result: null, error });
     }
+  };
+
+  // Pressing accept shows a busy state at once, then the acceptance stamp replaces the button and focus moves to "Withdraw".
+  const accept = () => {
+    if (accepting) return;
+    setAccepting(true);
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.setTimeout(() => {
+      setAccepting(false);
+      setAccepted(detail.contract_hash);
+      setToggled((n) => n + 1);
+    }, reduce ? 0 : 220);
   };
 
   const run = async () => {
@@ -429,8 +493,12 @@ function ExampleDetailView({ detail, profile, status }: { detail: ExampleDetail;
             <ErrorNotice error={profile.error} title="Timing example unavailable" />
           )}
         </Disclosure>
-        <Disclosure summary="Ask Nemotron to interpret the brief" meta="Optional">
-          <p className="prose">Compare the brief with the fixed contract to surface matches, conflicts, and open decisions. The model cannot change the contract.</p>
+        {recorded && <RecordedInterpretationView recorded={recorded} />}
+        <Disclosure summary={recorded ? "Interpret the brief live with Nemotron" : "Ask Nemotron to interpret the brief"} meta={recorded ? "Needs a model key" : "Optional"}>
+          <p className="prose">
+            Compare the brief with the fixed contract to surface matches, conflicts, and open decisions. The model cannot change the contract.
+            {recorded ? " A live result appears below and replaces the recorded one for the conflict check." : ""}
+          </p>
           <p className="muted small">This sends the brief, RTL, and contract to the model endpoint; see the data notice above.</p>
           <button type="button" className="btn btn-secondary" onClick={interpret} disabled={interp.busy} aria-busy={interp.busy}>
             {interp.busy ? <LoaderCircle className="spin" size={16} aria-hidden="true" /> : <Bot size={16} aria-hidden="true" />}
@@ -474,12 +542,14 @@ function ExampleDetailView({ detail, profile, status }: { detail: ExampleDetail;
             <button
               ref={acceptRef}
               type="button"
-              className="btn btn-secondary"
+              className={`btn btn-secondary${accepting ? " is-pressed" : ""}`}
               disabled={needsAck && !ackConflict}
-              onClick={() => { setAccepted(detail.contract_hash); setToggled((n) => n + 1); }}
+              aria-busy={accepting}
+              aria-disabled={accepting || undefined}
+              onClick={accept}
             >
-              <FileCheck2 size={16} aria-hidden="true" />
-              Accept contract v{version} ({shortHash(detail.contract_hash)})
+              {accepting ? <LoaderCircle className="spin" size={16} aria-hidden="true" /> : <FileCheck2 size={16} aria-hidden="true" />}
+              {accepting ? `Accepting contract v${version}…` : `Accept contract v${version} (${shortHash(detail.contract_hash)})`}
             </button>
           )}
           <button type="button" className="btn btn-primary" disabled={!isAccepted || launch.busy || !verifierReady} onClick={run} aria-busy={launch.busy}>
@@ -531,6 +601,7 @@ export function SetupView({
   }, [examples]);
   const selectedId = exampleId ?? fallbackId;
   const detail = useAsync(() => (selectedId ? api.example(selectedId) : Promise.resolve(null)), [selectedId]);
+  useDocumentTitle(detail.status === "ok" && detail.data ? detail.data.title : "Contract setup");
 
   return (
     <div className="notebook-setup">

@@ -273,7 +273,7 @@ code { font-size: .84em; padding: 2px 4px; background: var(--color-muted); borde
 .code pre { margin: 0; padding: 14px 0; min-width: max-content; }
 .code code { display: block; background: none; padding: 0; font-size: inherit; overflow-wrap: normal; }
 .code code>span { display: block; }.code-line { display: flex; }
-.code-ln { flex: none; width: 3.5em; padding-right: 1em; text-align: right; color: #707668; user-select: none; }
+.code-ln { flex: none; width: 3.5em; padding-right: 1em; text-align: right; color: #5f6458; user-select: none; }
 .code-text { padding-right: 18px; white-space: pre; }
 .code-mark { background: #e4dfc2; box-shadow: inset 3px 0 #886711; }
 .code-mark .code-ln { color: #765715; }.code-gap .code-ln { color: var(--color-muted-foreground); }
@@ -442,11 +442,28 @@ code,pre,kbd,samp,textarea,.mono,.code,.code-input,.json,.waveform,.diff-line,.c
 .loop-provenance svg { flex: none; margin-top: 3px; color: var(--color-accent); }
 .progress-note { display: grid; gap: 8px; padding: 16px 18px; border: 1px solid var(--color-border-subtle); background: #faf9f3; }
 .progress-headline { font: 500 1.25rem/1.3 var(--font-heading); }
+.progress-sub { display: block; margin-top: 4px; font: .84rem/1.5 var(--font-body); color: var(--color-soft-foreground); }
 .progress-pair { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 0; }
 .progress-pair dt { font-size: .7rem; color: var(--color-muted-foreground); }
 .progress-pair dd { margin: 2px 0 0; font-size: .78rem; overflow-wrap: anywhere; }
 .exercise-grade { margin: 8px 0; }
 .unresolved-reason { font-weight: 400; }
+/* Unresolved obligations: a neutral note after the title and finding, not an alarm. */
+.unresolved-note { display: flex; gap: 10px; align-items: flex-start; max-width: 72ch; padding: 12px 14px; border: 1px solid var(--color-border-subtle); border-left: 3px solid var(--tone-neutral); background: var(--color-card); color: var(--color-soft-foreground); font-size: .84rem; }
+.unresolved-note svg { flex: none; margin-top: 3px; color: var(--tone-neutral); }
+.unresolved-note strong { color: var(--color-foreground); }
+.case-focus-pass::before { background: var(--tone-proved); }
+.case-payoff { font-size: .84rem; font-weight: 600; color: var(--tone-proved); margin-bottom: 8px; }
+.recorded-interpretation { display: grid; gap: 14px; padding: 18px; border: 1px solid var(--color-border-subtle); background: var(--color-card); }
+.recorded-interpretation-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.recorded-interpretation-head .subhead { margin: 0; }
+.btn.is-pressed { transform: translateY(1px); box-shadow: inset 0 2px 0 #00000033; cursor: progress; }
+.accept-stamp { animation: stamp-in 220ms var(--ease-out); }
+@keyframes stamp-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+.gallery-result-facts dd.fact-label-value { font: 600 .8rem/1.4 var(--font-body); letter-spacing: 0; }
+.checkset-reveal { margin-top: 6px; }
+.checkset-desc .hidden-answer { display: inline; }
+.exercise-reasons { margin-top: 6px; }
 /* Small screens: brand and the runtime toggle share one row, run status sits under the navigation. */
 @media(max-width:759px) {
   .site-header { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 10px 12px; padding: 14px 16px 12px; }
@@ -460,7 +477,8 @@ code,pre,kbd,samp,textarea,.mono,.code,.code-input,.json,.waveform,.diff-line,.c
   .service-details { grid-column: 2; grid-row: 1; position: relative; justify-self: end; }
   .service-details summary { min-height: 44px; padding: 12px 2px; line-height: 20px; }
   .service-details[open] .header-status { position: absolute; right: 0; top: 100%; z-index: 20; width: min(340px,calc(100vw - 32px)); padding: 12px; background: var(--color-card); border: 1px solid var(--color-border); box-shadow: 0 6px 18px #25282422; }
-  .run-context { grid-column: 1/-1; grid-row: 3; gap: 5px; }
+  /* The run hero repeats the run's source badge, so the rail copy is not repeated above the title on small screens. */
+  .run-context { display: none; }
   .loop,.progress-note { padding: 14px; }
   .loop-feedback { padding-left: 12px; }
   .loop-group .loop-feedback::after { left: 21px !important; }

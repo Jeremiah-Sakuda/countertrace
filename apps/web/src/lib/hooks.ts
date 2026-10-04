@@ -94,3 +94,10 @@ export function usePolling<T>(
   const refresh = useCallback(() => setKick((k) => k + 1), []);
   return { data, error, loading, refresh };
 }
+
+/** Set document.title for the current view, e.g. "Runs — Countertrace". Pass null while the view's name is still loading. */
+export function useDocumentTitle(title: string | null | undefined): void {
+  useEffect(() => {
+    document.title = title ? `${title} — Countertrace` : "Countertrace";
+  }, [title]);
+}

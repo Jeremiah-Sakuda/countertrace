@@ -6,7 +6,7 @@ import { Disclosure, ErrorNotice, Loading, Section, TableScroll } from "../compo
 import { Badge, VerdictBadge } from "../components/StatusBadge";
 import { formatDateTime } from "../lib/format";
 import { findingSignal, originLabel, passedAttempt, primaryFinding, signalValue } from "../lib/evidence";
-import { useAsync } from "../lib/hooks";
+import { useAsync, useDocumentTitle } from "../lib/hooks";
 import { href } from "../lib/route";
 
 function Outcome({ kind, state, verdict }: { kind: string; state: string; verdict: Verdict | null | undefined }) {
@@ -37,7 +37,7 @@ function caseDescription(run: RecordedRunSummary, detail: Run | null): string {
 
 /** Two facts per card, read from the recorded run. The strongest available evidence leads. */
 function CardFacts({ run, detail }: { run: RecordedRunSummary; detail: Run | null }) {
-  const facts: { label: string; value: ReactNode; note: string }[] = [];
+  const facts: { label: string; value: ReactNode; note: string; small?: boolean }[] = [];
   if (run.kind === "audit") {
     const s = detail?.audit?.summary;
     if (s) {
@@ -51,7 +51,7 @@ function CardFacts({ run, detail }: { run: RecordedRunSummary; detail: Run | nul
     const extras = [detail?.explanation?.result ? "Explanation" : null, attempt ? "accepted repair" : detail?.repair ? "repair attempted" : null].filter(Boolean);
     if (extras.length) {
       const text = extras.join(" · ");
-      facts.push({ label: "Recorded with", value: text.charAt(0).toUpperCase() + text.slice(1), note: attempt ? `candidate ${attempt.index} passed the unchanged checks` : "model output, checked separately" });
+      facts.push({ label: "Recorded with", small: true, value: text.charAt(0).toUpperCase() + text.slice(1), note: attempt ? `candidate ${attempt.index} passed the unchanged checks` : "model output, checked separately" });
     } else facts.push({ label: "Unresolved", value: run.verdict.unresolved, note: "obligations" });
   } else if (run.verdict) {
     facts.push({ label: "Properties proved", value: run.verdict.counts.proved ?? 0, note: "under the stated assumptions" });
@@ -63,7 +63,7 @@ function CardFacts({ run, detail }: { run: RecordedRunSummary; detail: Run | nul
       {facts.map((f) => (
         <div key={f.label}>
           <dt>{f.label}</dt>
-          <dd>{f.value}<span>{f.note}</span></dd>
+          <dd className={f.small ? "fact-label-value" : undefined}>{f.value}<span>{f.note}</span></dd>
         </div>
       ))}
     </dl>
@@ -79,7 +79,8 @@ function RecordedList({ items }: { items: RecordedRunSummary[] }) {
   const detailOf = (id: string) => (details.status === "ok" ? details.data[id] ?? null : null);
   if (items.length === 0) return <p className="muted">No recorded runs are bundled with this build.</p>;
   const firstFailure = items.find((item) => item.verdict?.headline === "counterexample");
-  const ordered = firstFailure ? [firstFailure, ...items.filter((item) => item.id !== firstFailure.id)] : items;
+  const base = firstFailure ? [firstFailure, ...items.filter((item) => item.id !== firstFailure.id)] : items;
+  const ordered = withCandidatesAfterParents(base, (id) => detailOf(id)?.parent_id ?? null);
   return (
     <div className="gallery-grid">
       {ordered.map((r, index) => {
@@ -111,6 +112,31 @@ function RecordedList({ items }: { items: RecordedRunSummary[] }) {
   );
 }
 
+/** Place each repair candidate directly after its parent (and after earlier candidates of that parent), keeping the order otherwise. */
+export function withCandidatesAfterParents<T extends { id: string }>(items: T[], parentOf: (id: string) => string | null): T[] {
+  const ids = new Set(items.map((item) => item.id));
+  const children = new Map<string, T[]>();
+  for (const item of items) {
+    const parent = parentOf(item.id);
+    if (parent && parent !== item.id && ids.has(parent)) children.set(parent, [...(children.get(parent) ?? []), item]);
+  }
+  const out: T[] = [];
+  const placed = new Set<string>();
+  const place = (item: T) => {
+    if (placed.has(item.id)) return;
+    placed.add(item.id);
+    out.push(item);
+    for (const child of children.get(item.id) ?? []) place(child);
+  };
+  for (const item of items) {
+    const parent = parentOf(item.id);
+    if (parent && ids.has(parent) && !placed.has(parent)) continue;
+    place(item);
+  }
+  for (const item of items) place(item);
+  return out;
+}
+
 const PAGE = 12;
 
 /**
@@ -140,12 +166,6 @@ function LocalList({ items, all }: { items: RunSummary[]; all: RunSummary[] }) {
   const [limit, setLimit] = useState(PAGE);
   const hidden = useMemo(() => evaluationIds(all), [all]);
   const evaluation = items.filter((r) => hidden.has(r.id)).length;
-  const roots = items.filter((r) => r.origin === "evaluation").length;
-  const descendants = evaluation - roots;
-  const hiddenText =
-    roots === 0
-      ? `${descendants} repair candidate${descendants === 1 ? "" : "s"} of evaluation runs hidden`
-      : `${roots} evaluation run${roots === 1 ? "" : "s"}${descendants > 0 ? ` and ${descendants} of their repair candidate${descendants === 1 ? "" : "s"}` : ""} hidden`;
   const visible = showEvaluation ? items : items.filter((r) => !hidden.has(r.id));
   const shown = visible.slice(0, limit);
   const moreRef = useRef<HTMLTableRowElement>(null);
@@ -168,18 +188,18 @@ function LocalList({ items, all }: { items: RunSummary[]; all: RunSummary[] }) {
     <div className="stack">
       <div className="ledger-controls">
         <p className="muted small" aria-live="polite">
-          Showing {shown.length} of {visible.length} run{visible.length === 1 ? "" : "s"}
-          {!showEvaluation && evaluation > 0 ? ` · ${hiddenText}` : ""}
+          Showing {shown.length} of {visible.length} run{visible.length === 1 ? "" : "s"} on this server
+          {!showEvaluation && evaluation > 0 ? ` · ${evaluation} evaluation run${evaluation === 1 ? "" : "s"} hidden` : ""}
         </p>
         {evaluation > 0 && (
           <label className="check-row ledger-toggle">
             <input type="checkbox" checked={showEvaluation} onChange={(e) => { setShowEvaluation(e.target.checked); setLimit(PAGE); }} />
-            <span>Show evaluation runs{descendants > 0 ? " and their repair candidates" : ""} ({evaluation})</span>
+            <span title="Evaluation-suite runs and their repair candidates">Show evaluation runs ({evaluation})</span>
           </label>
         )}
       </div>
       {shown.length === 0 ? (
-        <p className="muted">Only evaluation runs and their repair candidates exist on this server. Turn on the checkbox above to list them.</p>
+        <p className="muted">Only evaluation runs exist on this server. Turn on “Show evaluation runs” above to list them.</p>
       ) : (
         <TableScroll label="Runs on this server">
           <table className="data-table">
@@ -245,6 +265,7 @@ function LocalList({ items, all }: { items: RunSummary[]; all: RunSummary[] }) {
 }
 
 export function RunsView() {
+  useDocumentTitle("Runs");
   const recorded = useAsync(() => api.recorded(), []);
   const runs = useAsync(() => api.runs(), []);
   const local = runs.status === "ok" ? runs.data.filter((r) => !r.recorded) : [];
