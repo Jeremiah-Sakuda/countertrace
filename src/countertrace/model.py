@@ -34,6 +34,7 @@ INTERPRET_TOPICS = {
     "ordering": "Accepted words leave exactly once and in arrival order, across pointer wraparound.",
     "read_latency": "dout is registered: it holds the removed word after the edge of an accepted read (no fall-through).",
     "depth": "DEPTH words of capacity, for the selected DEPTH.",
+    "flags": "full is true exactly when DEPTH words are stored and empty exactly when none are; there are no early-warning or almost-full semantics on these outputs.",
     "width": "8-bit data words.",
 }
 STATUSES = ("matches", "conflict", "unspecified", "unsupported")

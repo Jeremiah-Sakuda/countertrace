@@ -1,0 +1,910 @@
+{
+  "set": "briefs-dev-v2",
+  "split": "development",
+  "model_id": "nvidia/nemotron-3-super-120b-a12b",
+  "prompt_sha256": "sha256:b426c60c4a0c245eda05ae89e54f95cff100273720042aaa8ad0e2e941149eef",
+  "at": "2026-10-04T05:06:16Z",
+  "summary": {
+    "conflicting_detected": "4 / 4",
+    "compatible_proceeded": "3 / 3",
+    "errors": 0
+  },
+  "results": [
+    {
+      "id": "dev-uart-rx",
+      "expected_blocking": false,
+      "expected_topics": [],
+      "status": "ok",
+      "blocking": [],
+      "needs_decision": [
+        "reset_kind",
+        "reset_priority",
+        "reset_recurrence",
+        "read_when_empty",
+        "simultaneous_mid",
+        "simultaneous_empty",
+        "simultaneous_full",
+        "read_latency",
+        "flags"
+      ],
+      "topic_hit": false,
+      "outcome": "proceeded",
+      "wall_s": 3.1,
+      "calls": [
+        {
+          "model_id": "nvidia/nemotron-3-super-120b-a12b",
+          "latency_ms": 3073,
+          "prompt_tokens": 544,
+          "completion_tokens": 659,
+          "status": "ok",
+          "schema_error": null
+        }
+      ],
+      "decisions": [
+        {
+          "topic": "reset_kind",
+          "contract": "Reset is synchronous and active-high, sampled on the rising clock edge.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "Brief states 'Reset clears the FIFO' but does not specify synchronous/active-high or sampling edge."
+        },
+        {
+          "topic": "reset_priority",
+          "contract": "Reset wins over read and write. Occupancy becomes zero; empty is true and full is false after the edge.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "Brief does not address reset interaction with read/write or occupancy outcome."
+        },
+        {
+          "topic": "reset_recurrence",
+          "contract": "Reset may be asserted again at any later edge and must restore the empty state.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "Brief does not mention if reset can be reasserted or its effect."
+        },
+        {
+          "topic": "write_when_full",
+          "contract": "Ignore the write.",
+          "brief_says": "new bytes are dropped rather than overwriting stored ones",
+          "status": "matches",
+          "note": "Matches contract: ignore write when full."
+        },
+        {
+          "topic": "read_when_empty",
+          "contract": "Ignore the read. Nothing is consumed and nothing is bypassed.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "Brief does not specify behavior on read when empty."
+        },
+        {
+          "topic": "simultaneous_mid",
+          "contract": "Accept both. Occupancy stays constant; the old head is read and the new word joins the tail.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "Brief does not address simultaneous read/write when neither empty nor full."
+        },
+        {
+          "topic": "simultaneous_empty",
+          "contract": "Accept only the write. The new word is not bypassed to dout.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "Brief does not address simultaneous read/write when empty."
+        },
+        {
+          "topic": "simultaneous_full",
+          "contract": "Accept only the read. The write is ignored even though the read frees a slot.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "Brief does not address simultaneous read/write when full."
+        },
+        {
+          "topic": "ordering",
+          "contract": "Accepted words leave exactly once and in arrival order, across pointer wraparound.",
+          "brief_says": "Bytes must come out in the order they arrived",
+          "status": "matches",
+          "note": "Matches contract: accepted words leave in arrival order."
+        },
+        {
+          "topic": "read_latency",
+          "contract": "dout is registered: it holds the removed word after the edge of an accepted read (no fall-through).",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "Brief does not specify dout registration or latency."
+        },
+        {
+          "topic": "depth",
+          "contract": "DEPTH words of capacity, for the selected DEPTH.",
+          "brief_says": "A 4-entry, 8-bit FIFO",
+          "status": "matches",
+          "note": "Matches contract: DEPTH=4."
+        },
+        {
+          "topic": "flags",
+          "contract": "full is true exactly when DEPTH words are stored and empty exactly when none are; there are no early-warning or almost-full semantics on these outputs.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "Brief does not specify exact conditions for full/empty flags."
+        },
+        {
+          "topic": "width",
+          "contract": "8-bit data words.",
+          "brief_says": "A 4-entry, 8-bit FIFO",
+          "status": "matches",
+          "note": "Matches contract: WIDTH=8."
+        }
+      ],
+      "detail": null
+    },
+    {
+      "id": "dev-plain",
+      "expected_blocking": false,
+      "expected_topics": [],
+      "status": "ok",
+      "blocking": [],
+      "needs_decision": [
+        "reset_priority",
+        "reset_recurrence",
+        "simultaneous_mid",
+        "simultaneous_empty",
+        "simultaneous_full",
+        "ordering",
+        "read_latency",
+        "flags"
+      ],
+      "topic_hit": false,
+      "outcome": "proceeded",
+      "wall_s": 1.91,
+      "calls": [
+        {
+          "model_id": "nvidia/nemotron-3-super-120b-a12b",
+          "latency_ms": 1912,
+          "prompt_tokens": 521,
+          "completion_tokens": 424,
+          "status": "ok",
+          "schema_error": null
+        }
+      ],
+      "decisions": [
+        {
+          "topic": "reset_kind",
+          "contract": "Reset is synchronous and active-high, sampled on the rising clock edge.",
+          "brief_says": "synchronous active-high reset",
+          "status": "matches",
+          "note": ""
+        },
+        {
+          "topic": "reset_priority",
+          "contract": "Reset wins over read and write. Occupancy becomes zero; empty is true and full is false after the edge.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": ""
+        },
+        {
+          "topic": "reset_recurrence",
+          "contract": "Reset may be asserted again at any later edge and must restore the empty state.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": ""
+        },
+        {
+          "topic": "write_when_full",
+          "contract": "Ignore the write.",
+          "brief_says": "Writes when full are ignored",
+          "status": "matches",
+          "note": ""
+        },
+        {
+          "topic": "read_when_empty",
+          "contract": "Ignore the read. Nothing is consumed and nothing is bypassed.",
+          "brief_says": "Reads when empty are ignored",
+          "status": "matches",
+          "note": ""
+        },
+        {
+          "topic": "simultaneous_mid",
+          "contract": "Accept both. Occupancy stays constant; the old head is read and the new word joins the tail.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": ""
+        },
+        {
+          "topic": "simultaneous_empty",
+          "contract": "Accept only the write. The new word is not bypassed to dout.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": ""
+        },
+        {
+          "topic": "simultaneous_full",
+          "contract": "Accept only the read. The write is ignored even though the read frees a slot.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": ""
+        },
+        {
+          "topic": "ordering",
+          "contract": "Accepted words leave exactly once and in arrival order, across pointer wraparound.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": ""
+        },
+        {
+          "topic": "read_latency",
+          "contract": "dout is registered: it holds the removed word after the edge of an accepted read (no fall-through).",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": ""
+        },
+        {
+          "topic": "depth",
+          "contract": "DEPTH words of capacity, for the selected DEPTH.",
+          "brief_says": "4-entry",
+          "status": "matches",
+          "note": ""
+        },
+        {
+          "topic": "flags",
+          "contract": "full is true exactly when DEPTH words are stored and empty exactly when none are; there are no early-warning or almost-full semantics on these outputs.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": ""
+        },
+        {
+          "topic": "width",
+          "contract": "8-bit data words.",
+          "brief_says": "8-bit",
+          "status": "matches",
+          "note": ""
+        }
+      ],
+      "detail": null
+    },
+    {
+      "id": "dev-exchange-when-full",
+      "expected_blocking": true,
+      "expected_topics": [
+        "simultaneous_full"
+      ],
+      "status": "ok",
+      "blocking": [
+        "simultaneous_full"
+      ],
+      "needs_decision": [
+        "reset_kind",
+        "reset_priority",
+        "reset_recurrence",
+        "write_when_full",
+        "read_when_empty",
+        "simultaneous_mid",
+        "simultaneous_empty",
+        "ordering",
+        "read_latency",
+        "flags",
+        "width"
+      ],
+      "topic_hit": true,
+      "outcome": "conflict_detected",
+      "wall_s": 2.57,
+      "calls": [
+        {
+          "model_id": "nvidia/nemotron-3-super-120b-a12b",
+          "latency_ms": 2566,
+          "prompt_tokens": 526,
+          "completion_tokens": 573,
+          "status": "ok",
+          "schema_error": null
+        }
+      ],
+      "decisions": [
+        {
+          "topic": "reset_kind",
+          "contract": "Reset is synchronous and active-high, sampled on the rising clock edge.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "No mention of reset type."
+        },
+        {
+          "topic": "reset_priority",
+          "contract": "Reset wins over read and write. Occupancy becomes zero; empty is true and full is false after the edge.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "No mention of reset priority."
+        },
+        {
+          "topic": "reset_recurrence",
+          "contract": "Reset may be asserted again at any later edge and must restore the empty state.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "No mention of reset recurrence."
+        },
+        {
+          "topic": "write_when_full",
+          "contract": "Ignore the write.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "No explicit statement about write when full alone."
+        },
+        {
+          "topic": "read_when_empty",
+          "contract": "Ignore the read. Nothing is consumed and nothing is bypassed.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "No mention of read when empty."
+        },
+        {
+          "topic": "simultaneous_mid",
+          "contract": "Accept both. Occupancy stays constant; the old head is read and the new word joins the tail.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "No mention of simultaneous operation at mid-occupancy."
+        },
+        {
+          "topic": "simultaneous_empty",
+          "contract": "Accept only the write. The new word is not bypassed to dout.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "No mention of simultaneous operation when empty."
+        },
+        {
+          "topic": "simultaneous_full",
+          "contract": "Accept only the read. The write is ignored even though the read frees a slot.",
+          "brief_says": "If it is full and a read and write arrive together, it should still accept the write because the read frees a slot.",
+          "status": "conflict",
+          "note": "Contract requires accepting only the read and ignoring the write in this case; brief demands accepting the write."
+        },
+        {
+          "topic": "ordering",
+          "contract": "Accepted words leave exactly once and in arrival order, across pointer wraparound.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "No mention of ordering."
+        },
+        {
+          "topic": "read_latency",
+          "contract": "dout is registered: it holds the removed word after the edge of an accepted read (no fall-through).",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "No mention of read latency."
+        },
+        {
+          "topic": "depth",
+          "contract": "DEPTH words of capacity, for the selected DEPTH.",
+          "brief_says": "A 4-entry FIFO.",
+          "status": "matches",
+          "note": "Matches DEPTH=4."
+        },
+        {
+          "topic": "flags",
+          "contract": "full is true exactly when DEPTH words are stored and empty exactly when none are; there are no early-warning or almost-full semantics on these outputs.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "No mention of flag behavior."
+        },
+        {
+          "topic": "width",
+          "contract": "8-bit data words.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "No explicit width stated, but implied by context; no conflict."
+        }
+      ],
+      "detail": null
+    },
+    {
+      "id": "dev-async-reset",
+      "expected_blocking": true,
+      "expected_topics": [
+        "reset_kind"
+      ],
+      "status": "ok",
+      "blocking": [
+        "reset_kind"
+      ],
+      "needs_decision": [
+        "reset_priority",
+        "reset_recurrence",
+        "write_when_full",
+        "read_when_empty",
+        "simultaneous_mid",
+        "simultaneous_empty",
+        "simultaneous_full",
+        "ordering",
+        "read_latency",
+        "flags"
+      ],
+      "topic_hit": true,
+      "outcome": "conflict_detected",
+      "wall_s": 2.24,
+      "calls": [
+        {
+          "model_id": "nvidia/nemotron-3-super-120b-a12b",
+          "latency_ms": 2239,
+          "prompt_tokens": 529,
+          "completion_tokens": 411,
+          "status": "ok",
+          "schema_error": null
+        }
+      ],
+      "decisions": [
+        {
+          "topic": "reset_kind",
+          "contract": "Reset is synchronous and active-high, sampled on the rising clock edge.",
+          "brief_says": "asynchronous",
+          "status": "conflict",
+          "note": "Contract requires synchronous reset sampled on rising clock edge."
+        },
+        {
+          "topic": "reset_priority",
+          "contract": "Reset wins over read and write. Occupancy becomes zero; empty is true and full is false after the edge.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": ""
+        },
+        {
+          "topic": "reset_recurrence",
+          "contract": "Reset may be asserted again at any later edge and must restore the empty state.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": ""
+        },
+        {
+          "topic": "write_when_full",
+          "contract": "Ignore the write.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": ""
+        },
+        {
+          "topic": "read_when_empty",
+          "contract": "Ignore the read. Nothing is consumed and nothing is bypassed.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": ""
+        },
+        {
+          "topic": "simultaneous_mid",
+          "contract": "Accept both. Occupancy stays constant; the old head is read and the new word joins the tail.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": ""
+        },
+        {
+          "topic": "simultaneous_empty",
+          "contract": "Accept only the write. The new word is not bypassed to dout.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": ""
+        },
+        {
+          "topic": "simultaneous_full",
+          "contract": "Accept only the read. The write is ignored even though the read frees a slot.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": ""
+        },
+        {
+          "topic": "ordering",
+          "contract": "Accepted words leave exactly once and in arrival order, across pointer wraparound.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": ""
+        },
+        {
+          "topic": "read_latency",
+          "contract": "dout is registered: it holds the removed word after the edge of an accepted read (no fall-through).",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": ""
+        },
+        {
+          "topic": "depth",
+          "contract": "DEPTH words of capacity, for the selected DEPTH.",
+          "brief_says": "two-entry",
+          "status": "matches",
+          "note": "Matches DEPTH=2."
+        },
+        {
+          "topic": "flags",
+          "contract": "full is true exactly when DEPTH words are stored and empty exactly when none are; there are no early-warning or almost-full semantics on these outputs.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": ""
+        },
+        {
+          "topic": "width",
+          "contract": "8-bit data words.",
+          "brief_says": "byte",
+          "status": "matches",
+          "note": "Matches WIDTH=8."
+        }
+      ],
+      "detail": null
+    },
+    {
+      "id": "dev-fwft",
+      "expected_blocking": true,
+      "expected_topics": [
+        "read_latency"
+      ],
+      "status": "ok",
+      "blocking": [
+        "read_latency"
+      ],
+      "needs_decision": [
+        "reset_kind",
+        "reset_priority",
+        "reset_recurrence",
+        "write_when_full",
+        "read_when_empty",
+        "simultaneous_mid",
+        "simultaneous_empty",
+        "simultaneous_full",
+        "ordering",
+        "flags"
+      ],
+      "topic_hit": true,
+      "outcome": "conflict_detected",
+      "wall_s": 3.34,
+      "calls": [
+        {
+          "model_id": "nvidia/nemotron-3-super-120b-a12b",
+          "latency_ms": 3337,
+          "prompt_tokens": 532,
+          "completion_tokens": 628,
+          "status": "ok",
+          "schema_error": null
+        }
+      ],
+      "decisions": [
+        {
+          "topic": "reset_kind",
+          "contract": "Reset is synchronous and active-high, sampled on the rising clock edge.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "The brief does not mention reset behavior."
+        },
+        {
+          "topic": "reset_priority",
+          "contract": "Reset wins over read and write. Occupancy becomes zero; empty is true and full is false after the edge.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "The brief does not mention reset behavior."
+        },
+        {
+          "topic": "reset_recurrence",
+          "contract": "Reset may be asserted again at any later edge and must restore the empty state.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "The brief does not mention reset behavior."
+        },
+        {
+          "topic": "write_when_full",
+          "contract": "Ignore the write.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "The brief does not mention write behavior when full."
+        },
+        {
+          "topic": "read_when_empty",
+          "contract": "Ignore the read. Nothing is consumed and nothing is bypassed.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "The brief does not explicitly address read when empty, though its description implies dout is valid when not empty."
+        },
+        {
+          "topic": "simultaneous_mid",
+          "contract": "Accept both. Occupancy stays constant; the old head is read and the new word joins the tail.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "The brief does not mention simultaneous read and write in mid-state."
+        },
+        {
+          "topic": "simultaneous_empty",
+          "contract": "Accept only the write. The new word is not bypassed to dout.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "The brief does not mention simultaneous read and write when empty."
+        },
+        {
+          "topic": "simultaneous_full",
+          "contract": "Accept only the read. The write is ignored even though the read frees a slot.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "The brief does not mention simultaneous read and write when full."
+        },
+        {
+          "topic": "ordering",
+          "contract": "Accepted words leave exactly once and in arrival order, across pointer wraparound.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "The brief does not explicitly mention ordering, though FIFO implies it."
+        },
+        {
+          "topic": "read_latency",
+          "contract": "dout is registered: it holds the removed word after the edge of an accepted read (no fall-through).",
+          "brief_says": "the oldest byte is already visible on dout whenever the FIFO is not empty, and rd_en just acknowledges it",
+          "status": "conflict",
+          "note": "This describes first-word fall-through behavior, but the contract requires registered dout with no fall-through: dout updates only after the edge of an accepted read."
+        },
+        {
+          "topic": "depth",
+          "contract": "DEPTH words of capacity, for the selected DEPTH.",
+          "brief_says": "A 4-deep FIFO",
+          "status": "matches",
+          "note": "Matches DEPTH=4."
+        },
+        {
+          "topic": "flags",
+          "contract": "full is true exactly when DEPTH words are stored and empty exactly when none are; there are no early-warning or almost-full semantics on these outputs.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "The brief does not mention flag behavior."
+        },
+        {
+          "topic": "width",
+          "contract": "8-bit data words.",
+          "brief_says": "of bytes",
+          "status": "matches",
+          "note": "Bytes imply 8-bit width, matching WIDTH=8."
+        }
+      ],
+      "detail": null
+    },
+    {
+      "id": "dev-streaming",
+      "expected_blocking": false,
+      "expected_topics": [],
+      "status": "ok",
+      "blocking": [],
+      "needs_decision": [
+        "reset_kind",
+        "reset_priority",
+        "reset_recurrence",
+        "write_when_full",
+        "read_when_empty",
+        "simultaneous_empty",
+        "simultaneous_full",
+        "read_latency",
+        "flags",
+        "width"
+      ],
+      "topic_hit": false,
+      "outcome": "proceeded",
+      "wall_s": 2.81,
+      "calls": [
+        {
+          "model_id": "nvidia/nemotron-3-super-120b-a12b",
+          "latency_ms": 2807,
+          "prompt_tokens": 525,
+          "completion_tokens": 541,
+          "status": "ok",
+          "schema_error": null
+        }
+      ],
+      "decisions": [
+        {
+          "topic": "reset_kind",
+          "contract": "Reset is synchronous and active-high, sampled on the rising clock edge.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "No mention of reset behavior."
+        },
+        {
+          "topic": "reset_priority",
+          "contract": "Reset wins over read and write. Occupancy becomes zero; empty is true and full is false after the edge.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "No mention of reset priority."
+        },
+        {
+          "topic": "reset_recurrence",
+          "contract": "Reset may be asserted again at any later edge and must restore the empty state.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "No mention of reset recurrence."
+        },
+        {
+          "topic": "write_when_full",
+          "contract": "Ignore the write.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "No mention of write-on-full handling."
+        },
+        {
+          "topic": "read_when_empty",
+          "contract": "Ignore the read. Nothing is consumed and nothing is bypassed.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "No mention of read-on-empty handling."
+        },
+        {
+          "topic": "simultaneous_mid",
+          "contract": "Accept both. Occupancy stays constant; the old head is read and the new word joins the tail.",
+          "brief_says": "reads and writes often happen in the same cycle. Order must be preserved, including when both happen together while partially full.",
+          "status": "matches",
+          "note": "Matches contract: accepts both, occupancy constant, order preserved."
+        },
+        {
+          "topic": "simultaneous_empty",
+          "contract": "Accept only the write. The new word is not bypassed to dout.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "No specific mention of simultaneous empty case."
+        },
+        {
+          "topic": "simultaneous_full",
+          "contract": "Accept only the read. The write is ignored even though the read frees a slot.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "No specific mention of simultaneous full case."
+        },
+        {
+          "topic": "ordering",
+          "contract": "Accepted words leave exactly once and in arrival order, across pointer wraparound.",
+          "brief_says": "Order must be preserved, including when both happen together while partially full.",
+          "status": "matches",
+          "note": "Explicitly states order preservation, matching contract."
+        },
+        {
+          "topic": "read_latency",
+          "contract": "dout is registered: it holds the removed word after the edge of an accepted read (no fall-through).",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "No mention of read latency or dout registration."
+        },
+        {
+          "topic": "depth",
+          "contract": "DEPTH words of capacity, for the selected DEPTH.",
+          "brief_says": "A 4-entry streaming FIFO",
+          "status": "matches",
+          "note": "Matches DEPTH=4."
+        },
+        {
+          "topic": "flags",
+          "contract": "full is true exactly when DEPTH words are stored and empty exactly when none are; there are no early-warning or almost-full semantics on these outputs.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "No mention of flag behavior."
+        },
+        {
+          "topic": "width",
+          "contract": "8-bit data words.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "No explicit width stated, but implied by context; however, not directly specified in brief."
+        }
+      ],
+      "detail": null
+    },
+    {
+      "id": "dev-empty-late",
+      "expected_blocking": true,
+      "expected_topics": [
+        "flags"
+      ],
+      "status": "ok",
+      "blocking": [
+        "read_when_empty",
+        "flags"
+      ],
+      "needs_decision": [
+        "reset_kind",
+        "reset_priority",
+        "reset_recurrence",
+        "write_when_full",
+        "simultaneous_mid",
+        "simultaneous_empty",
+        "simultaneous_full",
+        "ordering",
+        "read_latency"
+      ],
+      "topic_hit": true,
+      "outcome": "conflict_detected",
+      "wall_s": 3.02,
+      "calls": [
+        {
+          "model_id": "nvidia/nemotron-3-super-120b-a12b",
+          "latency_ms": 3016,
+          "prompt_tokens": 529,
+          "completion_tokens": 648,
+          "status": "ok",
+          "schema_error": null
+        }
+      ],
+      "decisions": [
+        {
+          "topic": "reset_kind",
+          "contract": "Reset is synchronous and active-high, sampled on the rising clock edge.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "No mention of reset in the brief."
+        },
+        {
+          "topic": "reset_priority",
+          "contract": "Reset wins over read and write. Occupancy becomes zero; empty is true and full is false after the edge.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "No mention of reset priority in the brief."
+        },
+        {
+          "topic": "reset_recurrence",
+          "contract": "Reset may be asserted again at any later edge and must restore the empty state.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "No mention of reset recurrence in the brief."
+        },
+        {
+          "topic": "write_when_full",
+          "contract": "Ignore the write.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "No mention of write-when-full behavior in the brief."
+        },
+        {
+          "topic": "read_when_empty",
+          "contract": "Ignore the read. Nothing is consumed and nothing is bypassed.",
+          "brief_says": "empty should stay asserted until at least two bytes are stored, and reads during that time are refused",
+          "status": "conflict",
+          "note": "The brief modifies the empty flag condition and read refusal logic, conflicting with the contract's fixed behavior where empty is true only when zero words are stored and read_when_empty ignores the read without changing occupancy."
+        },
+        {
+          "topic": "simultaneous_mid",
+          "contract": "Accept both. Occupancy stays constant; the old head is read and the new word joins the tail.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "No mention of simultaneous operation in mid-occupancy in the brief."
+        },
+        {
+          "topic": "simultaneous_empty",
+          "contract": "Accept only the write. The new word is not bypassed to dout.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "No mention of simultaneous operation when empty in the brief."
+        },
+        {
+          "topic": "simultaneous_full",
+          "contract": "Accept only the read. The write is ignored even though the read frees a slot.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "No mention of simultaneous operation when full in the brief."
+        },
+        {
+          "topic": "ordering",
+          "contract": "Accepted words leave exactly once and in arrival order, across pointer wraparound.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "No mention of ordering in the brief."
+        },
+        {
+          "topic": "read_latency",
+          "contract": "dout is registered: it holds the removed word after the edge of an accepted read (no fall-through).",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": "No mention of read latency or dout registration in the brief."
+        },
+        {
+          "topic": "depth",
+          "contract": "DEPTH words of capacity, for the selected DEPTH.",
+          "brief_says": "A 4-entry byte FIFO",
+          "status": "matches",
+          "note": "Matches DEPTH=4 and WIDTH=8 (byte = 8-bit)."
+        },
+        {
+          "topic": "flags",
+          "contract": "full is true exactly when DEPTH words are stored and empty exactly when none are; there are no early-warning or almost-full semantics on these outputs.",
+          "brief_says": "empty should stay asserted until at least two bytes are stored",
+          "status": "conflict",
+          "note": "The brief redefines the empty flag to be false only when at least two bytes are stored, conflicting with the contract's fixed behavior where empty is true exactly when zero words are stored."
+        },
+        {
+          "topic": "width",
+          "contract": "8-bit data words.",
+          "brief_says": "A 4-entry byte FIFO",
+          "status": "matches",
+          "note": "Byte implies 8-bit width, matching WIDTH=8."
+        }
+      ],
+      "detail": null
+    }
+  ]
+}
