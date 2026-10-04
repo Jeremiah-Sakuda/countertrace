@@ -379,7 +379,9 @@ class Verification:
                         "step": min(f["step"] for f in failed), "assertions": failed,
                         "vcd": f"{rel}/{task}/trace.vcd" if vcd.is_file() else None,
                     }
-        self.stage("checking_properties", "done")
+        errors = [o for o in self.state["obligations"] if o["method"] in self.formal_tasks and o["status"] == "tool_error"]
+        self.stage("checking_properties", "error" if errors else "done",
+                   f"{len(errors)} formal obligation(s) ended in a tool error; none counts as a pass." if errors else None)
 
     def formal_error(self, message: str) -> None:
         for task in self.formal_tasks:

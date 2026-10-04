@@ -1,4 +1,4 @@
-import { Ban, Bot, CircleCheck, CircleHelp, CircleX, Equal, FlaskConical, GraduationCap, LoaderCircle, Play, ShieldAlert, Wrench, type LucideIcon } from "lucide-react";
+import { Ban, Bot, CircleCheck, CircleHelp, CircleX, Equal, EyeOff, FlaskConical, GraduationCap, LoaderCircle, Play, ScanSearch, ShieldAlert, Wrench, type LucideIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import { api } from "../api/client";
 import type { Audit, CheckSet, CheckSetProposal, Mutant, MutantClassification, Profile, Run } from "../api/types";
@@ -15,9 +15,9 @@ type ClassSpec = { title: string; note: string; tone: Tone; icon: LucideIcon };
 const CLASSIFICATION: Record<string, ClassSpec> = {
   valid_fault: {
     title: "Valid faults",
-    note: "The mandatory core checks detected a real contract violation. Only these count toward the supplemental set's score.",
-    tone: "fail",
-    icon: CircleX,
+    note: "The mandatory core checks caught each of these as a real contract violation. Only these count toward the supplemental set's score.",
+    tone: "info",
+    icon: ScanSearch,
   },
   equivalent: {
     title: "Equivalent mutants",
@@ -65,7 +65,7 @@ function CoreCell({ m }: { m: Mutant }) {
   if (m.core.status === "killed")
     return (
       <>
-        <Badge tone="fail" icon={CircleX}>
+        <Badge tone="info" icon={ScanSearch}>
           Core detected it
         </Badge>
         {m.core.first && (
@@ -111,7 +111,7 @@ function SupplementalCell({ m }: { m: Mutant }) {
   return <span className="muted">Not applicable</span>;
 }
 
-function MutantTable({ mutants, cls, requirements }: { mutants: Mutant[]; cls: MutantClassification; requirements: Audit["requirements"] }) {
+function MutantTable({ mutants, cls, requirements, revealed }: { mutants: Mutant[]; cls: MutantClassification; requirements: Audit["requirements"]; revealed: boolean }) {
   const spec = classSpec(cls);
   return (
     <div className="method-group">
@@ -160,7 +160,11 @@ function MutantTable({ mutants, cls, requirements }: { mutants: Mutant[]; cls: M
                     <SupplementalCell m={m} />
                   </td>
                   <td>
-                    {m.missing_requirements.length === 0 ? (
+                    {!revealed && m.missing_requirements.length > 0 ? (
+                      <span className="muted small hidden-answer">
+                        <EyeOff size={14} aria-hidden="true" /> Hidden until you answer the exercise
+                      </span>
+                    ) : m.missing_requirements.length === 0 ? (
                       <span className="muted">—</span>
                     ) : (
                       <ul className="plain-list">
@@ -180,18 +184,30 @@ function MutantTable({ mutants, cls, requirements }: { mutants: Mutant[]; cls: M
   );
 }
 
-function Exercise({ audit, requirementTitles }: { audit: Audit; requirementTitles: Record<string, string> }) {
-  const answer = useMemo(
-    () => Object.entries(audit.requirements).filter(([, r]) => !r.covered_by_set && r.surviving_faults.length > 0).map(([id]) => id),
-    [audit],
-  );
+export function exerciseAnswer(audit: Audit): string[] {
+  return Object.entries(audit.requirements).filter(([, r]) => !r.covered_by_set && r.surviving_faults.length > 0).map(([id]) => id);
+}
+
+function Exercise({
+  audit,
+  requirementTitles,
+  revealed,
+  onReveal,
+}: {
+  audit: Audit;
+  requirementTitles: Record<string, string>;
+  revealed: boolean;
+  onReveal: (value: boolean) => void;
+}) {
+  const answer = useMemo(() => exerciseAnswer(audit), [audit]);
   const options = Object.keys(requirementTitles);
   const [choice, setChoice] = useState<string>("");
-  const [revealed, setRevealed] = useState(false);
+  const [skipped, setSkipped] = useState(false);
+  const setRevealed = (value: boolean) => onReveal(value);
   if (answer.length === 0 || options.length === 0) return null;
   const correct = answer.includes(choice);
   return (
-    <Section title="Learner exercise" eyebrow="Before you look at the requirements panel">
+    <Section title="Learner exercise" eyebrow="Answer first: the requirement analysis below stays hidden until you do">
       <form
         className="exercise"
         onSubmit={(e) => {
@@ -203,7 +219,10 @@ function Exercise({ audit, requirementTitles }: { audit: Audit; requirementTitle
           <legend>
             <GraduationCap size={16} aria-hidden="true" /> Which requirement is this check set missing?
           </legend>
-          <p className="muted small">Use the surviving faults above as evidence.</p>
+          <p className="muted small">
+            {audit.summary.supplemental_survived} valid seeded faults survived this check set. Use the seeded-fault tables below as evidence:
+            which contract condition do the survivors target that the set never checks?
+          </p>
           <div className="options">
             {options.map((id) => (
               <label key={id} className="option">
@@ -217,12 +236,25 @@ function Exercise({ audit, requirementTitles }: { audit: Audit; requirementTitle
           <button type="submit" className="btn btn-primary" disabled={!choice || revealed}>
             Check my answer
           </button>
+          {!revealed && (
+            <button
+              type="button"
+              className="btn btn-ghost"
+              onClick={() => {
+                setSkipped(true);
+                setRevealed(true);
+              }}
+            >
+              Skip and show the answer
+            </button>
+          )}
           {revealed && (
             <button
               type="button"
               className="btn btn-ghost"
               onClick={() => {
                 setRevealed(false);
+                setSkipped(false);
                 setChoice("");
               }}
             >
@@ -233,8 +265,8 @@ function Exercise({ audit, requirementTitles }: { audit: Audit; requirementTitle
         {revealed && (
           <div role="status" className={`exercise-result ${correct ? "ok" : "bad"}`}>
             <p>
-              {correct ? <CircleCheck size={16} aria-hidden="true" /> : <CircleX size={16} aria-hidden="true" />}{" "}
-              <strong>{correct ? "Correct." : "Not quite."}</strong> The set does not cover{" "}
+              {skipped ? <GraduationCap size={16} aria-hidden="true" /> : correct ? <CircleCheck size={16} aria-hidden="true" /> : <CircleX size={16} aria-hidden="true" />}{" "}
+              <strong>{skipped ? "The answer." : correct ? "Correct." : "Not quite."}</strong> The set does not cover{" "}
               {answer.map((id, i) => (
                 <span key={id}>
                   {i > 0 ? ", " : ""}
@@ -268,6 +300,13 @@ export function AuditResult({ run, profile, now }: { run: Run; profile: AsyncSta
       </Callout>
     );
   }
+  return <AuditBody run={run} audit={audit} profile={profile} now={now} />;
+}
+
+function AuditBody({ run, audit, profile, now }: { run: Run; audit: Audit; profile: AsyncState<Profile>; now: number }) {
+  const [revealed, setRevealed] = useState(false);
+  const hasExercise = exerciseAnswer(audit).length > 0;
+  const showAnswers = revealed || !hasExercise;
   const s = audit.summary;
   const byClass = (c: MutantClassification) => audit.mutants.filter((m) => m.classification === c);
   const classes = [...CLASS_ORDER, ...new Set(audit.mutants.map((m) => m.classification).filter((c) => !CLASS_ORDER.includes(c)))];
@@ -335,19 +374,27 @@ export function AuditResult({ run, profile, now }: { run: Run; profile: AsyncSta
           </Disclosure>
         )}
       </Section>
+      <Exercise audit={audit} requirementTitles={requirementTitles} revealed={revealed} onReveal={setRevealed} />
       <Section title="Seeded faults by classification">
         <div className="stack-lg">
           {classes.map((c) => (
-            <MutantTable key={c} mutants={byClass(c)} cls={c} requirements={audit.requirements} />
+            <MutantTable key={c} mutants={byClass(c)} cls={c} requirements={audit.requirements} revealed={showAnswers} />
           ))}
         </div>
       </Section>
-      <Exercise audit={audit} requirementTitles={requirementTitles} />
       {!(run.state === "queued" || run.state === "running") && (
         <Section title="Stages" eyebrow="Completed stages" className="panel-quiet">
           <StagesPanel stages={audit.stages} now={now} compact />
         </Section>
       )}
+      {!showAnswers ? (
+        <Section title="Requirements covered by this check set">
+          <p className="muted hidden-answer">
+            <EyeOff size={16} aria-hidden="true" /> Hidden until you answer the learner exercise above: this table names the requirements the
+            set never checks.
+          </p>
+        </Section>
+      ) : (
       <Section title="Requirements covered by this check set">
         <p className="muted small">
           “Exercised” means the set's tests drive that condition; “checked” means the set compares an output there. A requirement can be
@@ -411,6 +458,7 @@ export function AuditResult({ run, profile, now }: { run: Run; profile: AsyncSta
           </table>
         </TableScroll>
       </Section>
+      )}
     </div>
   );
 }

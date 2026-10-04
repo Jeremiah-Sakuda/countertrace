@@ -45,10 +45,34 @@ function ModelPill({ status }: { status: AsyncState<Status> }) {
         Model not configured
       </Badge>
     );
+  // List every model the server uses, with its role, so no model call is attributed to the wrong one.
+  const roles: { id: string; role: string }[] = [];
+  const add = (id: string | null | undefined, role: string) => {
+    if (!id) return;
+    const existing = roles.find((r) => r.id === id);
+    if (existing) existing.role = `${existing.role}, ${role}`;
+    else roles.push({ id, role });
+  };
+  add(m.model_id, "explanation");
+  add(m.repair_model_id ?? m.model_id, "repair");
+  add(m.fast_model_id, "brief interpretation, check-set proposals");
   return (
-    <Badge tone="info" icon={Bot} title={m.endpoint_host ?? undefined}>
-      Model: {m.model_id ?? "configured"}
-    </Badge>
+    <dl className="model-roles" aria-label="Models in use">
+      {roles.map((r) => (
+        <div key={r.id}>
+          <dt>
+            <Bot size={13} aria-hidden="true" /> {r.role.charAt(0).toUpperCase() + r.role.slice(1)}
+          </dt>
+          <dd className="mono">{r.id}</dd>
+        </div>
+      ))}
+      {m.endpoint_host && (
+        <div>
+          <dt>Endpoint</dt>
+          <dd className="mono">{m.endpoint_host}</dd>
+        </div>
+      )}
+    </dl>
   );
 }
 
@@ -78,7 +102,6 @@ export function Header({ status, route, run }: { status: AsyncState<Status>; rou
               <a href={item.to} aria-current={item.match(route) ? "page" : undefined} className={item.match(route) ? "active" : undefined}>
                 <span className="nav-index" aria-hidden="true">0{i + 1}</span>
                 <span>{item.label}</span>
-                <span className="nav-arrow" aria-hidden="true">↗</span>
               </a>
             </li>
           ))}
@@ -93,7 +116,7 @@ export function Header({ status, route, run }: { status: AsyncState<Status>; rou
       <div className="rail-bottom">
         {run && (
           <div className="run-context">
-            <Badge tone="neutral" icon={run.recorded ? History : Radio}>{run.recorded ? "Recorded run" : "Live run"}</Badge>
+            <Badge tone="neutral" icon={run.recorded ? History : Radio}>{run.recorded ? "Recorded run" : "Run on this server"}</Badge>
             {run.kind === "verification" && <span role="status" aria-atomic="true" className="unresolved-count">
               <Badge tone={run.unresolved ? "unresolved" : "neutral"} icon={CircleHelp}>
                 {run.unresolved === null ? "Unresolved: pending" : `${run.unresolved} unresolved obligation${run.unresolved === 1 ? "" : "s"}`}

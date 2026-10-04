@@ -8,7 +8,9 @@ import { ModelCalls, ModelProvenance, ModelStatusNotice } from "../../components
 import { formatDuration } from "../../lib/format";
 import { useNow } from "../../lib/hooks";
 
-function ExplanationBody({ explanation, runId, onCite }: { explanation: Explanation; runId: string; onCite: (cycle: number) => void }) {
+type CiteHandler = (cycle: number, origin?: { element: HTMLElement; label: string }) => void;
+
+function ExplanationBody({ explanation, runId, onCite }: { explanation: Explanation; runId: string; onCite: CiteHandler }) {
   const r = explanation.result;
   const check = explanation.citation_check;
   const [source, setSource] = useState<string | null>(null);
@@ -53,7 +55,7 @@ function ExplanationBody({ explanation, runId, onCite }: { explanation: Explanat
                         <TriangleAlert size={12} aria-hidden="true" /> cycle {c} (invalid citation)
                       </span>
                     ) : (
-                      <button key={c} type="button" className="cite cycle-link" onClick={() => onCite(c)} aria-label={`Show cycle ${c} in the cycle table`}>
+                      <button key={c} type="button" className="cite cycle-link" onClick={(e) => onCite(c, { element: e.currentTarget, label: `Back to explanation step ${i + 1}` })} aria-label={`Show cycle ${c} in the cycle table`}>
                         cycle {c}
                       </button>
                     );
@@ -103,7 +105,7 @@ function ExplanationBody({ explanation, runId, onCite }: { explanation: Explanat
   );
 }
 
-export function ExplanationPanel({ run, hasFinding, onCite, onUpdated }: { run: Run; hasFinding: boolean; onCite: (cycle: number) => void; onUpdated: () => void }) {
+export function ExplanationPanel({ run, hasFinding, onCite, onUpdated }: { run: Run; hasFinding: boolean; onCite: CiteHandler; onUpdated: () => void }) {
   const [busy, setBusy] = useState(false);
   const [startedAt, setStartedAt] = useState<number | null>(null);
   const [error, setError] = useState<unknown>(null);

@@ -1,0 +1,2659 @@
+{
+  "suite": "eval-v2",
+  "started_at": "2026-10-04T04:57:25Z",
+  "model_ids": {
+    "explain": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "repair": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "interpret": "nvidia/nemotron-3-super-120b-a12b"
+  },
+  "prompt_sha256": {
+    "interpret": "sha256:b426c60c4a0c245eda05ae89e54f95cff100273720042aaa8ad0e2e941149eef",
+    "explain": "sha256:9b6e8934df835f60691a07ebf9ad42e74392d26a465758083770a0fe5d310b79",
+    "repair": "sha256:b9dea4ba311d8d99b0ea81773630603245a5da4131e4a72018e65e1616c26b08",
+    "propose_checks": "sha256:0eb0bc9c56f70598df638266c88145dc4118a4f9f7c31ea5ab0237bb808cdb16"
+  },
+  "cases": [
+    {
+      "id": "C1",
+      "impl": "regflags",
+      "depth": 4,
+      "expected": "correct",
+      "category": null,
+      "class": null,
+      "summary": null,
+      "held_out": true,
+      "diagnosis": {
+        "run_id": "20261004-005725-ver-d1aabb",
+        "state": "complete",
+        "headline": "no_counterexample",
+        "obligations": {
+          "simulation:empty_flag": "simulation_passed",
+          "simulation:full_flag": "simulation_passed",
+          "simulation:read_data": "simulation_passed",
+          "bmc:empty_flag": "bounded_pass",
+          "bmc:full_flag": "bounded_pass",
+          "bmc:read_data": "bounded_pass",
+          "prove:empty_flag": "proved",
+          "prove:full_flag": "proved",
+          "prove:read_data": "proved",
+          "cover:reachability": "bounded_pass"
+        },
+        "findings": [],
+        "formal_replay": null,
+        "integrity": [],
+        "timings": {
+          "total_s": 10.32
+        },
+        "outcome": "no_counterexample"
+      }
+    },
+    {
+      "id": "C2",
+      "impl": "regflags",
+      "depth": 2,
+      "expected": "correct",
+      "category": null,
+      "class": null,
+      "summary": null,
+      "held_out": true,
+      "diagnosis": {
+        "run_id": "20261004-005735-ver-2c417e",
+        "state": "complete",
+        "headline": "no_counterexample",
+        "obligations": {
+          "bmc:empty_flag": "bounded_pass",
+          "bmc:full_flag": "bounded_pass",
+          "bmc:read_data": "bounded_pass",
+          "prove:empty_flag": "proved",
+          "prove:full_flag": "proved",
+          "prove:read_data": "proved",
+          "cover:reachability": "bounded_pass",
+          "simulation:empty_flag": "simulation_passed",
+          "simulation:full_flag": "simulation_passed",
+          "simulation:read_data": "simulation_passed"
+        },
+        "findings": [],
+        "formal_replay": null,
+        "integrity": [],
+        "timings": {
+          "total_s": 3.87
+        },
+        "outcome": "no_counterexample"
+      }
+    },
+    {
+      "id": "C3",
+      "impl": "billdmar",
+      "depth": 4,
+      "expected": "correct",
+      "category": null,
+      "class": null,
+      "summary": null,
+      "held_out": false,
+      "diagnosis": {
+        "run_id": "20261004-005739-ver-b572d0",
+        "state": "complete",
+        "headline": "no_counterexample",
+        "obligations": {
+          "simulation:empty_flag": "simulation_passed",
+          "simulation:full_flag": "simulation_passed",
+          "simulation:read_data": "simulation_passed",
+          "bmc:empty_flag": "bounded_pass",
+          "bmc:full_flag": "bounded_pass",
+          "bmc:read_data": "bounded_pass",
+          "prove:empty_flag": "proved",
+          "prove:full_flag": "proved",
+          "prove:read_data": "proved",
+          "cover:reachability": "bounded_pass"
+        },
+        "findings": [],
+        "formal_replay": null,
+        "integrity": [],
+        "timings": {
+          "total_s": 11.87
+        },
+        "outcome": "no_counterexample"
+      }
+    },
+    {
+      "id": "C4",
+      "impl": "wrapbit",
+      "depth": 2,
+      "expected": "correct",
+      "category": null,
+      "class": null,
+      "summary": null,
+      "held_out": false,
+      "diagnosis": {
+        "run_id": "20261004-005751-ver-167ff7",
+        "state": "complete",
+        "headline": "no_counterexample",
+        "obligations": {
+          "bmc:empty_flag": "bounded_pass",
+          "bmc:full_flag": "bounded_pass",
+          "bmc:read_data": "bounded_pass",
+          "prove:empty_flag": "proved",
+          "prove:full_flag": "proved",
+          "prove:read_data": "proved",
+          "cover:reachability": "bounded_pass",
+          "simulation:empty_flag": "simulation_passed",
+          "simulation:full_flag": "simulation_passed",
+          "simulation:read_data": "simulation_passed"
+        },
+        "findings": [],
+        "formal_replay": null,
+        "integrity": [],
+        "timings": {
+          "total_s": 3.89
+        },
+        "outcome": "no_counterexample"
+      }
+    },
+    {
+      "id": "F1",
+      "impl": "regflags",
+      "depth": 4,
+      "expected": "faulty",
+      "category": "simultaneous",
+      "class": "both_mid",
+      "summary": "Flag updates written as independent if-statements: a simultaneous read and write at occupancy 1 sets empty.",
+      "held_out": true,
+      "diagnosis": {
+        "run_id": "20261004-005755-ver-a8ded4",
+        "state": "complete",
+        "headline": "counterexample",
+        "obligations": {
+          "bmc:empty_flag": "counterexample",
+          "bmc:full_flag": "unresolved",
+          "bmc:read_data": "unresolved",
+          "prove:empty_flag": "counterexample",
+          "prove:full_flag": "unresolved",
+          "prove:read_data": "unresolved",
+          "cover:reachability": "bounded_pass",
+          "simulation:empty_flag": "counterexample",
+          "simulation:full_flag": "simulation_passed",
+          "simulation:read_data": "simulation_passed"
+        },
+        "findings": [
+          {
+            "source": "simulation",
+            "test": "random_s3",
+            "cycle": 2,
+            "check": "empty_flag",
+            "requirement_id": "both_mid"
+          },
+          {
+            "source": "formal",
+            "test": "formal:bmc",
+            "cycle": 2,
+            "check": "empty_flag",
+            "requirement_id": "both_mid"
+          }
+        ],
+        "formal_replay": "reproduced",
+        "integrity": [],
+        "timings": {
+          "first_finding_s": 3.84,
+          "total_s": 7.72
+        },
+        "outcome": "reproduced"
+      },
+      "explanation": {
+        "status": "ok_with_invalid_citations",
+        "citation_check": {
+          "valid": 29,
+          "invalid": [
+            {
+              "step": 2,
+              "kind": "signal",
+              "value": "expected empty"
+            }
+          ],
+          "uncited_steps": 0,
+          "allowed_cycles": [
+            0,
+            4
+          ]
+        },
+        "finding": {
+          "test": "random_s3",
+          "cycle": 2,
+          "check": "empty_flag",
+          "requirement_id": "both_mid",
+          "source": "simulation"
+        },
+        "result": {
+          "summary": "At cycle 2 a simultaneous read and write occurs; the RTL's pop block sets empty_r using the old write pointer (wp) instead of the next write pointer (wp_next), so it incorrectly concludes the FIFO becomes empty when occupancy actually stays at one.",
+          "steps": [
+            {
+              "text": "Cycle 1: write accepted (push=1, pop=0) advances wp to 1, sets empty_r=0, full_r=0.",
+              "cycles": [
+                1
+              ],
+              "signals": [
+                "wr_en",
+                "rd_en",
+                "push",
+                "pop",
+                "wp",
+                "rp",
+                "empty_r",
+                "full_r"
+              ]
+            },
+            {
+              "text": "Cycle 2: both push and pop asserted; pop block computes empty_r <= (rp_next == wp) with rp_next=1 and wp=1 (old wp), yielding 1 and overwriting push block's empty_r=0.",
+              "cycles": [
+                2
+              ],
+              "signals": [
+                "wr_en",
+                "rd_en",
+                "push",
+                "pop",
+                "wp",
+                "rp",
+                "wp_next",
+                "rp_next",
+                "empty_r"
+              ]
+            },
+            {
+              "text": "Reference queue shows occupancy unchanged ([a3] -> [83]), so empty should be 0; RTL drives empty=1 causing the empty_flag mismatch.",
+              "cycles": [
+                2
+              ],
+              "signals": [
+                "empty",
+                "expected empty"
+              ]
+            }
+          ],
+          "likely_cause": {
+            "text": "The pop block (lines 53-56) uses the current wp instead of wp_next when computing the new empty flag, failing to account for a concurrent push that also advances wp. The push block (lines 49-52) has a symmetric issue for full_r using current rp instead of rp_next.",
+            "lines": [
+              53,
+              54,
+              55,
+              56,
+              49,
+              50,
+              51,
+              52
+            ]
+          },
+          "next_action": "Revise the flag-update logic to compute empty_r and full_r from the next pointers (wp_next, rp_next) and the push/pop actions, e.g., by evaluating a combined next-state condition that covers simultaneous operations.",
+          "limits": "This failure refutes the empty_flag contract for DEPTH=4, WIDTH=8 under the tested trace. Simulation passes for full_flag and read_data cover only the 14 named tests and do not guarantee correctness for all conditions. Formal checks for full_flag and read_data are unresolved. The cover check establishes reachability up to depth 24, not functional correctness."
+        },
+        "calls": [
+          {
+            "task": "explain",
+            "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+            "latency_ms": 8741,
+            "prompt_tokens": 2452,
+            "completion_tokens": 3290,
+            "status": "ok",
+            "schema_error": null,
+            "finish_reason": "stop"
+          }
+        ],
+        "review": {
+          "reviewer": "Claude (coding assistant), not independent",
+          "date": "2026-10-04",
+          "rubric": {
+            "violated_requirement": 2,
+            "first_failing_transaction": 2,
+            "expected_vs_observed": 2,
+            "limits": 2
+          },
+          "cause": "partial",
+          "notes": "Requirement, first failing transaction, expected/observed, and limits correct. Cause partly wrong: it also claims a symmetric full_r bug that does not occur (the pop branch's full_r <= 0 wins). One invalid citation ('expected empty')."
+        }
+      },
+      "repair": {
+        "status": "passed",
+        "wall_s": 48.02,
+        "attempts": [
+          {
+            "index": 1,
+            "status": "failed_checks",
+            "summary": "Counterexample: empty_flag at cycle 1 (Read requested while empty) in random_s5.",
+            "candidate_run_id": "20261004-005824-ver-b150cd",
+            "frozen_match": true,
+            "rationale": "The bug is that full/empty flags are updated using stale pointer values when both push and pop occur. The fix computes next-state flags from next pointers (wp_next, rp_next) in a single combinational block, ensuring correct occupancy tracking during simultaneous read/write.",
+            "diff": "--- a/dut.v\n+++ b/dut.v\n@@ -30,6 +30,8 @@\n     wire          pop     = rd_en && !empty_r;\n     wire [AW-1:0] wp_next = wp + 1'b1;\n     wire [AW-1:0] rp_next = rp + 1'b1;\n+    wire          full_next  = (push && !pop) ? (wp_next == rp) : 1'b0;\n+    wire          empty_next = (pop && !push) ? (rp_next == wp_next) : 1'b0;\n \n     always @(posedge clk) begin\n         if (rst) begin\n@@ -46,14 +48,8 @@\n                 dout <= ram[rp];\n                 rp   <= rp_next;\n             end\n-            if (push) begin\n-                empty_r <= 1'b0;\n-                full_r  <= (wp_next == rp);\n-            end\n-            if (pop) begin\n-                full_r  <= 1'b0;\n-                empty_r <= (rp_next == wp);\n-            end\n+            full_r  <= full_next;\n+            empty_r <= empty_next;\n         end\n     end\n endmodule\n",
+            "diagnostics": null,
+            "calls": [
+              {
+                "task": "repair",
+                "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "latency_ms": 10455,
+                "prompt_tokens": 1314,
+                "completion_tokens": 4096,
+                "status": "ok",
+                "schema_error": "Expecting property name enclosed in double quotes: line 1 column 3 (char 2)",
+                "finish_reason": "length"
+              },
+              {
+                "task": "repair",
+                "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "latency_ms": 1716,
+                "prompt_tokens": 1341,
+                "completion_tokens": 630,
+                "status": "ok",
+                "schema_error": null,
+                "finish_reason": "stop"
+              }
+            ]
+          },
+          {
+            "index": 2,
+            "status": "failed_checks",
+            "summary": "Counterexample: empty_flag at cycle 2 (Read requested while not empty) in random_s1.",
+            "candidate_run_id": "20261004-005841-ver-739960",
+            "frozen_match": true,
+            "rationale": "The empty and full flags were incorrectly cleared when no push/pop occurred (i.e., when both push and pop are 0). The next-state logic must preserve the flags when occupancy doesn't change (both push and pop asserted or both deasserted). The new combinational logic computes full_next and empty_next correctly for all cases: set full when push without pop and pointers meet, clear full when pop without push; set empty when pop without push and pointers meet, clear empty when push without pop; otherwise hold current flag values.",
+            "diff": "--- a/dut.v\n+++ b/dut.v\n@@ -30,6 +30,10 @@\n     wire          pop     = rd_en && !empty_r;\n     wire [AW-1:0] wp_next = wp + 1'b1;\n     wire [AW-1:0] rp_next = rp + 1'b1;\n+    wire          full_next  = (push && !pop) ? (wp_next == rp) : \n+                               (pop && !push) ? 1'b0 : full_r;\n+    wire          empty_next = (pop && !push) ? (rp_next == wp_next) : \n+                               (push && !pop) ? 1'b0 : empty_r;\n \n     always @(posedge clk) begin\n         if (rst) begin\n@@ -46,14 +50,8 @@\n                 dout <= ram[rp];\n                 rp   <= rp_next;\n             end\n-            if (push) begin\n-                empty_r <= 1'b0;\n-                full_r  <= (wp_next == rp);\n-            end\n-            if (pop) begin\n-                full_r  <= 1'b0;\n-                empty_r <= (rp_next == wp);\n-            end\n+            full_r  <= full_next;\n+            empty_r <= empty_next;\n         end\n     end\n endmodule\n",
+            "diagnostics": null,
+            "calls": [
+              {
+                "task": "repair",
+                "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "latency_ms": 9311,
+                "prompt_tokens": 1578,
+                "completion_tokens": 3467,
+                "status": "ok",
+                "schema_error": null,
+                "finish_reason": "stop"
+              }
+            ]
+          },
+          {
+            "index": 3,
+            "status": "passed_unchanged_checks",
+            "summary": "All 10 obligations resolved under the unchanged checks (3 proved, no counterexample).",
+            "candidate_run_id": "20261004-005853-ver-c66323",
+            "frozen_match": true,
+            "rationale": "The empty flag incorrectly uses wp_next (write pointer after increment) when only a pop occurs. Since no write happens, the write pointer doesn't change; empty should be true when rp_next equals the current wp. The fix replaces wp_next with wp in the pop-only branch of empty_next.",
+            "diff": "--- a/dut.v\n+++ b/dut.v\n@@ -30,6 +30,10 @@\n     wire          pop     = rd_en && !empty_r;\n     wire [AW-1:0] wp_next = wp + 1'b1;\n     wire [AW-1:0] rp_next = rp + 1'b1;\n+    wire          full_next  = (push && !pop) ? (wp_next == rp) : \n+                               (pop && !push) ? 1'b0 : full_r;\n+    wire          empty_next = (pop && !push) ? (rp_next == wp) : \n+                               (push && !pop) ? 1'b0 : empty_r;\n \n     always @(posedge clk) begin\n         if (rst) begin\n@@ -46,14 +50,8 @@\n                 dout <= ram[rp];\n                 rp   <= rp_next;\n             end\n-            if (push) begin\n-                empty_r <= 1'b0;\n-                full_r  <= (wp_next == rp);\n-            end\n-            if (pop) begin\n-                full_r  <= 1'b0;\n-                empty_r <= (rp_next == wp);\n-            end\n+            full_r  <= full_next;\n+            empty_r <= empty_next;\n         end\n     end\n endmodule\n",
+            "diagnostics": null,
+            "calls": [
+              {
+                "task": "repair",
+                "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "latency_ms": 4998,
+                "prompt_tokens": 2006,
+                "completion_tokens": 1854,
+                "status": "ok",
+                "schema_error": null,
+                "finish_reason": "stop"
+              }
+            ]
+          }
+        ],
+        "attempts_used": 3,
+        "passed_on_attempt": 3
+      }
+    },
+    {
+      "id": "F2",
+      "impl": "regflags",
+      "depth": 4,
+      "expected": "faulty",
+      "category": "reset",
+      "class": "reset",
+      "summary": "Reset does not clear the registered full flag.",
+      "held_out": true,
+      "diagnosis": {
+        "run_id": "20261004-005900-ver-08fd75",
+        "state": "complete",
+        "headline": "counterexample",
+        "obligations": {
+          "bmc:empty_flag": "unresolved",
+          "bmc:full_flag": "counterexample",
+          "bmc:read_data": "unresolved",
+          "prove:empty_flag": "unresolved",
+          "prove:full_flag": "counterexample",
+          "prove:read_data": "unresolved",
+          "cover:reachability": "bounded_pass",
+          "simulation:empty_flag": "simulation_passed",
+          "simulation:full_flag": "counterexample",
+          "simulation:read_data": "simulation_passed"
+        },
+        "findings": [
+          {
+            "source": "simulation",
+            "test": "fill_drain",
+            "cycle": 0,
+            "check": "full_flag",
+            "requirement_id": "reset"
+          },
+          {
+            "source": "formal",
+            "test": "formal:bmc",
+            "cycle": 0,
+            "check": "full_flag",
+            "requirement_id": "reset"
+          }
+        ],
+        "formal_replay": "reproduced",
+        "integrity": [],
+        "timings": {
+          "first_finding_s": 3.87,
+          "total_s": 7.75
+        },
+        "outcome": "reproduced"
+      },
+      "explanation": {
+        "status": "ok",
+        "citation_check": {
+          "valid": 10,
+          "invalid": [],
+          "uncited_steps": 0,
+          "allowed_cycles": [
+            0,
+            2
+          ]
+        },
+        "finding": {
+          "test": "fill_drain",
+          "cycle": 0,
+          "check": "full_flag",
+          "requirement_id": "reset",
+          "source": "simulation"
+        },
+        "result": {
+          "summary": "At cycle 0, reset is asserted but the RTL does not clear the full_r register, leaving full asserted (true) instead of false as the contract requires. The reset block initializes wp, rp, and empty_r but omits full_r.",
+          "steps": [
+            {
+              "text": "Cycle 0: rst=1, wr_en=0, rd_en=0. The design takes the reset branch (lines 35-38), setting wp=0, rp=0, empty_r=1. full_r is not assigned in this branch, so it retains its prior value (observed as 1). The contract requires full=0 after reset.",
+              "cycles": [
+                0
+              ],
+              "signals": [
+                "rst",
+                "full",
+                "empty_r",
+                "wp",
+                "rp"
+              ]
+            }
+          ],
+          "likely_cause": {
+            "text": "The reset block (lines 35-38) does not initialize full_r to 0. On reset, full_r keeps its previous value (here 1), causing full to be true instead of false.",
+            "lines": [
+              35,
+              36,
+              37,
+              38
+            ]
+          },
+          "next_action": "Add full_r <= 1'b0 in the reset block (e.g., after line 38) so that reset clears the full flag.",
+          "limits": "This failure refutes the full_flag contract for DEPTH=4, WIDTH=8. The simulation full_flag check failed in all 14 named tests; formal BMC and prove also produced counterexamples for full_flag. Simulation empty_flag and read_data passed their 14 tests, but formal checks for those properties are unresolved (stopped at another counterexample). Cover reachability passed bounded (depth 24). Passing checks cover only their named tests and horizons; they do not establish correctness for untested conditions or other configurations."
+        },
+        "calls": [
+          {
+            "task": "explain",
+            "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+            "latency_ms": 3348,
+            "prompt_tokens": 2397,
+            "completion_tokens": 1107,
+            "status": "ok",
+            "schema_error": null,
+            "finish_reason": "stop"
+          }
+        ],
+        "review": {
+          "reviewer": "Claude (coding assistant), not independent",
+          "date": "2026-10-04",
+          "rubric": {
+            "violated_requirement": 2,
+            "first_failing_transaction": 2,
+            "expected_vs_observed": 2,
+            "limits": 2
+          },
+          "cause": "correct",
+          "notes": "Correct: reset omits full_r."
+        }
+      },
+      "repair": {
+        "status": "passed",
+        "wall_s": 45.79,
+        "attempts": [
+          {
+            "index": 1,
+            "status": "failed_checks",
+            "summary": "Counterexample: empty_flag at cycle 1 (Read requested while empty) in random_s5.",
+            "candidate_run_id": "20261004-005924-ver-ac5ac4",
+            "frozen_match": true,
+            "rationale": "The reset logic does not clear full_r, causing full to remain true after reset. Also, the case statement only handles push-only and pop-only cases, missing simultaneous push+pop and no-op cases where flags must be updated. Need to reset full_r and empty_r, and handle all four push/pop combinations in the case statement.",
+            "diff": "--- a/dut.v\n+++ b/dut.v\n@@ -35,6 +35,7 @@\n         if (rst) begin\n             wp      <= 0;\n             rp      <= 0;\n+            full_r  <= 1'b0;\n             empty_r <= 1'b1;\n         end else begin\n             if (push) begin\n@@ -54,7 +55,13 @@\n                     full_r  <= 1'b0;\n                     empty_r <= (rp_next == wp);\n                 end\n+                2'b11: begin\n+                    full_r  <= (wp_next == rp_next);\n+                    empty_r <= (rp_next == wp_next);\n+                end\n                 default: begin\n+                    full_r  <= (wp_next == rp);\n+                    empty_r <= (rp_next == wp);\n                 end\n             endcase\n         end\n",
+            "diagnostics": null,
+            "calls": [
+              {
+                "task": "repair",
+                "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "latency_ms": 11491,
+                "prompt_tokens": 1245,
+                "completion_tokens": 4096,
+                "status": "ok",
+                "schema_error": "Expecting property name enclosed in double quotes: line 1 column 2 (char 1)",
+                "finish_reason": "length"
+              },
+              {
+                "task": "repair",
+                "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "latency_ms": 1421,
+                "prompt_tokens": 1272,
+                "completion_tokens": 460,
+                "status": "ok",
+                "schema_error": null,
+                "finish_reason": "stop"
+              }
+            ]
+          },
+          {
+            "index": 2,
+            "status": "passed_unchanged_checks",
+            "summary": "All 10 obligations resolved under the unchanged checks (3 proved, no counterexample).",
+            "candidate_run_id": "20261004-005944-ver-099d40",
+            "frozen_match": true,
+            "rationale": "The default case in the case statement incorrectly computes full/empty flags when neither push nor pop occurs. It uses wp_next and rp_next instead of current wp and rp, causing false full/empty assertions. The default case should maintain current flag values since no pointers change.",
+            "diff": "--- a/dut.v\n+++ b/dut.v\n@@ -35,6 +35,7 @@\n         if (rst) begin\n             wp      <= 0;\n             rp      <= 0;\n+            full_r  <= 1'b0;\n             empty_r <= 1'b1;\n         end else begin\n             if (push) begin\n@@ -54,7 +55,13 @@\n                     full_r  <= 1'b0;\n                     empty_r <= (rp_next == wp);\n                 end\n+                2'b11: begin\n+                    full_r  <= (wp_next == rp_next);\n+                    empty_r <= (rp_next == wp_next);\n+                end\n                 default: begin\n+                    full_r  <= full_r;\n+                    empty_r <= empty_r;\n                 end\n             endcase\n         end\n",
+            "diagnostics": null,
+            "calls": [
+              {
+                "task": "repair",
+                "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "latency_ms": 11190,
+                "prompt_tokens": 1570,
+                "completion_tokens": 4096,
+                "status": "ok",
+                "schema_error": "Expecting property name enclosed in double quotes: line 1 column 2 (char 1)",
+                "finish_reason": "length"
+              },
+              {
+                "task": "repair",
+                "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "latency_ms": 936,
+                "prompt_tokens": 1597,
+                "completion_tokens": 146,
+                "status": "ok",
+                "schema_error": null,
+                "finish_reason": "stop"
+              }
+            ]
+          }
+        ],
+        "attempts_used": 2,
+        "passed_on_attempt": 2
+      }
+    },
+    {
+      "id": "F3",
+      "impl": "regflags",
+      "depth": 4,
+      "expected": "faulty",
+      "category": "flags_boundaries",
+      "class": "write_not_full",
+      "summary": "full is computed from the current write pointer instead of the next one.",
+      "held_out": true,
+      "diagnosis": {
+        "run_id": "20261004-005956-ver-67c21a",
+        "state": "complete",
+        "headline": "counterexample",
+        "obligations": {
+          "bmc:empty_flag": "unresolved",
+          "bmc:full_flag": "counterexample",
+          "bmc:read_data": "unresolved",
+          "prove:empty_flag": "unresolved",
+          "prove:full_flag": "counterexample",
+          "prove:read_data": "unresolved",
+          "cover:reachability": "bounded_pass",
+          "simulation:empty_flag": "simulation_passed",
+          "simulation:full_flag": "counterexample",
+          "simulation:read_data": "simulation_passed"
+        },
+        "findings": [
+          {
+            "source": "simulation",
+            "test": "fill_drain",
+            "cycle": 1,
+            "check": "full_flag",
+            "requirement_id": "write_not_full"
+          },
+          {
+            "source": "formal",
+            "test": "formal:bmc",
+            "cycle": 1,
+            "check": "full_flag",
+            "requirement_id": "write_not_full"
+          }
+        ],
+        "formal_replay": "reproduced",
+        "integrity": [],
+        "timings": {
+          "first_finding_s": 4.1,
+          "total_s": 7.95
+        },
+        "outcome": "reproduced"
+      },
+      "explanation": {
+        "status": "ok",
+        "citation_check": {
+          "valid": 21,
+          "invalid": [],
+          "uncited_steps": 0,
+          "allowed_cycles": [
+            0,
+            3
+          ]
+        },
+        "finding": {
+          "test": "fill_drain",
+          "cycle": 1,
+          "check": "full_flag",
+          "requirement_id": "write_not_full",
+          "source": "simulation"
+        },
+        "result": {
+          "summary": "The FIFO incorrectly asserts full after the first write because the full-flag logic uses the current write pointer (wp) instead of the next write pointer (wp_next). This causes full to become true when wp==rp (which holds at reset) rather than when the FIFO is actually full (wp_next==rp), and the asserted full then blocks subsequent writes.",
+          "steps": [
+            {
+              "text": "At cycle 0 reset initializes wp=0, rp=0, full=0, empty=1; the reference queue is empty.",
+              "cycles": [
+                0
+              ],
+              "signals": [
+                "rst",
+                "wp",
+                "rp",
+                "full",
+                "empty"
+              ]
+            },
+            {
+              "text": "At cycle 1 a write occurs (wr_en=1, rd_en=0). The RTL computes push=1 because full_r=0, then sets full_r <= (wp == rp) which is true (0==0), so full becomes 1. The reference queue now has one element (occupancy=1) and should not be full (DEPTH=4).",
+              "cycles": [
+                1
+              ],
+              "signals": [
+                "wr_en",
+                "rd_en",
+                "push",
+                "wp",
+                "rp",
+                "full",
+                "empty"
+              ]
+            },
+            {
+              "text": "Because full is now 1, push becomes 0 for cycles 2 and 3 (wr_en=1 but !full_r=0), so no further writes are accepted and full stays 1. The reference queue accepts three writes (occupancy 1,2,3) and expects full=0 throughout.",
+              "cycles": [
+                2,
+                3
+              ],
+              "signals": [
+                "wr_en",
+                "full",
+                "push",
+                "empty"
+              ]
+            }
+          ],
+          "likely_cause": {
+            "text": "The full-flag update for a push-only operation (line 52) uses (wp == rp) instead of (wp_next == rp). At reset wp==rp, so the first write incorrectly sets full. The correct condition should compare the next write pointer against the current read pointer.",
+            "lines": [
+              52
+            ]
+          },
+          "next_action": "Change line 52 from `full_r <= (wp == rp);` to `full_r <= (wp_next == rp);` so that full is asserted only when the next write would make the write pointer catch up to the read pointer.",
+          "limits": "This failure refutes the full_flag contract for DEPTH=4, WIDTH=8. The simulation passes for empty_flag and read_data across 14 named tests (1386 cycles), but those passes only cover their named tests and do not guarantee full_flag correctness. The formal checks for full_flag (bmc and prove) also produced counterexamples at application cycle 1. The reachability cover (bounded_pass, depth 24) only establishes that some states are reachable, not that the specification is complete. Unresolved formal checks (empty_flag, read_data) are not passes."
+        },
+        "calls": [
+          {
+            "task": "explain",
+            "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+            "latency_ms": 8964,
+            "prompt_tokens": 2445,
+            "completion_tokens": 3355,
+            "status": "ok",
+            "schema_error": null,
+            "finish_reason": "stop"
+          }
+        ],
+        "review": {
+          "reviewer": "Claude (coding assistant), not independent",
+          "date": "2026-10-04",
+          "rubric": {
+            "violated_requirement": 2,
+            "first_failing_transaction": 2,
+            "expected_vs_observed": 2,
+            "limits": 2
+          },
+          "cause": "correct",
+          "notes": "Correct: full uses the current write pointer instead of the next one."
+        }
+      },
+      "repair": {
+        "status": "passed",
+        "wall_s": 22.95,
+        "attempts": [
+          {
+            "index": 1,
+            "status": "passed_unchanged_checks",
+            "summary": "All 10 obligations resolved under the unchanged checks (3 proved, no counterexample).",
+            "candidate_run_id": "20261004-010026-ver-aa754f",
+            "frozen_match": true,
+            "rationale": "The full flag logic is incorrect. When only writing (push=1, pop=0), full should be set when wp_next == rp (queue becomes full after write), not wp == rp. When only reading (push=0, pop=1), empty should be set when rp_next == wp (queue becomes empty after read), which is correct. Also need to handle simultaneous push/pop case to maintain full/empty flags correctly.",
+            "diff": "--- a/dut.v\n+++ b/dut.v\n@@ -49,11 +49,15 @@\n             case ({push, pop})\n                 2'b10: begin\n                     empty_r <= 1'b0;\n-                    full_r  <= (wp == rp);\n+                    full_r  <= (wp_next == rp);\n                 end\n                 2'b01: begin\n                     full_r  <= 1'b0;\n                     empty_r <= (rp_next == wp);\n+                end\n+                2'b11: begin\n+                    full_r  <= 1'b0;\n+                    empty_r <= 1'b0;\n                 end\n                 default: begin\n                 end\n",
+            "diagnostics": null,
+            "calls": [
+              {
+                "task": "repair",
+                "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "latency_ms": 11120,
+                "prompt_tokens": 1289,
+                "completion_tokens": 4096,
+                "status": "ok",
+                "schema_error": "Expecting property name enclosed in double quotes: line 1 column 2 (char 1)",
+                "finish_reason": "length"
+              },
+              {
+                "task": "repair",
+                "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "latency_ms": 1157,
+                "prompt_tokens": 1316,
+                "completion_tokens": 348,
+                "status": "ok",
+                "schema_error": null,
+                "finish_reason": "stop"
+              }
+            ]
+          }
+        ],
+        "attempts_used": 1,
+        "passed_on_attempt": 1
+      }
+    },
+    {
+      "id": "F4",
+      "impl": "regflags",
+      "depth": 4,
+      "expected": "faulty",
+      "category": "ordering_wraparound",
+      "class": "wraparound",
+      "summary": "The storage array is declared one entry short, so the last slot is lost at wraparound.",
+      "held_out": true,
+      "diagnosis": {
+        "run_id": "20261004-010036-ver-e6c1e7",
+        "state": "complete",
+        "headline": "counterexample",
+        "obligations": {
+          "bmc:empty_flag": "tool_error",
+          "bmc:full_flag": "tool_error",
+          "bmc:read_data": "tool_error",
+          "prove:empty_flag": "tool_error",
+          "prove:full_flag": "tool_error",
+          "prove:read_data": "tool_error",
+          "cover:reachability": "bounded_pass",
+          "simulation:empty_flag": "simulation_passed",
+          "simulation:full_flag": "simulation_passed",
+          "simulation:read_data": "counterexample"
+        },
+        "findings": [
+          {
+            "source": "simulation",
+            "test": "learner_basic",
+            "cycle": 8,
+            "check": "read_data",
+            "requirement_id": "read_not_empty"
+          }
+        ],
+        "formal_replay": null,
+        "integrity": [],
+        "timings": {
+          "first_finding_s": 3.56,
+          "total_s": 3.58
+        },
+        "outcome": "reproduced"
+      },
+      "explanation": {
+        "status": "ok",
+        "citation_check": {
+          "valid": 17,
+          "invalid": [],
+          "uncited_steps": 0,
+          "allowed_cycles": [
+            0,
+            10
+          ]
+        },
+        "finding": {
+          "test": "learner_basic",
+          "cycle": 8,
+          "check": "read_data",
+          "requirement_id": "read_not_empty",
+          "source": "simulation"
+        },
+        "result": {
+          "summary": "The FIFO fails to return the correct data on the fourth read (cycle 8) because the internal RAM is sized DEPTH-1 (3 entries) instead of DEPTH (4 entries), causing the fourth write (cycle 4) and fourth read (cycle 8) to access an out-of-bounds index (3). The observed dout 0x73 is garbage from the invalid read, while the reference queue expects 0xf9 written at cycle 4.",
+          "steps": [
+            {
+              "text": "Cycle 4 accepts write of 0xf9 with wp=3; the RTL writes to ram[3] but ram is declared [0:DEPTH-2] (indices 0..2), so the write is out of bounds and the value is not stored in the accessible array.",
+              "cycles": [
+                4
+              ],
+              "signals": [
+                "wr_en",
+                "din",
+                "wp",
+                "full_r"
+              ]
+            },
+            {
+              "text": "Cycles 5-7 read the first three words (c6, d7, e8) from ram[0], ram[1], ram[2] correctly because rp increments 0\u21921\u21922 and those indices are within the declared RAM.",
+              "cycles": [
+                5,
+                6,
+                7
+              ],
+              "signals": [
+                "rd_en",
+                "rp",
+                "dout"
+              ]
+            },
+            {
+              "text": "Cycle 8 accepts a read with rp=3; the RTL reads ram[3] (out of bounds) and drives dout=0x73 instead of the expected 0xf9, causing the read_data mismatch.",
+              "cycles": [
+                8
+              ],
+              "signals": [
+                "rd_en",
+                "rp",
+                "dout",
+                "empty"
+              ]
+            }
+          ],
+          "likely_cause": {
+            "text": "RAM array declared with DEPTH-1 entries (line 20) but pointers wp/rp range 0..DEPTH-1; the fourth element writes to and reads from an index that does not exist in the array.",
+            "lines": [
+              20
+            ]
+          },
+          "next_action": "Change line 20 to `reg [WIDTH-1:0] ram [0:DEPTH-1];` (or `[DEPTH-1:0]`) so the RAM has DEPTH entries matching the pointer range.",
+          "limits": "This failure refutes the read_data contract for DEPTH=4, WIDTH=8. The simulation passes for empty_flag and full_flag across 14 tests, but those passes do not cover read_data correctness. Formal checks (bmc, prove) returned tool errors and provide no evidence. The cover reachability check passed (bounded) but only establishes state reachability, not functional correctness. No other configuration is implied."
+        },
+        "calls": [
+          {
+            "task": "explain",
+            "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+            "latency_ms": 6931,
+            "prompt_tokens": 2761,
+            "completion_tokens": 2661,
+            "status": "ok",
+            "schema_error": null,
+            "finish_reason": "stop"
+          }
+        ],
+        "review": {
+          "reviewer": "Claude (coding assistant), not independent",
+          "date": "2026-10-04",
+          "rubric": {
+            "violated_requirement": 2,
+            "first_failing_transaction": 2,
+            "expected_vs_observed": 2,
+            "limits": 2
+          },
+          "cause": "correct",
+          "notes": "Correct short-array cause; correctly states that the formal tasks ended in tool errors and give no evidence."
+        }
+      },
+      "repair": {
+        "status": "passed",
+        "wall_s": 18.96,
+        "attempts": [
+          {
+            "index": 1,
+            "status": "passed_unchanged_checks",
+            "summary": "All 10 obligations resolved under the unchanged checks (3 proved, no counterexample).",
+            "candidate_run_id": "20261004-010055-ver-bc19f7",
+            "frozen_match": true,
+            "rationale": "The RAM array was declared with only DEPTH-1 entries (indices 0 to DEPTH-2), but the write and read pointers (wp, rp) are AW bits wide and can address DEPTH locations (0 to DEPTH-1). This causes the last memory location to be inaccessible, so data written when wp == DEPTH-1 is lost, and subsequent reads from that index return garbage. Changing the array size to DEPTH entries fixes the storage capacity to match the pointer range.",
+            "diff": "--- a/dut.v\n+++ b/dut.v\n@@ -17,7 +17,7 @@\n );\n     localparam integer AW = $clog2(DEPTH);\n \n-    reg [WIDTH-1:0] ram [0:DEPTH-2];\n+    reg [WIDTH-1:0] ram [0:DEPTH-1];\n     reg [AW-1:0]    wp;\n     reg [AW-1:0]    rp;\n     reg             full_r;\n",
+            "diagnostics": null,
+            "calls": [
+              {
+                "task": "repair",
+                "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "latency_ms": 8341,
+                "prompt_tokens": 1648,
+                "completion_tokens": 3012,
+                "status": "ok",
+                "schema_error": null,
+                "finish_reason": "stop"
+              }
+            ]
+          }
+        ],
+        "attempts_used": 1,
+        "passed_on_attempt": 1
+      }
+    },
+    {
+      "id": "F5",
+      "impl": "count",
+      "depth": 4,
+      "expected": "faulty",
+      "category": "flags_boundaries",
+      "class": "write_not_full",
+      "summary": "Two bugs: full asserts one word early, and reset does not clear the read pointer.",
+      "held_out": false,
+      "diagnosis": {
+        "run_id": "20261004-010106-ver-3790a5",
+        "state": "complete",
+        "headline": "counterexample",
+        "obligations": {
+          "bmc:empty_flag": "unresolved",
+          "bmc:full_flag": "unresolved",
+          "bmc:read_data": "counterexample",
+          "prove:empty_flag": "unresolved",
+          "prove:full_flag": "unresolved",
+          "prove:read_data": "counterexample",
+          "cover:reachability": "bounded_pass",
+          "simulation:empty_flag": "simulation_passed",
+          "simulation:full_flag": "counterexample",
+          "simulation:read_data": "counterexample"
+        },
+        "findings": [
+          {
+            "source": "simulation",
+            "test": "random_s1",
+            "cycle": 2,
+            "check": "read_data",
+            "requirement_id": "read_not_empty"
+          },
+          {
+            "source": "formal",
+            "test": "formal:bmc",
+            "cycle": 2,
+            "check": "read_data",
+            "requirement_id": "both_mid"
+          }
+        ],
+        "formal_replay": "reproduced",
+        "integrity": [],
+        "timings": {
+          "first_finding_s": 3.57,
+          "total_s": 7.15
+        },
+        "outcome": "reproduced"
+      },
+      "explanation": {
+        "status": "ok",
+        "citation_check": {
+          "valid": 18,
+          "invalid": [],
+          "uncited_steps": 0,
+          "allowed_cycles": [
+            0,
+            4
+          ]
+        },
+        "finding": {
+          "test": "random_s1",
+          "cycle": 2,
+          "check": "read_data",
+          "requirement_id": "read_not_empty",
+          "source": "simulation"
+        },
+        "result": {
+          "summary": "The FIFO fails to return the correct data on the first read after reset because the read pointer (rd_ptr) is not initialized during reset, causing it to read from an arbitrary memory location instead of the oldest written word. The full flag is also incorrectly computed as count >= DEPTH-1 rather than count == DEPTH.",
+          "steps": [
+            {
+              "text": "At cycle 0 reset, wr_ptr and count are cleared but rd_ptr is left uninitialized; the reference model assumes rd_ptr=0 so the first write at cycle 1 goes to mem[0]=0x96.",
+              "cycles": [
+                0,
+                1
+              ],
+              "signals": [
+                "rst",
+                "wr_ptr",
+                "rd_ptr",
+                "count",
+                "din",
+                "wr_en"
+              ]
+            },
+            {
+              "text": "At cycle 2 a read is accepted (rd_en=1, count=1), so dout should be mem[rd_ptr]=mem[0]=0x96, but the observed dout=0x4D shows rd_ptr was not zero, confirming rd_ptr was not reset.",
+              "cycles": [
+                2
+              ],
+              "signals": [
+                "rd_en",
+                "do_read",
+                "dout",
+                "rd_ptr",
+                "mem"
+              ]
+            }
+          ],
+          "likely_cause": {
+            "text": "The reset block (lines 31-33) initializes wr_ptr and count but omits rd_ptr, leaving it with an unknown value; the first accepted read therefore indexes an arbitrary memory slot. Additionally, line 28 computes full as count >= DEPTH-1 (3) instead of count == DEPTH (4), a separate flag error.",
+            "lines": [
+              31,
+              32,
+              33,
+              28
+            ]
+          },
+          "next_action": "Add rd_ptr <= 0; to the reset block (after line 33) and correct line 28 to assign full = (count == DEPTH); then re-run simulation and formal checks.",
+          "limits": "This simulation counterexample (random_s1, cycle 2) refutes the read_data contract for DEPTH=4, WIDTH=8. The simulation empty_flag passed 14 named tests but does not cover all reset/read sequences; the formal read_data check also produced a counterexample at application cycle 2. The unresolved formal empty_flag and full_flag checks establish nothing. The cover:reachability bounded_pass only shows state reachability, not correctness."
+        },
+        "calls": [
+          {
+            "task": "explain",
+            "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+            "latency_ms": 7104,
+            "prompt_tokens": 2336,
+            "completion_tokens": 2598,
+            "status": "ok",
+            "schema_error": null,
+            "finish_reason": "stop"
+          }
+        ],
+        "review": {
+          "reviewer": "Claude (coding assistant), not independent",
+          "date": "2026-10-04",
+          "rubric": {
+            "violated_requirement": 2,
+            "first_failing_transaction": 2,
+            "expected_vs_observed": 2,
+            "limits": 2
+          },
+          "cause": "correct",
+          "notes": "Correct; names both injected bugs."
+        }
+      },
+      "repair": {
+        "status": "passed",
+        "wall_s": 16.47,
+        "attempts": [
+          {
+            "index": 1,
+            "status": "passed_unchanged_checks",
+            "summary": "All 10 obligations resolved under the unchanged checks (3 proved, no counterexample).",
+            "candidate_run_id": "20261004-010132-ver-c3c888",
+            "frozen_match": true,
+            "rationale": "The read pointer (rd_ptr) was not initialized during reset, causing the first read to fetch from an unknown location (observed 0x4D instead of the written 0x96). Additionally, the full flag was incorrectly defined as (count >= DEPTH-1) instead of (count == DEPTH), which would assert full one cycle early. Both issues are fixed by resetting rd_ptr and correcting the full condition.",
+            "diff": "--- a/dut.v\n+++ b/dut.v\n@@ -25,11 +25,12 @@\n     wire do_write = wr_en && (count != DEPTH);\n \n     assign empty = (count == 0);\n-    assign full  = (count >= DEPTH - 1);\n+    assign full  = (count == DEPTH);\n \n     always @(posedge clk) begin\n         if (rst) begin\n             wr_ptr <= 0;\n+            rd_ptr <= 0;\n             count  <= 0;\n         end else begin\n             if (do_write) begin\n",
+            "diagnostics": null,
+            "calls": [
+              {
+                "task": "repair",
+                "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "latency_ms": 11192,
+                "prompt_tokens": 1252,
+                "completion_tokens": 4040,
+                "status": "ok",
+                "schema_error": null,
+                "finish_reason": "stop"
+              }
+            ]
+          }
+        ],
+        "attempts_used": 1,
+        "passed_on_attempt": 1
+      }
+    },
+    {
+      "id": "F6",
+      "impl": "wrapbit",
+      "depth": 4,
+      "expected": "faulty",
+      "category": "flags_boundaries",
+      "class": "read_empty",
+      "summary": "Two bugs: empty ignores the wrap bit, and a read while empty is not ignored.",
+      "held_out": false,
+      "diagnosis": {
+        "run_id": "20261004-010137-ver-dd43e0",
+        "state": "complete",
+        "headline": "counterexample",
+        "obligations": {
+          "bmc:empty_flag": "counterexample",
+          "bmc:full_flag": "unresolved",
+          "bmc:read_data": "unresolved",
+          "prove:empty_flag": "counterexample",
+          "prove:full_flag": "unresolved",
+          "prove:read_data": "unresolved",
+          "cover:reachability": "bounded_pass",
+          "simulation:empty_flag": "counterexample",
+          "simulation:full_flag": "simulation_passed",
+          "simulation:read_data": "simulation_passed"
+        },
+        "findings": [
+          {
+            "source": "simulation",
+            "test": "random_s2",
+            "cycle": 1,
+            "check": "empty_flag",
+            "requirement_id": "both_empty"
+          },
+          {
+            "source": "formal",
+            "test": "formal:bmc",
+            "cycle": 1,
+            "check": "empty_flag",
+            "requirement_id": "both_empty"
+          }
+        ],
+        "formal_replay": "reproduced",
+        "integrity": [],
+        "timings": {
+          "first_finding_s": 3.57,
+          "total_s": 7.41
+        },
+        "outcome": "reproduced"
+      },
+      "explanation": {
+        "status": "ok_with_invalid_citations",
+        "citation_check": {
+          "valid": 17,
+          "invalid": [
+            {
+              "step": 2,
+              "kind": "signal",
+              "value": "queue"
+            }
+          ],
+          "uncited_steps": 0,
+          "allowed_cycles": [
+            0,
+            3
+          ]
+        },
+        "finding": {
+          "test": "random_s2",
+          "cycle": 1,
+          "check": "empty_flag",
+          "requirement_id": "both_empty",
+          "source": "simulation"
+        },
+        "result": {
+          "summary": "At cycle 1, the FIFO is reset empty (head=tail=0). Both wr_en and rd_en are asserted. The RTL accepts the write (put=1) because full=0, but also accepts the read (take=1) because take lacks an empty guard. Both pointers increment to 1, so head==tail and empty stays asserted (true), while the reference queue has one element (a9) so empty should be false.",
+          "steps": [
+            {
+              "text": "Reset at cycle 0 initializes head=0, tail=0, empty=1.",
+              "cycles": [
+                0
+              ],
+              "signals": [
+                "rst",
+                "head",
+                "tail",
+                "empty"
+              ]
+            },
+            {
+              "text": "At cycle 1, wr_en=1 and rd_en=1. The RTL's put = wr_en && !full = 1 (full=0), so write occurs: tail becomes 1. The RTL's take = rd_en = 1 (no empty check), so read occurs: head becomes 1. After the edge, head==tail==1, so empty = (head[1:0]==tail[1:0]) = 1.",
+              "cycles": [
+                1
+              ],
+              "signals": [
+                "wr_en",
+                "rd_en",
+                "put",
+                "take",
+                "head",
+                "tail",
+                "empty"
+              ]
+            },
+            {
+              "text": "Reference model accepts only the write (contract row both_empty), so post-edge queue is [a9] (occupancy 1). Expected empty=0, observed empty=1 \u2192 empty_flag mismatch.",
+              "cycles": [
+                1
+              ],
+              "signals": [
+                "empty",
+                "queue"
+              ]
+            }
+          ],
+          "likely_cause": {
+            "text": "The read enable 'take' is not gated by empty (line 27). When rd_en is asserted while empty, the read pointer increments, making head==tail again and incorrectly keeping empty asserted.",
+            "lines": [
+              27,
+              42
+            ]
+          },
+          "next_action": "Change line 27 to 'wire take = rd_en && !empty;' so reads are only accepted when the FIFO is not empty.",
+          "limits": "This failure refutes the empty_flag contract for DEPTH=4, WIDTH=8. The simulation passes for full_flag and read_data in 14 tests, but those passes do not cover the empty_flag failure. The formal checks (bmc:empty_flag, prove:empty_flag) also produced counterexamples. The cover:reachability bounded_pass only establishes reachability, not correctness. Unresolved formal checks (full_flag, read_data) are not passes."
+        },
+        "calls": [
+          {
+            "task": "explain",
+            "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+            "latency_ms": 7726,
+            "prompt_tokens": 2263,
+            "completion_tokens": 2661,
+            "status": "ok",
+            "schema_error": null,
+            "finish_reason": "stop"
+          }
+        ],
+        "review": {
+          "reviewer": "Claude (coding assistant), not independent",
+          "date": "2026-10-04",
+          "rubric": {
+            "violated_requirement": 2,
+            "first_failing_transaction": 2,
+            "expected_vs_observed": 2,
+            "limits": 2
+          },
+          "cause": "incomplete",
+          "notes": "First failing transaction and the take-guard bug correct; does not mention the second bug (empty ignores the wrap bit). One invalid citation ('queue')."
+        }
+      },
+      "repair": {
+        "status": "passed",
+        "wall_s": 33.1,
+        "attempts": [
+          {
+            "index": 1,
+            "status": "failed_checks",
+            "summary": "Counterexample: empty_flag at cycle 4 (Write requested while not full) in fill_drain.",
+            "candidate_run_id": "20261004-010200-ver-42e87f",
+            "frozen_match": true,
+            "rationale": "The current design accepts a read when the FIFO is empty because the take signal is simply rd_en. This causes the head pointer to advance on a read-while-empty, making the empty flag stay true and corrupting the queue order. The contract requires that a read while empty be ignored. Changing take to rd_en && !empty ensures reads are only accepted when the FIFO is not empty, which fixes the both_empty case and all other read-while-empty scenarios.",
+            "diff": "--- a/dut.v\n+++ b/dut.v\n@@ -24,7 +24,7 @@\n     assign empty = (head[AW-1:0] == tail[AW-1:0]);\n     assign full  = (head[AW] != tail[AW]) && (head[AW-1:0] == tail[AW-1:0]);\n \n-    wire take = rd_en;\n+    wire take = rd_en && !empty;\n     wire put  = wr_en && !full;\n \n     always @(posedge clk) begin\n",
+            "diagnostics": null,
+            "calls": [
+              {
+                "task": "repair",
+                "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "latency_ms": 8386,
+                "prompt_tokens": 1169,
+                "completion_tokens": 2923,
+                "status": "ok",
+                "schema_error": null,
+                "finish_reason": "stop"
+              }
+            ]
+          },
+          {
+            "index": 2,
+            "status": "passed_unchanged_checks",
+            "summary": "All 10 obligations resolved under the unchanged checks (3 proved, no counterexample).",
+            "candidate_run_id": "20261004-010214-ver-b5bcad",
+            "frozen_match": true,
+            "rationale": "The empty flag incorrectly compares only the lower address bits (head[AW-1:0] == tail[AW-1:0]), causing empty to be true when the FIFO is actually full (head and tail differ in the wrap bit). The correct empty condition for a synchronous FIFO with wrap-bit pointers is (head == tail), comparing all bits. This change will make empty false when the FIFO is full, and will also allow reads to proceed when the FIFO is not empty.",
+            "diff": "--- a/dut.v\n+++ b/dut.v\n@@ -21,10 +21,10 @@\n     reg [AW:0]      head;   // read pointer with wrap bit\n     reg [AW:0]      tail;   // write pointer with wrap bit\n \n-    assign empty = (head[AW-1:0] == tail[AW-1:0]);\n+    assign empty = (head == tail);\n     assign full  = (head[AW] != tail[AW]) && (head[AW-1:0] == tail[AW-1:0]);\n \n-    wire take = rd_en;\n+    wire take = rd_en && !empty;\n     wire put  = wr_en && !full;\n \n     always @(posedge clk) begin\n",
+            "diagnostics": null,
+            "calls": [
+              {
+                "task": "repair",
+                "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "latency_ms": 4985,
+                "prompt_tokens": 1554,
+                "completion_tokens": 1774,
+                "status": "ok",
+                "schema_error": null,
+                "finish_reason": "stop"
+              }
+            ]
+          }
+        ],
+        "attempts_used": 2,
+        "passed_on_attempt": 2
+      }
+    },
+    {
+      "id": "F7",
+      "impl": "billdmar",
+      "depth": 4,
+      "expected": "faulty",
+      "category": "flags_boundaries",
+      "class": "reset",
+      "summary": "full ignores the wrap bit, so it is also asserted when the FIFO is empty.",
+      "held_out": false,
+      "diagnosis": {
+        "run_id": "20261004-010225-ver-152f39",
+        "state": "complete",
+        "headline": "counterexample",
+        "obligations": {
+          "bmc:empty_flag": "unresolved",
+          "bmc:full_flag": "counterexample",
+          "bmc:read_data": "unresolved",
+          "prove:empty_flag": "unresolved",
+          "prove:full_flag": "counterexample",
+          "prove:read_data": "unresolved",
+          "cover:reachability": "bounded_pass",
+          "simulation:empty_flag": "simulation_passed",
+          "simulation:full_flag": "counterexample",
+          "simulation:read_data": "simulation_passed"
+        },
+        "findings": [
+          {
+            "source": "simulation",
+            "test": "fill_drain",
+            "cycle": 0,
+            "check": "full_flag",
+            "requirement_id": "reset"
+          },
+          {
+            "source": "formal",
+            "test": "formal:bmc",
+            "cycle": 0,
+            "check": "full_flag",
+            "requirement_id": "reset"
+          }
+        ],
+        "formal_replay": "reproduced",
+        "integrity": [],
+        "timings": {
+          "first_finding_s": 3.57,
+          "total_s": 7.66
+        },
+        "outcome": "reproduced"
+      },
+      "explanation": {
+        "status": "ok",
+        "citation_check": {
+          "valid": 21,
+          "invalid": [],
+          "uncited_steps": 0,
+          "allowed_cycles": [
+            0,
+            2
+          ]
+        },
+        "finding": {
+          "test": "fill_drain",
+          "cycle": 0,
+          "check": "full_flag",
+          "requirement_id": "reset",
+          "source": "simulation"
+        },
+        "result": {
+          "summary": "At the reset edge (cycle 0), the FIFO's full flag incorrectly asserts true because the RTL's full assignment (line 96) only compares the low address bits of the write and read pointers, omitting the required MSB wrap-flag inequality. Consequently, the design believes it is full immediately after reset, blocking writes and causing empty/full mismatches in all subsequent cycles.",
+          "steps": [
+            {
+              "text": "Reset asserts at cycle 0; both pointers are cleared to zero. The buggy full expression (wptr[1:0] == rptr[1:0]) evaluates true because the low bits match, even though the MSBs also match (should be false). Observed full=1, expected full=0.",
+              "cycles": [
+                0
+              ],
+              "signals": [
+                "rst",
+                "full",
+                "empty",
+                "wptr",
+                "rptr"
+              ]
+            },
+            {
+              "text": "Because full=1, the qualified write strobe (do_write = wr_en && !full) is de-asserted at cycle 1 despite wr_en=1, so the write is not accepted. The reference queue advances but the DUT pointers stay at zero, leaving empty=1 and full=1 (mismatches).",
+              "cycles": [
+                1
+              ],
+              "signals": [
+                "wr_en",
+                "full",
+                "do_write",
+                "wptr",
+                "rptr",
+                "empty"
+              ]
+            },
+            {
+              "text": "Same condition persists at cycle 2: another write is attempted but blocked by the stuck full flag, so the DUT remains at empty=1, full=1 while the reference queue grows to two entries.",
+              "cycles": [
+                2
+              ],
+              "signals": [
+                "wr_en",
+                "full",
+                "do_write",
+                "wptr",
+                "rptr",
+                "empty"
+              ]
+            }
+          ],
+          "likely_cause": {
+            "text": "The full flag assignment (line 96) lacks the MSB wrap-flag inequality check required by the extra-MSB pointer scheme. It should be (wptr[ADDR_WIDTH] != rptr[ADDR_WIDTH]) && (wptr[ADDR_WIDTH-1:0] == rptr[ADDR_WIDTH-1:0]).",
+            "lines": [
+              96
+            ]
+          },
+          "next_action": "Correct line 96 to include the MSB inequality condition, then re-run simulation and formal checks for the DEPTH=4, WIDTH=8 configuration.",
+          "limits": "This failure refutes the contract for DEPTH=4, WIDTH=8. The simulation full_flag check failed in all 14 named tests; BMC and prove also produced counterexamples for full_flag. The simulation empty_flag and read_data checks passed for the same 14 tests, but those passes cover only the tested scenarios and do not establish correctness for other configurations, untested input sequences, or the formal properties (which remain unresolved). The cover reachability check passed bounded (depth 24), which only shows state reachability, not functional correctness."
+        },
+        "calls": [
+          {
+            "task": "explain",
+            "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+            "latency_ms": 7183,
+            "prompt_tokens": 4049,
+            "completion_tokens": 2556,
+            "status": "ok",
+            "schema_error": null,
+            "finish_reason": "stop"
+          }
+        ],
+        "review": {
+          "reviewer": "Claude (coding assistant), not independent",
+          "date": "2026-10-04",
+          "rubric": {
+            "violated_requirement": 2,
+            "first_failing_transaction": 2,
+            "expected_vs_observed": 2,
+            "limits": 2
+          },
+          "cause": "correct",
+          "notes": "Correct: full ignores the wrap bit."
+        }
+      },
+      "repair": {
+        "status": "passed",
+        "wall_s": 15.82,
+        "attempts": [
+          {
+            "index": 1,
+            "status": "passed_unchanged_checks",
+            "summary": "All 10 obligations resolved under the unchanged checks (3 proved, no counterexample).",
+            "candidate_run_id": "20261004-010245-ver-d0af2e",
+            "frozen_match": true,
+            "rationale": "The full flag is incorrectly asserted when the FIFO is empty because it only compares the lower address bits (wptr[ADDR_WIDTH-1:0] == rptr[ADDR_WIDTH-1:0]) without requiring the wrap-bit (MSB) to differ. After reset, both pointers are zero, so the lower bits match and full becomes true simultaneously with empty. The correct full condition for the extra-MSB pointer scheme is (wptr[ADDR_WIDTH] != rptr[ADDR_WIDTH]) && (wptr[ADDR_WIDTH-1:0] == rptr[ADDR_WIDTH-1:0]).",
+            "diff": "--- a/dut.v\n+++ b/dut.v\n@@ -93,7 +93,7 @@\n     // Empty / full / count : combinationally derived from the pointers only.\n     //--------------------------------------------------------------------------\n     assign empty = (wptr == rptr);\n-    assign full  = (wptr[ADDR_WIDTH-1:0] == rptr[ADDR_WIDTH-1:0]);\n+    assign full  = (wptr[ADDR_WIDTH] != rptr[ADDR_WIDTH]) && (wptr[ADDR_WIDTH-1:0] == rptr[ADDR_WIDTH-1:0]);\n \n     // count = wptr - rptr in (ADDR_WIDTH+1)-bit unsigned arithmetic. This wraps\n     // correctly and yields 0..DEPTH inclusive.\n",
+            "diagnostics": null,
+            "calls": [
+              {
+                "task": "repair",
+                "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "latency_ms": 4881,
+                "prompt_tokens": 2541,
+                "completion_tokens": 1740,
+                "status": "ok",
+                "schema_error": null,
+                "finish_reason": "stop"
+              }
+            ]
+          }
+        ],
+        "attempts_used": 1,
+        "passed_on_attempt": 1
+      }
+    },
+    {
+      "id": "F8",
+      "impl": "billdmar",
+      "depth": 4,
+      "expected": "faulty",
+      "category": "ordering_wraparound",
+      "class": "read_not_empty",
+      "summary": "Reads return the slot after the head.",
+      "held_out": false,
+      "diagnosis": {
+        "run_id": "20261004-010256-ver-49e534",
+        "state": "complete",
+        "headline": "counterexample",
+        "obligations": {
+          "bmc:empty_flag": "unresolved",
+          "bmc:full_flag": "unresolved",
+          "bmc:read_data": "counterexample",
+          "prove:empty_flag": "unresolved",
+          "prove:full_flag": "unresolved",
+          "prove:read_data": "counterexample",
+          "cover:reachability": "bounded_pass",
+          "simulation:empty_flag": "simulation_passed",
+          "simulation:full_flag": "simulation_passed",
+          "simulation:read_data": "counterexample"
+        },
+        "findings": [
+          {
+            "source": "simulation",
+            "test": "random_s1",
+            "cycle": 2,
+            "check": "read_data",
+            "requirement_id": "read_not_empty"
+          },
+          {
+            "source": "formal",
+            "test": "formal:bmc",
+            "cycle": 2,
+            "check": "read_data",
+            "requirement_id": "read_not_empty"
+          }
+        ],
+        "formal_replay": "reproduced",
+        "integrity": [],
+        "timings": {
+          "first_finding_s": 3.59,
+          "total_s": 7.18
+        },
+        "outcome": "reproduced"
+      },
+      "explanation": {
+        "status": "ok",
+        "citation_check": {
+          "valid": 17,
+          "invalid": [],
+          "uncited_steps": 0,
+          "allowed_cycles": [
+            0,
+            4
+          ]
+        },
+        "finding": {
+          "test": "random_s1",
+          "cycle": 2,
+          "check": "read_data",
+          "requirement_id": "read_not_empty",
+          "source": "simulation"
+        },
+        "result": {
+          "summary": "At cycle 2 a read is accepted (rd_en=1, empty=0) but dout becomes 0xE6 instead of the 0x96 written at cycle 1. The RTL reads from mem[raddr+1] (line 137) rather than the head at mem[raddr], causing an off-by-one error on every accepted read.",
+          "steps": [
+            {
+              "text": "Cycle 1 accepts a write of 0x96 into an empty FIFO; wptr advances to 1, rptr stays 0, queue becomes [96] at index 0.",
+              "cycles": [
+                1
+              ],
+              "signals": [
+                "wr_en",
+                "rd_en",
+                "din",
+                "wptr",
+                "rptr",
+                "empty",
+                "full"
+              ]
+            },
+            {
+              "text": "Cycle 2 asserts rd_en=1 with empty=0, so do_read=1; the design samples mem[raddr+1] = mem[1] (uninitialized) into rd_data and increments rptr, yielding dout=0xE6 instead of the head 0x96 at mem[0].",
+              "cycles": [
+                2
+              ],
+              "signals": [
+                "rd_en",
+                "empty",
+                "do_read",
+                "raddr",
+                "rd_data",
+                "dout",
+                "rptr"
+              ]
+            }
+          ],
+          "likely_cause": {
+            "text": "Read port uses raddr+1 for the memory read address (line 137) instead of raddr, so the registered output captures the next slot rather than the current head on an accepted read.",
+            "lines": [
+              137
+            ]
+          },
+          "next_action": "Change line 137 from `rd_data <= mem[raddr + 1'b1];` to `rd_data <= mem[raddr];` so that an accepted read returns the oldest word.",
+          "limits": "This simulation counterexample (random_s1, cycle 2) and the matching BMC/prove counterexamples (step 3, application cycle 2) refute the read_data contract for DEPTH=4, WIDTH=8. The simulation passes for empty_flag and full_flag across 14 tests (1386 cycles), but those passes only cover the named flag properties under the exercised stimuli; they do not imply read_data correctness. The cover:reachability bounded_pass (depth 24) only shows state reachability, not functional correctness. Unresolved BMC/prove checks for empty_flag and full_flag are not passes and are unrelated to this read_data failure."
+        },
+        "calls": [
+          {
+            "task": "explain",
+            "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+            "latency_ms": 8321,
+            "prompt_tokens": 4153,
+            "completion_tokens": 2650,
+            "status": "ok",
+            "schema_error": null,
+            "finish_reason": "stop"
+          }
+        ],
+        "review": {
+          "reviewer": "Claude (coding assistant), not independent",
+          "date": "2026-10-04",
+          "rubric": {
+            "violated_requirement": 2,
+            "first_failing_transaction": 2,
+            "expected_vs_observed": 2,
+            "limits": 2
+          },
+          "cause": "correct",
+          "notes": "Correct: read address off by one slot."
+        }
+      },
+      "repair": {
+        "status": "passed",
+        "wall_s": 16.14,
+        "attempts": [
+          {
+            "index": 1,
+            "status": "passed_unchanged_checks",
+            "summary": "All 10 obligations resolved under the unchanged checks (3 proved, no counterexample).",
+            "candidate_run_id": "20261004-010315-ver-00c75e",
+            "frozen_match": true,
+            "rationale": "The read port incorrectly reads from the next address (raddr + 1) instead of the current read pointer (raddr). This causes the output data to be the word after the oldest, not the oldest itself. The fix is to read from mem[raddr] when a read is accepted.",
+            "diff": "--- a/dut.v\n+++ b/dut.v\n@@ -134,7 +134,7 @@\n             rd_data <= '0;\n         end else begin\n             if (do_read) begin\n-                rd_data <= mem[raddr + 1'b1];\n+                rd_data <= mem[raddr];\n                 rptr    <= rptr + 1'b1;\n             end\n         end\n",
+            "diagnostics": null,
+            "calls": [
+              {
+                "task": "repair",
+                "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "latency_ms": 3619,
+                "prompt_tokens": 2643,
+                "completion_tokens": 1230,
+                "status": "ok",
+                "schema_error": null,
+                "finish_reason": "stop"
+              }
+            ]
+          }
+        ],
+        "attempts_used": 1,
+        "passed_on_attempt": 1
+      }
+    }
+  ],
+  "briefs": {
+    "set": "briefs-eval-v2",
+    "split": "evaluation",
+    "model_id": "nvidia/nemotron-3-super-120b-a12b",
+    "prompt_sha256": "sha256:b426c60c4a0c245eda05ae89e54f95cff100273720042aaa8ad0e2e941149eef",
+    "at": "2026-10-04T05:03:50Z",
+    "summary": {
+      "conflicting_detected": "3 / 4",
+      "compatible_proceeded": "4 / 4",
+      "errors": 0
+    },
+    "results": [
+      {
+        "id": "B1",
+        "expected_blocking": true,
+        "expected_topics": [
+          "write_when_full",
+          "depth"
+        ],
+        "status": "ok",
+        "blocking": [],
+        "needs_decision": [
+          "reset_kind",
+          "reset_priority",
+          "reset_recurrence",
+          "read_when_empty",
+          "simultaneous_mid",
+          "simultaneous_empty",
+          "simultaneous_full",
+          "ordering",
+          "read_latency"
+        ],
+        "topic_hit": false,
+        "outcome": "missed_conflict",
+        "wall_s": 2.32,
+        "calls": [
+          {
+            "model_id": "nvidia/nemotron-3-super-120b-a12b",
+            "latency_ms": 2317,
+            "prompt_tokens": 503,
+            "completion_tokens": 470,
+            "status": "ok",
+            "schema_error": null
+          }
+        ],
+        "decisions": [
+          {
+            "topic": "reset_kind",
+            "contract": "Reset is synchronous and active-high, sampled on the rising clock edge.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of reset type."
+          },
+          {
+            "topic": "reset_priority",
+            "contract": "Reset wins over read and write. Occupancy becomes zero; empty is true and full is false after the edge.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of reset priority."
+          },
+          {
+            "topic": "reset_recurrence",
+            "contract": "Reset may be asserted again at any later edge and must restore the empty state.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of reset recurrence."
+          },
+          {
+            "topic": "write_when_full",
+            "contract": "Ignore the write.",
+            "brief_says": "further writes should then be refused",
+            "status": "matches",
+            "note": "Matches contract behavior of ignoring writes when full."
+          },
+          {
+            "topic": "read_when_empty",
+            "contract": "Ignore the read. Nothing is consumed and nothing is bypassed.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of read when empty."
+          },
+          {
+            "topic": "simultaneous_mid",
+            "contract": "Accept both. Occupancy stays constant; the old head is read and the new word joins the tail.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of simultaneous read/write in mid-state."
+          },
+          {
+            "topic": "simultaneous_empty",
+            "contract": "Accept only the write. The new word is not bypassed to dout.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of simultaneous operation when empty."
+          },
+          {
+            "topic": "simultaneous_full",
+            "contract": "Accept only the read. The write is ignored even though the read frees a slot.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of simultaneous operation when full."
+          },
+          {
+            "topic": "ordering",
+            "contract": "Accepted words leave exactly once and in arrival order, across pointer wraparound.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of ordering guarantees."
+          },
+          {
+            "topic": "read_latency",
+            "contract": "dout is registered: it holds the removed word after the edge of an accepted read (no fall-through).",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of read latency or register behavior."
+          },
+          {
+            "topic": "depth",
+            "contract": "DEPTH words of capacity, for the selected DEPTH.",
+            "brief_says": "A 4-entry byte FIFO",
+            "status": "matches",
+            "note": "Matches DEPTH=4."
+          },
+          {
+            "topic": "width",
+            "contract": "8-bit data words.",
+            "brief_says": "byte FIFO",
+            "status": "matches",
+            "note": "Matches WIDTH=8 (byte = 8 bits)."
+          }
+        ],
+        "detail": null
+      },
+      {
+        "id": "B2",
+        "expected_blocking": true,
+        "expected_topics": [
+          "read_latency"
+        ],
+        "status": "ok",
+        "blocking": [
+          "read_latency"
+        ],
+        "needs_decision": [
+          "reset_kind",
+          "reset_priority",
+          "reset_recurrence",
+          "write_when_full",
+          "read_when_empty",
+          "simultaneous_mid",
+          "simultaneous_empty",
+          "simultaneous_full",
+          "ordering",
+          "width"
+        ],
+        "topic_hit": true,
+        "outcome": "conflict_detected",
+        "wall_s": 2.51,
+        "calls": [
+          {
+            "model_id": "nvidia/nemotron-3-super-120b-a12b",
+            "latency_ms": 2506,
+            "prompt_tokens": 504,
+            "completion_tokens": 520,
+            "status": "ok",
+            "schema_error": null
+          }
+        ],
+        "decisions": [
+          {
+            "topic": "reset_kind",
+            "contract": "Reset is synchronous and active-high, sampled on the rising clock edge.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of reset behavior."
+          },
+          {
+            "topic": "reset_priority",
+            "contract": "Reset wins over read and write. Occupancy becomes zero; empty is true and full is false after the edge.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of reset priority."
+          },
+          {
+            "topic": "reset_recurrence",
+            "contract": "Reset may be asserted again at any later edge and must restore the empty state.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of reset recurrence."
+          },
+          {
+            "topic": "write_when_full",
+            "contract": "Ignore the write.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of write when full."
+          },
+          {
+            "topic": "read_when_empty",
+            "contract": "Ignore the read. Nothing is consumed and nothing is bypassed.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of read when empty."
+          },
+          {
+            "topic": "simultaneous_mid",
+            "contract": "Accept both. Occupancy stays constant; the old head is read and the new word joins the tail.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of simultaneous mid-operation."
+          },
+          {
+            "topic": "simultaneous_empty",
+            "contract": "Accept only the write. The new word is not bypassed to dout.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of simultaneous empty operation."
+          },
+          {
+            "topic": "simultaneous_full",
+            "contract": "Accept only the read. The write is ignored even though the read frees a slot.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of simultaneous full operation."
+          },
+          {
+            "topic": "ordering",
+            "contract": "Accepted words leave exactly once and in arrival order, across pointer wraparound.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of ordering guarantees."
+          },
+          {
+            "topic": "read_latency",
+            "contract": "dout is registered: it holds the removed word after the edge of an accepted read (no fall-through).",
+            "brief_says": "The oldest byte should already be sitting on dout whenever the FIFO is not empty, so the decoder can look at it before deciding to pop it with rd_en.",
+            "status": "conflict",
+            "note": "This implies fall-through (combinational) read behavior where dout updates immediately on write without waiting for read enable, but the contract requires registered dout that only updates after the clock edge of an accepted read."
+          },
+          {
+            "topic": "depth",
+            "contract": "DEPTH words of capacity, for the selected DEPTH.",
+            "brief_says": "A 4-deep FIFO",
+            "status": "matches",
+            "note": "Matches DEPTH=4."
+          },
+          {
+            "topic": "width",
+            "contract": "8-bit data words.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No explicit mention of width, but 'byte' implies 8-bit which matches WIDTH=8."
+          }
+        ],
+        "detail": null
+      },
+      {
+        "id": "B3",
+        "expected_blocking": true,
+        "expected_topics": [
+          "reset_priority"
+        ],
+        "status": "ok",
+        "blocking": [
+          "reset_priority"
+        ],
+        "needs_decision": [
+          "reset_kind",
+          "reset_recurrence",
+          "write_when_full",
+          "read_when_empty",
+          "simultaneous_mid",
+          "simultaneous_empty",
+          "simultaneous_full",
+          "ordering",
+          "read_latency",
+          "width"
+        ],
+        "topic_hit": true,
+        "outcome": "conflict_detected",
+        "wall_s": 3.74,
+        "calls": [
+          {
+            "model_id": "nvidia/nemotron-3-super-120b-a12b",
+            "latency_ms": 3734,
+            "prompt_tokens": 496,
+            "completion_tokens": 662,
+            "status": "ok",
+            "schema_error": null
+          }
+        ],
+        "decisions": [
+          {
+            "topic": "reset_kind",
+            "contract": "Reset is synchronous and active-high, sampled on the rising clock edge.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "Brief does not mention reset type; contract specifies synchronous active-high."
+          },
+          {
+            "topic": "reset_priority",
+            "contract": "Reset wins over read and write. Occupancy becomes zero; empty is true and full is false after the edge.",
+            "brief_says": "If reset and a write arrive on the same edge, the command being written should be kept so that nothing is lost during a soft reset.",
+            "status": "conflict",
+            "note": "Brief requires write to survive concurrent reset; contract mandates reset wins, forcing occupancy to zero and ignoring the write."
+          },
+          {
+            "topic": "reset_recurrence",
+            "contract": "Reset may be asserted again at any later edge and must restore the empty state.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "Brief does not address reset reassertion; contract allows reset at any later edge to restore empty state."
+          },
+          {
+            "topic": "write_when_full",
+            "contract": "Ignore the write.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "Brief does not discuss write behavior on full FIFO; contract ignores the write."
+          },
+          {
+            "topic": "read_when_empty",
+            "contract": "Ignore the read. Nothing is consumed and nothing is bypassed.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "Brief does not discuss read behavior on empty FIFO; contract ignores the read."
+          },
+          {
+            "topic": "simultaneous_mid",
+            "contract": "Accept both. Occupancy stays constant; the old head is read and the new word joins the tail.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "Brief does not address simultaneous read/write when FIFO is neither empty nor full; contract accepts both with constant occupancy."
+          },
+          {
+            "topic": "simultaneous_empty",
+            "contract": "Accept only the write. The new word is not bypassed to dout.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "Brief does not address simultaneous read/write when empty; contract accepts only write (not bypassed)."
+          },
+          {
+            "topic": "simultaneous_full",
+            "contract": "Accept only the read. The write is ignored even though the read frees a slot.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "Brief does not address simultaneous read/write when full; contract accepts only read (write ignored)."
+          },
+          {
+            "topic": "ordering",
+            "contract": "Accepted words leave exactly once and in arrival order, across pointer wraparound.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "Brief does not mention ordering; contract requires accepted words to leave in arrival order across wraparound."
+          },
+          {
+            "topic": "read_latency",
+            "contract": "dout is registered: it holds the removed word after the edge of an accepted read (no fall-through).",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "Brief does not specify read latency; contract registers dout so it holds the removed word after the edge (no fall-through)."
+          },
+          {
+            "topic": "depth",
+            "contract": "DEPTH words of capacity, for the selected DEPTH.",
+            "brief_says": "A 2-entry command FIFO.",
+            "status": "matches",
+            "note": "Brief specifies 2 entries; contract fixes DEPTH=2."
+          },
+          {
+            "topic": "width",
+            "contract": "8-bit data words.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "Brief does not explicitly state width; 'command' implies 8-bit but contract fixes WIDTH=8."
+          }
+        ],
+        "detail": null
+      },
+      {
+        "id": "B4",
+        "expected_blocking": true,
+        "expected_topics": [
+          "read_when_empty",
+          "simultaneous_empty"
+        ],
+        "status": "ok",
+        "blocking": [
+          "read_when_empty"
+        ],
+        "needs_decision": [
+          "reset_kind",
+          "reset_priority",
+          "reset_recurrence",
+          "write_when_full",
+          "simultaneous_mid",
+          "simultaneous_empty",
+          "simultaneous_full",
+          "ordering",
+          "read_latency",
+          "width"
+        ],
+        "topic_hit": true,
+        "outcome": "conflict_detected",
+        "wall_s": 2.78,
+        "calls": [
+          {
+            "model_id": "nvidia/nemotron-3-super-120b-a12b",
+            "latency_ms": 2777,
+            "prompt_tokens": 501,
+            "completion_tokens": 556,
+            "status": "ok",
+            "schema_error": null
+          }
+        ],
+        "decisions": [
+          {
+            "topic": "reset_kind",
+            "contract": "Reset is synchronous and active-high, sampled on the rising clock edge.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of reset behavior."
+          },
+          {
+            "topic": "reset_priority",
+            "contract": "Reset wins over read and write. Occupancy becomes zero; empty is true and full is false after the edge.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of reset priority."
+          },
+          {
+            "topic": "reset_recurrence",
+            "contract": "Reset may be asserted again at any later edge and must restore the empty state.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of reset recurrence."
+          },
+          {
+            "topic": "write_when_full",
+            "contract": "Ignore the write.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of write-when-full behavior."
+          },
+          {
+            "topic": "read_when_empty",
+            "contract": "Ignore the read. Nothing is consumed and nothing is bypassed.",
+            "brief_says": "A read requested while it is empty should not be dropped: the FIFO should remember it and deliver the next byte that arrives on dout as soon as it is written.",
+            "status": "conflict",
+            "note": "The brief requires remembering and servicing pending reads on empty, but the contract mandates ignoring reads when empty (nothing consumed, nothing bypassed)."
+          },
+          {
+            "topic": "simultaneous_mid",
+            "contract": "Accept both. Occupancy stays constant; the old head is read and the new word joins the tail.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of simultaneous read/write in mid-state."
+          },
+          {
+            "topic": "simultaneous_empty",
+            "contract": "Accept only the write. The new word is not bypassed to dout.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of simultaneous read/write when empty."
+          },
+          {
+            "topic": "simultaneous_full",
+            "contract": "Accept only the read. The write is ignored even though the read frees a slot.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of simultaneous read/write when full."
+          },
+          {
+            "topic": "ordering",
+            "contract": "Accepted words leave exactly once and in arrival order, across pointer wraparound.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of ordering guarantees beyond FIFO semantics."
+          },
+          {
+            "topic": "read_latency",
+            "contract": "dout is registered: it holds the removed word after the edge of an accepted read (no fall-through).",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of read latency or dout registration."
+          },
+          {
+            "topic": "depth",
+            "contract": "DEPTH words of capacity, for the selected DEPTH.",
+            "brief_says": "A 4-byte FIFO.",
+            "status": "matches",
+            "note": "Matches DEPTH=4 (4 bytes capacity)."
+          },
+          {
+            "topic": "width",
+            "contract": "8-bit data words.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No explicit mention of width, but 'byte' implies 8-bit; however, since not stated, treated as unspecified per instruction to only rely on explicit brief content."
+          }
+        ],
+        "detail": null
+      },
+      {
+        "id": "B5",
+        "expected_blocking": false,
+        "expected_topics": [],
+        "status": "ok",
+        "blocking": [],
+        "needs_decision": [
+          "reset_kind",
+          "reset_priority",
+          "reset_recurrence",
+          "read_when_empty",
+          "simultaneous_mid",
+          "simultaneous_empty",
+          "simultaneous_full",
+          "ordering",
+          "read_latency",
+          "width"
+        ],
+        "topic_hit": false,
+        "outcome": "proceeded",
+        "wall_s": 2.68,
+        "calls": [
+          {
+            "model_id": "nvidia/nemotron-3-super-120b-a12b",
+            "latency_ms": 2681,
+            "prompt_tokens": 497,
+            "completion_tokens": 560,
+            "status": "ok",
+            "schema_error": null
+          }
+        ],
+        "decisions": [
+          {
+            "topic": "reset_kind",
+            "contract": "Reset is synchronous and active-high, sampled on the rising clock edge.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of reset type or timing."
+          },
+          {
+            "topic": "reset_priority",
+            "contract": "Reset wins over read and write. Occupancy becomes zero; empty is true and full is false after the edge.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No description of reset overriding read/write operations."
+          },
+          {
+            "topic": "reset_recurrence",
+            "contract": "Reset may be asserted again at any later edge and must restore the empty state.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No indication that reset can be reasserted later to restore empty state."
+          },
+          {
+            "topic": "write_when_full",
+            "contract": "Ignore the write.",
+            "brief_says": "if it writes anyway while full, the byte is silently discarded and the queue is unchanged",
+            "status": "matches",
+            "note": "Matches contract: write ignored when full, no change to occupancy."
+          },
+          {
+            "topic": "read_when_empty",
+            "contract": "Ignore the read. Nothing is consumed and nothing is bypassed.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "Behavior on read when empty is not described."
+          },
+          {
+            "topic": "simultaneous_mid",
+            "contract": "Accept both. Occupancy stays constant; the old head is read and the new word joins the tail.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No specification for simultaneous read/write when FIFO is neither empty nor full."
+          },
+          {
+            "topic": "simultaneous_empty",
+            "contract": "Accept only the write. The new word is not bypassed to dout.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No specification for simultaneous read/write when FIFO is empty."
+          },
+          {
+            "topic": "simultaneous_full",
+            "contract": "Accept only the read. The write is ignored even though the read frees a slot.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No specification for simultaneous read/write when FIFO is full."
+          },
+          {
+            "topic": "ordering",
+            "contract": "Accepted words leave exactly once and in arrival order, across pointer wraparound.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of FIFO ordering or preservation of arrival sequence."
+          },
+          {
+            "topic": "read_latency",
+            "contract": "dout is registered: it holds the removed word after the edge of an accepted read (no fall-through).",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No indication that dout is registered or latency behavior."
+          },
+          {
+            "topic": "depth",
+            "contract": "DEPTH words of capacity, for the selected DEPTH.",
+            "brief_says": "A 4-byte FIFO",
+            "status": "matches",
+            "note": "Matches DEPTH=4 capacity."
+          },
+          {
+            "topic": "width",
+            "contract": "8-bit data words.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "Although implied by 'byte', explicit 8-bit width is not stated."
+          }
+        ],
+        "detail": null
+      },
+      {
+        "id": "B6",
+        "expected_blocking": false,
+        "expected_topics": [],
+        "status": "ok",
+        "blocking": [],
+        "needs_decision": [
+          "reset_recurrence",
+          "write_when_full",
+          "read_when_empty",
+          "simultaneous_mid",
+          "simultaneous_empty",
+          "simultaneous_full",
+          "ordering",
+          "read_latency",
+          "width"
+        ],
+        "topic_hit": false,
+        "outcome": "proceeded",
+        "wall_s": 2.59,
+        "calls": [
+          {
+            "model_id": "nvidia/nemotron-3-super-120b-a12b",
+            "latency_ms": 2589,
+            "prompt_tokens": 499,
+            "completion_tokens": 569,
+            "status": "ok",
+            "schema_error": null
+          }
+        ],
+        "decisions": [
+          {
+            "topic": "reset_kind",
+            "contract": "Reset is synchronous and active-high, sampled on the rising clock edge.",
+            "brief_says": "Reset is synchronous and active-high, sampled on the rising clock edge.",
+            "status": "matches",
+            "note": "Brief implies synchronous reset via context; contract specifies this exactly."
+          },
+          {
+            "topic": "reset_priority",
+            "contract": "Reset wins over read and write. Occupancy becomes zero; empty is true and full is false after the edge.",
+            "brief_says": "Asserting reset in the middle of operation throws away whatever was stored, even if a read or write was requested on that edge.",
+            "status": "matches",
+            "note": "Matches contract: reset wins over read/write, occupancy becomes zero."
+          },
+          {
+            "topic": "reset_recurrence",
+            "contract": "Reset may be asserted again at any later edge and must restore the empty state.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "Brief does not address whether reset can be reasserted later."
+          },
+          {
+            "topic": "write_when_full",
+            "contract": "Ignore the write.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of write behavior when full."
+          },
+          {
+            "topic": "read_when_empty",
+            "contract": "Ignore the read. Nothing is consumed and nothing is bypassed.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of read behavior when empty."
+          },
+          {
+            "topic": "simultaneous_mid",
+            "contract": "Accept both. Occupancy stays constant; the old head is read and the new word joins the tail.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of simultaneous read/write when neither empty nor full."
+          },
+          {
+            "topic": "simultaneous_empty",
+            "contract": "Accept only the write. The new word is not bypassed to dout.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of simultaneous read/write when empty."
+          },
+          {
+            "topic": "simultaneous_full",
+            "contract": "Accept only the read. The write is ignored even though the read frees a slot.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of simultaneous read/write when full."
+          },
+          {
+            "topic": "ordering",
+            "contract": "Accepted words leave exactly once and in arrival order, across pointer wraparound.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of FIFO ordering or word delivery guarantees."
+          },
+          {
+            "topic": "read_latency",
+            "contract": "dout is registered: it holds the removed word after the edge of an accepted read (no fall-through).",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of dout registration or fall-through behavior."
+          },
+          {
+            "topic": "depth",
+            "contract": "DEPTH words of capacity, for the selected DEPTH.",
+            "brief_says": "A 2-entry FIFO.",
+            "status": "matches",
+            "note": "Matches DEPTH=2."
+          },
+          {
+            "topic": "width",
+            "contract": "8-bit data words.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No explicit mention of 8-bit width, but implied by context; however, per instructions, only exact match or conflict/unspecified \u2014 so unspecified as not stated."
+          }
+        ],
+        "detail": null
+      },
+      {
+        "id": "B7",
+        "expected_blocking": false,
+        "expected_topics": [],
+        "status": "ok",
+        "blocking": [],
+        "needs_decision": [
+          "reset_kind",
+          "reset_priority",
+          "reset_recurrence",
+          "read_when_empty",
+          "simultaneous_empty",
+          "ordering",
+          "read_latency"
+        ],
+        "topic_hit": false,
+        "outcome": "proceeded",
+        "wall_s": 2.75,
+        "calls": [
+          {
+            "model_id": "nvidia/nemotron-3-super-120b-a12b",
+            "latency_ms": 2751,
+            "prompt_tokens": 506,
+            "completion_tokens": 577,
+            "status": "ok",
+            "schema_error": null
+          }
+        ],
+        "decisions": [
+          {
+            "topic": "reset_kind",
+            "contract": "Reset is synchronous and active-high, sampled on the rising clock edge.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of reset in the brief."
+          },
+          {
+            "topic": "reset_priority",
+            "contract": "Reset wins over read and write. Occupancy becomes zero; empty is true and full is false after the edge.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of reset in the brief."
+          },
+          {
+            "topic": "reset_recurrence",
+            "contract": "Reset may be asserted again at any later edge and must restore the empty state.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "No mention of reset in the brief."
+          },
+          {
+            "topic": "write_when_full",
+            "contract": "Ignore the write.",
+            "brief_says": "When it is completely full, a simultaneous write is refused",
+            "status": "matches",
+            "note": "Matches contract: write ignored when full."
+          },
+          {
+            "topic": "read_when_empty",
+            "contract": "Ignore the read. Nothing is consumed and nothing is bypassed.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "Behavior not described in brief."
+          },
+          {
+            "topic": "simultaneous_mid",
+            "contract": "Accept both. Occupancy stays constant; the old head is read and the new word joins the tail.",
+            "brief_says": "When the consumer reads while the producer writes and the FIFO already holds some data, both happen",
+            "status": "matches",
+            "note": "Matches contract: both accepted, occupancy constant."
+          },
+          {
+            "topic": "simultaneous_empty",
+            "contract": "Accept only the write. The new word is not bypassed to dout.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "Behavior not described in brief."
+          },
+          {
+            "topic": "simultaneous_full",
+            "contract": "Accept only the read. The write is ignored even though the read frees a slot.",
+            "brief_says": "When it is completely full, a simultaneous write is refused and only the read happens",
+            "status": "matches",
+            "note": "Matches contract: write ignored, read accepted."
+          },
+          {
+            "topic": "ordering",
+            "contract": "Accepted words leave exactly once and in arrival order, across pointer wraparound.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "Not mentioned in brief."
+          },
+          {
+            "topic": "read_latency",
+            "contract": "dout is registered: it holds the removed word after the edge of an accepted read (no fall-through).",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "Not mentioned in brief."
+          },
+          {
+            "topic": "depth",
+            "contract": "DEPTH words of capacity, for the selected DEPTH.",
+            "brief_says": "A 4-deep byte FIFO",
+            "status": "matches",
+            "note": "Matches DEPTH=4."
+          },
+          {
+            "topic": "width",
+            "contract": "8-bit data words.",
+            "brief_says": "byte FIFO",
+            "status": "matches",
+            "note": "Byte implies 8 bits, matches WIDTH=8."
+          }
+        ],
+        "detail": null
+      },
+      {
+        "id": "B8",
+        "expected_blocking": false,
+        "expected_topics": [],
+        "status": "ok",
+        "blocking": [],
+        "needs_decision": [
+          "reset_kind",
+          "reset_priority",
+          "reset_recurrence",
+          "write_when_full",
+          "read_when_empty",
+          "simultaneous_mid",
+          "simultaneous_empty",
+          "simultaneous_full",
+          "ordering"
+        ],
+        "topic_hit": false,
+        "outcome": "proceeded",
+        "wall_s": 2.84,
+        "calls": [
+          {
+            "model_id": "nvidia/nemotron-3-super-120b-a12b",
+            "latency_ms": 2841,
+            "prompt_tokens": 496,
+            "completion_tokens": 570,
+            "status": "ok",
+            "schema_error": null
+          }
+        ],
+        "decisions": [
+          {
+            "topic": "reset_kind",
+            "contract": "Reset is synchronous and active-high, sampled on the rising clock edge.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "The brief does not mention reset behavior."
+          },
+          {
+            "topic": "reset_priority",
+            "contract": "Reset wins over read and write. Occupancy becomes zero; empty is true and full is false after the edge.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "The brief does not mention reset priority over read/write."
+          },
+          {
+            "topic": "reset_recurrence",
+            "contract": "Reset may be asserted again at any later edge and must restore the empty state.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "The brief does not mention reset recurrence."
+          },
+          {
+            "topic": "write_when_full",
+            "contract": "Ignore the write.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "The brief does not specify behavior on write when full."
+          },
+          {
+            "topic": "read_when_empty",
+            "contract": "Ignore the read. Nothing is consumed and nothing is bypassed.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "The brief does not specify behavior on read when empty."
+          },
+          {
+            "topic": "simultaneous_mid",
+            "contract": "Accept both. Occupancy stays constant; the old head is read and the new word joins the tail.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "The brief does not address simultaneous read/write when neither empty nor full."
+          },
+          {
+            "topic": "simultaneous_empty",
+            "contract": "Accept only the write. The new word is not bypassed to dout.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "The brief does not address simultaneous read/write when empty."
+          },
+          {
+            "topic": "simultaneous_full",
+            "contract": "Accept only the read. The write is ignored even though the read frees a slot.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "The brief does not address simultaneous read/write when full."
+          },
+          {
+            "topic": "ordering",
+            "contract": "Accepted words leave exactly once and in arrival order, across pointer wraparound.",
+            "brief_says": null,
+            "status": "unspecified",
+            "note": "The brief does not mention FIFO ordering or arrival-order preservation."
+          },
+          {
+            "topic": "read_latency",
+            "contract": "dout is registered: it holds the removed word after the edge of an accepted read (no fall-through).",
+            "brief_says": "after a successful read, dout holds the byte that was removed, and it keeps that value until the next successful read",
+            "status": "matches",
+            "note": "Matches the contract: dout is registered and holds the removed word after the edge of an accepted read."
+          },
+          {
+            "topic": "depth",
+            "contract": "DEPTH words of capacity, for the selected DEPTH.",
+            "brief_says": "A 4-entry byte FIFO",
+            "status": "matches",
+            "note": "Matches DEPTH=4 as specified in the contract profile."
+          },
+          {
+            "topic": "width",
+            "contract": "8-bit data words.",
+            "brief_says": "byte FIFO",
+            "status": "matches",
+            "note": "Matches WIDTH=8 as specified in the contract profile."
+          }
+        ],
+        "detail": null
+      }
+    ]
+  },
+  "finished_at": "2026-10-04T05:03:50Z",
+  "summary": {
+    "diagnosis_reproduced": "8 / 8",
+    "categories_reproduced": [
+      "flags_boundaries",
+      "ordering_wraparound",
+      "reset",
+      "simultaneous"
+    ],
+    "controls_false_alarms": "0 / 4",
+    "controls_inconclusive": 0,
+    "explanations_ok": "6 / 8",
+    "repair_all_cases": "8 / 8",
+    "repair_attempted_cases": "8 / 8",
+    "repair_first_attempt": 5,
+    "interpretation": {
+      "conflicting_detected": "3 / 4",
+      "compatible_proceeded": "4 / 4",
+      "errors": 0
+    },
+    "model_requests": 32,
+    "prompt_tokens": 52193,
+    "completion_tokens": 63370
+  },
+  "review_note": "Explanations reviewed by the coding assistant against traces, RTL, and obligations; no independent human review."
+}

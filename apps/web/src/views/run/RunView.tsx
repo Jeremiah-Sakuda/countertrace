@@ -1,15 +1,17 @@
-import { ArrowLeft, Ban, History, LoaderCircle, Radio, ScanSearch } from "lucide-react";
+import { ArrowLeft, Ban, History, LoaderCircle, ScanSearch, Server } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { api } from "../../api/client";
+import { api, ApiError } from "../../api/client";
 import type { Finding, Profile, Run, Status } from "../../api/types";
 import { Callout, Disclosure, ErrorNotice, Loading, Section } from "../../components/common";
 import type { FocusRequest } from "../../components/CycleTable";
 import type { RunContextInfo } from "../../components/Header";
 import { Badge, ObligationBadge, VerdictBadge } from "../../components/StatusBadge";
-import { elapsedSeconds, formatDateTime, formatDuration, hex, METHOD_LABELS, STAGE_LABELS } from "../../lib/format";
+import { findingSignal, primaryFinding, probableOrigin, signalValue } from "../../lib/evidence";
+import { elapsedSeconds, formatDateTime, formatDuration, METHOD_LABELS, STAGE_LABELS } from "../../lib/format";
 import { useNow, usePolling, type AsyncState } from "../../lib/hooks";
 import { href } from "../../lib/route";
 import { AuditResult } from "../AuditView";
+import { CandidatePanel, RepairPayoff } from "./CandidatePanel";
 import { EvidencePanel } from "./EvidencePanel";
 import { ExplanationPanel } from "./ExplanationPanel";
 import { FindingPanel, FormalFindingPanel } from "./FindingPanel";
@@ -39,11 +41,11 @@ function RunHeader({ run, now, onCancel, cancelling, cancelError }: { run: Run; 
   const active = run.state === "queued" || run.state === "running";
   const total = elapsedSeconds(run.started_at ?? run.created_at, run.finished_at, now);
   const t = run.verification?.timings;
-  const findings = run.verification?.findings ?? [];
-  const finding = findings.find((f) => f.source === "simulation") ?? findings[0];
+  const finding = primaryFinding(run);
+  const origin = probableOrigin(finding);
   const obligations = run.verification?.obligations ?? [];
-  const signal = finding?.check === "empty_flag" ? "empty" : finding?.check === "full_flag" ? "full" : "dout";
-  const sample = (value: Finding["expected"]) => signal === "dout" ? hex(value.dout) : String(Number(value[signal]));
+  const signal = finding ? findingSignal(finding) : "dout";
+  const audit = run.kind === "audit" && run.state === "complete" ? run.audit?.summary : undefined;
   return (
     <div className="run-header">
       <div className="case-masthead">
@@ -52,22 +54,42 @@ function RunHeader({ run, now, onCancel, cancelling, cancelError }: { run: Run; 
       </div>
       <div className="case-hero">
         <div className="case-title">
-          <p className="eyebrow">{run.recorded ? "From the recorded collection" : "Live investigation"}</p>
+          <p className="eyebrow">{run.recorded ? "From the recorded collection" : "Run on this server"}</p>
           <h1>{run.title}</h1>
           <div className="run-badges">
-            <Badge tone="neutral" icon={run.recorded ? History : Radio}>{run.recorded ? "Recorded run" : "Live run"}</Badge>
+            <Badge tone="neutral" icon={run.recorded ? History : Server}>{run.recorded ? "Recorded run" : "Run on this server"}</Badge>
             {run.kind === "verification" && <VerdictBadge headline={active ? "pending" : run.verdict?.headline ?? (run.state === "failed" ? "tool_error" : "unresolved")} />}
           </div>
-          <p className="case-caption">{finding ? "A requirement failed. Trace the sequence, inspect the cause, and follow the repair evidence." : "Every result has a method, a set of assumptions, and evidence you can inspect."}</p>
+          <p className="case-caption">
+            {audit
+              ? "Seeded faults the mandatory core confirms as real bugs, scored against one named supplemental check set."
+              : finding
+                ? "A requirement failed. Trace the sequence, inspect the cause, and follow the repair evidence."
+                : run.parent_id
+                  ? "A repair candidate, re-run against its parent's frozen contract and checks."
+                  : "Every result has a method, a set of assumptions, and evidence you can inspect."}
+          </p>
+          {run.kind === "verification" && <RepairPayoff run={run} />}
         </div>
+        {audit && (
+          <aside className="case-focus case-focus-failure" aria-label="Audit result at a glance">
+            <span className="eyebrow">Audit result · valid seeded faults</span>
+            <div className="case-focus-number">{audit.supplemental_survived}<span>of {audit.valid_faults} valid faults</span></div>
+            <p className="audit-headline">
+              {audit.supplemental_survived} of {audit.valid_faults} real bugs slip past this check set
+            </p>
+            <p className="case-focus-source">{audit.supplemental_killed} caught · {audit.equivalent} equivalent, {audit.unresolved} unresolved, {audit.invalid} invalid excluded</p>
+          </aside>
+        )}
         {run.kind === "verification" && <aside className={`case-focus ${finding ? "case-focus-failure" : ""}`} aria-label="Run at a glance">
-          <span className="eyebrow">{finding ? "First mismatch in this trace" : active ? "In progress" : "Check obligations"}</span>
+          <span className="eyebrow">{finding ? (finding.source === "simulation" ? `First mismatch in simulation test ${finding.test}` : "Shortest formal counterexample") : active ? "In progress" : "Check obligations"}</span>
           <div className="case-focus-number">{finding ? String(finding.cycle).padStart(2, "0") : active ? "…" : obligations.length}<span>{finding ? "cycle" : active ? "running" : "checks"}</span></div>
           {finding ? <div className="case-signal">
-            <span><small>Expected {signal}</small><strong>{sample(finding.expected)}</strong></span>
+            <span><small>Expected {signal}</small><strong>{signalValue(finding, "expected")}</strong></span>
             <span aria-hidden="true" className="case-signal-arrow">→</span>
-            <span><small>Observed</small><strong>{sample(finding.observed)}</strong></span>
+            <span><small>Observed</small><strong>{signalValue(finding, "observed")}</strong></span>
           </div> : <p className="small">Results below keep simulation, bounded checks, and proof distinct.</p>}
+          {origin && <p className="case-origin small">Probable origin: <strong>cycle {origin.cycle}</strong>, derived from the trace</p>}
           <p className="case-focus-source">{finding ? `${finding.source} / ${finding.test}` : `DEPTH ${run.depth ?? "—"} · WIDTH 8`}</p>
         </aside>}
       </div>
@@ -82,7 +104,6 @@ function RunHeader({ run, now, onCancel, cancelling, cancelError }: { run: Run; 
         {run.recorded_note && <p className="small muted">{run.recorded_note}</p>}
         <p className="run-timing small">{run.started_at ? `Started ${formatDateTime(run.started_at)}` : "Not started"}{run.finished_at ? ` · finished ${formatDateTime(run.finished_at)}` : ""}{total !== null ? ` · ${active ? "elapsed" : "took"} ${formatDuration(total)}` : ""}{run.image ? ` · verifier ${run.image.tag}` : ""}</p>
       </Disclosure>
-      {run.parent_id && <p className="small">Repair candidate for <a href={href.run(run.parent_id)} className="mono wrap-anywhere">{run.parent_id}</a>, checked against its frozen contract and checks.</p>}
       {active && !run.recorded && <button type="button" className="btn btn-danger btn-sm" onClick={onCancel} disabled={cancelling} aria-busy={cancelling}>{cancelling ? <LoaderCircle className="spin" size={14} aria-hidden="true" /> : <Ban size={14} aria-hidden="true" />} Cancel run</button>}
       {run.state === "cancelled" && <Callout kind="warn" title="Run cancelled"><p>A cancelled run establishes nothing. Unfinished obligations remain unresolved.</p></Callout>}
       {run.state === "failed" && <Callout kind="error" title="Run failed" role="alert"><p>{run.error || "The run ended with an error. No result is claimed."}</p></Callout>}
@@ -149,15 +170,21 @@ function VerificationBody({
 }) {
   const v = run.verification;
   const [focus, setFocus] = useState<FocusRequest | null>(null);
-  const onCite = useCallback((cycle: number) => setFocus((f) => ({ cycle, nonce: (f?.nonce ?? 0) + 1 })), []);
+  const onCite = useCallback(
+    (cycle: number, origin?: { element: HTMLElement; label: string }) =>
+      setFocus((f) => ({ cycle, nonce: (f?.nonce ?? 0) + 1, returnTo: origin?.element ?? null, returnLabel: origin?.label })),
+    [],
+  );
   const requirements = profile.status === "ok" ? profile.data.contract.requirements : undefined;
   const checks = profile.status === "ok" ? profile.data.contract.checks : undefined;
   const findings = v?.findings ?? [];
   const primary: Finding | undefined = useMemo(() => findings.find((f) => f.source === "simulation") ?? findings[0], [findings]);
+  const formalOthers = findings.filter((f) => f !== primary && f.source === "formal");
   const others = findings.filter((f) => f !== primary);
   const depth = run.depth ?? 4;
   const active = run.state === "queued" || run.state === "running";
   const sections = [
+    ...(run.parent_id ? [{ id: "run-candidate", label: "What the repair changed" }] : []),
     { id: "run-finding", label: primary ? "Finding & trace" : "Result" },
     ...(primary || run.explanation ? [{ id: "run-explanation", label: "Explanation" }] : []),
     { id: "run-repair", label: "Repair & export" },
@@ -190,8 +217,10 @@ function VerificationBody({
         </Section>
       )}
 
+      {run.parent_id && <CandidatePanel run={run} />}
+
       {primary ? (
-        <FindingPanel runId={run.id} finding={primary} traces={v?.traces} requirements={requirements} depth={depth} focusRequest={focus} onCite={onCite} />
+        <FindingPanel runId={run.id} finding={primary} traces={v?.traces} requirements={requirements} depth={depth} focusRequest={focus} onCite={onCite} otherFormal={formalOthers} />
       ) : run.state === "complete" && run.verdict?.headline === "no_counterexample" ? (
         <NoCounterexample run={run} />
       ) : run.state === "complete" ? (
@@ -211,7 +240,7 @@ function VerificationBody({
       ) : null}
 
       {others.map((f, i) => (
-        <FormalFindingPanel key={`${f.test}-${i}`} runId={run.id} finding={f} traces={v?.traces} requirements={requirements} depth={depth} />
+        <FormalFindingPanel key={`${f.test}-${i}`} runId={run.id} finding={f} traces={v?.traces} requirements={requirements} depth={depth} lead={primary} />
       ))}
 
       {(primary || run.explanation) && <ExplanationPanel run={run} hasFinding={Boolean(primary)} onCite={onCite} onUpdated={refresh} />}
@@ -270,6 +299,15 @@ export function RunView({
   };
 
   if (loading && !run) return <Loading label="Loading run" />;
+  if (!run && error instanceof ApiError && error.status === 404)
+    return (
+      <Callout kind="warn" title="No run with this ID" role="alert">
+        <p>
+          There is no run <code>{id}</code> on this server or in the recorded collection. Check the link, or open the{" "}
+          <a href={href.runs()}>runs list</a>.
+        </p>
+      </Callout>
+    );
   if (!run) return <ErrorNotice error={error} title={`Run ${id} unavailable`} onRetry={refresh} />;
 
   return (

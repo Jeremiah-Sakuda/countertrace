@@ -1,10 +1,11 @@
-import { ArrowUpRight, Bot, CircleCheck, CircleHelp, CircleX, FileCheck2, History, LoaderCircle, Play, ShieldAlert, Ban } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { Bot, CircleCheck, CircleHelp, CircleX, FileCheck2, History, LoaderCircle, Lock, Play, ShieldAlert, Ban, Undo2 } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { api } from "../api/client";
 import type { Contract, Decision, Example, ExampleDetail, Interpretation, Profile, RunSummary, Status } from "../api/types";
 import { CodeView } from "../components/CodeView";
 import { Callout, Disclosure, ErrorNotice, Hash, Loading, Section, TableScroll } from "../components/common";
 import { ModelCalls, ModelProvenance, ModelStatusNotice } from "../components/ModelResult";
+import { ShowcaseTour } from "../components/ShowcaseTour";
 import { Badge, VerdictBadge } from "../components/StatusBadge";
 import { formatDateTime, hex, shortHash } from "../lib/format";
 import { useAsync, type AsyncState } from "../lib/hooks";
@@ -316,6 +317,10 @@ function ExampleDetailView({ detail, profile, status }: { detail: ExampleDetail;
   const [interp, setInterp] = useState<{ busy: boolean; result: Interpretation | null; error: unknown }>({ busy: false, result: null, error: null });
   const [accepted, setAccepted] = useState<string | null>(null);
   const [ackConflict, setAckConflict] = useState(false);
+  // Acceptance swaps the accept button for a stamp; move focus to the control that replaced the one the user pressed.
+  const [toggled, setToggled] = useState(0);
+  const acceptRef = useRef<HTMLButtonElement>(null);
+  const withdrawRef = useRef<HTMLButtonElement>(null);
   const [launch, setLaunch] = useState<{ busy: boolean; error: unknown }>({ busy: false, error: null });
   const previous = useAsync(() => api.runs(), [detail.id]);
 
@@ -325,6 +330,12 @@ function ExampleDetailView({ detail, profile, status }: { detail: ExampleDetail;
     setAckConflict(false);
     setLaunch({ busy: false, error: null });
   }, [detail.id]);
+
+  useEffect(() => {
+    if (toggled === 0) return;
+    (accepted ? withdrawRef : acceptRef).current?.focus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [toggled]);
 
   const blocking = interp.result?.blocking ?? [];
   const needsAck = blocking.length > 0;
@@ -420,7 +431,7 @@ function ExampleDetailView({ detail, profile, status }: { detail: ExampleDetail;
         </Disclosure>
         <Disclosure summary="Ask Nemotron to interpret the brief" meta="Optional">
           <p className="prose">Compare the brief with the fixed contract to surface matches, conflicts, and open decisions. The model cannot change the contract.</p>
-          {status.status === "ok" && <p className="muted small">{status.data.data_notice}</p>}
+          <p className="muted small">This sends the brief, RTL, and contract to the model endpoint; see the data notice above.</p>
           <button type="button" className="btn btn-secondary" onClick={interpret} disabled={interp.busy} aria-busy={interp.busy}>
             {interp.busy ? <LoaderCircle className="spin" size={16} aria-hidden="true" /> : <Bot size={16} aria-hidden="true" />}
             {interp.busy ? "Interpreting…" : "Interpret brief with Nemotron"}
@@ -434,7 +445,7 @@ function ExampleDetailView({ detail, profile, status }: { detail: ExampleDetail;
 
       <Section
         title="Let the evidence answer."
-        className="notebook-step notebook-launch"
+        className={`notebook-step notebook-launch${isAccepted ? " is-accepted" : ""}`}
         eyebrow={<><span className="notebook-step-number">03</span> Accept & run</>}
       >
         <p className="prose">Accept this exact contract, then run simulation and formal checks in the isolated verifier. The result will show what each method established and what remains unresolved.</p>
@@ -444,17 +455,33 @@ function ExampleDetailView({ detail, profile, status }: { detail: ExampleDetail;
             <span>I understand verification checks contract v{version}, which conflicts with the brief on: {blocking.join(", ")}.</span>
           </label>
         )}
+        {isAccepted ? (
+          <div className="accept-stamp" role="status">
+            <Lock size={18} aria-hidden="true" />
+            <div>
+              <p className="accept-stamp-title">Contract v{version} accepted</p>
+              <p className="small">
+                Frozen at hash <Hash value={detail.contract_hash} n={16} />. This exact version is what the run checks.
+              </p>
+            </div>
+            <button ref={withdrawRef} type="button" className="btn btn-ghost btn-sm" onClick={() => { setAccepted(null); setToggled((n) => n + 1); }}>
+              <Undo2 size={14} aria-hidden="true" /> Withdraw acceptance
+            </button>
+          </div>
+        ) : null}
         <div className="action-row">
-          <button
-            type="button"
-            className={`btn ${isAccepted ? "btn-secondary" : "btn-primary"}`}
-            aria-pressed={isAccepted}
-            disabled={needsAck && !ackConflict}
-            onClick={() => setAccepted(isAccepted ? null : detail.contract_hash)}
-          >
-            <FileCheck2 size={16} aria-hidden="true" />
-            {isAccepted ? `Accepted contract v${version} (${shortHash(detail.contract_hash)})` : `Accept contract v${version} (${shortHash(detail.contract_hash)})`}
-          </button>
+          {!isAccepted && (
+            <button
+              ref={acceptRef}
+              type="button"
+              className="btn btn-secondary"
+              disabled={needsAck && !ackConflict}
+              onClick={() => { setAccepted(detail.contract_hash); setToggled((n) => n + 1); }}
+            >
+              <FileCheck2 size={16} aria-hidden="true" />
+              Accept contract v{version} ({shortHash(detail.contract_hash)})
+            </button>
+          )}
           <button type="button" className="btn btn-primary" disabled={!isAccepted || launch.busy || !verifierReady} onClick={run} aria-busy={launch.busy}>
             {launch.busy ? <LoaderCircle className="spin" size={16} aria-hidden="true" /> : <Play size={16} aria-hidden="true" />}
             {launch.busy ? "Starting…" : "Run verification"}
@@ -466,7 +493,6 @@ function ExampleDetailView({ detail, profile, status }: { detail: ExampleDetail;
             <p>Docker and the verifier image are required for a live run. <a href={href.runs()}>Recorded case files</a> remain inspectable.</p>
           </Callout>
         )}
-        {status.status === "ok" && <p className="muted small">{status.data.data_notice}</p>}
         {launch.error ? <ErrorNotice error={launch.error} title="Could not start the run" /> : null}
         {priorRuns.length > 0 && (
           <Disclosure summary="Earlier runs of this example" meta={`${priorRuns.length} recent runs`}>
@@ -508,23 +534,28 @@ export function SetupView({
 
   return (
     <div className="notebook-setup">
-      <header className="notebook-hero">
+      <header className="notebook-hero landing-hero">
         <div>
-          <p className="eyebrow">The workbench / Contract setup</p>
-          <h1>Start with a question.<br /><em>Follow the evidence.</em></h1>
-          <p className="lede">A small queue. An exact contract. A sequence you can inspect. Choose a FIFO and find out what its checks actually establish.</p>
+          <p className="eyebrow">Countertrace · synchronous FIFO verification</p>
+          <h1>
+            Find the exact cycle your FIFO breaks, <em>see why, and check a fix against checks the AI can’t change.</em>
+          </h1>
+          <p className="lede">
+            Simulation and formal tools run in an isolated verifier. NVIDIA Nemotron explains the failure and proposes a fix; independent,
+            frozen checks decide whether it passes.
+          </p>
         </div>
-        <aside className="notebook-hero-aside" aria-label="Start with recorded evidence">
-          <span className="notebook-margin-label">First time here?</span>
-          <p>Open a recorded case file to explore a real failure, its explanation, and the checked repair.</p>
-          <a className="inline-link" href={href.runs()}>Browse the case files <ArrowUpRight size={16} aria-hidden="true" /></a>
-        </aside>
+        <ShowcaseTour profile={profile} />
       </header>
-      <ol className="notebook-workflow" aria-label="Verification workflow">
-        <li><span>01</span><div><strong>Inspect the input</strong><p>Choose a bundled FIFO.</p></div></li>
-        <li><span>02</span><div><strong>Review the contract</strong><p>Make the required behavior explicit.</p></div></li>
-        <li><span>03</span><div><strong>Accept & run</strong><p>Inspect findings and their limits.</p></div></li>
-      </ol>
+      <div className="setup-intro">
+        <h2 className="setup-intro-title">Or run one yourself</h2>
+        <p className="muted small">Choose a bundled FIFO, review its contract, accept it, and run it in the local verifier.</p>
+        {status.status === "ok" && (
+          <p className="data-notice small">
+            <ShieldAlert size={14} aria-hidden="true" /> <span>{status.data.data_notice}</span>
+          </p>
+        )}
+      </div>
       <div className="notebook-setup-layout">
         <aside className="notebook-example-sidebar">
           <h2 className="aside-title">Choose your example</h2>

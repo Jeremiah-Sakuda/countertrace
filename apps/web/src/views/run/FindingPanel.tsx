@@ -1,5 +1,5 @@
-import { CircleCheck, CircleHelp, CircleX, Download, FileCode2, Repeat, Wrench, CircleMinus } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { ArrowUp, CircleCheck, CircleHelp, CircleX, Download, FileCode2, Repeat, Route, Wrench, CircleMinus } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { fileUrl } from "../../api/client";
 import type { CycleRow, Finding, Replay, Requirement } from "../../api/types";
 import { Disclosure } from "../../components/common";
@@ -7,6 +7,7 @@ import { CycleTable, type FocusRequest } from "../../components/CycleTable";
 import { QueueView } from "../../components/QueueView";
 import { Badge, type Tone } from "../../components/StatusBadge";
 import { Waveform } from "../../components/Waveform";
+import { probableOrigin } from "../../lib/evidence";
 import { bit, CHECK_SIGNAL, hex } from "../../lib/format";
 
 const REPLAY: Record<Replay["status"], { tone: Tone; icon: typeof CircleCheck; label: string }> = {
@@ -30,6 +31,20 @@ export function ReplayBadge({ replay }: { replay: Replay | undefined }) {
 function testLabel(f: Finding): string {
   if (f.source === "formal") return `the formal ${f.test.replace(/^formal:/, "")} trace`;
   return `test ${f.test}`;
+}
+
+/** How each finding is named, so a simulation finding and a formal one are never mistaken for the same failure. */
+export function findingKind(f: Finding): string {
+  if (f.source === "simulation") return `First mismatch in simulation test ${f.test}`;
+  const task = f.test.replace(/^formal:/, "");
+  if (task === "bmc") return "Shortest formal counterexample (bounded model check)";
+  if (task === "prove") return "Formal counterexample from the unbounded proof (induction)";
+  return `Formal counterexample (${task})`;
+}
+
+export interface CiteOrigin {
+  element: HTMLElement;
+  label: string;
 }
 
 function ExpectedObserved({ finding }: { finding: Finding }) {
@@ -113,6 +128,36 @@ export function TraceBlock({
   }, [focusRequest, finding, showAll]);
 
   const current = rows.find((r) => r.cycle === selected?.cycle) ?? rows.find((r) => r.cycle === finding.cycle) ?? rows[0] ?? null;
+  const contextRef = useRef<HTMLDivElement>(null);
+  const [back, setBack] = useState<{ element: HTMLElement; label: string; cycle: number } | null>(null);
+
+  // A citation jump brings the reference queue and the cited row into view together when they fit.
+  const onFocusRequestHandled = useCallback((rowEl: HTMLElement, request: FocusRequest) => {
+    const behavior: ScrollBehavior = matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+    if (request.returnTo) setBack({ element: request.returnTo, label: request.returnLabel ?? "Back", cycle: request.cycle });
+    else setBack(null);
+    window.requestAnimationFrame(() => {
+      const context = contextRef.current;
+      if (context) {
+        const span = rowEl.getBoundingClientRect().bottom - context.getBoundingClientRect().top;
+        if (span + 32 <= window.innerHeight) {
+          context.scrollIntoView({ block: "start", behavior });
+          return;
+        }
+      }
+      // Too tall to show both: keep the row at the bottom so as much of the queue above it as possible stays visible.
+      rowEl.scrollIntoView({ block: "end", behavior });
+    });
+  }, []);
+
+  const goBack = () => {
+    if (!back) return;
+    const target = back.element.isConnected ? back.element : document.getElementById("run-explanation");
+    setBack(null);
+    if (!target) return;
+    target.focus({ preventScroll: true });
+    target.scrollIntoView({ block: "center", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  };
 
   if (total === 0)
     return (
@@ -134,7 +179,17 @@ export function TraceBlock({
           </button>
         ) : null}
       </div>
-      {current && <QueueView row={current} depth={depth} />}
+      <div ref={contextRef} className="trace-context">
+        {back && (
+          <div className="back-bar">
+            <button type="button" className="btn btn-ghost btn-sm" onClick={goBack}>
+              <ArrowUp size={14} aria-hidden="true" /> {back.label}
+            </button>
+            <span className="muted small">Showing cycle {back.cycle}, cited there.</span>
+          </div>
+        )}
+        {current && <QueueView row={current} depth={depth} />}
+      </div>
       <CycleTable
         rows={rows}
         caption={caption}
@@ -143,6 +198,7 @@ export function TraceBlock({
         focusRequest={focusRequest}
         onSelect={setSelected}
         selectedCycle={current?.cycle ?? null}
+        onFocusRequestHandled={onFocusRequestHandled}
       />
       <Disclosure summary="Waveform (drawn from these trace rows)">
         <Waveform rows={rows} markCycle={finding.cycle} />
@@ -167,6 +223,7 @@ export function FindingPanel({
   depth,
   focusRequest,
   onCite,
+  otherFormal = [],
 }: {
   runId: string;
   finding: Finding;
@@ -174,14 +231,18 @@ export function FindingPanel({
   requirements: Record<string, Requirement> | undefined;
   depth: number;
   focusRequest: FocusRequest | null;
-  onCite: (cycle: number) => void;
+  onCite: (cycle: number, origin?: CiteOrigin) => void;
+  /** Formal counterexamples on other traces; they are different first failures, not this one. */
+  otherFormal?: Finding[];
 }) {
+  const origin = probableOrigin(finding);
+  const originTitle = origin ? requirements?.[origin.row ?? ""]?.title ?? origin.row ?? null : null;
   return (
     <section className="panel finding" aria-labelledby="run-finding">
       <header className="panel-header">
         <div>
           <p className="eyebrow eyebrow-fail">
-            <CircleX size={14} aria-hidden="true" /> Counterexample found · {finding.source === "formal" ? "formal" : "simulation"}
+            <CircleX size={14} aria-hidden="true" /> Counterexample found · {findingKind(finding)}
           </p>
           <h2 id="run-finding" className="panel-title" tabIndex={-1}>
             Violated requirement: {finding.requirement_title}
@@ -190,8 +251,48 @@ export function FindingPanel({
       </header>
       <p className="requirement-text">{finding.requirement_text}</p>
       <p className="finding-headline">
-        First observed mismatch at <strong>cycle {finding.cycle}</strong> in <strong>{testLabel(finding)}</strong>.
+        {finding.source === "simulation" ? (
+          <>
+            First mismatch in simulation test <strong>{finding.test}</strong>: <strong>cycle {finding.cycle}</strong>.
+          </>
+        ) : (
+          <>
+            {findingKind(finding)}: first observed mismatch at <strong>cycle {finding.cycle}</strong> of <strong>{testLabel(finding)}</strong>.
+          </>
+        )}
       </p>
+      {origin && (
+        <div className="probable-origin">
+          <Route size={18} aria-hidden="true" />
+          <div>
+            <p className="probable-origin-line">
+              Probable origin:{" "}
+              <button type="button" className="cycle-link" onClick={() => onCite(origin.cycle)} aria-label={`Show cycle ${origin.cycle} in the cycle table`}>
+                cycle {origin.cycle}
+              </button>{" "}
+              <span>— {originTitle ?? "an ignored operation"}</span>
+            </p>
+            <p className="small muted">
+              Derived from the trace and the contract, not from the model: {origin.text}
+            </p>
+          </div>
+        </div>
+      )}
+      {otherFormal.length > 0 && (
+        <p className="small finding-distinct">
+          <CircleHelp size={14} aria-hidden="true" />
+          <span>
+            Formal checking found a different first failure on its own trace:{" "}
+            {otherFormal.map((f, i) => (
+              <span key={f.test}>
+                {i > 0 ? "; " : ""}
+                <code>{f.check}</code> at cycle {f.cycle} of <code>{f.trace}</code>
+              </span>
+            ))}
+            . Cycle numbers are local to each trace. See the formal panel below.
+          </span>
+        </p>
+      )}
       <div className="grid-2 finding-grid">
         <div>
           <h3 className="subhead">Failed check</h3>
@@ -256,12 +357,15 @@ export function FormalFindingPanel({
   traces,
   requirements,
   depth,
+  lead,
 }: {
   runId: string;
   finding: Finding;
   traces: Record<string, CycleRow[]> | undefined;
   requirements: Record<string, Requirement> | undefined;
   depth: number;
+  /** The lead finding shown above, when this panel describes a different trace. */
+  lead?: Finding;
 }) {
   const replay = finding.replay;
   return (
@@ -269,7 +373,7 @@ export function FormalFindingPanel({
       <header className="panel-header">
         <div>
           <p className="eyebrow eyebrow-fail">
-            <CircleX size={14} aria-hidden="true" /> {finding.source === "formal" ? "Formal counterexample" : "Additional simulation finding"} · {finding.test}
+            <CircleX size={14} aria-hidden="true" /> {finding.source === "formal" ? findingKind(finding) : `Additional simulation finding · ${finding.test}`}
           </p>
           <h2 id={`formal-${finding.test}`} className="panel-title">
             {finding.requirement_title}
@@ -282,6 +386,15 @@ export function FormalFindingPanel({
       <p>
         Check <code>{finding.check}</code> failed at application cycle <strong>{finding.cycle}</strong>. {finding.check_text}.
       </p>
+      {lead && lead.trace !== finding.trace && (
+        <p className="small finding-distinct">
+          <CircleHelp size={14} aria-hidden="true" />
+          <span>
+            This is a separate failure from the {lead.source === "simulation" ? `first mismatch in simulation test ${lead.test}` : lead.test} above
+            ({lead.check} at its cycle {lead.cycle}). It comes from a different trace, so its cycle numbers are not comparable.
+          </span>
+        </p>
+      )}
       {replay && (
         <p className="muted small">
           {replay.solver_step !== null && replay.application_cycle !== null

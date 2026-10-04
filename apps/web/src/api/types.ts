@@ -29,6 +29,8 @@ export interface Status {
     reason: string | null;
     model_id: string | null;
     repair_model_id: string | null;
+    /** Faster model used for brief interpretation and check-set proposals. */
+    fast_model_id?: string | null;
     endpoint_host: string | null;
     input_token_limit: number | null;
     output_token_limit: number | null;
@@ -177,6 +179,9 @@ export interface RunSummary {
   parent_id: string | null;
   recorded: boolean;
   verdict: Verdict | null;
+  /** bundled_example | model_repair | evaluation | local_file | … (absent on older servers and audits). */
+  origin?: string | null;
+  depth?: number | null;
 }
 
 export type StageId = "validating" | "simulating" | "checking_properties" | "replaying" | string;

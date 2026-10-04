@@ -1,9 +1,11 @@
-import { ArrowRight, ArrowUpRight, ClipboardCheck, History, Radio } from "lucide-react";
+import { ArrowRight, ClipboardCheck, History, Server } from "lucide-react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { api } from "../api/client";
-import type { RecordedRunSummary, RunSummary, Verdict } from "../api/types";
+import type { RecordedRunSummary, Run, RunSummary, Verdict } from "../api/types";
 import { Disclosure, ErrorNotice, Loading, Section, TableScroll } from "../components/common";
 import { Badge, VerdictBadge } from "../components/StatusBadge";
 import { formatDateTime } from "../lib/format";
+import { findingSignal, originLabel, passedAttempt, primaryFinding, signalValue } from "../lib/evidence";
 import { useAsync } from "../lib/hooks";
 import { href } from "../lib/route";
 
@@ -25,103 +27,198 @@ function Outcome({ kind, state, verdict }: { kind: string; state: string; verdic
   );
 }
 
-function caseDescription(run: RecordedRunSummary): string {
+function caseDescription(run: RecordedRunSummary, detail: Run | null): string {
   if (run.kind === "audit") return "See which seeded faults a supplemental check set misses. The mandatory core checks stay independent.";
+  if (detail?.parent_id) return "A model-proposed repair, re-run against the parent's frozen contract and checks. Compare its results with the failing run.";
   if (run.verdict?.headline === "counterexample") return "Follow the failing sequence from its first mismatch to the evidence behind it.";
   if (run.verdict?.headline === "no_counterexample") return "Inspect the individual simulation, bounded-check, and proof results, with their assumptions and limits.";
   return "Read the preserved checks, trace artifacts, and unresolved questions for this run.";
 }
 
+/** Two facts per card, read from the recorded run. The strongest available evidence leads. */
+function CardFacts({ run, detail }: { run: RecordedRunSummary; detail: Run | null }) {
+  const facts: { label: string; value: ReactNode; note: string }[] = [];
+  if (run.kind === "audit") {
+    const s = detail?.audit?.summary;
+    if (s) {
+      facts.push({ label: "Real bugs missed", value: `${s.supplemental_survived} of ${s.valid_faults}`, note: "valid seeded faults survived the set" });
+      facts.push({ label: "Caught", value: s.supplemental_killed, note: "valid faults killed by the set" });
+    }
+  } else if (run.verdict?.headline === "counterexample") {
+    const finding = primaryFinding(detail);
+    const attempt = passedAttempt(detail);
+    if (finding) facts.push({ label: "First mismatch", value: `Cycle ${finding.cycle}`, note: `${findingSignal(finding)} ${signalValue(finding, "expected")} expected, ${signalValue(finding, "observed")} observed` });
+    const extras = [detail?.explanation?.result ? "Explanation" : null, attempt ? "accepted repair" : detail?.repair ? "repair attempted" : null].filter(Boolean);
+    if (extras.length) {
+      const text = extras.join(" · ");
+      facts.push({ label: "Recorded with", value: text.charAt(0).toUpperCase() + text.slice(1), note: attempt ? `candidate ${attempt.index} passed the unchanged checks` : "model output, checked separately" });
+    } else facts.push({ label: "Unresolved", value: run.verdict.unresolved, note: "obligations" });
+  } else if (run.verdict) {
+    facts.push({ label: "Properties proved", value: run.verdict.counts.proved ?? 0, note: "under the stated assumptions" });
+    facts.push({ label: "Unresolved", value: run.verdict.unresolved, note: "obligations" });
+  }
+  if (facts.length === 0) return null;
+  return (
+    <dl className="gallery-result-facts">
+      {facts.map((f) => (
+        <div key={f.label}>
+          <dt>{f.label}</dt>
+          <dd>{f.value}<span>{f.note}</span></dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
 function RecordedList({ items }: { items: RecordedRunSummary[] }) {
+  // Only a handful of recordings ship, so their full records are fetched to describe each card accurately.
+  const details = useAsync(async () => {
+    const entries = await Promise.all(items.map(async (r) => [r.id, await api.run(r.id).catch(() => null)] as const));
+    return Object.fromEntries(entries) as Record<string, Run | null>;
+  }, [items.map((r) => r.id).join(",")]);
+  const detailOf = (id: string) => (details.status === "ok" ? details.data[id] ?? null : null);
   if (items.length === 0) return <p className="muted">No recorded runs are bundled with this build.</p>;
   const firstFailure = items.find((item) => item.verdict?.headline === "counterexample");
   const ordered = firstFailure ? [firstFailure, ...items.filter((item) => item.id !== firstFailure.id)] : items;
   return (
     <div className="gallery-grid">
-      {ordered.map((r, index) => (
-        <article key={r.id} className={`gallery-card${r.id === firstFailure?.id ? " gallery-card-featured" : ""}`} aria-labelledby={`case-${r.id}`}>
-          <div className="gallery-card-top">
-            <span className="gallery-card-number">{String(index + 1).padStart(2, "0")}</span>
-            <span className="gallery-card-type">{r.kind === "audit" ? "Check-quality audit" : "Verification case"}</span>
-            <Badge tone="neutral" icon={History}>Recorded</Badge>
-          </div>
-          <h3 id={`case-${r.id}`} className="gallery-title"><a href={href.run(r.id)}>{r.title}</a></h3>
-          <div className="gallery-outcome"><Outcome kind={r.kind} state="complete" verdict={r.verdict} /></div>
-          <p className="gallery-description">{caseDescription(r)}</p>
-          {r.verdict && (
-            <dl className="gallery-result-facts">
-              <div><dt>Properties proved</dt><dd>{r.verdict.counts.proved ?? 0}<span>under the stated assumptions</span></dd></div>
-              <div><dt>Unresolved</dt><dd>{r.verdict.unresolved}<span>obligations</span></dd></div>
-            </dl>
-          )}
-          <div className="gallery-card-footer">
-            <time dateTime={r.created_at} className="gallery-meta">{formatDateTime(r.created_at)}</time>
-            <a href={href.run(r.id)} className="gallery-open" aria-label={`Open case file: ${r.title}`}>Open case file <ArrowUpRight size={18} aria-hidden="true" /></a>
-          </div>
-          <Disclosure className="gallery-note" summary="Recording notes & provenance">
-            <p className="mono small wrap-anywhere">{r.id}</p>
-            {r.recorded_note && <p className="muted small">{r.recorded_note}</p>}
-            <p className="muted small">Dates, versions, and timings come from the original run. This is recorded evidence, not a new execution.</p>
-          </Disclosure>
-        </article>
-      ))}
+      {ordered.map((r, index) => {
+        const detail = detailOf(r.id);
+        return (
+          <article key={r.id} className={`gallery-card${r.id === firstFailure?.id ? " gallery-card-featured" : ""}`} aria-labelledby={`case-${r.id}`}>
+            <div className="gallery-card-top">
+              <span className="gallery-card-number">{String(index + 1).padStart(2, "0")}</span>
+              <span className="gallery-card-type">{r.kind === "audit" ? "Check-quality audit" : detail?.parent_id ? "Repair candidate" : "Verification case"}</span>
+              <Badge tone="neutral" icon={History}>Recorded</Badge>
+            </div>
+            <h3 id={`case-${r.id}`} className="gallery-title"><a href={href.run(r.id)}>{r.title}</a></h3>
+            <div className="gallery-outcome"><Outcome kind={r.kind} state="complete" verdict={r.verdict} /></div>
+            <p className="gallery-description">{caseDescription(r, detail)}</p>
+            <CardFacts run={r} detail={detail} />
+            <div className="gallery-card-footer">
+              <time dateTime={r.created_at} className="gallery-meta">{formatDateTime(r.created_at)}</time>
+              <a href={href.run(r.id)} className="gallery-open" aria-label={`Open case file: ${r.title}`}>Open case file <ArrowRight size={18} aria-hidden="true" /></a>
+            </div>
+            <Disclosure className="gallery-note" summary="Recording notes & provenance">
+              <p className="mono small wrap-anywhere">{r.id}</p>
+              {r.recorded_note && <p className="muted small">{r.recorded_note}</p>}
+              <p className="muted small">Dates, versions, and timings come from the original run. This is recorded evidence, not a new execution.</p>
+            </Disclosure>
+          </article>
+        );
+      })}
     </div>
   );
 }
 
-function LiveList({ items }: { items: RunSummary[] }) {
+const PAGE = 12;
+
+function LocalList({ items }: { items: RunSummary[] }) {
+  const [showEvaluation, setShowEvaluation] = useState(false);
+  const [limit, setLimit] = useState(PAGE);
+  const evaluation = items.filter((r) => r.origin === "evaluation").length;
+  const visible = showEvaluation ? items : items.filter((r) => r.origin !== "evaluation");
+  const shown = visible.slice(0, limit);
+  const moreRef = useRef<HTMLTableRowElement>(null);
+  const [focusFrom, setFocusFrom] = useState<number | null>(null);
+
+  useEffect(() => {
+    // After "Show more", move focus to the first newly shown run so keyboard users continue where they were.
+    if (focusFrom === null) return;
+    moreRef.current?.querySelector<HTMLAnchorElement>("a")?.focus();
+    setFocusFrom(null);
+  }, [focusFrom]);
+
   if (items.length === 0)
     return (
       <p className="muted">
-        No live runs yet. Start one from <a href={href.setup()}>contract setup</a>.
+        No runs on this server yet. Start one from <a href={href.setup()}>contract setup</a>.
       </p>
     );
   return (
-    <TableScroll label="Live runs">
-      <table className="data-table">
-        <thead>
-          <tr>
-            <th scope="col">Run</th>
-            <th scope="col">Created</th>
-            <th scope="col">Outcome</th>
-          </tr>
-        </thead>
-        <tbody>
-          {items.map((r) => (
-            <tr key={r.id}>
-              <th scope="row">
-                <a href={href.run(r.id)}>{r.title}</a>
-                <p className="mono small muted">
-                  {r.id}
-                  {r.example_id ? ` · ${r.example_id}` : ""}
-                </p>
-                {r.parent_id && (
-                  <p className="small muted">
-                    Repair candidate for <a href={href.run(r.parent_id)} className="mono">{r.parent_id}</a>
-                  </p>
-                )}
-              </th>
-              <td className="small">
-                <Badge tone="info" icon={Radio}>
-                  Live run
-                </Badge>
-                <p className="mono small">{formatDateTime(r.created_at)}</p>
-              </td>
-              <td>
-                <Outcome kind={r.kind} state={r.state} verdict={r.verdict} />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </TableScroll>
+    <div className="stack">
+      <div className="ledger-controls">
+        <p className="muted small" aria-live="polite">
+          Showing {shown.length} of {visible.length} run{visible.length === 1 ? "" : "s"}
+          {!showEvaluation && evaluation > 0 ? ` · ${evaluation} evaluation run${evaluation === 1 ? "" : "s"} hidden` : ""}
+        </p>
+        {evaluation > 0 && (
+          <label className="check-row ledger-toggle">
+            <input type="checkbox" checked={showEvaluation} onChange={(e) => { setShowEvaluation(e.target.checked); setLimit(PAGE); }} />
+            <span>Show evaluation runs ({evaluation})</span>
+          </label>
+        )}
+      </div>
+      {shown.length === 0 ? (
+        <p className="muted">Only evaluation runs exist on this server. Turn on “Show evaluation runs” to list them.</p>
+      ) : (
+        <TableScroll label="Runs on this server">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th scope="col">Run</th>
+                <th scope="col">Created</th>
+                <th scope="col">Outcome</th>
+              </tr>
+            </thead>
+            <tbody>
+              {shown.map((r, i) => {
+                const origin = originLabel(r.origin) ?? (r.kind === "audit" ? "Check-set audit" : null);
+                return (
+                  <tr key={r.id} ref={i === focusFrom ? moreRef : undefined}>
+                    <th scope="row">
+                      <a href={href.run(r.id)}>{r.title}</a>
+                      <p className="mono small muted">
+                        {r.id}
+                        {r.example_id ? ` · ${r.example_id}` : ""}
+                        {r.depth ? ` · depth ${r.depth}` : ""}
+                      </p>
+                      {r.parent_id && (
+                        <p className="small muted">
+                          Repair candidate for <a href={href.run(r.parent_id)} className="mono">{r.parent_id}</a>
+                        </p>
+                      )}
+                    </th>
+                    <td className="small">
+                      <Badge tone="info" icon={Server}>
+                        Run on this server
+                      </Badge>
+                      {origin && <p className="small muted">{origin}</p>}
+                      <p className="mono small">{formatDateTime(r.created_at)}</p>
+                    </td>
+                    <td>
+                      <Outcome kind={r.kind} state={r.state} verdict={r.verdict} />
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </TableScroll>
+      )}
+      {visible.length > shown.length && (
+        <div className="action-row">
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            onClick={() => {
+              setFocusFrom(shown.length);
+              setLimit((n) => n + PAGE);
+            }}
+          >
+            Show {Math.min(PAGE, visible.length - shown.length)} more
+          </button>
+          <span className="muted small">{visible.length - shown.length} older runs not shown</span>
+        </div>
+      )}
+    </div>
   );
 }
 
 export function RunsView() {
   const recorded = useAsync(() => api.recorded(), []);
   const runs = useAsync(() => api.runs(), []);
-  const live = runs.status === "ok" ? runs.data.filter((r) => !r.recorded) : [];
+  const local = runs.status === "ok" ? runs.data.filter((r) => !r.recorded) : [];
   return (
     <div className="stack-lg gallery-page">
       <header className="notebook-hero gallery-hero">
@@ -147,15 +244,15 @@ export function RunsView() {
         {recorded.status === "ok" && <RecordedList items={recorded.data} />}
       </section>
       <Section
-        title="Live runs on this server"
+        title="Runs on this server"
         eyebrow="The working ledger"
         className="gallery-live"
         actions={<button type="button" className="btn btn-ghost btn-sm" onClick={runs.reload}>Refresh</button>}
       >
-        <p className="muted small">New executions and repair candidates stay here, separate from the bundled case files.</p>
+        <p className="muted small">New executions and repair candidates stay here, separate from the bundled case files. Newest first.</p>
         {runs.status === "loading" && <Loading label="Loading runs" />}
         {runs.status === "error" && <ErrorNotice error={runs.error} title="Runs unavailable" onRetry={runs.reload} />}
-        {runs.status === "ok" && <LiveList items={live} />}
+        {runs.status === "ok" && <LocalList items={local} />}
       </Section>
     </div>
   );

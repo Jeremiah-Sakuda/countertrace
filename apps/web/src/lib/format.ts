@@ -84,3 +84,9 @@ export const METHOD_LABELS: Record<string, string> = {
   cover: "Reachability",
   admission: "Admission",
 };
+
+export function formatDate(value: string | null | undefined): string {
+  const t = parseIso(value);
+  if (t === null) return "—";
+  return new Date(t).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+}

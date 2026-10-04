@@ -12,29 +12,132 @@ export function acceptedText(row: CycleRow): string {
   return "None";
 }
 
-function Mismatch({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="mismatch">
-      <CircleX size={14} aria-hidden="true" />
-      <span>{children}</span>
-      <span className="mismatch-tag">mismatch</span>
+/** Visible "expected / observed" text is hidden from assistive technology; a plain sentence replaces it. */
+function Pair({ signal, expected, observed, bad }: { signal: string; expected: string | null; observed: string; bad: boolean }) {
+  const spoken = `${signal} expected ${expected ?? "not checked"}, observed ${observed}${bad ? ", mismatch" : ""}`;
+  const visible = (
+    <span aria-hidden="true">
+      {expected === null ? <span className="unchecked-label">not checked</span> : expected} /{" "}
+      {expected === null ? <span className="unchecked-value">{observed}</span> : observed}
     </span>
+  );
+  return (
+    <td className={`mono pair${bad ? " cell-mismatch" : ""}${expected === null ? " unchecked" : ""}`}>
+      {bad ? (
+        <span className="mismatch">
+          <CircleX size={14} aria-hidden="true" />
+          {visible}
+          <span className="mismatch-tag" aria-hidden="true">mismatch</span>
+        </span>
+      ) : (
+        visible
+      )}
+      <span className="sr-only">{spoken}</span>
+    </td>
   );
 }
 
-function FlagCell({ exp, obs, bad }: { exp: boolean; obs: boolean; bad: boolean }) {
-  const text = (
-    <>
-      {bit(exp)} <span aria-hidden="true">/</span>
-      <span className="sr-only"> expected, observed </span> {bit(obs)}
-    </>
-  );
-  return <td className={`mono pair${bad ? " cell-mismatch" : ""}`}>{bad ? <Mismatch>{text}</Mismatch> : text}</td>;
+function spokenQueue(queue: number[] | null): string {
+  if (queue === null) return "unspecified";
+  if (queue.length === 0) return "empty";
+  return queue.map((v) => hex(v)).join(", ");
+}
+
+/** Narrow screens put the outputs next to the sticky cycle column so the mismatch is visible without scrolling. */
+function useNarrow(query = "(max-width: 759px)"): boolean {
+  const [narrow, setNarrow] = useState(() => typeof window !== "undefined" && typeof window.matchMedia === "function" && window.matchMedia(query).matches);
+  useEffect(() => {
+    if (typeof window.matchMedia !== "function") return;
+    const mq = window.matchMedia(query);
+    const on = () => setNarrow(mq.matches);
+    on();
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, [query]);
+  return narrow;
+}
+
+type ColumnKey = "rst" | "wr_en" | "rd_en" | "din" | "row" | "accepted" | "dout" | "empty" | "full" | "queue";
+const INPUTS: ColumnKey[] = ["rst", "wr_en", "rd_en", "din", "row", "accepted"];
+const OUTPUTS: ColumnKey[] = ["dout", "empty", "full"];
+
+function ColumnHeader({ col }: { col: ColumnKey }) {
+  switch (col) {
+    case "rst":
+    case "wr_en":
+    case "rd_en":
+      return <th scope="col" className="bitcol">{col}</th>;
+    case "din":
+      return <th scope="col">din</th>;
+    case "row":
+      return <th scope="col">Contract row</th>;
+    case "accepted":
+      return <th scope="col">Accepted</th>;
+    case "dout":
+    case "empty":
+    case "full":
+      return (
+        <th scope="col">
+          {col} <span className="th-sub">exp / obs</span>
+        </th>
+      );
+    case "queue":
+      return <th scope="col">Queue before → after</th>;
+  }
+}
+
+function Cell({ col, row, requirements }: { col: ColumnKey; row: CycleRow; requirements: Record<string, Requirement> | undefined }) {
+  const bad = row.mismatches;
+  switch (col) {
+    case "rst":
+    case "wr_en":
+    case "rd_en":
+      return <td className="mono bitcol">{row[col]}</td>;
+    case "din":
+      return <td className="mono">{hex(row.din)}</td>;
+    case "row": {
+      const req = requirements?.[row.row];
+      return (
+        <td>
+          <span className="row-id" title={req?.text}>
+            {req?.title ?? row.row}
+          </span>
+        </td>
+      );
+    }
+    case "accepted":
+      return (
+        <td>
+          {acceptedText(row)}
+          {row.wraps.length > 0 && <span className="muted small"> · wraps {row.wraps.join(", ")}</span>}
+        </td>
+      );
+    case "dout":
+      return <Pair signal="dout" expected={row.dout_checked ? hex(row.expected.dout) : null} observed={hex(row.observed.dout)} bad={bad.includes("read_data")} />;
+    case "empty":
+      return <Pair signal="empty" expected={bit(row.expected.empty)} observed={bit(row.observed.empty)} bad={bad.includes("empty_flag")} />;
+    case "full":
+      return <Pair signal="full" expected={bit(row.expected.full)} observed={bit(row.observed.full)} bad={bad.includes("full_flag")} />;
+    case "queue":
+      return (
+        <td className="mono queue-cell">
+          <span aria-hidden="true">
+            {queueText(row.pre_queue)} → {queueText(row.post_queue)}
+          </span>
+          <span className="sr-only">
+            queue before {spokenQueue(row.pre_queue)}; after {spokenQueue(row.post_queue)}
+          </span>
+        </td>
+      );
+  }
 }
 
 export interface FocusRequest {
   cycle: number;
   nonce: number;
+  /** The control that asked for the jump (for example an explanation citation), so focus can return to it. */
+  returnTo?: HTMLElement | null;
+  returnLabel?: string;
 }
 
 export function CycleTable({
@@ -45,6 +148,7 @@ export function CycleTable({
   focusRequest,
   onSelect,
   selectedCycle,
+  onFocusRequestHandled,
 }: {
   rows: CycleRow[];
   caption: string;
@@ -54,6 +158,8 @@ export function CycleTable({
   focusRequest?: FocusRequest | null;
   onSelect?: (row: CycleRow) => void;
   selectedCycle?: number | null;
+  /** When set, a focus request focuses the row without scrolling and the parent decides what to bring into view. */
+  onFocusRequestHandled?: (row: HTMLElement, request: FocusRequest) => void;
 }) {
   const [activeCycle, setActiveCycle] = useState(markCycle ?? rows[0]?.cycle);
   // Keep a keyboard entry point when the full trace is collapsed and the active cycle disappears.
@@ -62,14 +168,17 @@ export function CycleTable({
   const active = previousIndex >= 0 ? previousIndex : Math.max(0, markedIndex);
   const [flash, setFlash] = useState<number | null>(null);
   const rowRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const narrow = useNarrow();
+  const columns: ColumnKey[] = narrow ? [...OUTPUTS, ...INPUTS, "queue"] : [...INPUTS, ...OUTPUTS, "queue"];
 
-  const focusIndex = (i: number, center = false) => {
+  const focusIndex = (i: number, scroll: "nearest" | "center" | "none" = "nearest") => {
     const clamped = Math.max(0, Math.min(rows.length - 1, i));
     setActiveCycle(rows[clamped]?.cycle);
     const el = rowRefs.current[clamped];
     if (el) {
       el.focus({ preventScroll: true });
-      el.scrollIntoView({ block: center ? "center" : "nearest", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+      if (scroll !== "none")
+        el.scrollIntoView({ block: scroll, inline: "nearest", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
     }
     const row = rows[clamped];
     if (row && onSelect) onSelect(row);
@@ -81,7 +190,11 @@ export function CycleTable({
     const i = rows.findIndex((r) => r.cycle === focusRequest.cycle);
     if (i < 0) return; // the parent may widen the rows; retry when they change
     handledNonce.current = focusRequest.nonce;
-    focusIndex(i, true);
+    if (onFocusRequestHandled) {
+      focusIndex(i, "none");
+      const el = rowRefs.current[i]?.closest("tr");
+      if (el) onFocusRequestHandled(el, focusRequest);
+    } else focusIndex(i, "center");
     setFlash(focusRequest.cycle);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focusRequest, rows]);
@@ -101,47 +214,28 @@ export function CycleTable({
   };
 
   return (
+    <div className="stack-sm">
+    <p className="caption-hint muted small">
+      Select a cycle to inspect its queue. Use ↑ / ↓, Home, or End to move between cycles. Queues are shown oldest first.
+      {narrow ? <> Outputs come first on small screens; <span className="scroll-hint">scroll sideways for inputs and the queue →</span></> : null}
+    </p>
     <TableScroll label={caption}>
       <table className="data-table cycle-table">
-        <caption>
-          <span className="sr-only">{caption}. </span>
-          <span className="caption-hint">Select a cycle to inspect its queue. Use ↑ / ↓, Home, or End to move between cycles. Queues are shown oldest first.</span>
-        </caption>
+        <caption className="sr-only">{caption}</caption>
         <thead>
           <tr>
             <th scope="col">Cycle</th>
-            <th scope="col" className="bitcol">
-              rst
-            </th>
-            <th scope="col" className="bitcol">
-              wr_en
-            </th>
-            <th scope="col" className="bitcol">
-              rd_en
-            </th>
-            <th scope="col">din</th>
-            <th scope="col">Contract row</th>
-            <th scope="col">Accepted</th>
-            <th scope="col">
-              dout <span className="th-sub">exp / obs</span>
-            </th>
-            <th scope="col">
-              empty <span className="th-sub">exp / obs</span>
-            </th>
-            <th scope="col">
-              full <span className="th-sub">exp / obs</span>
-            </th>
-            <th scope="col">Queue before → after</th>
+            {columns.map((col) => (
+              <ColumnHeader key={col} col={col} />
+            ))}
           </tr>
         </thead>
         <tbody onKeyDown={onKeyDown}>
           {rows.map((row, i) => {
-            const bad = new Set(row.mismatches);
             const isMark = row.cycle === markCycle;
-            const req = requirements?.[row.row];
             const classes = [
               isMark ? "row-mark" : "",
-              bad.size ? "row-bad" : "",
+              row.mismatches.length ? "row-bad" : "",
               flash === row.cycle ? "row-flash" : "",
               selectedCycle === row.cycle ? "row-selected" : "",
             ]
@@ -171,50 +265,15 @@ export function CycleTable({
                     {isMark && <Crosshair size={13} aria-hidden="true" />}
                   </button>
                 </th>
-                <td className="mono bitcol">{row.rst}</td>
-                <td className="mono bitcol">{row.wr_en}</td>
-                <td className="mono bitcol">{row.rd_en}</td>
-                <td className="mono">{hex(row.din)}</td>
-                <td>
-                  <span className="row-id" title={req?.text}>
-                    {req?.title ?? row.row}
-                  </span>
-                </td>
-                <td>
-                  {acceptedText(row)}
-                  {row.wraps.length > 0 && <span className="muted small"> · wraps {row.wraps.join(", ")}</span>}
-                </td>
-                {row.dout_checked ? (
-                  <td className={`mono pair${bad.has("read_data") ? " cell-mismatch" : ""}`}>
-                    {bad.has("read_data") ? (
-                      <Mismatch>
-                        {hex(row.expected.dout)} <span aria-hidden="true">/</span>
-                        <span className="sr-only"> expected, observed </span> {hex(row.observed.dout)}
-                      </Mismatch>
-                    ) : (
-                      <>
-                        {hex(row.expected.dout)} <span aria-hidden="true">/</span>
-                        <span className="sr-only"> expected, observed </span> {hex(row.observed.dout)}
-                      </>
-                    )}
-                  </td>
-                ) : (
-                  <td className="mono unchecked">
-                    <span className="unchecked-label">not checked</span> <span aria-hidden="true">/</span>
-                    <span className="sr-only">, observed </span> <span className="unchecked-value">{hex(row.observed.dout)}</span>
-                  </td>
-                )}
-                <FlagCell exp={row.expected.empty} obs={row.observed.empty} bad={bad.has("empty_flag")} />
-                <FlagCell exp={row.expected.full} obs={row.observed.full} bad={bad.has("full_flag")} />
-                <td className="mono queue-cell">
-                  {queueText(row.pre_queue)} <span aria-hidden="true">→</span>
-                  <span className="sr-only"> becomes </span> {queueText(row.post_queue)}
-                </td>
+                {columns.map((col) => (
+                  <Cell key={col} col={col} row={row} requirements={requirements} />
+                ))}
               </tr>
             );
           })}
         </tbody>
       </table>
     </TableScroll>
+    </div>
   );
 }
