@@ -59,7 +59,8 @@ class RunStore:
             except ValueError:
                 continue
             items.append({k: state.get(k) for k in (
-                "id", "kind", "example_id", "title", "state", "created_at", "parent_id", "recorded", "verdict")})
+                "id", "kind", "example_id", "title", "state", "created_at", "parent_id", "recorded", "verdict",
+                "origin", "depth")})
         return items
 
     def new_id(self, kind: str) -> str:

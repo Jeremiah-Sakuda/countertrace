@@ -94,7 +94,13 @@ class RepairLoopTest(unittest.TestCase):
                 {"status": "ok", "result": {"rationale": "no-op", "source": catalog.fault_source("count-full-exchange"), "changed_lines": []}, "calls": []},
                 {"status": "ok", "result": {"rationale": "gate the write on full", "source": good, "changed_lines": [24]}, "calls": []},
             ])
-            with mock.patch.object(model, "propose_repair", side_effect=lambda *a, **k: next(proposals)):
+            seen = []
+
+            def propose(source, finding, rows, previous):
+                seen.append((finding["requirement_id"], finding["cycle"], [a["status"] for a in previous]))
+                return next(proposals)
+
+            with mock.patch.object(model, "propose_repair", side_effect=propose):
                 store.save({**store.load(parent["id"]), "repair": {"status": "running", "attempts": [],
                                                                    "parent_frozen": store.load(parent["id"])["verification"]["frozen"]}})
                 repair.run_loop(store, parent["id"])
@@ -104,6 +110,11 @@ class RepairLoopTest(unittest.TestCase):
             self.assertTrue(result["attempts"][2]["frozen_match"])
             self.assertEqual(result["status"], "passed")
             self.assertIn("-    wire do_write = wr_en;", result["attempts"][2]["diff"])
+            # Attempt 3 is driven by attempt 2's own counterexample, not the parent's.
+            self.assertEqual(result["attempts"][1]["feedback"]["requirement_id"], "both_full")
+            self.assertEqual(seen[2][0], "both_full")
+            self.assertNotEqual(seen[0][:2], seen[2][:2])
+            self.assertEqual(seen[2][2], ["admission_rejected", "failed_checks"])
 
 
 

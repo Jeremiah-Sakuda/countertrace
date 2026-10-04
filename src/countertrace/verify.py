@@ -43,7 +43,7 @@ def now() -> str:
     return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
 
 
-def frozen_check_set(contract: Contract, limits: dict) -> dict:
+def frozen_check_set(contract: Contract, limits: dict, formal_tasks=FORMAL_TASKS) -> dict:
     """Everything that must stay identical across a repair comparison."""
     tests = suite(contract.depth)
     return {
@@ -53,7 +53,7 @@ def frozen_check_set(contract: Contract, limits: dict) -> dict:
         "stimulus_version": STIMULUS_VERSION,
         "stimulus": {name: sha256_json(render(edges)) for name, edges in tests.items()},
         "limits": limits,
-        "formal_tasks": list(FORMAL_TASKS),
+        "formal_tasks": list(formal_tasks),  # the tasks that actually run
         "expected_properties": EXPECTED_PROPERTIES,
     }
 
@@ -84,7 +84,7 @@ class Verification:
             "interface_map": interface_map,
             "interface_map_hash": interface_map_digest(interface_map),
             "contract_hash": contract.digest(),
-            "frozen": frozen_check_set(contract, self.limits),
+            "frozen": frozen_check_set(contract, self.limits, self.formal_tasks),
             "stages": [
                 {"id": s, "status": "pending"} for s in
                 ("validating", "simulating", "checking_properties", "replaying")
@@ -286,7 +286,8 @@ class Verification:
             elif check in failed_checks:
                 status = "counterexample"
                 tests_failed = sorted({f["test"] for f in failures if check in f["checks_failed"]})
-                detail = f"Failed in {len(tests_failed)} of {len(tests)} tests: {', '.join(tests_failed[:4])}."
+                more = f" and {len(tests_failed) - 4} more" if len(tests_failed) > 4 else ""
+                detail = f"Failed in {len(tests_failed)} of {len(tests)} tests: {', '.join(tests_failed[:4])}{more}."
             else:
                 status = "simulation_passed"
                 detail = f"{len(tests)} named tests ({cycles} cycles, seeds {', '.join(n for n in tests if n.startswith('random'))})."
@@ -429,7 +430,7 @@ class Verification:
                 elif sim_finding:
                     replay.update(status="mismatch", detail=f"Simulation failed differently ({sim_finding['check']} at cycle {sim_finding['cycle']}). Investigate; pre-reset state can differ between engines.")
                 else:
-                    replay.update(status="not_reproduced", detail="Simulation of the same inputs did not fail. The counterexample may depend on pre-reset or uninitialized state.")
+                    replay.update(status="not_reproduced", detail="Simulation of the same inputs did not fail. Investigate: the counterexample may depend on pre-reset or uninitialized state, or an output may depend combinationally on current inputs (the contract assumes registered outputs; formal then samples it under the next cycle's inputs).")
             except runner.Cancelled:
                 self.stage("replaying", "cancelled")
                 return

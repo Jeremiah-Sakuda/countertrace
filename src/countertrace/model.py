@@ -13,6 +13,7 @@ import json
 import os
 from pathlib import Path
 import re
+import threading
 import time
 from urllib import error, request
 from urllib.parse import urlsplit
@@ -134,8 +135,21 @@ def ledger_path() -> Path:
     return path
 
 
+def model_prices(cfg: dict) -> dict[str, tuple[float, float]]:
+    """Optional per-model prices from COUNTERTRACE_MODEL_PRICES_JSON: {"model": [input, output]} per million."""
+    try:
+        raw = json.loads(os.environ.get("COUNTERTRACE_MODEL_PRICES_JSON", "") or "{}")
+        return {k: (float(v[0]), float(v[1])) for k, v in raw.items()}
+    except (ValueError, TypeError, IndexError):
+        return {}
+
+
 def spend_summary(cfg: dict) -> dict:
     total_in = total_out = calls = 0
+    cost = 0.0
+    priced = cfg["price_in"] is not None and cfg["price_out"] is not None
+    per_model = model_prices(cfg)
+    defaulted = set()
     path = ledger_path()
     if path.is_file():
         for line in path.read_text().splitlines():
@@ -144,19 +158,26 @@ def spend_summary(cfg: dict) -> dict:
             except ValueError:
                 continue
             calls += 1
-            total_in += entry.get("prompt_tokens") or 0
-            total_out += entry.get("completion_tokens") or 0
-    cost = None
-    if cfg["price_in"] is not None and cfg["price_out"] is not None:
-        cost = round(total_in / 1e6 * cfg["price_in"] + total_out / 1e6 * cfg["price_out"], 4)
+            tokens_in, tokens_out = entry.get("prompt_tokens") or 0, entry.get("completion_tokens") or 0
+            total_in += tokens_in
+            total_out += tokens_out
+            price = per_model.get(entry.get("model_id") or "")
+            if price is None:
+                defaulted.add(entry.get("model_id") or "unknown")
+                price = (cfg["price_in"], cfg["price_out"]) if priced else None
+            if price is not None:
+                cost += tokens_in / 1e6 * price[0] + tokens_out / 1e6 * price[1]
+    estimated = priced or (not defaulted and bool(per_model))
     return {"calls": calls, "prompt_tokens": total_in, "completion_tokens": total_out,
-            "estimated_cost_usd": cost, "cost_status": "estimated" if cost is not None else "unavailable",
+            "estimated_cost_usd": round(cost, 4) if estimated else None,
+            "cost_status": "estimated" if estimated else "unavailable",
+            "models_at_default_price": sorted(m for m in defaulted if m not in per_model),
             "spend_limit_usd": cfg["spend_limit"]}
 
 
 def record_usage(meta: dict) -> None:
     entry = {k: meta.get(k) for k in ("task", "model_id", "prompt_tokens", "completion_tokens", "latency_ms",
-                                       "status", "at")}
+                                       "status", "at", "thinking", "finish_reason")}
     with ledger_path().open("a") as handle:
         handle.write(json.dumps(entry) + "\n")
 
@@ -185,8 +206,23 @@ def extract_json(text: str) -> dict:
     return value
 
 
+_CONCURRENCY = threading.BoundedSemaphore(int(os.environ.get("COUNTERTRACE_MODEL_CONCURRENCY", "3") or 3))
+
+
+def thinking_default(task: str) -> bool:
+    """Reasoning is on unless the task is listed in COUNTERTRACE_THINKING_OFF_TASKS."""
+    off = {t.strip() for t in os.environ.get("COUNTERTRACE_THINKING_OFF_TASKS", "").split(",") if t.strip()}
+    return task not in off
+
+
 def chat(task: str, system: str, user: str, max_tokens: int | None = None, model_id: str | None = None,
-         temperature: float = 0.2) -> tuple[str, dict]:
+         temperature: float = 0.2, thinking: bool | None = None) -> tuple[str, dict]:
+    with _CONCURRENCY:  # bound simultaneous inference calls across all visitors
+        return _chat(task, system, user, max_tokens, model_id, temperature, thinking)
+
+
+def _chat(task: str, system: str, user: str, max_tokens: int | None, model_id: str | None,
+          temperature: float, thinking: bool | None) -> tuple[str, dict]:
     cfg = config()
     reason = unavailable_reason(cfg)
     if reason:
@@ -206,8 +242,12 @@ def chat(task: str, system: str, user: str, max_tokens: int | None = None, model
         "temperature": temperature,
         "response_format": {"type": "json_object"},
     }
+    thinking = thinking_default(task) if thinking is None else thinking
+    if not thinking:
+        # Nemotron 3 chat template switch; Token Factory honors it (verified 2026-10-04).
+        payload["chat_template_kwargs"] = {"enable_thinking": False}
     meta = {"task": task, "model_id": model, "endpoint_host": urlsplit(cfg["base_url"]).hostname,
-            "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "attempts": 0}
+            "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "attempts": 0, "thinking": thinking}
     last_error = None
     for attempt in range(3):
         meta["attempts"] = attempt + 1
@@ -224,6 +264,10 @@ def chat(task: str, system: str, user: str, max_tokens: int | None = None, model
         except error.HTTPError as exc:
             detail = exc.read()[:500].decode(errors="replace")
             last_error = f"HTTP {exc.code}: {detail}"
+            if exc.code == 400 and "chat_template_kwargs" in payload and "chat_template" in detail:
+                payload.pop("chat_template_kwargs")  # endpoint without the template switch
+                meta["thinking"] = None
+                continue
             if exc.code == 400 and "response_format" in payload:
                 payload.pop("response_format")  # some deployments reject JSON mode; validation still applies
                 continue
@@ -254,19 +298,30 @@ def chat(task: str, system: str, user: str, max_tokens: int | None = None, model
 
 def structured(task: str, system: str, user: str, validate, max_tokens: int | None = None,
                model_id: str | None = None) -> dict:
-    """Call the model, parse JSON, validate, and retry once with the validation error."""
+    """Call the model, parse JSON, validate, and retry once.
+
+    A reply cut off at the output limit is retried with reasoning switched off,
+    so the retry spends its budget on the answer rather than repeating the same
+    exhausted request. Other schema failures are retried with the validator's error.
+    """
     calls = []
     prompt = user
+    thinking = None
     for attempt in range(2):
-        content, meta = chat(task, system, prompt, max_tokens=max_tokens, model_id=model_id)
+        content, meta = chat(task, system, prompt, max_tokens=max_tokens, model_id=model_id, thinking=thinking)
         calls.append(meta)
         try:
             value = validate(extract_json(content))
             return {"status": "ok", "result": value, "calls": calls}
         except (ValueError, KeyError, TypeError) as exc:
             calls[-1]["schema_error"] = str(exc)[:300]
-            prompt = (f"{user}\n\nYour previous reply was rejected by the schema validator: {exc}. "
-                      "Reply again with only the JSON object in the required schema.")
+            if meta.get("finish_reason") == "length":
+                thinking = False
+                prompt = (f"{user}\n\nYour previous reply ran out of output tokens before the JSON was complete. "
+                          "Answer directly with only the JSON object; keep text fields short.")
+            else:
+                prompt = (f"{user}\n\nYour previous reply was rejected by the schema validator: {exc}. "
+                          "Reply again with only the JSON object in the required schema.")
     return {"status": "schema_error", "result": None, "calls": calls,
             "detail": "The model response did not satisfy the schema after one retry."}
 
@@ -492,10 +547,13 @@ def propose_repair(source: str, finding: dict, rows: list[dict], previous: list[
     cfg = config()
     start, end = finding["window"]["start"], finding["window"]["end"]
     history = "\n".join(
-        f"- Attempt {a['index']}: {a['status']}. {a.get('summary', '')}" for a in previous) or "- none"
+        f"- Attempt {a['index']}: {a['status']}. {a.get('summary', '')}"
+        + (f"\n  Diff it applied:\n{a['diff'][:1500]}" if a.get("diff") else "") for a in previous) or "- none"
     contract_text = "\n".join(f"- {r['title']}: {r['text']}" for r in REQUIREMENTS.values())
     user = (
         f"Contract requirements:\n{contract_text}\nChecks: {json.dumps(CHECKS)}\n\n"
+        f"The current RTL below is what failed; the finding and trace are from verifying it"
+        f"{' (a previous candidate)' if previous else ''}.\n"
         f"Failing clause ({finding['requirement_id']}): {finding['requirement_text']}\n"
         f"First mismatch: cycle {finding['cycle']}, check {finding['check']}; expected {json.dumps(finding['expected'])}, "
         f"observed {json.dumps(finding['observed'])}.\n"

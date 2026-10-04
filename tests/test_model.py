@@ -30,9 +30,9 @@ class FakeResponse(io.BytesIO):
         return False
 
 
-def reply(content: str, prompt_tokens: int = 100, completion_tokens: int = 50):
+def reply(content: str, prompt_tokens: int = 100, completion_tokens: int = 50, finish_reason: str = "stop"):
     body = {"model": "nvidia/test-nemotron", "usage": {"prompt_tokens": prompt_tokens, "completion_tokens": completion_tokens},
-            "choices": [{"message": {"content": content}, "finish_reason": "stop"}]}
+            "choices": [{"message": {"content": content}, "finish_reason": finish_reason}]}
     return FakeResponse(json.dumps(body).encode())
 
 
@@ -172,6 +172,37 @@ class ModelTest(unittest.TestCase):
                       [{"find": "wire a = b;", "replace": "wire a = b;"}]):  # no change
             with self.assertRaises(ValueError):
                 model.validate_repair({"rationale": "r", "edits": edits}, rtl)
+
+    def test_length_cutoff_retries_with_reasoning_off(self):
+        decisions = [{"topic": t, "brief_says": None, "status": "matches", "note": ""} for t in model.INTERPRET_TOPICS]
+        good = json.dumps({"summary": "", "decisions": decisions})
+        with mock.patch.dict(os.environ, CONFIG), mock.patch.object(
+                model.request, "urlopen", side_effect=[reply('{"summ', finish_reason="length"), reply(good)]) as call:
+            result = model.interpret("A FIFO.", Contract(depth=4))
+        self.assertEqual(result["status"], "ok")
+        first, second = (json.loads(c[0][0].data) for c in call.call_args_list)
+        self.assertNotIn("chat_template_kwargs", first)
+        self.assertEqual(second["chat_template_kwargs"], {"enable_thinking": False})
+        self.assertIn("ran out of output tokens", second["messages"][1]["content"])
+        self.assertEqual([c["thinking"] for c in result["calls"]], [True, False])
+
+    def test_thinking_can_be_disabled_per_task(self):
+        decisions = [{"topic": t, "brief_says": None, "status": "matches", "note": ""} for t in model.INTERPRET_TOPICS]
+        with mock.patch.dict(os.environ, {**CONFIG, "COUNTERTRACE_THINKING_OFF_TASKS": "interpret"}), \
+                mock.patch.object(model.request, "urlopen", return_value=reply(json.dumps({"summary": "", "decisions": decisions}))) as call:
+            model.interpret("A FIFO.", Contract(depth=4))
+        self.assertEqual(json.loads(call.call_args[0][0].data)["chat_template_kwargs"], {"enable_thinking": False})
+
+    def test_per_model_prices_and_default_flagging(self):
+        ledger = Path(self.tmp.name) / "model_usage.jsonl"
+        ledger.write_text(json.dumps({"model_id": "big", "prompt_tokens": 1_000_000, "completion_tokens": 0}) + "\n"
+                          + json.dumps({"model_id": "small", "prompt_tokens": 1_000_000, "completion_tokens": 0}) + "\n")
+        env = {**CONFIG, "COUNTERTRACE_MODEL_PRICE_INPUT_PER_MTOK_USD": "1", "COUNTERTRACE_MODEL_PRICE_OUTPUT_PER_MTOK_USD": "3",
+               "COUNTERTRACE_MODEL_PRICES_JSON": '{"small": [0.25, 0.5]}'}
+        with mock.patch.dict(os.environ, env):
+            spend = model.spend_summary(model.config())
+        self.assertEqual(spend["estimated_cost_usd"], 1.25)
+        self.assertEqual(spend["models_at_default_price"], ["big"])
 
     def test_extract_json_handles_fences_and_reasoning(self):
         self.assertEqual(model.extract_json('<think>x</think>```json\n{"a": 1}\n```'), {"a": 1})

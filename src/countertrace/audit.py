@@ -15,7 +15,8 @@ import threading
 
 from countertrace import catalog, runner
 from countertrace.contract import REQUIREMENTS, Contract
-from countertrace.formal import parse_failed_assertions, parse_status
+from countertrace.admission import admit, check_ports_json
+from countertrace.formal import EXPECTED_PROPERTIES, parse_failed_assertions, parse_status, property_inventory
 from countertrace.scoreboard import (
     ROWS, TraceError, check_set_from_dict, first_finding, normalize, parse_sim_trace,
 )
@@ -85,6 +86,9 @@ def execute(store, state: dict, cancel: threading.Event, image: dict) -> None:
     designs = [("base", catalog.base_source(library["base"]), None)]
     for fault_id in library["faults"]:
         designs.append((fault_id, catalog.fault_source(fault_id), catalog.fault(fault_id)))
+    rejected = [name for name, source, _ in designs if not admit(source).accepted]
+    if rejected:  # library sources pass the same admission gate as any other RTL
+        raise ValueError(f"fault library sources failed admission: {rejected}")
     audit = {
         "check_set": raw_set, "library_version": library["version"], "base": library["base"], "depth": depth,
         "contract_hash": contract.digest(), "stimulus": list(tests),
@@ -124,6 +128,26 @@ def execute(store, state: dict, cancel: threading.Event, image: dict) -> None:
             audit["integrity_error"] = f"{kind} batch failed integrity: {record.get('worker_error', 'harness hash mismatch')}"
             audit["stages"][0 if kind == "sim" else 1]["status"] = "error"
             return
+    # Same integrity rules as verification: elaborated ports and the property
+    # inventory (exactly the trusted monitor's properties) for every design.
+    problems = []
+    for kind, record in (("sim", sim), ("formal", formal)):
+        for name, _, _ in designs:
+            out = record["out"] / record["ids"][name]
+            try:
+                problems += [f"{kind}:{name}: {d.message}" for d in
+                             check_ports_json(json.loads((out / "ports.json").read_text()), "fifo", 8)]
+                inventory = property_inventory(json.loads((out / "properties.json").read_text()))
+            except (OSError, ValueError) as exc:
+                problems.append(f"{kind}:{name}: missing elaboration evidence ({exc})")
+                continue
+            if inventory["counts"] != EXPECTED_PROPERTIES or inventory["problems"]:
+                problems.append(f"{kind}:{name}: property inventory {inventory['counts']} {inventory['problems']}")
+    if problems:
+        audit["integrity_error"] = "; ".join(problems[:6])
+        for stage in audit["stages"]:
+            stage["status"] = "error"
+        return
     audit["tool_versions"] = sim["worker"]["tool_versions"]
 
     watched = monitored(raw_set)

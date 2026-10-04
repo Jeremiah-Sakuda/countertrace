@@ -107,6 +107,14 @@ def run_loop(store, run_id: str) -> None:
             else:
                 verify_candidate(store, parent, candidate, attempt, "model_repair")
                 current = candidate
+                if attempt["status"] == "failed_checks":
+                    # Feed the candidate's own counterexample to the next proposal.
+                    child = store.load(attempt["candidate_run_id"])
+                    child_finding = model.primary_finding(child)
+                    if child_finding:
+                        finding = child_finding
+                        rows = child["verification"]["traces"][child_finding["trace"]]
+                        attempt["feedback"] = {k: child_finding[k] for k in ("test", "cycle", "check", "requirement_id")}
         attempt["finished_at"] = now()
         update(store, run_id, lambda s: s["repair"]["attempts"].__setitem__(index - 1, dict(attempt)))
         if attempt["status"] == "passed_unchanged_checks":
