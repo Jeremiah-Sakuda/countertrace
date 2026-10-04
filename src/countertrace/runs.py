@@ -11,6 +11,7 @@ import time
 
 from countertrace import catalog, runner
 from countertrace.contract import Contract
+from countertrace.interface_map import validate as validate_map
 from countertrace.verify import FORMAL_TASKS, STATUS_LABELS, Verification, now
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -68,7 +69,8 @@ class RunStore:
     def create_verification(self, example_id: str | None = None, source_path: str | None = None,
                             source_text: str | None = None, depth: int | None = None,
                             formal_tasks=FORMAL_TASKS, parent_id: str | None = None,
-                            origin: str = "bundled_example", title: str | None = None, extra: dict | None = None) -> dict:
+                            origin: str = "bundled_example", title: str | None = None, extra: dict | None = None,
+                            interface_map: dict | None = None) -> dict:
         if example_id:
             item = catalog.example(example_id)
             source = catalog.example_source(item)
@@ -97,6 +99,7 @@ class RunStore:
             "parent_id": parent_id,
             "depth": depth,
             "formal_tasks": list(formal_tasks),
+            "interface_map": validate_map(interface_map) if interface_map else None,
             "state": "queued",
             "created_at": now(),
             "recorded": False,
@@ -178,7 +181,8 @@ class RunStore:
                 self.save(state)
 
         verification = Verification(run_dir, "dut", source, contract, emit, cancel, image,
-                                    formal_tasks=tuple(state.get("formal_tasks", FORMAL_TASKS)))
+                                    formal_tasks=tuple(state.get("formal_tasks", FORMAL_TASKS)),
+                                    interface_map=state.get("interface_map"))
         verification.run()
         emit()
 

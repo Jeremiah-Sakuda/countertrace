@@ -117,6 +117,8 @@ def export(store, run_id: str) -> Path:
     contract = Contract(depth=state["depth"])
     files: dict[str, bytes] = {}
     files["inputs/dut.v"] = (run_dir / "dut.v").read_bytes()
+    if state.get("interface_map"):
+        files["inputs/interface_map.json"] = json.dumps(state["interface_map"], indent=2).encode()
     files["inputs/contract.json"] = json.dumps(contract.document(), indent=2).encode()
     driven = sorted((run_dir / "batches").glob("*-sim/job/stimulus/*.txt"))
     if driven:  # exactly what the run drove
@@ -158,6 +160,7 @@ def export(store, run_id: str) -> Path:
         "run": {k: state.get(k) for k in ("id", "title", "kind", "example_id", "origin", "parent_id", "created_at",
                                           "started_at", "finished_at", "state", "recorded")},
         "dut": {"path": "inputs/dut.v", "hash": sha256(files["inputs/dut.v"])},
+        "interface_map": state.get("interface_map"),
         "contract": {"hash": contract.digest(), "parameters": {"DEPTH": contract.depth, "WIDTH": contract.width},
                      "assumptions": ASSUMPTIONS},
         "frozen_check_set": v.get("frozen"),
@@ -201,6 +204,7 @@ def replay(bundle_path: str) -> dict:
         bundled_harness = {Path(n).name: sha256(zf.read(n)) for n in manifest["files"] if n.startswith("verifier/harness/")}
         source = zf.read("inputs/dut.v").decode()
         contract_doc = json.loads(zf.read("inputs/contract.json"))
+        mapping = json.loads(zf.read("inputs/interface_map.json")) if "inputs/interface_map.json" in manifest["files"] else None
     if bundled_harness != runner.harness_hashes():
         return {"matches": False, "error": "The bundled verifier harness differs from this checkout. Check out "
                                            f"commit {manifest.get('git_commit')} and replay again."}
@@ -215,7 +219,8 @@ def replay(bundle_path: str) -> dict:
                                            f"commit {manifest.get('git_commit')} and replay again."}
     with tempfile.TemporaryDirectory(dir=Path.home()) as tmp:
         v = Verification(Path(tmp), "dut", source, contract, lambda: None, threading.Event(), image,
-                         limits=frozen.get("limits"), formal_tasks=tuple(frozen.get("formal_tasks", ("bmc", "prove", "cover"))))
+                         limits=frozen.get("limits"), formal_tasks=tuple(frozen.get("formal_tasks", ("bmc", "prove", "cover"))),
+                         interface_map=mapping)
         state = {"verification": v.run()}
     now_outcome = outcome(state)
     recorded = manifest["outcome"]

@@ -14,6 +14,10 @@ import re
 MAX_BYTES = 64 * 1024
 MAX_NONBLANK_LINES = 500
 ALLOWED_SYSTEM_FUNCTIONS = {"$clog2", "$signed", "$unsigned", "$bits"}
+# Severity tasks are accepted for elaboration-time parameter guards. They cannot
+# touch files or processes; a runtime $fatal only truncates the trace (a tool
+# error), and any property cell outside the trusted monitor fails integrity.
+SEVERITY_TASKS = {"$error", "$warning", "$info", "$fatal"}
 ALLOWED_DIRECTIVES = {"default_nettype", "timescale"}
 
 # Keywords that could add verification semantics, bypass the harness, reach the
@@ -83,7 +87,7 @@ def line_of(text: str, index: int) -> int:
     return text.count("\n", 0, index) + 1
 
 
-def admit(source: bytes | str) -> Admission:
+def admit(source: bytes | str, mapping: dict | None = None) -> Admission:
     result = Admission(accepted=False)
     diag = result.diagnostics.append
     raw = source.encode() if isinstance(source, str) else source
@@ -104,8 +108,11 @@ def admit(source: bytes | str) -> Admission:
         return result
 
     code = strip_comments(text)
-    if re.search(r'"', code):
-        diag(Diagnostic("string", "String literals are not used by supported FIFO RTL.", line_of(code, code.index('"'))))
+    # String literals are only meaningful as severity-task messages; blank their
+    # contents so message text is never scanned as code.
+    code = re.sub(r'"(?:[^"\\\n]|\\.)*"', lambda m: '"' + " " * (len(m.group()) - 2) + '"', code)
+    if code.count('"') % 2:
+        diag(Diagnostic("string", "Unterminated string literal."))
     if "/*" in code or "*/" in code:
         diag(Diagnostic("comment", "Unbalanced block comment."))
     for match in PROHIBITED_ATTRIBUTES.finditer(code):
@@ -117,10 +124,10 @@ def admit(source: bytes | str) -> Admission:
                             line_of(code, match.start()),
                             "Use parameters instead of macros; includes and defines are not supported."))
     for match in re.finditer(r"\$[A-Za-z_]\w*", code):
-        if match.group() not in ALLOWED_SYSTEM_FUNCTIONS:
+        if match.group() not in ALLOWED_SYSTEM_FUNCTIONS | SEVERITY_TASKS:
             diag(Diagnostic("system_task", f"System task or function {match.group()} is not accepted.",
                             line_of(code, match.start()),
-                            "Only $clog2, $signed, $unsigned, and $bits are supported."))
+                            "Only $clog2, $signed, $unsigned, $bits, and severity tasks are supported."))
     for match in re.finditer(r"\b([A-Za-z_]\w*)\b", code):
         word = match.group(1)
         if word in PROHIBITED_KEYWORDS:
@@ -139,40 +146,56 @@ def admit(source: bytes | str) -> Admission:
         header_end = code.find(");", modules[0].end())
         header = code[modules[0].end(): header_end if header_end >= 0 else len(code)]
         result.parameters = re.findall(r"\bparameter\b(?:\s+(?:integer|int|logic|\[[^\]]*\]))?\s+([A-Za-z_]\w*)", header)
-        for name in ("DEPTH", "WIDTH"):
+        if mapping is not None:
+            from countertrace.interface_map import MappingError, expected_ports, validate
+
+            try:
+                mapping = validate(mapping)
+            except MappingError as exc:
+                diag(Diagnostic("mapping", f"Invalid interface mapping: {exc}"))
+                mapping = None
+        names = mapping["parameters"] if mapping else {"DEPTH": "DEPTH", "WIDTH": "WIDTH"}
+        if mapping and result.module != mapping["module"]:
+            diag(Diagnostic("mapping", f"The mapping names module {mapping['module']}, but the source declares {result.module}."))
+        for canonical, name in names.items():
             if name not in result.parameters:
-                diag(Diagnostic("interface", f"Parameter {name} must be declared in the module header.",
+                diag(Diagnostic("interface", f"Parameter {name} ({canonical}) must be declared in the module header.",
                                 alternative="Declare `parameter integer DEPTH = 4, parameter integer WIDTH = 8`."))
         for direction, rng, name in re.findall(
             r"\b(input|output)\b\s*(?:wire|reg|logic)?\s*(\[[^\]]*\])?\s*([A-Za-z_]\w*)", header
         ):
             result.ports[name] = {"direction": direction, "range": rng or None}
-        expected = {
-            "clk": ("input", None), "rst": ("input", None), "wr_en": ("input", None),
-            "rd_en": ("input", None), "din": ("input", "WIDTH"), "dout": ("output", "WIDTH"),
-            "full": ("output", None), "empty": ("output", None),
-        }
-        for name, (direction, width) in expected.items():
+        if mapping:
+            expected = expected_ports(mapping)
+        else:
+            expected = {
+                "clk": ("input", None), "rst": ("input", None), "wr_en": ("input", None),
+                "rd_en": ("input", None), "din": ("input", "[WIDTH-1:0]"), "dout": ("output", "[WIDTH-1:0]"),
+                "full": ("output", None), "empty": ("output", None),
+            }
+        for name, (direction, rng) in expected.items():
             port = result.ports.get(name)
             if port is None:
-                diag(Diagnostic("interface", f"Missing canonical port {name}.",
-                                alternative="Ports must be clk, rst, wr_en, rd_en, din, dout, full, empty (ANSI style)."))
+                diag(Diagnostic("interface", f"Missing port {name}.",
+                                alternative="Ports must be clk, rst, wr_en, rd_en, din, dout, full, empty (ANSI style), "
+                                            "or declared in a validated interface mapping."))
                 continue
             if port["direction"] != direction:
                 diag(Diagnostic("interface", f"Port {name} must be an {direction}."))
-            if width is None and port["range"]:
+            if rng is None and port["range"]:
                 diag(Diagnostic("interface", f"Port {name} must be one bit."))
-            if width == "WIDTH" and (port["range"] or "").replace(" ", "") != "[WIDTH-1:0]":
-                diag(Diagnostic("interface", f"Port {name} must be declared [WIDTH-1:0]."))
+            if rng not in (None, "*") and (port["range"] or "").replace(" ", "") != rng:
+                diag(Diagnostic("interface", f"Port {name} must be declared {rng}."))
         extra = sorted(set(result.ports) - set(expected))
         if extra:
             diag(Diagnostic("interface", f"Unexpected ports: {', '.join(extra)}.",
-                            alternative="Port-name mapping is not yet supported."))
+                            alternative="Declare them as unused outputs in an interface mapping, if they are outputs."))
+        clock = mapping["ports"]["clk"] if mapping else "clk"
         clocks = set(re.findall(r"@\s*\(\s*posedge\s+([A-Za-z_]\w*)", code))
-        if clocks - {"clk"}:
+        if clocks - {clock}:
             diag(Diagnostic("clocking", f"Only posedge clk is supported; found {sorted(clocks)}.",
                             alternative="Use synchronous active-high reset sampled on posedge clk."))
-        if re.search(r"@\s*\(\s*posedge\s+clk\s*(or|,)", code):
+        if re.search(rf"@\s*\(\s*posedge\s+{clock}\s*(or|,)", code):
             diag(Diagnostic("clocking", "Asynchronous reset or multiple events are not supported."))
         if re.search(r"\b(always_latch)\b", code):
             diag(Diagnostic("clocking", "Latches are not supported."))

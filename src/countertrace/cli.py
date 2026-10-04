@@ -80,8 +80,14 @@ def cmd_verify(args) -> int:
     from countertrace import runs
 
     store = runs.RunStore()
+    mapping = None
+    if args.interface_map:
+        from countertrace.interface_map import load
+
+        mapping = load(args.interface_map)
     run = store.create_verification(example_id=args.example, source_path=args.file, depth=args.depth,
-                                    formal_tasks=tuple(args.formal.split(",")) if args.formal else ())
+                                    formal_tasks=tuple(args.formal.split(",")) if args.formal else (),
+                                    interface_map=mapping)
     store.execute(run["id"])
     state = store.load(run["id"])
     print(runs.render_summary(state))
@@ -201,6 +207,7 @@ def main() -> int:
     source.add_argument("--file", help="Local RTL file (local test build only)")
     verify.add_argument("--depth", type=int, choices=(2, 4), help="DEPTH for --file runs")
     verify.add_argument("--formal", default="bmc,prove,cover", help="Comma-separated SBY tasks, or empty")
+    verify.add_argument("--interface-map", help="Validated port/parameter mapping JSON for non-canonical names")
     verify.set_defaults(func=cmd_verify)
 
     survey = commands.add_parser("survey", help="Run every bundled example and print raw outcomes")

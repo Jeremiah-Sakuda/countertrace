@@ -34,8 +34,8 @@ def update(store, run_id: str, mutate) -> dict:
         return state
 
 
-def interface_problems(original: str, candidate: str) -> list[str]:
-    a, b = admit(original), admit(candidate)
+def interface_problems(original: str, candidate: str, mapping: dict | None = None) -> list[str]:
+    a, b = admit(original, mapping), admit(candidate, mapping)
     problems = [d.message for d in b.diagnostics]
     if a.module != b.module:
         problems.append(f"Module name changed from {a.module} to {b.module}.")
@@ -71,7 +71,8 @@ def verify_candidate(store, parent: dict, source: str, attempt: dict, origin: st
     run_id = parent["id"]
     child = store.create_verification(source_text=source, depth=parent["depth"], parent_id=run_id,
                                       origin=origin, title=f"{parent.get('title', 'Run')} — candidate {attempt['index']}",
-                                      formal_tasks=tuple(parent.get("formal_tasks", ("bmc", "prove", "cover"))))
+                                      formal_tasks=tuple(parent.get("formal_tasks", ("bmc", "prove", "cover"))),
+                                      interface_map=parent.get("interface_map"))
     attempt.update(status="verifying", candidate_run_id=child["id"])
     update(store, run_id, lambda s: s["repair"]["attempts"].__setitem__(attempt["index"] - 1, dict(attempt)))
     store.execute(child["id"])
@@ -97,7 +98,7 @@ def run_loop(store, run_id: str) -> None:
         else:
             candidate = proposal["result"]["source"]
             attempt.update(rationale=proposal["result"]["rationale"], diff=unified_diff(original, candidate))
-            problems = interface_problems(original, candidate)
+            problems = interface_problems(original, candidate, parent.get("interface_map"))
             if problems:
                 attempt.update(status="admission_rejected", diagnostics=problems[:8],
                                summary="Rejected before execution: " + problems[0])
@@ -160,7 +161,7 @@ def user_candidate(store, run_id: str, source: str) -> dict:
     attempt = {"index": len(state["repair"]["attempts"]) + 1, "origin": "user", "status": "proposing",
                "diff": unified_diff(original, source), "started_at": now()}
     update(store, run_id, lambda s: s["repair"]["attempts"].append(dict(attempt)))
-    problems = interface_problems(original, source)
+    problems = interface_problems(original, source, parent.get("interface_map"))
 
     def target() -> None:
         if problems:

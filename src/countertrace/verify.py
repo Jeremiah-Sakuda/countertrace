@@ -15,6 +15,7 @@ from typing import Callable
 
 from countertrace import runner
 from countertrace.admission import admit, check_ports_json
+from countertrace.interface_map import WRAPPER, digest as interface_map_digest, wrapper
 from countertrace.contract import CHECKS, Contract, sha256_json
 from countertrace.formal import (
     COVER_LABELS, EXPECTED_PROPERTIES, counterexample_observations, parse_covers,
@@ -62,8 +63,10 @@ class Verification:
 
     def __init__(self, run_dir: Path, design_id: str, source: str, contract: Contract,
                  emit: Callable[[], None], cancel: threading.Event, image: dict,
-                 limits: dict | None = None, formal_tasks=FORMAL_TASKS, simulate: bool = True):
+                 limits: dict | None = None, formal_tasks=FORMAL_TASKS, simulate: bool = True,
+                 interface_map: dict | None = None):
         self.run_dir = run_dir
+        self.interface_map = interface_map
         self.design_id = design_id
         self.source = source
         self.contract = contract
@@ -78,6 +81,8 @@ class Verification:
         self.state: dict = {
             "design_id": design_id,
             "source_hash": sha256_json(source),
+            "interface_map": interface_map,
+            "interface_map_hash": interface_map_digest(interface_map),
             "contract_hash": contract.digest(),
             "frozen": frozen_check_set(contract, self.limits),
             "stages": [
@@ -126,7 +131,7 @@ class Verification:
     # -- pipeline ------------------------------------------------------
     def run(self) -> dict:
         self.stage("validating", "running")
-        admission = admit(self.source)
+        admission = admit(self.source, self.interface_map)
         self.state["admission"] = admission.as_dict()
         if not admission.accepted:
             self.stage("validating", "error", "Admission rejected the source.")
@@ -137,7 +142,7 @@ class Verification:
                 self.stage(s, "skipped")
             return self.finish()
         self.stage("validating", "done", f"Module {admission.module}; one file; supported constructs only.")
-        top = admission.module
+        top = WRAPPER if self.interface_map else admission.module
         tests = suite(self.contract.depth)
         with ThreadPoolExecutor(max_workers=2) as pool:
             futures = []
@@ -175,10 +180,14 @@ class Verification:
             self.emit()
             return self.state
 
+    def job_source(self) -> str:
+        """DUT source, plus the trusted wrapper generated from a validated mapping."""
+        return self.source + (wrapper(self.interface_map) if self.interface_map else "")
+
     def batch(self, kind: str, top: str, specs: dict, stimulus: dict[str, str]) -> dict:
         root = self.run_dir / "batches" / f"{self.design_id}-{kind}"
         batch = runner.prepare_batch(root, [({"id": self.design_id, "top": top, "depth": self.contract.depth,
-                                               "width": self.contract.width, "seed": 1, **specs}, self.source)],
+                                               "width": self.contract.width, "seed": 1, **specs}, self.job_source())],
                                      stimulus, self.limits)
         record = runner.run_batch(batch, self.image, self.cancel)
         record["out_dir"] = str(batch.out_dir.relative_to(self.run_dir))
@@ -203,7 +212,8 @@ class Verification:
                 problems.append(f"{kind}: elaborated interface was not produced")
             else:
                 for d in check_ports_json(json.loads(ports_path.read_text()),
-                                          self.state["admission"]["module"], self.contract.width):
+                                          WRAPPER if self.interface_map else self.state["admission"]["module"],
+                                          self.contract.width):
                     problems.append(f"{kind}: {d.message}")
             props = out / self.design_id / "properties.json"
             if not props.is_file():
