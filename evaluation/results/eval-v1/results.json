@@ -1637,7 +1637,7 @@
   "briefs": {
     "set": "briefs-eval-v1",
     "split": "evaluation",
-    "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "model_id": "nvidia/nemotron-3-super-120b-a12b",
     "prompt_sha256": "sha256:b426c60c4a0c245eda05ae89e54f95cff100273720042aaa8ad0e2e941149eef",
     "at": "2026-10-04T04:34:05Z",
     "summary": {
@@ -2605,7 +2605,8 @@
         ],
         "detail": null
       }
-    ]
+    ],
+    "metadata_correction": "2026-10-04: model_id originally recorded the explanation model (Ultra) by mistake; every brief call record shows Super. Corrected after an internal review."
   },
   "finished_at": "2026-10-04T04:34:05Z",
   "summary": {

@@ -42,7 +42,8 @@ def interpret_briefs(path: Path) -> dict:
     conflicting = [r for r in results if r["expected_blocking"]]
     compatible = [r for r in results if not r["expected_blocking"]]
     return {
-        "set": data["version"], "split": data["split"], "model_id": model.config()["model_id"],
+        "set": data["version"], "split": data["split"],
+        "model_id": model.config()["fast_model_id"] or model.config()["model_id"],
         "prompt_sha256": prompt_hashes()["interpret"],
         "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "summary": {

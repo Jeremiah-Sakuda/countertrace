@@ -210,8 +210,14 @@ _CONCURRENCY = threading.BoundedSemaphore(int(os.environ.get("COUNTERTRACE_MODEL
 
 
 def thinking_default(task: str) -> bool:
-    """Reasoning is on unless the task is listed in COUNTERTRACE_THINKING_OFF_TASKS."""
-    off = {t.strip() for t in os.environ.get("COUNTERTRACE_THINKING_OFF_TASKS", "").split(",") if t.strip()}
+    """Reasoning is on unless the task is listed in COUNTERTRACE_THINKING_OFF_TASKS.
+
+    Default: off for the interactive interpretation and check-proposal tasks
+    (6/6 development briefs either way, 1.7-2.9 s instead of 4.7-9 s on Super);
+    on for explanation and repair.
+    """
+    raw = os.environ.get("COUNTERTRACE_THINKING_OFF_TASKS", "interpret,propose_checks")
+    off = {t.strip() for t in raw.split(",") if t.strip()}
     return task not in off
 
 

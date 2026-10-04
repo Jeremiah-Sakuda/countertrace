@@ -176,12 +176,12 @@ class ModelTest(unittest.TestCase):
     def test_length_cutoff_retries_with_reasoning_off(self):
         decisions = [{"topic": t, "brief_says": None, "status": "matches", "note": ""} for t in model.INTERPRET_TOPICS]
         good = json.dumps({"summary": "", "decisions": decisions})
-        with mock.patch.dict(os.environ, CONFIG), mock.patch.object(
+        with mock.patch.dict(os.environ, {**CONFIG, "COUNTERTRACE_THINKING_OFF_TASKS": ""}), mock.patch.object(
                 model.request, "urlopen", side_effect=[reply('{"summ', finish_reason="length"), reply(good)]) as call:
             result = model.interpret("A FIFO.", Contract(depth=4))
         self.assertEqual(result["status"], "ok")
         first, second = (json.loads(c[0][0].data) for c in call.call_args_list)
-        self.assertNotIn("chat_template_kwargs", first)
+        self.assertNotIn("chat_template_kwargs", first)  # reasoning on for this task in this test
         self.assertEqual(second["chat_template_kwargs"], {"enable_thinking": False})
         self.assertIn("ran out of output tokens", second["messages"][1]["content"])
         self.assertEqual([c["thinking"] for c in result["calls"]], [True, False])

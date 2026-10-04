@@ -1,0 +1,267 @@
+{
+  "dev-full-exchange": {
+    "status": "ok",
+    "result": {
+      "summary": "At cycle 6 the FIFO is full (occupancy == DEPTH) and both wr_en and rd_en are asserted. The contract requires accepting only the read, but the design's do_write condition (line 25) evaluates to true because it includes '|| do_read', causing both a write and a read to be accepted. The count therefore stays at DEPTH and the full flag remains asserted, contradicting the expected deassertion.",
+      "steps": [
+        {
+          "text": "Cycles 2\u20135: four consecutive writes (wr_en=1, rd_en=0) fill the FIFO to depth 4; the full flag becomes true at cycle 5 as expected.",
+          "cycles": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "signals": [
+            "wr_en",
+            "rd_en",
+            "din",
+            "full",
+            "empty"
+          ]
+        },
+        {
+          "text": "Cycle 6: both_full contract row (wr_en=1, rd_en=1). The design asserts do_read (rd_en && count!=0) and do_write (wr_en && (count!=DEPTH || do_read)) because do_read is true. Both operations are accepted, count does not change (case 2'b11 falls to default), so full stays true. The reference queue drops to 3 entries, so full should be false.",
+          "cycles": [
+            6
+          ],
+          "signals": [
+            "wr_en",
+            "rd_en",
+            "din",
+            "full",
+            "empty",
+            "dout"
+          ]
+        }
+      ],
+      "likely_cause": {
+        "text": "The do_write condition on line 25 incorrectly permits a write when the FIFO is full and a simultaneous read occurs (via '|| do_read'). This makes both do_write and do_read true, so the count update (lines 44\u201348) leaves count unchanged, keeping full asserted. The contract requires that only the read be accepted in this both_full case.",
+        "lines": [
+          25,
+          28,
+          44,
+          45,
+          46,
+          47,
+          48
+        ]
+      },
+      "next_action": "Revise the do_write expression to not allow a write when the FIFO is full and a read is accepted (e.g., remove '|| do_read' or add a priority condition that suppresses write in the both_full case).",
+      "limits": "This failure refutes the full_flag contract for the tested configuration (DEPTH=4, WIDTH=8). The simulation full_flag check failed in 10 of 14 tests (including random_s8). BMC and prove full_flag also produced counterexamples. Other properties (empty_flag, read_data) are unresolved in formal verification; simulation passed them but only for the named tests. Reachability cover passed bounded. No conclusion can be drawn about other configurations or untested input sequences."
+    },
+    "calls": [
+      {
+        "task": "explain",
+        "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+        "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+        "at": "2026-10-04T04:15:36Z",
+        "attempts": 1,
+        "request_id": "1901cbf3c7d47781f86f7204f14bf724",
+        "latency_ms": 6507,
+        "prompt_tokens": 2565,
+        "completion_tokens": 2198,
+        "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+        "status": "ok",
+        "finish_reason": "stop"
+      }
+    ],
+    "citation_check": {
+      "valid": 23,
+      "invalid": [],
+      "uncited_steps": 0,
+      "allowed_cycles": [
+        0,
+        8
+      ]
+    },
+    "finding": {
+      "test": "random_s8",
+      "cycle": 6,
+      "check": "full_flag",
+      "requirement_id": "both_full",
+      "source": "simulation"
+    }
+  },
+  "dev-reset-keeps-wrptr": {
+    "status": "ok",
+    "result": {
+      "summary": "The FIFO returns incorrect data on the first read after reset because the write pointer is not initialized, causing the first write to go to an arbitrary location. The read then fetches stale data from the default read pointer location.",
+      "steps": [
+        {
+          "text": "Reset asserts at cycle 0; rd_ptr and count are cleared but wr_ptr is left uninitialized.",
+          "cycles": [
+            0
+          ],
+          "signals": [
+            "rst",
+            "rd_ptr",
+            "count",
+            "wr_ptr"
+          ]
+        },
+        {
+          "text": "Write accepted at cycle 1 (wr_en=1, rd_en=0) with din=0x96; the write targets mem[wr_ptr] where wr_ptr is unknown, then wr_ptr increments.",
+          "cycles": [
+            1
+          ],
+          "signals": [
+            "wr_en",
+            "din",
+            "wr_ptr",
+            "mem"
+          ]
+        },
+        {
+          "text": "Read accepted at cycle 2 (rd_en=1); dout captures mem[rd_ptr] with rd_ptr=0, yielding stale value 0x4d instead of the expected 0x96.",
+          "cycles": [
+            2
+          ],
+          "signals": [
+            "rd_en",
+            "dout",
+            "rd_ptr",
+            "mem"
+          ]
+        }
+      ],
+      "likely_cause": {
+        "text": "The synchronous reset block initializes rd_ptr and count but omits wr_ptr, leaving the write pointer uninitialized. The first write therefore targets an arbitrary memory location, and the subsequent read from rd_ptr=0 returns stale data.",
+        "lines": [
+          31,
+          32,
+          33
+        ]
+      },
+      "next_action": "Add wr_ptr <= 0 to the reset block (after line 33) and re-run simulation and formal verification.",
+      "limits": "The witnessed simulation failure (simulation:read_data, counterexample in 14/14 tests) refutes the read_data contract for the tested DEPTH=2, WIDTH=8 configuration. The passing simulation checks for empty_flag and full_flag (simulation:empty_flag, simulation:full_flag) cover only the 14 named tests and do not guarantee correctness under all conditions. The formal checks for empty_flag and full_flag (bmc:empty_flag, bmc:full_flag, prove:empty_flag, prove:full_flag) are unresolved and establish nothing. The cover:reachability bounded pass only reduces vacuity risk. Unresolved obligations are not passes."
+    },
+    "calls": [
+      {
+        "task": "explain",
+        "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+        "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+        "at": "2026-10-04T04:15:42Z",
+        "attempts": 1,
+        "request_id": "d2f594ac125244babf9559c1373f85f3",
+        "latency_ms": 11445,
+        "prompt_tokens": 2321,
+        "completion_tokens": 4096,
+        "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+        "status": "ok",
+        "finish_reason": "length",
+        "schema_error": "Expecting ',' delimiter: line 18 column 6 (char 1069)"
+      },
+      {
+        "task": "explain",
+        "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+        "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+        "at": "2026-10-04T04:15:54Z",
+        "attempts": 1,
+        "request_id": "5cfe04e9937b2e57fbbb0c374c7d0b61",
+        "latency_ms": 10193,
+        "prompt_tokens": 2364,
+        "completion_tokens": 3555,
+        "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+        "status": "ok",
+        "finish_reason": "stop"
+      }
+    ],
+    "citation_check": {
+      "valid": 18,
+      "invalid": [],
+      "uncited_steps": 0,
+      "allowed_cycles": [
+        0,
+        4
+      ]
+    },
+    "finding": {
+      "test": "random_s1",
+      "cycle": 2,
+      "check": "read_data",
+      "requirement_id": "read_not_empty",
+      "source": "simulation"
+    }
+  },
+  "dev-wrapbit-duplicate": {
+    "status": "ok",
+    "result": {
+      "summary": "During simultaneous read/write (both_mid) at cycle 2, the write pointer advanced but the read pointer did not, causing the same data (0xa3) to be read again at cycle 3 instead of the newly written 0x83. The contract requires occupancy to stay constant with both pointers advancing.",
+      "steps": [
+        {
+          "text": "Cycle 2: both_mid accepted; write stores 0x83 at tail index 1 and increments tail to 2; read outputs 0xa3 from head index 0 but head stays at 0 because put is true.",
+          "cycles": [
+            2
+          ],
+          "signals": [
+            "wr_en",
+            "rd_en",
+            "din",
+            "put",
+            "take",
+            "head",
+            "tail",
+            "dout"
+          ]
+        },
+        {
+          "text": "Cycle 3: both_mid accepted; write stores 0x31 at tail index 2 and increments tail to 3; read outputs storage[head=0] = 0xa3 again, but reference queue expects 0x83 from index 1.",
+          "cycles": [
+            3
+          ],
+          "signals": [
+            "wr_en",
+            "rd_en",
+            "din",
+            "put",
+            "take",
+            "head",
+            "tail",
+            "dout"
+          ]
+        }
+      ],
+      "likely_cause": {
+        "text": "The read pointer increments only when !put (line 44). During simultaneous read/write, put is true so head does not advance, breaking constant-occupancy semantics.",
+        "lines": [
+          44
+        ]
+      },
+      "next_action": "Remove the conditional on line 44 so head increments on every accepted read (take).",
+      "limits": "This simulation failure refutes read_data for the tested DEPTH=4, WIDTH=8 configuration. Simulation passed empty_flag in 14 tests but failed full_flag in 4 tests and read_data in 2 tests (random_s3, random_s7). Formal BMC and prove found counterexamples for empty_flag; full_flag and read_data are unresolved. Cover reachability passed bounded. No other properties or configurations are established."
+    },
+    "calls": [
+      {
+        "task": "explain",
+        "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+        "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+        "at": "2026-10-04T04:16:04Z",
+        "attempts": 1,
+        "request_id": "60104f16d1e055e5d3cc663d72d000e6",
+        "latency_ms": 6480,
+        "prompt_tokens": 2375,
+        "completion_tokens": 2325,
+        "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+        "status": "ok",
+        "finish_reason": "stop"
+      }
+    ],
+    "citation_check": {
+      "valid": 19,
+      "invalid": [],
+      "uncited_steps": 0,
+      "allowed_cycles": [
+        0,
+        5
+      ]
+    },
+    "finding": {
+      "test": "random_s3",
+      "cycle": 3,
+      "check": "read_data",
+      "requirement_id": "both_mid",
+      "source": "simulation"
+    }
+  }
+}

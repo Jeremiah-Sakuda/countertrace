@@ -1,0 +1,116 @@
+[
+  {
+    "example": "showcase-overwrite-when-full",
+    "run_id": "20261004-003607-ver-4cc749",
+    "status": "passed",
+    "wall_s": 13.4,
+    "attempts": [
+      [
+        "passed_unchanged_checks",
+        [
+          [
+            2960,
+            "stop",
+            ""
+          ]
+        ]
+      ]
+    ],
+    "diff": [
+      "-    wire do_write = wr_en;",
+      "+    wire do_write = wr_en && !full;"
+    ]
+  },
+  {
+    "example": "dev-full-exchange",
+    "run_id": "20261004-003628-ver-8d694f",
+    "status": "passed",
+    "wall_s": 8.7,
+    "attempts": [
+      [
+        "passed_unchanged_checks",
+        [
+          [
+            1266,
+            "stop",
+            ""
+          ]
+        ]
+      ]
+    ],
+    "diff": [
+      "-    wire do_write = wr_en && ((count != DEPTH) || do_read);",
+      "+    wire do_write = wr_en && (count != DEPTH);"
+    ]
+  },
+  {
+    "example": "dev-reset-keeps-wrptr",
+    "run_id": "20261004-003643-ver-fd9987",
+    "status": "passed",
+    "wall_s": 21.8,
+    "attempts": [
+      [
+        "passed_unchanged_checks",
+        [
+          [
+            4096,
+            "length",
+            "Expecting property name enclosed in double quotes:"
+          ],
+          [
+            1883,
+            "stop",
+            ""
+          ]
+        ]
+      ]
+    ],
+    "diff": [
+      "+            wr_ptr <= 0;"
+    ]
+  },
+  {
+    "example": "dev-wrapbit-read-wrap-lost",
+    "run_id": "20261004-003711-ver-0fdbde",
+    "status": "passed",
+    "wall_s": 17.2,
+    "attempts": [
+      [
+        "passed_unchanged_checks",
+        [
+          [
+            2388,
+            "stop",
+            ""
+          ]
+        ]
+      ]
+    ],
+    "diff": [
+      "-            head[AW-1:0] <= head[AW-1:0] + 1'b1;",
+      "+            head <= head + 1'b1;"
+    ]
+  },
+  {
+    "example": "dev-wrapbit-duplicate",
+    "run_id": "20261004-003735-ver-c99f53",
+    "status": "passed",
+    "wall_s": 13.9,
+    "attempts": [
+      [
+        "passed_unchanged_checks",
+        [
+          [
+            1172,
+            "stop",
+            ""
+          ]
+        ]
+      ]
+    ],
+    "diff": [
+      "-            if (!put) head <= head + 1'b1;",
+      "+            head <= head + 1'b1;"
+    ]
+  }
+]
