@@ -10,4 +10,12 @@ After a full panel, implement actionable fixes within the current FIFO education
 
 ## Results
 
-Pending the first completed panel. Individual reviews will be stored beside this file.
+| Round | Technology | Design | Impact | Idea | Overall | Decision |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| 1 | 8.23 | 8.03 | 7.33 | 8.33 | 7.98 | Fix actionable findings and rerun. |
+
+Round 1: [learning](education-round1-learning.md), [hardware](education-round1-hardware.md), [sponsor](education-round1-sponsor.md). Individual means were 8.325, 7.875, and 7.750. Their differences are subjective judgment, not statistical uncertainty bounds.
+
+Implemented after round 1: release-pinned replay digest (browser and coaching service); invalid/inconsistent practice rejection; restore/replay past experiments; count recorded model assistance; preserve context-bound live coaching transcripts and ignore responses invalidated by edits/reset; align actual Devpost/testing fields with education; link completed labs directly to real rejected/accepted Nemotron repairs. Added declared development coaching checks across all three lessons and retained unsuccessful outcomes. No external learner evidence was manufactured.
+
+Fresh rounds do not receive earlier scores. All individual reports remain here for audit.

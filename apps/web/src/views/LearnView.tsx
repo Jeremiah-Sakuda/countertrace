@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Download, FlaskConical, Lightbulb, RotateCcw } from 'lucide-react';
 import { useDocumentTitle, type AsyncState } from '../lib/hooks';
 import type { Status } from '../api/types';
 import { href } from '../lib/route';
-import { actionNames, evidenceRows, hex, lessons, newSession, sessionReport, validateSession, type Action, type Library, type Session } from '../lib/learning';
+import { actionNames, evidenceRows, hex, lessons, newSession, sessionReport, validateSession, parseLibrary, type Action, type Library, type Session } from '../lib/learning';
 
 function download(name: string, content: string, type = 'text/plain') {
   const url = URL.createObjectURL(new Blob([content], {type}));
@@ -43,16 +43,18 @@ export function LearnView({id, status}: {id: string; status: AsyncState<Status>}
   const [library, setLibrary] = useState<Library | null>(null);
   const [error, setError] = useState('');
   const [choice, setChoice] = useState<number | null>(null);
-  const [path, setPath] = useState('');
-  const [prediction, setPrediction] = useState('');
-  const [tested, setTested] = useState('');
+  const [path, setPath] = useState(session.attempts.at(-1)?.path ?? '');
+  const [prediction, setPrediction] = useState(session.attempts.at(-1)?.prediction ?? '');
+  const [tested, setTested] = useState(session.attempts.at(-1)?.path ?? '');
   const [transfer, setTransfer] = useState<number | null>(null);
-  const [tutor, setTutor] = useState<{text: string; model?: string} | null>(null);
+  const [tutor, setTutor] = useState<{text: string; model?: string; path:string; reflection:string} | null>(null);
   const [tutoring, setTutoring] = useState(false);
+  const tutorEpoch = useRef(0);
+  function invalidateTutor() {tutorEpoch.current++;setTutor(null);setTutoring(false);}
   const [coachExample, setCoachExample] = useState<{request:{reflection:string};response:{result:{hint:string};calls:{model_id:string;latency_ms:number}[]}} | null>(null);
   useEffect(()=>{if(id==='overflow') void fetch('/learning/coach.json').then(r=>r.ok?r.json():null).then(d=>{if(d?.attempts?.length) setCoachExample(d.attempts[d.attempts.length-1]);}).catch(()=>{});},[id]);
   useDocumentTitle(lesson?.title ?? 'Lab not found');
-  useEffect(() => { let active = true; fetch('/learning/library.json').then(async r => {if (!r.ok) throw new Error('Learning evidence could not be loaded.'); const d = await r.json(); if (d.schema !== 'countertrace-learning/1') throw new Error('Unsupported evidence version.'); if (active) setLibrary(d);}).catch(e => active && setError(String(e.message))); return () => {active = false;}; }, []);
+  useEffect(() => { let active = true; fetch('/learning/library.json').then(async r => {if (!r.ok) throw new Error('Learning evidence could not be loaded.'); const d = await parseLibrary(await r.text()); if (active) setLibrary(d);}).catch(e => active && setError(String(e.message))); return () => {active = false;}; }, []);
   useEffect(() => {try { localStorage.setItem(`countertrace:lesson:${id}`, JSON.stringify(session)); setSaved(true); } catch {setSaved(false);}}, [id, session]);
   if (!lesson) return <section className="card"><h1>Lab not found</h1><a href="#/">Choose a lab</a></section>;
   const patch = (value: Partial<Session>) => setSession(s => ({...s, ...value}));
@@ -63,18 +65,23 @@ export function LearnView({id, status}: {id: string; status: AsyncState<Status>}
   const investigated = session.attempts.length > 0;
   const live = status.status === 'ok' && status.data.deployment?.mode !== 'recorded' && status.data.model.configured;
   async function askTutor() {
+    const ticket=++tutorEpoch.current;
+    const context={path:tested,reflection:session.reflection,requested:new Date().toISOString()};
     setTutoring(true); setTutor(null);
     patch({hints:session.hints+1});
     try {
       const response = await fetch('/api/learn/hint', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({lesson:id, path:tested, reflection:session.reflection})});
       const result = await response.json();
       if (!response.ok || result.status !== 'ok') throw new Error(result.detail ?? result.error ?? 'Model coaching is unavailable.');
-      setTutor({text:result.result.hint, model:result.calls?.[0]?.model_id});
-    } catch(e) {setTutor({text:`Could not get a model hint: ${e instanceof Error ? e.message : String(e)}. The authored hints still work.`});} finally {setTutoring(false);}
+      if(ticket!==tutorEpoch.current) return;
+      const model=result.calls?.[0]?.model_id ?? 'Unknown model';
+      setTutor({text:result.result.hint,model,...context});
+      setSession(s=>({...s,coaching:[...s.coaching.slice(-99),{...context,status:'ok',hint:result.result.hint,cycles:result.result.cycles,model,latency_ms:result.calls?.[0]?.latency_ms ?? null}]}));
+    } catch(e) {if(ticket===tutorEpoch.current) {const detail=`Could not get a model hint: ${e instanceof Error ? e.message : String(e)}. The authored hints still work.`.slice(0,1600); setTutor({text:detail,...context}); setSession(s=>({...s,coaching:[...s.coaching.slice(-99),{...context,status:'error',hint:detail,cycles:[],model:'Unavailable',latency_ms:null}]}));}} finally {if(ticket===tutorEpoch.current)setTutoring(false);}
   }
   function testSequence() {
     if (!library || !path || !prediction) return;
-    try { const result = evidenceRows(library, id, path); setTested(path); setError(''); setTutor(null); patch({attempts:[...session.attempts.slice(-199), {path, prediction, firstMismatch:result.find(r => r.mismatches.length)?.cycle ?? null}]}); }
+    try { const result = evidenceRows(library, id, path); setTested(path); setError(''); invalidateTutor(); patch({attempts:[...session.attempts.slice(-199), {path, prediction, firstMismatch:result.find(r => r.mismatches.length)?.cycle ?? null}]}); }
     catch(e) {setError(String(e));}
   }
   return <div className="learning-lab stack-lg">
@@ -85,9 +92,9 @@ export function LearnView({id, status}: {id: string; status: AsyncState<Status>}
       {session.initialAnswer === null ? <><fieldset className="choice-list"><legend className="sr-only">Your initial prediction</legend>{lesson.choices.map((c,i)=><label key={c}><input type="radio" name="initial" checked={choice===i} onChange={()=>setChoice(i)}/>{c}</label>)}</fieldset><button className="button primary" disabled={choice===null} onClick={()=>patch({initialAnswer:choice, initialCorrect:choice===lesson.answer})}>Commit prediction & open the bench</button></> : <p className="learning-feedback">Your prediction: <strong>{lesson.choices[session.initialAnswer]}</strong>. Keep it in mind as you investigate.</p>}
     </div></section>
     {session.initialAnswer !== null && <section className="learning-stage" aria-labelledby="investigate-heading"><div className="stage-number">02</div><div><h2 id="investigate-heading">Build the experiment</h2><p>Start after reset. Add up to six clock edges. Each write offers the next numbered word: edge 1 offers 0x11, edge 2 offers 0x22, and so on.</p>
-      <div className="lab-toolbar" aria-label="Add a clock edge">{(Object.keys(actionNames) as Action[]).map(a=><button className="button" key={a} disabled={path.length>=6} onClick={()=>{setPath(p=>p+a);setTested('');setPrediction('');}}>{actionNames[a]}</button>)}</div>
+      <div className="lab-toolbar" aria-label="Add a clock edge">{(Object.keys(actionNames) as Action[]).map(a=><button className="button" key={a} disabled={path.length>=6} onClick={()=>{setPath(p=>p+a);setTested('');setPrediction('');invalidateTutor();}}>{actionNames[a]}</button>)}</div>
       <ol className="sequence-strip" aria-label="Your experiment">{[...path].map((a,i)=><li key={i}><small>EDGE {i+1}</small><strong>{actionNames[a as Action]}</strong>{(a==='w'||a==='b')&&<code>{hex(17*(i+1))}</code>}</li>)}{!path&&<li className="sequence-empty">Add your first action above.</li>}</ol>
-      <div className="actions"><button className="button" disabled={!path} onClick={()=>{setPath(p=>p.slice(0,-1));setTested('');setPrediction('');}}>Undo edge</button><button className="button" disabled={!path} onClick={()=>{setPath('');setTested('');setPrediction('');}}>Clear sequence</button><span className="muted">{path.length}/6 edges</span></div>
+      <div className="actions"><button className="button" disabled={!path} onClick={()=>{setPath(p=>p.slice(0,-1));setTested('');setPrediction('');invalidateTutor();}}>Undo edge</button><button className="button" disabled={!path} onClick={()=>{setPath('');setTested('');setPrediction('');invalidateTutor();}}>Clear sequence</button><span className="muted">{path.length}/6 edges</span></div>
       <label className="lab-select">Before running, what do you expect?<select value={prediction} onChange={e=>setPrediction(e.target.value)}><option value="">Choose an expectation</option><option value="mismatch">This sequence will expose a mismatch</option><option value="no-mismatch">No mismatch in this sequence</option><option value="unsure">I am unsure; I want to investigate</option></select></label>
       <button className="button primary" disabled={!library||!path||!prediction} onClick={testSequence}>{library ? 'Run my experiment' : 'Loading recorded evidence…'} <ArrowRight size={16}/></button>
       <p className="muted small">Replays an actually executed RTL sequence from the recorded library. No live RTL execution or model call.</p>
@@ -99,14 +106,16 @@ export function LearnView({id, status}: {id: string; status: AsyncState<Status>}
       <details className="lab-source"><summary>Inspect candidate RTL & evidence provenance</summary><p>{library?.designs[id]?.origin} You may inspect source; this is an open practice lab.</p><pre><code>{library?.designs[id]?.source}</code></pre><p>Source SHA-256: <code>{library?.designs[id]?.source_sha256}</code></p><p>{library?.method} {library?.sequences_per_design.toLocaleString()} six-edge sequences per candidate, including all shorter prefixes. Recorded {library?.created_at.slice(0,10)}.</p><a href="/learning/evidence.zip" download>Download raw traces, RTL, stimulus & hash manifest</a></details>
       <div className="hint-panel"><h3><Lightbulb size={18} aria-hidden="true"/> Need a nudge?</h3><p className="small muted">Authored hints; opening a hint is recorded as assistance.</p>{lesson.hints.slice(0,session.authoredHints).map(h=><p key={h}>{h}</p>)}<button className="button" disabled={session.authoredHints>=3} onClick={()=>patch({hints:session.hints+1,authoredHints:session.authoredHints+1})}>Reveal next hint ({session.authoredHints}/3)</button></div>
     </div></section>}
-    {investigated && <section className="learning-stage" aria-labelledby="explain-heading"><div className="stage-number">03</div><div><h2 id="explain-heading">Explain it. Then transfer it.</h2><label className="lab-select">What did your experiment establish? What test would you keep?<textarea rows={4} maxLength={2000} value={session.reflection} onChange={e=>patch({reflection:e.target.value})} placeholder="Name the edge, the rule, and the evidence. A no-mismatch result also has limits."/></label><p className="small muted">Your explanation is for discussion with a mentor. It is not automatically graded.</p>
+    {investigated && <section className="learning-stage" aria-labelledby="explain-heading"><div className="stage-number">03</div><div><h2 id="explain-heading">Explain it. Then transfer it.</h2><label className="lab-select">What did your experiment establish? What test would you keep?<textarea rows={4} maxLength={2000} value={session.reflection} disabled={!!session.completed} onChange={e=>{patch({reflection:e.target.value});invalidateTutor();}} placeholder="Name the edge, the rule, and the evidence. A no-mismatch result also has limits."/></label><p className="small muted">Your explanation is for discussion with a mentor. It is not automatically graded.</p>
       {live ? <><button className="button" disabled={tutoring||!tested||!session.reflection.trim()} onClick={()=>void askTutor()}>{tutoring?'Getting a grounded hint…':'Ask Nemotron about my reasoning'}</button><p className="small muted">Sends this explanation and sequence to Nebius Token Factory. AI feedback is advisory and counts as assistance.</p></> : <p className="small muted">Live Nemotron coaching is available in the configured local build. These hosted labs use authored hints.</p>}
-      {tutor&&<div className="learning-feedback"><strong>Model coaching · advisory {tutor.model??''}</strong><p>{tutor.text}</p></div>}
-      {coachExample && <details className="lab-source"><summary>See an actual recorded Nemotron coaching example</summary><p><strong>Recorded development example · not a response to your text.</strong> The example used Write → Write → Write → Read on this candidate.</p><p>Example learner explanation: “{coachExample.request.reflection}”</p><blockquote>{coachExample.response.result.hint}</blockquote><p className="small muted">{coachExample.response.calls[0]?.model_id} via Nebius Token Factory · {coachExample.response.calls[0]?.latency_ms} ms. Two earlier Super responses followed the mistaken cause. The revised Ultra prompt includes source and an authored facilitator focus; this is one useful assistant-reviewed example, not an efficacy result.</p><a href="/learning/coach.json">Inspect all three development calls</a></details>}
+      {tutor&&<div className="learning-feedback"><strong>Model coaching · advisory {tutor.model??''}</strong><p className="small">For sequence {tutor.path.toUpperCase()} and the explanation: “{tutor.reflection}”</p><p>{tutor.text}</p><p className="small muted">Coaching checks references, not semantic accuracy. Development checks found some incorrect edge and scope wording; compare the evidence and discuss uncertain claims with a mentor.</p></div>}
+      {coachExample && <details className="lab-source" onToggle={e=>{if(e.currentTarget.open&&!session.recordedCoachingViewed) setSession(s=>s.recordedCoachingViewed?s:{...s,recordedCoachingViewed:true,hints:s.hints+1});}}><summary>See an actual recorded Nemotron coaching example</summary><p><strong>Recorded development example · not a response to your text.</strong> The example used Write → Write → Write → Read on this candidate.</p><p>Example learner explanation: “{coachExample.request.reflection}”</p><blockquote>{coachExample.response.result.hint}</blockquote><p className="small muted">{coachExample.response.calls[0]?.model_id} via Nebius Token Factory · {coachExample.response.calls[0]?.latency_ms} ms. Two earlier Super responses followed the mistaken cause. The revised Ultra prompt includes source and an authored facilitator focus; this is one useful assistant-reviewed example, not an efficacy result.</p><a href="/learning/coach.json">Inspect all three development calls</a></details>}
       <h3 className="transfer-heading">A new situation</h3><p>{lesson.transfer}</p><fieldset className="choice-list" disabled={session.transferAnswer!==null}><legend className="sr-only">Transfer answer</legend>{lesson.transferChoices.map((c,i)=><label key={c}><input type="radio" name="transfer" checked={(session.transferAnswer??transfer)===i} onChange={()=>setTransfer(i)}/>{c}</label>)}</fieldset>
       {session.transferAnswer===null ? <button className="button primary" disabled={transfer===null||!session.reflection.trim()} onClick={()=>patch({transferAnswer:transfer,transferCorrect:transfer===lesson.transferAnswer,completed:new Date().toISOString()})}>Check my reasoning</button> : <div className="learning-feedback" role="status"><h3>{session.transferCorrect?'Your transfer answer matches the contract.':'Revisit the boundary rule.'}</h3><p>{lesson.transferWhy}</p><p><strong>Initial prediction:</strong> {session.initialCorrect?'Matched the contract.':'Needed revision.'}</p><p>{lesson.takeaway}</p><p>This is practice on a small set of cases, not a certification or evidence of learning gains.</p></div>}
     </div></section>}
-    <section className="lab-session"><div><h3>Your lab notebook</h3><p>{session.attempts.length} experiment{session.attempts.length===1?'':'s'} · {session.hints} hint request{session.hints===1?'':'s'} · {session.completed?'Reflection completed':'In progress'}</p></div><div className="actions"><button className="button" onClick={()=>download(`countertrace-${id}.md`,sessionReport(session))}><Download size={16}/> Download notes</button><button className="button" onClick={()=>download(`countertrace-${id}.json`,JSON.stringify(session,null,2),'application/json')}>Export session JSON</button><button className="button" onClick={()=>{if(window.confirm('Clear this lab’s saved answers and attempts? Download them first if you want to keep them.')){setSession(newSession(id));setPath('');setTested('');setChoice(null);setTransfer(null);setTutor(null);}}}><RotateCcw size={16}/> Start over</button></div></section>
+    {session.attempts.length>0 && <details className="lab-source"><summary>Previous experiments ({session.attempts.length})</summary><ol>{session.attempts.map((a,i)=><li key={i}><span>{a.path.split('').map(x=>actionNames[x as Action]).join(' → ')} · {a.firstMismatch===null?'no mismatch':`mismatch at edge ${a.firstMismatch}`} </span><button className="button" onClick={()=>{setPath(a.path);setTested(a.path);setPrediction(a.prediction);invalidateTutor();}}>Replay experiment {i+1}</button></li>)}</ol><p className="small muted">Replay restores the evidence without adding an attempt.</p></details>}
+    <section className="lab-session"><div><h3>Your lab notebook</h3><p>{session.attempts.length} experiment{session.attempts.length===1?'':'s'} · {session.hints} hint request{session.hints===1?'':'s'} · {session.completed?'Reflection completed':'In progress'}</p></div><div className="actions"><button className="button" onClick={()=>download(`countertrace-${id}.md`,sessionReport(session))}><Download size={16}/> Download notes</button><button className="button" onClick={()=>download(`countertrace-${id}.json`,JSON.stringify(session,null,2),'application/json')}>Export session JSON</button><button className="button" onClick={()=>{if(window.confirm('Clear this lab’s saved answers and attempts? Download them first if you want to keep them.')){setSession(newSession(id));setPath('');setTested('');setChoice(null);setTransfer(null);invalidateTutor();}}}><RotateCcw size={16}/> Start over</button></div></section>
+    {session.completed&&<section className="learning-contract"><h3>Now challenge a real AI repair</h3><p>The lab candidates were authored exercises. In this separate recorded Nemotron run, an initial patch failed and the next candidate passed the unchanged checks. Inspect what evidence justified the decision.</p><a href="#/runs/rec-20261004-010137-ver-dd43e0">Inspect the rejected and accepted Nemotron repairs →</a></section>}
     {session.completed&&<a className="button primary" href={`#/learn/${lessons[(lessons.findIndex(l=>l.id===id)+1)%lessons.length]!.id}`}>Try another lab <ArrowRight size={16}/></a>}
   </div>;
 }

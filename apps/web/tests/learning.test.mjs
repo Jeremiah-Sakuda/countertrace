@@ -7,8 +7,13 @@ import {renderToStaticMarkup} from 'react-dom/server';
 test('all browser queue states agree with independent executed evidence; errors never pass', async()=>{
   const vite=await createServer({server:{middlewareMode:true,hmr:false,ws:false,watch:null}});
   try {
-    const {evidenceRows,lessons,newSession,sessionReport,validateSession}=await vite.ssrLoadModule('/src/lib/learning.ts');
-    const library=JSON.parse(await readFile(new URL('../public/learning/library.json',import.meta.url),'utf8'));
+    const {evidenceRows,lessons,newSession,sessionReport,validateSession,parseLibrary}=await vite.ssrLoadModule('/src/lib/learning.ts');
+    const raw=await readFile(new URL('../public/learning/library.json',import.meta.url),'utf8');
+    const library=await parseLibrary(raw);
+    const altered=JSON.parse(raw); altered.designs.overflow.nodes.wwwr[3]=17;
+    await assert.rejects(()=>parseLibrary(JSON.stringify(altered)),/integrity/);
+    assert.throws(()=>validateSession({...newSession('overflow'),transferAnswer:1,completed:new Date().toISOString()}),/progression/);
+    assert.throws(()=>validateSession({...newSession('overflow'),recordedCoachingViewed:true}),/progression/);
     for(const id of Object.keys(library.designs)) for(const key of Object.keys(library.designs[id].nodes)) if(key) assert.equal(evidenceRows(library,id,key).length,key.length);
     assert.equal(evidenceRows(library,'overflow','wr').some(r=>r.mismatches.length),false);
     assert.equal(evidenceRows(library,'overflow','wwwr').find(r=>r.mismatches.length).cycle,4);

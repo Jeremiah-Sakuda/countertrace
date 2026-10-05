@@ -4,17 +4,18 @@ The recorded Vercel demo is deployed. **Before submitting:** add the project-fun
 
 ---
 
-## Hosted recorded demo (no setup or account)
+## Hosted learning lab (no setup or account)
 
-Open https://countertrace.vercel.app. The “Recorded demo” notice describes what is available. No API key or login is needed.
+Open https://countertrace.vercel.app. All browser experiments replay actual recorded RTL execution. No API key or login is needed.
 
-1. **Open the showcase run.** “Queue that overwrites when full” shows cycle 6: expected 0x21, got 0x65; probable origin is the ignored write at cycle 5. Follow a cycle citation in the recorded Nemotron explanation, then inspect the one-line repair and the candidate's ten unchanged obligations, including three proofs.
-2. **Runs → “Two bugs: reads while empty, and empty ignores the wrap bit.”** The timeline preserves candidate 1's rejection at cycle 4, its counterexample feedback, and candidate 2's acceptance.
-3. **Contract setup.** Inspect the source and contract for any bundled example. The showcase and “Accepts a write when full and reading” include actual recorded Super interpretations; the latter flags a contract conflict. “Set up this example” links keep the selected example when navigating from a recording.
-4. **Check-quality audit → Open the recorded audit.** Try the missing-requirement exercise, then compare with the faults that escaped the deliberately weak named check set. This does not ingest a user's testbench.
-5. **Repair & export → Download evidence bundle.** Verification recordings export ZIPs with inputs, logs, traces, and a manifest of hashes. Replay them locally using the instructions below.
+1. **Start the first lab → The disappearing word.** Commit a prediction. Add Write → Read, choose “No mismatch,” and run. Clear the sequence, add Write → Write → Write → Read, predict a mismatch, and run. Edge 4 should show expected 0x11 versus observed 0x33. The expected reference queue ignores the third write while full.
+2. **Explain and transfer.** Write an explanation. Open an authored hint or the explicitly recorded Nemotron example if desired; assistance is counted. The recorded response answers its displayed example text, not your newly typed text. Answer the depth-4 simultaneous-operation question and download notes or session JSON. Free text is ungraded.
+3. **Facilitator desk.** Open lesson notes/answer keys. Optionally import the JSON you just exported; it stays in the browser. Counts describe practice records, not unique participants or learning gains.
+4. **Other labs.** The simultaneous-operation candidate fails Write → Write → Read + write at edge 3. The correct-control lesson permits no-mismatch conclusions; Write → Read repeated three times returns no mismatch under this finite test.
+5. **Real model repair extension.** Follow the completed lab's link to the recorded two-bug run. Inspect candidate 1's rejection and candidate 2's acceptance under unchanged checks. The learner fixtures and these actual model proposals are explicitly distinguished.
+6. **Evidence.** The lab downloads its raw trace/source/stimulus archive and hash manifest. Runs in the workbench separately export replayable verification bundles. The library is finite simulation; workbench formal results retain their named methods and scope.
 
-The Vercel deployment is read-only. Live verification, interpretation, explanation, repair, and new audits are disabled there. The recorded model calls are real past Token Factory executions, with their original metadata preserved.
+The hosted site does not call a model or execute RTL live. Vercel rejects API writes. Authored hints and recorded coaching remain usable without paid access. The local build below supplies live coaching, interpretation, verification, explanation, repair, and audits when configured.
 
 ## Local working test build
 
@@ -29,7 +30,9 @@ make web
 make serve      # http://127.0.0.1:8765
 ```
 
-The local build includes the same recorded journey plus live deterministic verification, new audits, and bundle replay without a model key. Accept a bundled example's contract and press **Run verification**. Warm runs took 3–11 seconds per example on the development laptop and up to about 25 seconds with concurrent work; this is not a hosted latency promise. One run executes at a time.
+The local build includes the same learning lab and recorded workbench plus live deterministic verification, new audits, and bundle replay without a model key. Accept a bundled example's contract and press **Run verification**. Warm runs took 3–11 seconds per example on the development laptop and up to about 25 seconds with concurrent work; this is not a hosted latency promise. One run executes at a time.
+
+After a local experiment and reflection, **Ask Nemotron about my reasoning** sends those inputs to the configured service. The hint is advisory and retains its experiment context.
 
 For developers, live Nemotron actions require a Token Factory API key in the local `.env`; never place that key in browser code or a public submission. Endpoint, model IDs, token caps, and estimated prices are supplied in `.env.example`. Judge-specific project-funded live access instructions are pending; judges should not be asked to buy credits or provide a paid key.
 

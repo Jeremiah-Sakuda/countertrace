@@ -1,6 +1,14 @@
+import manifest from "./learning-manifest.json";
 export type Action = 'w' | 'r' | 'b' | 'x';
 export type Sample = [number | null, number, number, number | null, number, number];
 export type Library = { schema: string; depth: number; width: number; max_steps: number; created_at: string; method: string; sequences_per_design: number; provenance: { tools: Record<string, string>; wall_s: number }; designs: Record<string, { source: string; source_sha256: string; origin: string; nodes: Record<string, Sample> }> };
+export async function parseLibrary(text: string): Promise<Library> {
+  const digest = [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)))].map(x=>x.toString(16).padStart(2,'0')).join('');
+  if (digest !== manifest.sha256) throw new Error('Learning evidence integrity check failed. Reload the current release; no result is available.');
+  const d = JSON.parse(text);
+  if (d.schema !== 'countertrace-learning/1' || d.profile !== 'sync-fifo-v1' || d.depth !== 2 || d.width !== 8 || d.max_steps !== 6 || JSON.stringify(d.actions) !== '["w","r","b","x"]') throw new Error('Unsupported learning evidence metadata.');
+  return d;
+}
 export const actionNames: Record<Action, string> = {w: 'Write', r: 'Read', b: 'Read + write', x: 'Reset'};
 export const hex = (n: number | null) => n === null ? 'Not checked' : `0x${n.toString(16).padStart(2, '0').toUpperCase()}`;
 export function reference(path: string) {
@@ -54,18 +62,21 @@ export const lessons = [
     takeaway: 'A useful engineer can distinguish a witnessed defect, a passing simulation, a bounded result, and a property proof.' },
 ] as const;
 export type Attempt = {path: string; prediction: string; firstMismatch: number | null};
-export type Session = {version: 1; lesson: string; started: string; initialAnswer: number | null; initialCorrect: boolean | null; attempts: Attempt[]; hints: number; authoredHints: number; reflection: string; transferAnswer: number | null; transferCorrect: boolean | null; completed: string | null};
-export function newSession(lesson: string): Session { return {version:1, lesson, started:new Date().toISOString(), initialAnswer:null, initialCorrect:null, attempts:[], hints:0, authoredHints:0, reflection:'', transferAnswer:null, transferCorrect:null, completed:null}; }
+export type Coaching = {status:'ok'|'error'; path:string; reflection:string; hint:string; cycles:number[]; model:string; requested:string; latency_ms:number | null};
+export type Session = {version: 1; lesson: string; started: string; initialAnswer: number | null; initialCorrect: boolean | null; attempts: Attempt[]; hints: number; authoredHints: number; recordedCoachingViewed: boolean; coaching: Coaching[]; reflection: string; transferAnswer: number | null; transferCorrect: boolean | null; completed: string | null};
+export function newSession(lesson: string): Session { return {version:1, lesson, started:new Date().toISOString(), initialAnswer:null, initialCorrect:null, attempts:[], hints:0, authoredHints:0, recordedCoachingViewed:false, coaching:[], reflection:'', transferAnswer:null, transferCorrect:null, completed:null}; }
 export function sessionReport(s: Session) {
-  return `# Countertrace learning record\n\nLesson: ${s.lesson}\nStarted: ${s.started}\nCompleted: ${s.completed ?? 'In progress'}\n\nInitial answer: ${s.initialAnswer === null ? 'Unanswered' : s.initialAnswer + 1} (${s.initialCorrect === null ? 'unscored' : s.initialCorrect ? 'matched contract' : 'revisit'})\nHints opened: ${s.hints}\n\n## Experiments\n${s.attempts.map((a,i)=>`${i+1}. ${a.path.split('').map(x=>actionNames[x as Action]).join(' → ')}; prediction: ${a.prediction}; ${a.firstMismatch === null ? 'no mismatch in this sequence' : `first mismatch at edge ${a.firstMismatch}`}`).join('\n')}\n\n## Learner explanation (ungraded)\n${s.reflection || 'Not supplied'}\n\nTransfer answer: ${s.transferAnswer === null ? 'Unanswered' : s.transferAnswer+1}; ${s.transferCorrect === null ? 'unscored' : s.transferCorrect ? 'matched contract' : 'revisit'}\n\nThis is a self-reported practice record, not a certificate or measured learning gain. Browser results replay a finite library of RTL simulations. No live model call or RTL execution occurs on Vercel.\n`;
+  return `# Countertrace learning record\n\nLesson: ${s.lesson}\nStarted: ${s.started}\nCompleted: ${s.completed ?? 'In progress'}\n\nInitial answer: ${s.initialAnswer === null ? 'Unanswered' : s.initialAnswer + 1} (${s.initialCorrect === null ? 'unscored' : s.initialCorrect ? 'matched contract' : 'revisit'})\nAssistance requests/views: ${s.hints} (authored: ${s.authoredHints}; recorded coaching viewed: ${s.recordedCoachingViewed ? 'yes' : 'no'}; live requests: ${s.hints-s.authoredHints-Number(s.recordedCoachingViewed)}; live successes/errors saved: ${s.coaching.filter(c=>c.status==='ok').length}/${s.coaching.filter(c=>c.status==='error').length})\n\n## Experiments\n${s.attempts.map((a,i)=>`${i+1}. ${a.path.split('').map(x=>actionNames[x as Action]).join(' → ')}; prediction: ${a.prediction}; ${a.firstMismatch === null ? 'no mismatch in this sequence' : `first mismatch at edge ${a.firstMismatch}`}`).join('\n')}\n\n## Saved live coaching (advisory)\n${s.coaching.map(c=>`Status: ${c.status}; sequence: ${c.path}; model: ${c.model}; requested: ${c.requested}\nLearner text: ${c.reflection}\nResponse: ${c.hint}`).join('\n\n')}\n\n## Learner explanation (ungraded)\n${s.reflection || 'Not supplied'}\n\nTransfer answer: ${s.transferAnswer === null ? 'Unanswered' : s.transferAnswer+1}; ${s.transferCorrect === null ? 'unscored' : s.transferCorrect ? 'matched contract' : 'revisit'}\n\nThis is a self-reported practice record, not a certificate or measured learning gain. Browser results replay a finite library of RTL simulations. No live model call or RTL execution occurs on Vercel.\n`;
 }
 
 export function validateSession(value: unknown): Session {
   if (!value || typeof value !== 'object') throw new Error('Invalid Countertrace session.');
-  const s = value as Session;
+  const s = {...value, recordedCoachingViewed:(value as Session).recordedCoachingViewed ?? false, coaching:(value as Session).coaching ?? []} as Session;
   const l = lessons.find(l => l.id === s.lesson);
   if (s.version !== 1 || !l || typeof s.started !== 'string' || !Number.isFinite(Date.parse(s.started)) ||
       !(s.completed === null || typeof s.completed === 'string' && Number.isFinite(Date.parse(s.completed))) ||
+      typeof s.recordedCoachingViewed !== 'boolean' || !Array.isArray(s.coaching) || s.coaching.length > 100 ||
+      s.coaching.some(c=>!c || !/^[wrbx]{1,6}$/.test(c.path) || !['ok','error'].includes(c.status) || typeof c.reflection !== 'string' || c.reflection.length>2000 || typeof c.hint !== 'string' || c.hint.length>1600 || typeof c.model !== 'string' || typeof c.requested !== 'string' || !Number.isFinite(Date.parse(c.requested)) || !Array.isArray(c.cycles) || c.cycles.some(n=>!Number.isInteger(n)||n<1||n>c.path.length) || !(c.latency_ms===null||Number.isFinite(c.latency_ms)&&c.latency_ms>=0)) ||
       !Array.isArray(s.attempts) || s.attempts.length > 200 ||
       !Number.isInteger(s.hints) || s.hints < 0 || s.hints > 1000 ||
       !Number.isInteger(s.authoredHints) || s.authoredHints < 0 || s.authoredHints > 3 || s.hints < s.authoredHints ||
@@ -76,6 +87,10 @@ export function validateSession(value: unknown): Session {
         !(a.firstMismatch === null || Number.isInteger(a.firstMismatch) && a.firstMismatch >= 1 && a.firstMismatch <= a.path.length))) {
     throw new Error('Invalid Countertrace session.');
   }
+  if ((s.initialAnswer === null && (s.attempts.length > 0 || s.hints > 0 || s.transferAnswer !== null || s.reflection.trim())) ||
+      (s.transferAnswer !== null && (!s.attempts.length || !s.reflection.trim() || s.completed === null)) ||
+      (s.completed !== null && (s.transferAnswer === null || Date.parse(s.completed) < Date.parse(s.started))) ||
+      s.hints < s.authoredHints + Number(s.recordedCoachingViewed) + s.coaching.length) throw new Error('Inconsistent lesson progression.');
   return {...s, initialCorrect:s.initialAnswer === null ? null : s.initialAnswer === l.answer,
     transferCorrect:s.transferAnswer === null ? null : s.transferAnswer === l.transferAnswer};
 }

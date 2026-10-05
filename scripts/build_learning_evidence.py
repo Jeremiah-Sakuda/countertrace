@@ -104,6 +104,7 @@ def build():
             archive.writestr(name, body)
         archive.writestr('manifest.json', json.dumps(manifest, indent=2))
     (DEST / 'library.json').write_bytes(payload)
+    (ROOT / 'apps/web/src/lib/learning-manifest.json').write_text(json.dumps({'schema':'countertrace-learning-integrity/1', 'sha256':hashlib.sha256(payload).hexdigest()}, indent=2) + '\n')
     print(json.dumps({'designs':len(sources), 'sequences_per_design':len(paths),
                       'cycles_per_design':len(stimulus), 'wall_s':result['wall_s'],
                       'library_bytes':len(payload), 'artifact':str(root)}))
