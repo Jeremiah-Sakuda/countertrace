@@ -1,3 +1,17 @@
+# Countertrace submission draft
+
+## Education release positioning
+
+Countertrace is an interactive hardware debugging lab where students learn to find bugs, challenge plausible fixes, and justify conclusions with executable evidence. It is designed for digital-design instructors and FPGA club mentors.
+
+The learner commits a prediction, builds a short sequence, compares actual recorded RTL outputs with an independent reference, writes an explanation, and answers a related transfer question. The facilitator can share lessons and review voluntarily exported anonymous practice records. Three labs cover overflow, simultaneous operations, and evidence limits. The correct-control lesson makes clear that no mismatch is a scoped observation, not proof of universal correctness.
+
+NVIDIA Nemotron on Nebius Token Factory powers live coaching in the configured local build and the underlying workbench's interpretation, explanation, and repair. Hosted Vercel labs use authored hints and replay a finite library of real simulations; they do not make live model calls. Every candidate sequence was run in an isolated verifier. The model cannot grade free text authoritatively or approve a hardware result.
+
+The educational interaction is implemented; learner outcomes and instructor adoption are unmeasured. The video remains owner-recorded and unpublished. Internal reviewers should evaluate the current demo script as intended content, never as completed footage. Funded free live judge access remains a release dependency.
+
+The following engineering evidence supports the underlying workbench and does not establish educational efficacy.
+
 # Devpost submission: Countertrace
 
 Paste each section into the matching Devpost field. Items in [brackets] still need a value before submitting.

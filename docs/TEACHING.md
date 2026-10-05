@@ -1,4 +1,27 @@
-# A 15 minute FIFO debugging lab
+# Facilitate the Countertrace learning lab
+
+The primary audience is instructors and FPGA club mentors teaching learners who know clocks, reset, and basic RTL. Open the [facilitator desk](https://countertrace.vercel.app/#/teach) for shareable learner links and answer keys. The three interactive labs replace the worksheet as the primary journey. The worksheet below remains an optional workbench activity.
+
+## Suggested 20 minute session
+
+1. Introduce the fixed FIFO contract and ask each learner to commit a prediction (3 minutes).
+2. In pairs, build input sequences and compare expected versus observed outputs (8 minutes).
+3. Each learner writes an explanation and answers a new transfer question independently (5 minutes).
+4. Discuss scope, hints used, and what remains unchecked (4 minutes).
+
+This timing is a suggested plan, not measured. Lab 1 explores overflow, lab 2 simultaneous operations, and lab 3 a correct candidate and evidence limits. Start with one lab per session; the other lessons are extensions. Authored hints are available in the browser. The configured local build also offers live Nemotron coaching, which is advisory and counts as assistance.
+
+Practice records contain initial answers, experiment predictions and action sequences, first mismatches, hints opened, ungraded reflection, and the first submitted transfer answer. Learners can download Markdown notes or JSON. With their permission, collect anonymous JSON records through your existing channel and import them at the facilitator desk. Imports remain in that browser tab. Counts describe self-reported records, not unique students, grades, or measured gains. Ask learners to download before resetting. No outreach or recruitment has occurred.
+
+## Evidence and limits
+
+All available browser sequences actually ran in the isolated Verilator worker: three authored candidates, 4,096 paths each, six edges after reset, four allowed actions, depth 2, width 8. Shorter prefixes share checked recorded observations. Write data is fixed by edge position. The library contains no novel-input live execution, no AI-generated candidate claim, and no formal proof. Download the source, raw traces, stimulus, and hash manifest from the bench. The existing workbench contains genuine Nemotron repair records under separate exact configurations.
+
+Proposed observation: can a learner construct a useful boundary test, explain the governing rule, and answer a related transfer case? Record assistance, failed attempts, and exact answers. At least two of three unassisted transfer successes is a proposed pilot target, not an observed outcome. No learning efficacy, adoption, or preparation-time saving has been measured.
+
+---
+
+## Optional 15 minute workbench worksheet
 
 Use Countertrace to teach the difference between the cycle where a bug becomes visible and the operation that caused it. This guide is for digital-design instructors and FPGA club mentors working with learners who understand clocks, reset, and basic RTL. It includes a guided example, a short worksheet, and an answer key.
 

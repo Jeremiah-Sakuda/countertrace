@@ -8,6 +8,7 @@ import { href, useRoute } from "./lib/route";
 import { AuditView } from "./views/AuditView";
 import { RunsView } from "./views/RunsView";
 import { RunView } from "./views/run/RunView";
+import { LearnHome, LearnView, TeachView } from "./views/LearnView";
 import { SetupView } from "./views/SetupView";
 
 function NotFound({ hash }: { hash: string }) {
@@ -31,7 +32,7 @@ export function App() {
   const first = useRef(true);
 
   // Move focus to the main region on navigation so keyboard and screen-reader users land on the new view.
-  const routeKey = route.name === "run" ? `run:${route.id}` : route.name;
+  const routeKey = route.name === "run" || route.name === "learn" ? `${route.name}:${route.id}` : route.name;
 
   useEffect(() => {
     if (first.current) {
@@ -49,7 +50,9 @@ export function App() {
       </a>
       <Header status={status} route={route} run={route.name === "run" ? runContext : null} />
       <main id="main" ref={mainRef} tabIndex={-1} className="main">
-        <DeploymentNotice status={status} />
+        {route.name !== "learn" && route.name !== "teach" && <DeploymentNotice status={status} />}
+        {route.name === "learn" && (route.id ? <LearnView key={route.id} id={route.id} status={status} /> : <LearnHome />)}
+        {route.name === "teach" && <TeachView />}
         {route.name === "setup" && <SetupView exampleId={route.exampleId} profile={profile} status={status} />}
         {route.name === "runs" && <RunsView status={status} />}
         {route.name === "run" && <RunView key={route.id} id={route.id} profile={profile} status={status} onContext={onContext} />}

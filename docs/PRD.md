@@ -1,34 +1,34 @@
 # Countertrace PRD
 
-**Version:** 1.1 · **Date:** October 1, 2026 · **Status:** Hackathon scope and acceptance criteria updated after the fit review. Implementation, user validation, and benchmark results are not yet established.
+**Version:** 1.2 · **Date:** October 5, 2026 · **Status:** Education is the primary product direction. The verification engine and recorded model repairs have run; learning outcomes remain unmeasured. See repository STATUS.md for current execution evidence.
 
-Build Countertrace from scratch: a hardware verification workbench that helps advanced digital-design students and junior FPGA developers expose FIFO bugs, understand the exact failing sequence, and validate a proposed RTL repair against unchanged checks. The hackathon release supports small synchronous FIFOs and produces reproducible evidence for explicit requirements. It does not ingest or evaluate users' existing testbenches; the check-quality audit evaluates a named generated or supplemental check set. Passing tests do not establish complete hardware correctness. The older [AKILI repository](https://github.com/jeremiah-Sakuda/akili) is optional historical background; no code reuse or existing implementation capability is assumed.
+Countertrace is an interactive hardware debugging lab for digital-design students, instructors, and FPGA club mentors. Learners predict behavior, construct a short experiment, inspect an actual counterexample, and explain what their evidence establishes. The first release supports one synchronous FIFO contract and reusable lessons on overflow, simultaneous operations, and evidence limits. The existing verification workbench remains available for diagnosis, model-proposed repair, and reproducible evidence export. Public arbitrary uploads and user testbench ingestion remain deferred. The project was built from scratch; historical AKILI code is not a dependency.
 
 The recommended entry is in Coding and Agentic Engineering. The submission deadline is October 30, 2026 at 1:00 p.m. EDT. The working project must remain available for judging through December 15, 2026. These dates and the requirement to use an NVIDIA open model with Nebius come from the [official rules](https://nebiusglobalaihackathon.devpost.com/rules).
 
-The coding track is the primary fit because the product interprets requirements, runs verification tools, diagnoses failures, and optionally repairs RTL. Hardware subject matter alone does not make this a Physical AI entry. The diagnosis release remains a developer testing and debugging tool. All four judging criteria are equally weighted; technical depth must be supported by a coherent experience, audience evidence, and a visible model contribution.
+Coding and Agentic Engineering remains the recommended track: learners investigate executable RTL and inspect NVIDIA Nemotron interpretations, explanations, and independently checked repairs. The education workflow adds advisory coaching through Nebius Token Factory in the configured local build. Hardware subject matter alone does not make this Physical AI. All four judging criteria are equally weighted. Educational positioning does not establish impact without observed learner usefulness.
 
 ## Product decision
 
-Commit to one complete journey: existing RTL and intended behavior → reviewed contract → executable checks → counterexample → proposed RTL patch → unchanged checks → evidence export.
+Commit to one learning journey: read a fixed contract → commit a prediction → build a short test sequence → compare expected and observed behavior → explain the evidence → answer a transfer question → export a practice record. The instructor journey is choose a lesson → share its link → facilitate experiments → review voluntarily shared anonymous practice records.
 
-The distinctive product hypothesis is that learners benefit from seeing exactly which requirements a named supplemental check set fails to test. The primary job is completing a debugging task; learning to assess evidence supports that job. The audit earns prominence only if users can identify a missing requirement and recognize the same omission in a different example. A mutation count alone is not evidence of learning or better repair. The contribution is the accessible workflow and demonstrated outcomes. Agentic RTL generation, formal repair, mutation testing, and specification-linked coverage already have precedents; novelty claims must acknowledge them.
+The distinctive product hypothesis is that constructing counterexamples helps learners challenge plausible hardware fixes and recognize the limits of passing tests. The learning lab is the primary experience. A passing sequence is not complete correctness, and a practice score is not a learning gain. The existing check-quality audit and real Nemotron repair records support advanced discussion. Agentic RTL repair, educational HDL exercises, formal verification, and mutation testing have precedents; make no first-of-kind research claim.
 
-The original spec-to-verified-RTL concept is narrowed in three ways. Existing RTL is the primary input; unrestricted generation is deferred. One FIFO behavior profile is supported first; generic SystemVerilog is deferred. Formal and simulation results retain their exact scope instead of becoming a universal verified badge.
+Keep the scope narrow: one fixed FIFO contract, three reusable lessons, a finite set of recorded experiments, and optional live advisory coaching. The verification workbench retains eligible RTL input in the local build. Generic SystemVerilog support, arbitrary public uploads, course catalogs, accounts, grading automation, and LMS integrations are deferred.
 
 ## Audience and problem
 
-The primary user understands clocks, reset, and basic RTL but cannot yet efficiently construct a reliable verification environment. They have a small queue module and do not know whether reset, boundary conditions, and simultaneous operations are adequately checked. Their ordinary tests may have passed outside Countertrace, but the MVP makes no claim about those tests unless their execution is separately evidenced.
+Learners understand clocks, reset, and basic RTL but need practice choosing revealing inputs and explaining why a result supports a conclusion. The initial activities use small synchronous queues. They practice boundary behavior, causal reasoning, and scoped evidence; the product does not claim to assess their existing testbenches.
 
-Their job is to answer four questions: What behavior did I actually specify? Which check failed? What sequence caused the failure? Does the proposed change fix it without changing the requirement? The main workflow should help the user decide the next debugging action; educational detail is revealed where it helps that decision.
+Learners should answer: What do I predict? Which sequence would test that prediction? Where do expected and observed behavior diverge? What does the result establish, and what remains unchecked? Instructors should be able to run a lesson without assembling their own simulator environment, then inspect actual answers, attempts, and assistance.
 
-Instructors and FPGA club mentors are secondary users who can review evidence and reuse an example. Commercial hardware teams are a future audience, because proprietary-design handling, broad language support, integrations, and sign-off expectations require a different product scope.
+Instructors and FPGA club mentors are the primary facilitators and adoption audience; digital-design students and junior FPGA developers are the learners. Commercial hardware teams remain a future audience requiring broader language support and different privacy, integration, and sign-off capabilities.
 
 The need and willingness to adopt this workflow are hypotheses. No interviews, endorsements, time savings, or pilot results are claimed in this PRD.
 
 ## What success means
 
-The product succeeds when a user can take an eligible FIFO through the complete journey and leave with a reproduced defect, an understandable explanation, and a checkable result for the repair. A successful check is always relative to the accepted contract, assumptions, parameters, and tool semantics.
+The education release succeeds when a learner can complete prediction, investigation, explanation, and transfer, and an instructor can reuse the lesson and inspect exported practice records. Completion means the activity was completed; it must not imply mastery. Proposed pilot target: at least two of three observed learners identify the governing rule and answer a related transfer case, with assistance and failed attempts disclosed. This small sample cannot establish general learning gains. The following engineering targets remain verification-workbench regression targets; they are not educational efficacy measures.
 
 Proposed launch targets are:
 
@@ -46,7 +46,7 @@ Proposed launch targets are:
 
 These are release targets, not measured performance or guarantees. Failure to meet them triggers a smaller product or a narrower claim. Zero observed errors on a small suite does not establish a general error rate of zero.
 
-Two release profiles are defined. **Primary release:** diagnosis, check-quality audit, proposed repair, unchanged-check validation, and export; all targets above apply. **Diagnosis release:** diagnosis, audit, trace explanation, and export; remove the repair target, repair controls, and patch demonstration. If only bounded checking is reliable, replace the unbounded-proof target and all proof language with exact tested horizons. Treat diagnosis as the delivery commitment until repair is demonstrated. Make an initial profile decision on October 8 and finalize by October 14; do not describe the reduced release using the primary release's promises.
+The primary hackathon experience is now the education release described above. The verification workbench retains two engineering profiles: diagnosis with audit and export, or full diagnosis plus independently checked repair. Real repair evidence may be shown only with its exact frozen checks and outcomes. Educational activities must remain usable without paid learner credentials. Recorded replay, live inference, and live RTL execution must remain visibly distinct. Decide the maintained workbench profile by October 14; no change to evidence or isolation requirements is implied by the education direction.
 
 ## Supported hardware contract
 
@@ -106,7 +106,17 @@ The product remains useful if automatic repair is cut: it can still diagnose a r
 
 ## User experience
 
-The application has three main surfaces rather than a general chat interface.
+The learning lab is the default landing experience, with a facilitator desk and the existing verification workbench accessible separately.
+
+**Learning bench.** Offer three lessons: overflow/data order, simultaneous operations, and evidence limits with a correct control. Collect an initial prediction before showing results. Let learners compose one to six actions (write, read, simultaneous read/write, reset). Use depth 2 and deterministic 8-bit offered values for these exercises. Each available sequence must have actually executed in the isolated RTL verifier. The hosted site may replay a finite recorded library, clearly labeling its action alphabet, horizon, original method, and provenance. No browser-computed DUT behavior may be presented as executed RTL evidence. Missing, corrupt, or mismatching library evidence is an error, never a passing result.
+
+**Explanation and transfer.** Show the independent reference queue and sampled outputs, including the first mismatch and unobserved/unchecked values. Require a learner explanation before the transfer answer is revealed. Grade only fixed-choice answers against the contract. Free text is ungraded discussion material. Keep initial answers, experiment predictions, sequences, assistance, and transfer outcomes in downloadable local practice records. No certificate, inferred mastery, or population learning claim.
+
+**Coaching.** Authored hint ladders remain available without model access and must be labeled as authored. In the configured local build, Nemotron can respond to the learner explanation using server-selected recorded evidence. Model output is advisory and cannot change an answer key or verification verdict. Validate structured output and cited edges, disclose inference destination, and retain bounded retries, budgets, and per-visitor rate limits. A recorded coaching example, if shown, must preserve its actual request and response and cannot impersonate a live response.
+
+**Facilitator desk.** Provide shareable lesson routes, a suggested session plan, prerequisites, facilitator answer keys, and voluntary import of anonymous practice records. Imported files remain local to the browser, are validated and bounded, and are self-reported practice rather than independent study evidence. Report record counts, not unique participants or demonstrated gains. No outreach or collection happens automatically.
+
+The workbench retains its three existing surfaces:
 
 **Contract setup.** A user can immediately try a public FIFO example, or submit an eligible module in the local test build. Public upload is an optional later capability. Show the supported profile, data-processing destination, exact parameter choice, and any mismatch before launching work. Present plain-language requirements beside ports and concrete examples, especially simultaneous operations and reset. The user accepts a specific contract version. A change later creates a new baseline.
 
@@ -251,13 +261,13 @@ Target a 2 minute 45 second public video, leaving room below the three-minute li
 
 | Time | What the judge sees |
 | --- | --- |
-| 0:00 to 0:15 | The consequence: this queue loses or duplicates an item under a specific condition. State the supported scope. |
-| 0:15 to 0:35 | The input RTL and accepted behavior. Show Nemotron's interpretation role when its output appears. |
-| 0:35 to 1:05 | Replay genuine failing transactions and highlight the first expected/observed mismatch. Show how the model explanation cites the trace. |
-| 1:05 to 1:35 | A proposed patch, unchanged contract/checker hashes, and actual rerun results. |
-| 1:35 to 2:00 | One explicitly labeled weak supplemental check set misses a reviewed fault; show the missing requirement and what the learner can conclude. The mandatory core still identifies the fault. |
-| 2:00 to 2:20 | Inspect method-specific results and unresolved obligations, then export reproducible evidence. |
-| 2:20 to 2:45 | Actual evaluation counts, user observations if obtained, and the measured NVIDIA/Nebius roles. |
+| 0:00 to 0:20 | A learner predicts what happens to the oldest word when a full queue receives a write. State the audience and fixed FIFO scope. |
+| 0:20 to 1:00 | Build an ordinary passing sequence, then a boundary sequence. Label recorded simulation replay and inspect expected versus observed outputs. |
+| 1:00 to 1:30 | Explain the failure. Show actual Nemotron coaching from the configured local build or an explicitly recorded response; never portray authored hints as model output. |
+| 1:30 to 1:55 | Answer a related transfer question and export the practice record. Explain that free text is ungraded and the activity is not a measured learning gain. |
+| 1:55 to 2:15 | Open the facilitator desk, answer key, and voluntarily imported example records labeled as demonstrations. |
+| 2:15 to 2:35 | Show genuine rejected and accepted Nemotron repair evidence, unchanged checks, and method-specific limits in the underlying workbench. |
+| 2:35 to 2:45 | State what has run, what remains unmeasured, and how NVIDIA and Nebius contribute. |
 
 For the diagnosis release, replace the patch segment with a second held-out counterexample and evidence replay. For bounded-only delivery, replace the proof segment with the exact checked horizon and remaining uncertainty. The video follows the selected release profile.
 
@@ -294,13 +304,13 @@ The reviews support proceeding conditionally. They do not establish technical fe
 
 | Dependency | Current state and next action |
 | --- | --- |
-| Historical AKILI project | Repository supplied as background. User chose a fresh implementation; it is not a dependency and no capabilities or code reuse are assumed. |
-| Team capacity | Solo-builder assumption. Reorder the plan when actual availability is known; preserve scope limits. |
-| Nebius account and model access | Public documentation reviewed; authenticated model calls and cloud execution have not been tested. Confirm in the first feasibility work. |
-| Tool versions and solver performance | No integrated toolchain has run during PRD preparation. Pin and measure before committing runtime claims. |
-| Independent technical reviewer | Not recruited. Begin recruitment in week one and seek review before freezing ground truth; disclose the limitation if unavailable. |
-| User recruitment | No participants confirmed. Begin recruitment in week one; observe an early debugging session with the intended audience; do not substitute invented testimonials. |
-| Hosting and operating budget | Not provisioned or priced for this account. Establish actual resource limits, funded judge access, credit expiry, and a recovery plan through December 15. |
+| Historical AKILI | Background only; no dependency. |
+| Nebius/NVIDIA | Authenticated interpretation, explanation, and repair calls recorded. Education coaching must be exercised separately; account funding through judging remains unverified. |
+| Verification | Pinned isolated Docker, simulation/formal checks, and clean evidence replay have run. Results retain exact scope. |
+| Education | Three bounded lessons are the delivery scope. No learner pilot or classroom adoption claimed. |
+| Technical review | Assistant reviews exist; independent human review remains evidence strengthening, not an official entry requirement. |
+| Hosting | Vercel serves recorded evidence. Live model/verification uses the local build; free funded judge access remains a release dependency. |
+| Video | Owner records and publishes. Internal panels may assess the script as intended content, not actual footage. |
 
 ## Research references
 

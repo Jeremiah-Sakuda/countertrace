@@ -1,0 +1,116 @@
+{
+  "kind": "Actual development coaching calls; assistant review, not learner evidence",
+  "attempts": [
+    {
+      "kind": "actual recorded local coaching response; not learner evidence",
+      "request": {
+        "lesson": "overflow",
+        "path": "wwwr",
+        "reflection": "The read at edge 4 is broken because it returns 0x33 instead of 0x11. I think changing the read pointer is the fix."
+      },
+      "response": {
+        "status": "ok",
+        "result": {
+          "hint": "At edge\u202f4 the FIFO is full after three writes (edges\u202f1\u20113). A read should return the value written at edge\u202f1 (0x11), but you observed the value from edge\u202f3 (0x33). Examine how you update the read pointer on a read when the FIFO is full\u2014does it advance to the next slot or remain pointing at the most recent write?",
+          "cycles": [
+            4
+          ]
+        },
+        "calls": [
+          {
+            "task": "learning_hint",
+            "model_id": "nvidia/nemotron-3-super-120b-a12b",
+            "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+            "at": "2026-10-05T04:11:59Z",
+            "attempts": 1,
+            "thinking": true,
+            "request_id": "0031bf5ad909ce99f61db38713ba3247",
+            "latency_ms": 4093,
+            "prompt_tokens": 457,
+            "completion_tokens": 606,
+            "model_reported": "nvidia/nemotron-3-super-120b-a12b",
+            "status": "ok",
+            "finish_reason": "stop"
+          }
+        ],
+        "advisory": true,
+        "citation_scope": "Edge references checked; semantic correctness is not guaranteed."
+      },
+      "review": "Unhelpful: follows the mistaken read-pointer hypothesis without considering the ignored write. Citations alone did not ensure correctness."
+    },
+    {
+      "request": {
+        "lesson": "overflow",
+        "path": "wwwr",
+        "reflection": "The read at edge 4 is broken because it returns 0x33 instead of 0x11. I think changing the read pointer is the fix."
+      },
+      "response": {
+        "status": "ok",
+        "result": {
+          "hint": "At edge\u202f4 the FIFO returned the newest written value (0x33) instead of the oldest (0x11). This suggests the read pointer may be pointing to the wrong location when the read occurs. Check whether you update rd_ptr before or after using it to fetch dout, and verify that reset initializes both pointers to the same location.",
+          "cycles": [
+            4
+          ]
+        },
+        "calls": [
+          {
+            "task": "learning_hint",
+            "model_id": "nvidia/nemotron-3-super-120b-a12b",
+            "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+            "at": "2026-10-05T04:13:07Z",
+            "attempts": 1,
+            "thinking": true,
+            "request_id": "9a1350acdd41dd90443c2a75e2b9ab18",
+            "latency_ms": 3542,
+            "prompt_tokens": 1010,
+            "completion_tokens": 585,
+            "model_reported": "nvidia/nemotron-3-super-120b-a12b",
+            "status": "ok",
+            "finish_reason": "stop"
+          }
+        ],
+        "advisory": true,
+        "citation_scope": "Edge references checked; semantic correctness is not guaranteed."
+      },
+      "prompt_change": "Include candidate RTL and explicitly question the learner cause against earlier operations.",
+      "review": "Still unhelpful: infers a read-pointer problem despite the source. Not accepted as a useful coaching example."
+    },
+    {
+      "request": {
+        "lesson": "overflow",
+        "path": "wwwr",
+        "reflection": "The read at edge 4 is broken because it returns 0x33 instead of 0x11. I think changing the read pointer is the fix."
+      },
+      "response": {
+        "status": "ok",
+        "result": {
+          "hint": "At edge 3, the queue is full (full=1) but a write occurs. The contract says full ignores writes. In the RTL, do_write = wr_en without checking full. What should do_write be to ignore writes when full? How does that affect the stored data at edge 4?",
+          "cycles": [
+            3
+          ]
+        },
+        "calls": [
+          {
+            "task": "learning_hint",
+            "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+            "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+            "at": "2026-10-05T04:14:38Z",
+            "attempts": 1,
+            "thinking": true,
+            "request_id": "672825c657558ade7163600639f5a7f5",
+            "latency_ms": 3792,
+            "prompt_tokens": 1056,
+            "completion_tokens": 945,
+            "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+            "status": "ok",
+            "finish_reason": "stop"
+          }
+        ],
+        "advisory": true,
+        "citation_scope": "Edge references checked; semantic correctness is not guaranteed."
+      },
+      "prompt_change": "Use Ultra for reasoning coaching and include an authored facilitator focus tied to the exact candidate.",
+      "review": "Useful on this development example: redirects the mistaken read-pointer hypothesis to do_write lacking a full guard. Assistant review only; not an independent learner assessment."
+    }
+  ]
+}

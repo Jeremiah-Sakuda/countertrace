@@ -1,16 +1,20 @@
 # Countertrace
 
-Countertrace helps FPGA learners expose FIFO bugs, understand the exact failing sequence, and validate a proposed RTL repair against unchanged checks.
+Countertrace is an interactive hardware debugging lab. Students predict behavior, build a revealing input sequence, and explain what the evidence establishes. Instructors and FPGA club mentors get reusable lessons and downloadable practice records.
 
-For instructors and FPGA club mentors: [run a 15-minute debugging lab](docs/TEACHING.md) using the public recorded demo, a learner worksheet, and a facilitator answer key. No setup or API key is needed for the recorded lesson. The lesson is prepared; learner outcomes have not been measured.
+[Open the learning lab](https://countertrace.vercel.app) · [Facilitator desk](https://countertrace.vercel.app/#/teach) · [Teaching guide](docs/TEACHING.md)
 
-**Status: public recorded demo and working local build, with two frozen evaluations.** On October 4, a pre-registered suite of 4 controls and 8 seeded faults (half derived from an independently authored FIFO held out of prompt development) gave: diagnosis 8/8 across four defect classes with 0/4 false alarms, Nemotron repairs passing unchanged checks in 7/8 cases, and conflict detection 4/4 with 4/4 compatible briefs accepted ([report](evaluation/results/eval-v1/REPORT.md)). A second pre-registered run on fresh, harder cases (multi-line and two-bug defects, a new held-out FIFO) with the current repair agent gave diagnosis 8/8, 0/4 false alarms, repairs 8/8 including three cases that needed a second or third candidate (in an exploratory run with reduced feedback, the two-bug case was the only failure), conflicts 3/4 with 4/4 compatible, and 6/8 explanations with only valid citations (assistant review found one partly wrong and one incomplete root cause) ([report](evaluation/results/eval-v2/REPORT.md)). The cases and labels were authored by the developer's coding assistant and have not been externally reviewed; no user study has been run. The hosted route is a recorded evidence demo; live verification and model calls run in the local build. See [implementation status](docs/STATUS.md) for exactly what ran.
+Three labs cover overflow, simultaneous operations, and the limits of passing tests. The browser replays actual isolated Verilator simulations for every allowed sequence: 4,096 six-edge paths per candidate (plus all prefixes), two slots, four actions, fixed 8-bit data. This finite simulation library is not an unbounded proof. Candidates are authored fixtures, not claimed AI outputs. No account or API key is needed for the hosted labs; no learner study or learning gain is claimed.
+
+Nemotron coaching runs in the configured local build using the learner's explanation and server-selected evidence. Authored hints work on the hosted site and are explicitly labeled. The underlying verification workbench retains actual model explanations, rejected and accepted repairs, independent checks, and reproducible exports.
+
+**Status: public recorded demo and working local build, with two frozen evaluations.** On October 4, a pre-registered suite of 4 controls and 8 seeded faults (half derived from an independently authored FIFO held out of prompt development) gave: diagnosis 8/8 across four defect classes with 0/4 false alarms, Nemotron repairs passing unchanged checks in 7/8 cases, and conflict detection 4/4 with 4/4 compatible briefs accepted ([report](evaluation/results/eval-v1/REPORT.md)). A second pre-registered run on fresh, harder cases (multi-line and two-bug defects, a new held-out FIFO) with the current repair agent gave diagnosis 8/8, 0/4 false alarms, repairs 8/8 including three cases that needed a second or third candidate (in an exploratory run with reduced feedback, the two-bug case was the only failure), conflicts 3/4 with 4/4 compatible, and 6/8 explanations with only valid citations (assistant review found one partly wrong and one incomplete root cause) ([report](evaluation/results/eval-v2/REPORT.md)). The cases and labels were authored by the developer's coding assistant and have not been externally reviewed; no user study has been run. The hosted learning lab and workbench replay recorded evidence; live verification and model calls run in the local build. See [implementation status](docs/STATUS.md) for exactly what ran.
 
 Built for the [Nebius x NVIDIA Global AI Hackathon](https://nebiusglobalaihackathon.devpost.com/), targeting Coding and Agentic Engineering. Submission: October 30, 2026, 1:00 p.m. EDT. Judge access must remain available through December 15.
 
-[Open the recorded demo](https://countertrace.vercel.app) · [Run the local build](#quick-start) · [Deployment details](docs/DEPLOYMENT.md)
+[Open the learning lab](https://countertrace.vercel.app) · [Run the local build](#quick-start) · [Deployment details](docs/DEPLOYMENT.md)
 
-## What it does
+## The verification workbench
 
 One bounded synchronous FIFO profile (`sync-fifo-v1`: one positive-edge clock, synchronous active-high reset, 8-bit words, depth 2 or 4):
 
@@ -29,6 +33,7 @@ Every model call is a runtime call from the control service to the Nebius Token 
 
 | Task | Model | Role and safeguards |
 | --- | --- | --- |
+| Learning coaching | Configured Ultra | Responds to learner reasoning using server-selected recorded observations. Advisory only; validates cited edges. Hosted labs use authored hints. |
 | Brief interpretation | `nvidia/nemotron-3-super-120b-a12b` | Flags conflicts between a plain-English brief and the fixed contract (cannot change it). Reasoning off by default for these tasks: 1.7 to 3.7 s per brief across development and eval-v2 briefs (7.1 to 11.4 s with reasoning on in eval-v1). |
 | Failure explanation | `nvidia/Nemotron-3-Ultra-550b-a55b` | Explains the recorded failing cycles for a learner; every cited cycle, signal, and RTL line is checked against the trace and source. Never changes the verdict. |
 | Repair agent | `nvidia/Nemotron-3-Ultra-550b-a55b` | Proposes exact-match RTL edits; each candidate is re-admitted and re-verified (simulation, bounded model checking, unbounded proof, reachability) against the frozen check set, up to three attempts. |

@@ -1,5 +1,16 @@
 # Implementation status
 
+## October 5 education release
+
+The primary product is now an interactive learning lab for instructors, FPGA club mentors, and students with RTL basics. Three lessons implement committed prediction, a six-edge action builder, actual recorded RTL outcomes, authored hints, an ungraded explanation, and a related transfer question. The facilitator desk supplies lesson links and answer keys and imports voluntarily shared anonymous session JSON entirely in the browser. Sessions are locally saved and exportable; completion is not mastery. No participants, user outcomes, adoption, or saved preparation time are claimed.
+
+The learning evidence builder executed **4,096 six-edge sequences per design across three depth-2 authored candidates**, 28,672 sampled cycles per candidate including resets, in 15.666 seconds in the existing isolated Verilator worker. All 5,461 prefixes per candidate are represented. Worker steps, harness hashes, elaborated ports/property inventory, raw trace completeness, and prefix repeatability were checked before publishing a 458,643-byte library and a compressed evidence archive. The independent Python reference reparses every archived observation; web tests check every browser reference state against that library. This is a finite four-action simulation library with fixed values, not a formal proof or live browser RTL execution. No evaluation holdouts were reused.
+
+Local `POST /api/learn/hint` uses server-owned recorded evidence, candidate source, authored facilitator focus, and the learner explanation. Two actual Super development responses followed a mistaken read-pointer hypothesis and were unhelpful. A revised Ultra response correctly redirected attention to the unguarded write at the full boundary; this is assistant review of one case, not a benchmark. All three requests, responses, timings, and usage are preserved in [the coaching record](evidence/learning-coach-2026-10-05.json). The site shows the final response only as an explicitly recorded example with the earlier failures disclosed. Live coaching remains in the configured local build; authored hints work on Vercel.
+
+Validation so far: **96 Python tests**, **3 web tests**, TypeScript and production build pass; **8 Docker integration tests actually executed and passed** in 93.003 seconds. Browser walkthrough confirmed the overflow result (expected 0x11, observed 0x33 at edge 4), locked first answers, and transfer feedback. Homepage checks at 375 and 1440 px showed no page overflow. PRD v1.2 was read back from Page sequence 4 and mirrored into the repository. Deployment and repeated panel results are recorded below when observed.
+
+
 Last updated: October 4, 2026. This page records what has actually run. The October 4 sections report two frozen evaluations (eval-v1 and eval-v2); eval-v1 includes an independently authored FIFO held out of prompt development. Everything else uses **development and showcase fixtures authored for this project**. No user study or external review has happened.
 
 ## October 4 correction of simulation summaries and citation checks

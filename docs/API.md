@@ -90,3 +90,7 @@ A candidate passes only when its verification has no findings, no tool errors or
 ```
 
 The mutation result scores the named supplemental check set only. It is never a design-confidence score, and the mandatory core still decides every mutant's validity.
+
+## Learning coaching
+
+`POST /api/learn/hint` (local live service): `{lesson: "overflow"|"exchange"|"control", path: string of 1–6 w/r/b/x actions, reflection: nonempty string up to 2000 characters}`. Loads server-owned recorded observations; client-supplied evidence is ignored. Uses configured Ultra, token/spend limits, and a two-request visitor reservation for the bounded retry. Returns structured advisory `hint` and validated edge references plus sanitized call metadata. It never changes a verdict or answer key. Hosted Vercel rejects this write route with 405. Authored hints need no API.

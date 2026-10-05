@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 
 export type Route =
+  | { name: "learn"; id: string | null }
+  | { name: "teach" }
   | { name: "setup"; exampleId: string | null }
   | { name: "runs" }
   | { name: "run"; id: string }
@@ -10,7 +12,9 @@ export type Route =
 export function parseHash(hash: string): Route {
   const path = hash.replace(/^#/, "") || "/";
   const parts = path.split("/").filter(Boolean).map(decodeURIComponent);
-  if (parts.length === 0) return { name: "setup", exampleId: null };
+  if (parts.length === 0) return { name: "learn", id: null };
+  if (parts[0] === "learn" && parts.length <= 2) return { name: "learn", id: parts[1] ?? null };
+  if (parts[0] === "teach" && parts.length === 1) return { name: "teach" };
   if (parts[0] === "examples" && parts.length <= 2) return { name: "setup", exampleId: parts[1] ?? null };
   if (parts[0] === "runs" && parts.length === 1) return { name: "runs" };
   if (parts[0] === "runs" && parts.length === 2 && parts[1]) return { name: "run", id: parts[1] };
@@ -19,7 +23,7 @@ export function parseHash(hash: string): Route {
 }
 
 export const href = {
-  setup: (exampleId?: string | null) => (exampleId ? `#/examples/${encodeURIComponent(exampleId)}` : "#/"),
+  setup: (exampleId?: string | null) => (exampleId ? `#/examples/${encodeURIComponent(exampleId)}` : "#/examples"),
   runs: () => "#/runs",
   run: (id: string) => `#/runs/${encodeURIComponent(id)}`,
   audit: () => "#/audit",

@@ -17,3 +17,7 @@ A 2:45 plan following the PRD's timing table. Every screen must show actual evid
 If repair is cut (diagnosis release), replace 1:05–1:35 with a second counterexample and its evidence replay. If only bounded checking is claimed, replace proof wording with the exact depth.
 
 Recording prerequisites: complete the [model gate and showcase refresh](MODEL_GATE.md), record the [release decision](RELEASE_DECISION.md), and replace the results segment with measured evaluation/study outcomes. No final video has been recorded. The October 4 showcase recording (`rec-20261004-003607-ver-4cc749`) contains the assistant-reviewed explanation and links to its one-line repaired candidate (`rec-20261004-003622-ver-d88ef8`); verification, explanation, and repair all ran October 4. Usage is measured, but account billing and credits remain unverified. Prompt iterations and one showcase repair must not be presented as evaluation performance.
+
+## Education release update — October 5
+
+The current narrative and timings are in [the education demo script](submission/DEMO_SCRIPT.md). Start at the learning lab, build an ordinary test and an overflow counterexample, then show explanation, transfer, and facilitator reuse. The earlier workbench shot list remains background. The owner records/uploads; script review is not footage review.

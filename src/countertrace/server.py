@@ -367,6 +367,11 @@ class Handler(BaseHTTPRequestHandler):
 
             app.claim_model_call(visitor)
             return self.send_json(audit.propose(str(body.get("description", ""))[:2000], int(body.get("depth", 4))))
+        if path == "/api/learn/hint":
+            from countertrace import learning
+
+            app.claim_model_call(visitor, units=2)
+            return self.send_json(learning.hint(body))
         if path == "/api/interpret":
             app.claim_model_call(visitor)
             return self.send_json(app.interpret(body))

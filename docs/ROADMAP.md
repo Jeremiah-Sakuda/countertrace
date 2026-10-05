@@ -2,6 +2,17 @@
 
 Dates are in 2026. A checked item has evidence in [STATUS.md](STATUS.md); development-fixture results are not evaluation results. The [PRD](PRD.md) defines acceptance targets and fallback behavior; this file is the working checklist.
 
+## October 5 education release
+
+The owner selected education as the primary product: predict → investigate → explain → transfer. The verification workbench remains available. PRD v1.2 and the Page are synchronized.
+
+- [x] Three interactive bounded labs, including a correct control; authored hint ladder and per-experiment predictions.
+- [x] Record every supported sequence using the isolated verifier; validate archived evidence and browser reference agreement.
+- [x] Facilitator desk, answer keys, local session export/import, ungraded explanations, explicit assistance and scope.
+- [x] Implement local evidence-grounded Nemotron coaching with existing budgets/rate limits.
+- [ ] Verify/deploy the completed education release and run up to five fresh simulated panel rounds, fixing actionable feedback until scores stabilize.
+- [ ] Observe actual learner/facilitator use when participants are available. No simulated panel substitutes for learners.
+
 ## October 1 to 4 — feasibility
 
 - [x] Create a fresh public repository and workspace scaffold.

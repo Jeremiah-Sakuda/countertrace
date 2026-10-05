@@ -58,7 +58,7 @@ function ModelPill({ status }: { status: AsyncState<Status> }) {
     if (existing) existing.role = `${existing.role}, ${role}`;
     else roles.push({ id, role });
   };
-  add(m.model_id, "explanation");
+  add(m.model_id, "explanation, learning coaching");
   add(m.repair_model_id ?? m.model_id, "repair");
   add(m.fast_model_id, "brief interpretation, check-set proposals");
   return (
@@ -82,6 +82,8 @@ function ModelPill({ status }: { status: AsyncState<Status> }) {
 }
 
 const NAV: { label: string; to: string; match: (r: Route) => boolean }[] = [
+  { label: "Learning labs", to: "#/", match: (r) => r.name === "learn" },
+  { label: "Facilitator desk", to: "#/teach", match: (r) => r.name === "teach" },
   { label: "Contract setup", to: href.setup(), match: (r) => r.name === "setup" },
   { label: "Runs", to: href.runs(), match: (r) => r.name === "runs" || r.name === "run" },
   { label: "Check-quality audit", to: href.audit(), match: (r) => r.name === "audit" },
@@ -91,16 +93,16 @@ export function Header({ status, route, run }: { status: AsyncState<Status>; rou
   return (
     <header className="site-header">
       <div className="site-header-inner">
-        <a href={href.setup()} className="brand-name" aria-label="Countertrace home">
+        <a href="#/" className="brand-name" aria-label="Countertrace home">
           <svg viewBox="0 0 40 40" width="40" height="40" aria-hidden="true">
             <path d="M5 10h19v8H13v12h22M5 24h6M29 10h6v14" fill="none" stroke="currentColor" strokeWidth="3" />
             <circle cx="35" cy="30" r="3" fill="currentColor" />
           </svg>
-          <span>Countertrace<span className="brand-caption">A hardware evidence notebook</span></span>
+          <span>Countertrace<span className="brand-caption">Learn to question the fix</span></span>
         </a>
       </div>
       <nav className="site-nav" aria-label="Primary">
-        <p className="rail-label">The workbench</p>
+        <p className="rail-label">The learning notebook</p>
         <ul>
           {NAV.map((item, i) => (
             <li key={item.to}>
