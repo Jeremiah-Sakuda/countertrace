@@ -213,8 +213,8 @@
     "id": "simulation:empty_flag",
     "check": "empty_flag",
     "method": "simulation",
-    "status": "simulation_passed",
-    "detail": "14 named tests (1386 cycles, seeds random_s1, random_s2, random_s3, random_s4, random_s5, random_s6, random_s7, random_s8).",
+    "status": "counterexample",
+    "detail": "Failed in 9 of 14 tests: random_s2, random_s3, random_s4, random_s5 and 5 more.",
     "tests": [
      "learner_basic",
      "fill_drain",
@@ -232,14 +232,14 @@
      "random_s8"
     ],
     "cycles": 1386,
-    "label": "Simulation passed for these runs"
+    "label": "Counterexample found"
    },
    {
     "id": "simulation:full_flag",
     "check": "full_flag",
     "method": "simulation",
     "status": "counterexample",
-    "detail": "Failed in 6 of 14 tests: random_s1, random_s4, random_s5, random_s7.",
+    "detail": "Failed in 10 of 14 tests: random_s1, random_s2, random_s3, random_s4 and 6 more.",
     "tests": [
      "learner_basic",
      "fill_drain",
@@ -264,7 +264,7 @@
     "check": "read_data",
     "method": "simulation",
     "status": "counterexample",
-    "detail": "Failed in 8 of 14 tests: fill_drain, random_s2, random_s3, random_s4.",
+    "detail": "Failed in 12 of 14 tests: fill_drain, random_s1, random_s2, random_s3 and 8 more.",
     "tests": [
      "learner_basic",
      "fill_drain",
@@ -49886,10 +49886,10 @@
  "verdict": {
   "headline": "counterexample",
   "counts": {
-   "simulation_passed": 1,
+   "simulation_passed": 0,
    "bounded_pass": 1,
    "proved": 0,
-   "counterexample": 4,
+   "counterexample": 5,
    "unresolved": 4,
    "tool_error": 0,
    "not_checked": 0,
@@ -50054,15 +50054,247 @@
    "check": "read_data",
    "requirement_id": "read_not_empty",
    "source": "simulation"
-  }
+  },
+  "evidence_notice": "This original model response used simulation summaries that were later corrected. Some claims that a check passed are contradicted by later cycles in the preserved traces. Use the corrected check results below; the model text has not been regenerated."
  },
  "recorded_from": "20261004-003607-ver-4cc749",
  "recorded_at": "2026-10-04T04:38:31Z",
- "recorded_note": "Recorded October 4, 2026 on the owner's Apple M3 Pro (Docker in colima). Explanation by Nemotron 3 Ultra (one request), reviewed against the trace by the coding assistant, not independently. Repair by Nemotron 3 Ultra as a one-line exact-match edit on the first candidate; the independent checks, not the model, accepted it. Original timings and versions shown.",
+ "recorded_note": "Recorded October 4, 2026 on the owner's Apple M3 Pro (Docker in colima). Explanation by Nemotron 3 Ultra (one request), reviewed against the trace by the coding assistant, not independently. Repair by Nemotron 3 Ultra as a one-line exact-match edit on the first candidate; the independent checks, not the model, accepted it. Original timings and versions shown. Derived simulation summaries corrected October 4, 2026 from the preserved traces; see evidence_corrections in run.json. Original timings, raw artifacts, and model text are unchanged.",
  "recorded_versions": {
   "verilator": "Verilator 5.053 devel rev v5.052-258-ga419e9157 (mod)",
   "yosys": "Yosys 0.69+158 (git sha1 a1a0ad7d4-dirty, Release, GNU /usr/bin/aarch64-linux-gnu-g++ 15.2.0)",
   "python": "Python 3.11.2",
   "oss_cad_suite": "2026-09-30"
- }
+ },
+ "evidence_corrections": [
+  {
+   "id": "simulation-all-edges-and-declared-citations-v1",
+   "date": "2026-10-04",
+   "original_commit": "fd4cdcab1cfe2faf1173fb341148345e054169d2",
+   "original_run_sha256": "sha256:f38e295967f0e84d05d456c86e978defa22781f70785b7e41cbec786fc4117d5",
+   "method": "Reparsed preserved raw simulation traces against their recorded stimulus; aggregated all edges. Rechecked citations against declarations. No new RTL execution or model call.",
+   "input_hashes": {
+    "batches/dut-sim/job/stimulus/learner_basic.txt": "sha256:d7ac539195953620c07d04ba0e6abb987e165778da75a05db7fa69a71eff4fd2",
+    "batches/dut-sim/out/dut/sim/learner_basic.trace": "sha256:36b1a7a039c4230be850297ff2c4e91f0754b2f8dc3dd142cbf793dbaf09657d",
+    "batches/dut-sim/job/stimulus/fill_drain.txt": "sha256:974e0747c34a72ef9b5a95c85e4217bbf121da0d79efde1cf4d6519d529071d3",
+    "batches/dut-sim/out/dut/sim/fill_drain.trace": "sha256:acac09a196360bb4c6c17ef137c4f5b23720bf614442e233f2a0b564b6efd504",
+    "batches/dut-sim/job/stimulus/write_when_full.txt": "sha256:b32c56086e9f37d6bb45783922374689d5f3d5ddbd51cc2c9356bdb99cbd9425",
+    "batches/dut-sim/out/dut/sim/write_when_full.trace": "sha256:606d412c43404568f48806db6a6ae03fe849e7ebb611225d5cf4db226ee59c9a",
+    "batches/dut-sim/job/stimulus/simultaneous.txt": "sha256:20dd80e5bbb1219e23c8190af456a6ea513d9a80733928ce8c54cccd8cb7dd0e",
+    "batches/dut-sim/out/dut/sim/simultaneous.trace": "sha256:a8aabb7aa7a33273354e10037a6239d128975403b122a7fcdda94b886527de9e",
+    "batches/dut-sim/job/stimulus/wraparound.txt": "sha256:ef1140dc4089cc0e692a959dbec601fcc2dd164222ec2cffd643fb294524afa9",
+    "batches/dut-sim/out/dut/sim/wraparound.trace": "sha256:e400b724d89805d99b0440e5e82f8b141d8d0372460d3f9ecb8a3a6a4ad75254",
+    "batches/dut-sim/job/stimulus/recurrent_reset.txt": "sha256:a2db40e27f439e421383df22877e250e1f5d4cbfd5c40d2dcf77559a160e6f13",
+    "batches/dut-sim/out/dut/sim/recurrent_reset.trace": "sha256:0ba8f49eeb9cfb3288d2350eb80339c7c909de79b0eff6f4be4305732dc8bdec",
+    "batches/dut-sim/job/stimulus/random_s1.txt": "sha256:2752b0a53e5e5df2b5d674ed48fcf398bf97d6c2d611b18c5acefe4921874dea",
+    "batches/dut-sim/out/dut/sim/random_s1.trace": "sha256:17f872c5362762b0af80443aeed1015c31fb6533cc527fa0f0cd7fb2a7a5fe1d",
+    "batches/dut-sim/job/stimulus/random_s2.txt": "sha256:d22befe0e0ca3e1f477df945aeb2245764d05ccd1de9a10a94c0e33d440fce7e",
+    "batches/dut-sim/out/dut/sim/random_s2.trace": "sha256:dea05845fb7e85c4b7997662df3f64e9fce87e17e75b331a5a8f47c923b51496",
+    "batches/dut-sim/job/stimulus/random_s3.txt": "sha256:ab7e59a4a2f9393a52f2dfd0d8ac67bc5d2650531dac28dcffe3c69f9483e031",
+    "batches/dut-sim/out/dut/sim/random_s3.trace": "sha256:94cb8589b5ef5f6b44afbd664599baf7a606be64e1d361da5c91eda364858c09",
+    "batches/dut-sim/job/stimulus/random_s4.txt": "sha256:ae2119d8c694b4de4dc259db3c673412ecdc98f67bec8c140fbc93c9082a3b42",
+    "batches/dut-sim/out/dut/sim/random_s4.trace": "sha256:f8fb1c610667f9f8cf24906e20db91059ff303d452ed81f3cc424a6916ca9b8c",
+    "batches/dut-sim/job/stimulus/random_s5.txt": "sha256:f5cf271bb2f733b4de6d48187872454bbee6bcdb24b1ac0da51ec3a5d6693ba9",
+    "batches/dut-sim/out/dut/sim/random_s5.trace": "sha256:5a2745d9d165c5b54784ef946fca997c9cd34f28e35a9c32536bdc00547ceff1",
+    "batches/dut-sim/job/stimulus/random_s6.txt": "sha256:4dc884b4fc0571a16f9d161846e549dd8442e12029ee1b599ca81777969d8fc8",
+    "batches/dut-sim/out/dut/sim/random_s6.trace": "sha256:d7c80103711160043b12ec5f36f09a60d1fa00f2eb8425bafc67276267f773bc",
+    "batches/dut-sim/job/stimulus/random_s7.txt": "sha256:6954e6801e0e72642310b361ee408aecbd5c6b74da96cfc8e75213780125c077",
+    "batches/dut-sim/out/dut/sim/random_s7.trace": "sha256:aef97619d7626c97b614c823c56a86f1007f32ca0f2be2f88e16c69cbc9b2f24",
+    "batches/dut-sim/job/stimulus/random_s8.txt": "sha256:53853f53fec2a745accc2d29f995abb57acc3adfe0ca91340d19adab090ad06b",
+    "batches/dut-sim/out/dut/sim/random_s8.trace": "sha256:5bb7d5b3782e8d14f43de823ac1e8d9c760b3d82399226f0a844c48563ff4fec"
+   },
+   "changes": [
+    {
+     "field": "verification.obligations.simulation:empty_flag",
+     "before": {
+      "id": "simulation:empty_flag",
+      "check": "empty_flag",
+      "method": "simulation",
+      "status": "simulation_passed",
+      "detail": "14 named tests (1386 cycles, seeds random_s1, random_s2, random_s3, random_s4, random_s5, random_s6, random_s7, random_s8).",
+      "tests": [
+       "learner_basic",
+       "fill_drain",
+       "write_when_full",
+       "simultaneous",
+       "wraparound",
+       "recurrent_reset",
+       "random_s1",
+       "random_s2",
+       "random_s3",
+       "random_s4",
+       "random_s5",
+       "random_s6",
+       "random_s7",
+       "random_s8"
+      ],
+      "cycles": 1386,
+      "label": "Simulation passed for these runs"
+     },
+     "after": {
+      "id": "simulation:empty_flag",
+      "check": "empty_flag",
+      "method": "simulation",
+      "status": "counterexample",
+      "detail": "Failed in 9 of 14 tests: random_s2, random_s3, random_s4, random_s5 and 5 more.",
+      "tests": [
+       "learner_basic",
+       "fill_drain",
+       "write_when_full",
+       "simultaneous",
+       "wraparound",
+       "recurrent_reset",
+       "random_s1",
+       "random_s2",
+       "random_s3",
+       "random_s4",
+       "random_s5",
+       "random_s6",
+       "random_s7",
+       "random_s8"
+      ],
+      "cycles": 1386,
+      "label": "Counterexample found"
+     }
+    },
+    {
+     "field": "verification.obligations.simulation:full_flag",
+     "before": {
+      "id": "simulation:full_flag",
+      "check": "full_flag",
+      "method": "simulation",
+      "status": "counterexample",
+      "detail": "Failed in 6 of 14 tests: random_s1, random_s4, random_s5, random_s7.",
+      "tests": [
+       "learner_basic",
+       "fill_drain",
+       "write_when_full",
+       "simultaneous",
+       "wraparound",
+       "recurrent_reset",
+       "random_s1",
+       "random_s2",
+       "random_s3",
+       "random_s4",
+       "random_s5",
+       "random_s6",
+       "random_s7",
+       "random_s8"
+      ],
+      "cycles": 1386,
+      "label": "Counterexample found"
+     },
+     "after": {
+      "id": "simulation:full_flag",
+      "check": "full_flag",
+      "method": "simulation",
+      "status": "counterexample",
+      "detail": "Failed in 10 of 14 tests: random_s1, random_s2, random_s3, random_s4 and 6 more.",
+      "tests": [
+       "learner_basic",
+       "fill_drain",
+       "write_when_full",
+       "simultaneous",
+       "wraparound",
+       "recurrent_reset",
+       "random_s1",
+       "random_s2",
+       "random_s3",
+       "random_s4",
+       "random_s5",
+       "random_s6",
+       "random_s7",
+       "random_s8"
+      ],
+      "cycles": 1386,
+      "label": "Counterexample found"
+     }
+    },
+    {
+     "field": "verification.obligations.simulation:read_data",
+     "before": {
+      "id": "simulation:read_data",
+      "check": "read_data",
+      "method": "simulation",
+      "status": "counterexample",
+      "detail": "Failed in 8 of 14 tests: fill_drain, random_s2, random_s3, random_s4.",
+      "tests": [
+       "learner_basic",
+       "fill_drain",
+       "write_when_full",
+       "simultaneous",
+       "wraparound",
+       "recurrent_reset",
+       "random_s1",
+       "random_s2",
+       "random_s3",
+       "random_s4",
+       "random_s5",
+       "random_s6",
+       "random_s7",
+       "random_s8"
+      ],
+      "cycles": 1386,
+      "label": "Counterexample found"
+     },
+     "after": {
+      "id": "simulation:read_data",
+      "check": "read_data",
+      "method": "simulation",
+      "status": "counterexample",
+      "detail": "Failed in 12 of 14 tests: fill_drain, random_s1, random_s2, random_s3 and 8 more.",
+      "tests": [
+       "learner_basic",
+       "fill_drain",
+       "write_when_full",
+       "simultaneous",
+       "wraparound",
+       "recurrent_reset",
+       "random_s1",
+       "random_s2",
+       "random_s3",
+       "random_s4",
+       "random_s5",
+       "random_s6",
+       "random_s7",
+       "random_s8"
+      ],
+      "cycles": 1386,
+      "label": "Counterexample found"
+     }
+    },
+    {
+     "field": "verdict",
+     "before": {
+      "headline": "counterexample",
+      "counts": {
+       "simulation_passed": 1,
+       "bounded_pass": 1,
+       "proved": 0,
+       "counterexample": 4,
+       "unresolved": 4,
+       "tool_error": 0,
+       "not_checked": 0,
+       "unsupported": 0
+      },
+      "unresolved": 4
+     },
+     "after": {
+      "headline": "counterexample",
+      "counts": {
+       "simulation_passed": 0,
+       "bounded_pass": 1,
+       "proved": 0,
+       "counterexample": 5,
+       "unresolved": 4,
+       "tool_error": 0,
+       "not_checked": 0,
+       "unsupported": 0
+      },
+      "unresolved": 4
+     }
+    }
+   ]
+  }
+ ]
 }

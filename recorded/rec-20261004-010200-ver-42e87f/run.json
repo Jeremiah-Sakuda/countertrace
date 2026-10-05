@@ -238,8 +238,8 @@
     "id": "simulation:full_flag",
     "check": "full_flag",
     "method": "simulation",
-    "status": "simulation_passed",
-    "detail": "14 named tests (1386 cycles, seeds random_s1, random_s2, random_s3, random_s4, random_s5, random_s6, random_s7, random_s8).",
+    "status": "counterexample",
+    "detail": "Failed in 13 of 14 tests: fill_drain, learner_basic, random_s1, random_s2 and 9 more.",
     "tests": [
      "learner_basic",
      "fill_drain",
@@ -257,14 +257,14 @@
      "random_s8"
     ],
     "cycles": 1386,
-    "label": "Simulation passed for these runs"
+    "label": "Counterexample found"
    },
    {
     "id": "simulation:read_data",
     "check": "read_data",
     "method": "simulation",
-    "status": "simulation_passed",
-    "detail": "14 named tests (1386 cycles, seeds random_s1, random_s2, random_s3, random_s4, random_s5, random_s6, random_s7, random_s8).",
+    "status": "counterexample",
+    "detail": "Failed in 13 of 14 tests: fill_drain, learner_basic, random_s1, random_s2 and 9 more.",
     "tests": [
      "learner_basic",
      "fill_drain",
@@ -282,7 +282,7 @@
      "random_s8"
     ],
     "cycles": 1386,
-    "label": "Simulation passed for these runs"
+    "label": "Counterexample found"
    }
   ],
   "findings": [
@@ -51872,10 +51872,10 @@
  "verdict": {
   "headline": "counterexample",
   "counts": {
-   "simulation_passed": 2,
+   "simulation_passed": 0,
    "bounded_pass": 1,
    "proved": 0,
-   "counterexample": 3,
+   "counterexample": 5,
    "unresolved": 4,
    "tool_error": 0,
    "not_checked": 0,
@@ -51886,12 +51886,190 @@
  "finished_at": "2026-10-04T05:02:09Z",
  "recorded_from": "20261004-010200-ver-42e87f",
  "recorded_at": "2026-10-04T05:06:35Z",
- "recorded_note": "eval-v2 F6 repair candidate 1: fixed one of two bugs; rejected by the unchanged checks with a new counterexample.",
+ "recorded_note": "eval-v2 F6 repair candidate 1: fixed one of two bugs; rejected by the unchanged checks with a new counterexample. Derived simulation summaries corrected October 4, 2026 from the preserved traces; see evidence_corrections in run.json. Original timings, raw artifacts, and model text are unchanged.",
  "recorded_versions": {
   "verilator": "Verilator 5.053 devel rev v5.052-258-ga419e9157 (mod)",
   "yosys": "Yosys 0.69+158 (git sha1 a1a0ad7d4-dirty, Release, GNU /usr/bin/aarch64-linux-gnu-g++ 15.2.0)",
   "python": "Python 3.11.2",
   "oss_cad_suite": "2026-09-30"
  },
- "title_original": "eval-v2 F6, candidate 1"
+ "title_original": "eval-v2 F6, candidate 1",
+ "evidence_corrections": [
+  {
+   "id": "simulation-all-edges-and-declared-citations-v1",
+   "date": "2026-10-04",
+   "original_commit": "fd4cdcab1cfe2faf1173fb341148345e054169d2",
+   "original_run_sha256": "sha256:4bb03699256d360626a26ee19c4fcf3d78684b85bd2d96ce0b1673c7cfc97ca0",
+   "method": "Reparsed preserved raw simulation traces against their recorded stimulus; aggregated all edges. Rechecked citations against declarations. No new RTL execution or model call.",
+   "input_hashes": {
+    "batches/dut-sim/job/stimulus/learner_basic.txt": "sha256:d7ac539195953620c07d04ba0e6abb987e165778da75a05db7fa69a71eff4fd2",
+    "batches/dut-sim/out/dut/sim/learner_basic.trace": "sha256:a1d51781307d3587a902bfd15b30e3c2e6d8088eea3a51877744aaca4cc300ec",
+    "batches/dut-sim/job/stimulus/fill_drain.txt": "sha256:974e0747c34a72ef9b5a95c85e4217bbf121da0d79efde1cf4d6519d529071d3",
+    "batches/dut-sim/out/dut/sim/fill_drain.trace": "sha256:a63fea3693f68dfe6d54cd9c94cbf548ab7b20e6f072b426fe7c09e47e43697b",
+    "batches/dut-sim/job/stimulus/write_when_full.txt": "sha256:b32c56086e9f37d6bb45783922374689d5f3d5ddbd51cc2c9356bdb99cbd9425",
+    "batches/dut-sim/out/dut/sim/write_when_full.trace": "sha256:4833e871393137ce9a9a09935046d244049cb4825078c1ee998ed6ec149d8185",
+    "batches/dut-sim/job/stimulus/simultaneous.txt": "sha256:20dd80e5bbb1219e23c8190af456a6ea513d9a80733928ce8c54cccd8cb7dd0e",
+    "batches/dut-sim/out/dut/sim/simultaneous.trace": "sha256:e2595d2f0540a2ec4bf3242dd597a6397aebc48412e91022e53b1bbc7bbaf7be",
+    "batches/dut-sim/job/stimulus/wraparound.txt": "sha256:ef1140dc4089cc0e692a959dbec601fcc2dd164222ec2cffd643fb294524afa9",
+    "batches/dut-sim/out/dut/sim/wraparound.trace": "sha256:2983ab49bfca87993799042180a1edd5a7b39a4ba9b7fa6abca7d69790c3cf51",
+    "batches/dut-sim/job/stimulus/recurrent_reset.txt": "sha256:a2db40e27f439e421383df22877e250e1f5d4cbfd5c40d2dcf77559a160e6f13",
+    "batches/dut-sim/out/dut/sim/recurrent_reset.trace": "sha256:60bc9697f1a3e961ba749c664dc404c2511ac3008b801d4089150d1be83fc399",
+    "batches/dut-sim/job/stimulus/random_s1.txt": "sha256:2752b0a53e5e5df2b5d674ed48fcf398bf97d6c2d611b18c5acefe4921874dea",
+    "batches/dut-sim/out/dut/sim/random_s1.trace": "sha256:eb03d78edfd1d85bfa2ca1e81a3a7222d5bbc141238616a4087c5afe7c4c3336",
+    "batches/dut-sim/job/stimulus/random_s2.txt": "sha256:d22befe0e0ca3e1f477df945aeb2245764d05ccd1de9a10a94c0e33d440fce7e",
+    "batches/dut-sim/out/dut/sim/random_s2.trace": "sha256:44bfc7d9796cbd907cff1dedf87e8fbbc94a21fd5574a4577c4e6fd56c4cc326",
+    "batches/dut-sim/job/stimulus/random_s3.txt": "sha256:ab7e59a4a2f9393a52f2dfd0d8ac67bc5d2650531dac28dcffe3c69f9483e031",
+    "batches/dut-sim/out/dut/sim/random_s3.trace": "sha256:11d5a49196d7983641a89602100f1db1e9fc309f58127cfefd9ca26fb3eb6f17",
+    "batches/dut-sim/job/stimulus/random_s4.txt": "sha256:ae2119d8c694b4de4dc259db3c673412ecdc98f67bec8c140fbc93c9082a3b42",
+    "batches/dut-sim/out/dut/sim/random_s4.trace": "sha256:b4e44dfe1026a85eb5c6f727b7c6193fb305eeae4aa5475297b130cae7dd817a",
+    "batches/dut-sim/job/stimulus/random_s5.txt": "sha256:f5cf271bb2f733b4de6d48187872454bbee6bcdb24b1ac0da51ec3a5d6693ba9",
+    "batches/dut-sim/out/dut/sim/random_s5.trace": "sha256:dea64b106c082b5359342d902515f81a2d11284de3d62af3e27487fc8d0c5d83",
+    "batches/dut-sim/job/stimulus/random_s6.txt": "sha256:4dc884b4fc0571a16f9d161846e549dd8442e12029ee1b599ca81777969d8fc8",
+    "batches/dut-sim/out/dut/sim/random_s6.trace": "sha256:3db3cd630a2bb832fbe7fd9b5dd24c9118d92158b3a5e4156acaa8c6ec6c902f",
+    "batches/dut-sim/job/stimulus/random_s7.txt": "sha256:6954e6801e0e72642310b361ee408aecbd5c6b74da96cfc8e75213780125c077",
+    "batches/dut-sim/out/dut/sim/random_s7.trace": "sha256:0e30b2da7188f9ec1d00d78d07fe894dc91239779635be8b0b3361d6e8e79f7d",
+    "batches/dut-sim/job/stimulus/random_s8.txt": "sha256:53853f53fec2a745accc2d29f995abb57acc3adfe0ca91340d19adab090ad06b",
+    "batches/dut-sim/out/dut/sim/random_s8.trace": "sha256:1d83dfddc264e3167f9a5b398353088ddef6325f2c3b506769a01b88a142fd06"
+   },
+   "changes": [
+    {
+     "field": "verification.obligations.simulation:full_flag",
+     "before": {
+      "id": "simulation:full_flag",
+      "check": "full_flag",
+      "method": "simulation",
+      "status": "simulation_passed",
+      "detail": "14 named tests (1386 cycles, seeds random_s1, random_s2, random_s3, random_s4, random_s5, random_s6, random_s7, random_s8).",
+      "tests": [
+       "learner_basic",
+       "fill_drain",
+       "write_when_full",
+       "simultaneous",
+       "wraparound",
+       "recurrent_reset",
+       "random_s1",
+       "random_s2",
+       "random_s3",
+       "random_s4",
+       "random_s5",
+       "random_s6",
+       "random_s7",
+       "random_s8"
+      ],
+      "cycles": 1386,
+      "label": "Simulation passed for these runs"
+     },
+     "after": {
+      "id": "simulation:full_flag",
+      "check": "full_flag",
+      "method": "simulation",
+      "status": "counterexample",
+      "detail": "Failed in 13 of 14 tests: fill_drain, learner_basic, random_s1, random_s2 and 9 more.",
+      "tests": [
+       "learner_basic",
+       "fill_drain",
+       "write_when_full",
+       "simultaneous",
+       "wraparound",
+       "recurrent_reset",
+       "random_s1",
+       "random_s2",
+       "random_s3",
+       "random_s4",
+       "random_s5",
+       "random_s6",
+       "random_s7",
+       "random_s8"
+      ],
+      "cycles": 1386,
+      "label": "Counterexample found"
+     }
+    },
+    {
+     "field": "verification.obligations.simulation:read_data",
+     "before": {
+      "id": "simulation:read_data",
+      "check": "read_data",
+      "method": "simulation",
+      "status": "simulation_passed",
+      "detail": "14 named tests (1386 cycles, seeds random_s1, random_s2, random_s3, random_s4, random_s5, random_s6, random_s7, random_s8).",
+      "tests": [
+       "learner_basic",
+       "fill_drain",
+       "write_when_full",
+       "simultaneous",
+       "wraparound",
+       "recurrent_reset",
+       "random_s1",
+       "random_s2",
+       "random_s3",
+       "random_s4",
+       "random_s5",
+       "random_s6",
+       "random_s7",
+       "random_s8"
+      ],
+      "cycles": 1386,
+      "label": "Simulation passed for these runs"
+     },
+     "after": {
+      "id": "simulation:read_data",
+      "check": "read_data",
+      "method": "simulation",
+      "status": "counterexample",
+      "detail": "Failed in 13 of 14 tests: fill_drain, learner_basic, random_s1, random_s2 and 9 more.",
+      "tests": [
+       "learner_basic",
+       "fill_drain",
+       "write_when_full",
+       "simultaneous",
+       "wraparound",
+       "recurrent_reset",
+       "random_s1",
+       "random_s2",
+       "random_s3",
+       "random_s4",
+       "random_s5",
+       "random_s6",
+       "random_s7",
+       "random_s8"
+      ],
+      "cycles": 1386,
+      "label": "Counterexample found"
+     }
+    },
+    {
+     "field": "verdict",
+     "before": {
+      "headline": "counterexample",
+      "counts": {
+       "simulation_passed": 2,
+       "bounded_pass": 1,
+       "proved": 0,
+       "counterexample": 3,
+       "unresolved": 4,
+       "tool_error": 0,
+       "not_checked": 0,
+       "unsupported": 0
+      },
+      "unresolved": 4
+     },
+     "after": {
+      "headline": "counterexample",
+      "counts": {
+       "simulation_passed": 0,
+       "bounded_pass": 1,
+       "proved": 0,
+       "counterexample": 5,
+       "unresolved": 4,
+       "tool_error": 0,
+       "not_checked": 0,
+       "unsupported": 0
+      },
+      "unresolved": 4
+     }
+    }
+   ]
+  }
+ ]
 }

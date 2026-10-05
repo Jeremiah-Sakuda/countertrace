@@ -829,7 +829,7 @@ export function AuditView({ profile, status }: { profile: AsyncState<Profile>; s
           }}
         />
       </Section>
-      <Section title="Earlier audits">
+      {!recordedDemo && <Section title="Earlier audits on this server">
         {runs.status === "loading" && <Loading label="Loading runs" />}
         {runs.status === "error" && <ErrorNotice error={runs.error} onRetry={runs.reload} />}
         {runs.status === "ok" &&
@@ -847,7 +847,7 @@ export function AuditView({ profile, status }: { profile: AsyncState<Profile>; s
               ))}
             </ul>
           ))}
-      </Section>
+      </Section>}
     </div>
   );
 }

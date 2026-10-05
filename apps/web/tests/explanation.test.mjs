@@ -15,6 +15,7 @@ test("real backend citation metadata renders and preserves citation warnings", a
     }));
     const html = render(run);
     assert.match(html, /Model-generated explanation/);
+    assert.match(html, /simulation summaries that were later corrected/);
     assert.match(html, /Show cycle 5 in the cycle table/);
     assert.match(html, /Show cycle 6 in the cycle table/);
     assert.doesNotMatch(html, /invalid citation|Some citations do not match/);

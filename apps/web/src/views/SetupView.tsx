@@ -621,6 +621,7 @@ export function SetupView({
             Simulation and formal tools run in an isolated verifier. NVIDIA Nemotron explains the failure and proposes a fix; independent,
             frozen checks decide whether it passes.
           </p>
+          <p className="small">Teaching a FIFO lab? <a href="https://github.com/Jeremiah-Sakuda/countertrace/blob/main/docs/TEACHING.md">Use the 15-minute instructor guide</a> with a worksheet and a second prediction exercise.</p>
         </div>
         <ShowcaseTour profile={profile} />
       </header>

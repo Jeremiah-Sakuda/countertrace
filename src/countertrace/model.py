@@ -18,6 +18,7 @@ import time
 from urllib import error, request
 from urllib.parse import urlsplit
 
+from countertrace.admission import LexError, strip_comments
 from countertrace.contract import ASSUMPTIONS, CHECKS, REQUIREMENTS, Contract
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -486,10 +487,64 @@ def trace_table(rows: list[dict], start: int, end: int) -> str:
     return "\n".join(lines)
 
 
+def declared_signals(source: str) -> set[str]:
+    """Read declaration names in the admitted RTL subset, never comment/RHS words.
+
+    This is a conservative name check, not elaboration or value validation.
+    Bare declarations are supported; hierarchical and indexed citations are
+    deliberately not accepted as evidence about an unobserved internal value.
+    """
+    try:
+        code = strip_comments(source)
+    except LexError:
+        return set()
+    code = re.sub(r"(?m)^\s*`[^\n]*", "", code)
+    tokens = re.findall(r"[A-Za-z_]\w*|\d+|[^\s]", code)
+    kinds = {"input", "output", "wire", "reg", "logic", "integer"}
+    qualifiers = kinds | {"signed", "unsigned"}
+    reserved = qualifiers | {"always", "assign", "begin", "end", "module", "endmodule", "parameter", "localparam"}
+    names = set()
+    for i, token in enumerate(tokens):
+        if token not in kinds or (i and tokens[i - 1] in {"parameter", "localparam"}):
+            continue
+        j = i + 1
+        while j < len(tokens):
+            while j < len(tokens) and tokens[j] in qualifiers:
+                j += 1
+            while j < len(tokens) and tokens[j] == "[":
+                depth = 1
+                j += 1
+                while j < len(tokens) and depth:
+                    depth += (tokens[j] == "[") - (tokens[j] == "]")
+                    j += 1
+            if j == len(tokens) or not re.fullmatch(r"[A-Za-z_]\w*", tokens[j]) or tokens[j] in reserved:
+                break
+            names.add(tokens[j])
+            j += 1
+            # Skip array ranges and initializers, including commas in function
+            # calls/concatenations, to the next name in this declaration.
+            depth = 0
+            while j < len(tokens):
+                t = tokens[j]
+                if depth == 0 and t in {",", ";", ")"}:
+                    break
+                depth += (t in {"(", "[", "{"}) - (t in {")", "]", "}"})
+                if depth < 0:
+                    break
+                j += 1
+            if j == len(tokens) or tokens[j] != ",":
+                break
+            j += 1
+            if j < len(tokens) and tokens[j] in kinds:
+                break  # the next ANSI port has its own declaration
+    return names
+
+
 def citation_check(result: dict, rows: list[dict], start: int, end: int, source: str) -> dict:
     allowed_cycles = {r["cycle"] for r in rows[start:end + 1]}
-    identifiers = set(re.findall(r"\b[A-Za-z_]\w*\b", source))
-    allowed_signals = set(CANONICAL_SIGNALS) | identifiers
+    # Canonical names also describe mapped ports in normalized traces. Reference
+    # queue fields must be named explicitly, not an invented signal like 'queue'.
+    allowed_signals = set(CANONICAL_SIGNALS) | {"pre_queue", "post_queue"} | declared_signals(source)
     line_count = len(source.splitlines())
     valid = 0
     invalid = []
@@ -503,8 +558,7 @@ def citation_check(result: dict, rows: list[dict], start: int, end: int, source:
             else:
                 invalid.append({"step": i, "kind": "cycle", "value": cycle})
         for signal in step["signals"]:
-            base = re.sub(r"\[.*$", "", signal).split(".")[-1]
-            if base in allowed_signals:
+            if signal in allowed_signals:
                 valid += 1
             else:
                 invalid.append({"step": i, "kind": "signal", "value": signal})

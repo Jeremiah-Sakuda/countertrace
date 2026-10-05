@@ -256,6 +256,7 @@ class Verification:
             self.sim_error("Verilator compilation failed or timed out.", log=f"{record['out_dir']}/{self.design_id}/logs/compile.log")
             return
         failures, cycles, errors = [], 0, []
+        failed_tests: dict[str, set[str]] = {check: set() for check in CHECKS}
         totals: dict[str, int] = {}
         for name, edges in tests.items():
             step = steps.get(f"{self.design_id}:sim:{name}")
@@ -270,6 +271,11 @@ class Verification:
                 continue
             rows = normalize(self.contract, observations)
             cycles += len(rows)
+            # A headline uses the first mismatch; each property's verdict must
+            # account for every edge, including failures after that headline.
+            for row in rows:
+                for check in row["mismatches"]:
+                    failed_tests[check].add(name)
             for key, value in coverage(rows).items():
                 totals[key] = totals.get(key, 0) + value
             finding = first_finding(rows, name, "simulation")
@@ -284,13 +290,12 @@ class Verification:
             self.state["coverage"] = totals
         if failures:
             self.add_finding(min(failures, key=lambda f: (f["cycle"], f["test"])))
-        failed_checks = {c for f in failures for c in f["checks_failed"]}
         for check in CHECKS:
-            if errors and check not in failed_checks:
+            if errors and not failed_tests[check]:
                 status, detail = "tool_error", "; ".join(errors[:3])
-            elif check in failed_checks:
+            elif failed_tests[check]:
                 status = "counterexample"
-                tests_failed = sorted({f["test"] for f in failures if check in f["checks_failed"]})
+                tests_failed = sorted(failed_tests[check])
                 more = f" and {len(tests_failed) - 4} more" if len(tests_failed) > 4 else ""
                 detail = f"Failed in {len(tests_failed)} of {len(tests)} tests: {', '.join(tests_failed[:4])}{more}."
             else:

@@ -23,7 +23,7 @@ Use the Vercel recorded demo for the evidence walkthrough. Capture the live veri
 
 **Screen:** Showcase finding, expected/observed values, probable origin. Scope caption: “Synchronous FIFO · 8-bit words · depths 2 and 4.”
 
-**Narration:** “This four-entry FIFO has a seeded bug. At cycle six, it returns 0x65 instead of 0x21. Countertrace traces the corruption to a write while full.”
+**Narration:** “For a student debugging a queue, the wrong byte is only a symptom. This FIFO returns 0x65 instead of 0x21. Countertrace traces the corruption to a write while full.”
 
 ### 2. The contract and Nemotron 3 Super (0:15 to 0:38)
 
@@ -39,7 +39,7 @@ Use the Vercel recorded demo for the evidence walkthrough. Capture the live veri
 
 ### 4. Explanation and repair with Nemotron 3 Ultra (1:05 to 1:40)
 
-**Screen:** Return to the recorded showcase. Use the Explanation shortcut; click cycle 5, then “Back to explanation step 1.” Use **Repair & export** to show the one-line diff and candidate comparison. Cut to tab 4's two-attempt timeline. Keep the counterexample at cycle 4 readable. Avoid opening secondary metadata during the timeline.
+**Screen:** Return to the recorded showcase. Use the Explanation shortcut; click cycle 5, then “Back to explanation step 1.” Keep the correction notice visible: original model text is preserved and check summaries were corrected from the raw traces. Use **Repair & export** to show the one-line diff and candidate comparison. Cut to tab 4's two-attempt timeline. Pause at least three seconds on the rejected candidate and its cycle-4 counterexample. Avoid opening secondary metadata during the timeline.
 
 **Narration:** “Nemotron 3 Ultra explains the failure and proposes a one-line patch. Citation checks validate references, not the reasoning itself. The patch passes all ten unchanged obligations, including three proofs. In this two-bug case, the first patch still fails. Its new counterexample goes back to Nemotron, and the second candidate passes. The model never approves its own fix.”
 
@@ -47,7 +47,7 @@ Use the Vercel recorded demo for the evidence walkthrough. Capture the live veri
 
 **Screen:** Tab 5. Show “3 of 6 real bugs slip past this check set,” try the exercise, and reveal the missing requirements. Keep the equivalent-mutant count visible. Caption: “Named supplemental set · not imported student testbenches.”
 
-**Narration:** “The audit exposes gaps in a named learner-style check set. This deliberately weak set misses three of six valid seeded bugs. Each survivor points to a requirement the set never exercises, such as writing while full.”
+**Narration:** “This weak check set misses three of six real seeded bugs. A learner can now name a missing test: fill the queue, attempt another write, then check that the oldest byte survives.”
 
 ### 6. Evidence anyone can rerun (2:00 to 2:15)
 
@@ -57,7 +57,7 @@ Use the Vercel recorded demo for the evidence walkthrough. Capture the live veri
 
 ### 7. Results and model roles (2:15 to 2:45)
 
-**Screen:** Results for eval-v1/eval-v2: diagnosis 8/8 and 8/8; false alarms 0/4 and 0/4; repair 7/8 and 8/8. Caption throughout: “One run per suite · assistant-authored cases and labels · no external review or learner study.” Then show Super → interpretation; Ultra → explanation/repair; Token Factory → model inference; isolated CPU containers → verification. End on the repository and demo links.
+**Screen:** Results for eval-v1/eval-v2: diagnosis 8/8 and 8/8; false alarms 0/4 and 0/4; repair 7/8 and 8/8. Caption throughout: “One run per suite · assistant-authored cases and labels · no external review or learner study.” Then show Super → interpretation; Ultra → explanation/repair; Token Factory → model inference; isolated CPU containers → verification. End on the repository and demo links, with “Instructor lab and worksheet available · not yet piloted.”
 
 **Narration:** “Each frozen evaluation used eight faults and four controls. Diagnosis found all faults without false alarms; repairs passed in seven of eight and then eight of eight cases. These are small, single-run engineering results. All model calls use Nebius Token Factory. Nemotron proposes patches; unchanged independent checks decide whether they count.”
 

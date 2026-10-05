@@ -446,6 +446,7 @@ export interface CitationCheck {
 }
 
 export interface Explanation extends ModelResult<ExplanationResult> {
+  evidence_notice?: string;
   citation_check?: CitationCheck;
   finding?: Partial<Finding> | null;
 }
@@ -570,6 +571,7 @@ export interface Run {
   finished_at?: Iso | null;
   recorded: boolean;
   recorded_note?: string;
+  evidence_corrections?: { id: string; date: string; method: string; original_commit: string; original_run_sha256: string }[];
   error?: string | null;
   image?: RunImage;
   verdict?: Verdict | null;

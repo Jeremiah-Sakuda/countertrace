@@ -1,6 +1,8 @@
 """Recorded repair navigation must work without the owner's private run store."""
 
 from pathlib import Path
+import hashlib
+import json
 import tempfile
 import unittest
 from unittest import mock
@@ -9,6 +11,28 @@ from countertrace import runs, server
 
 
 class RecordingTest(unittest.TestCase):
+    def test_published_simulation_verdicts_agree_with_every_trace_row(self):
+        checked = 0
+        for path in (Path(__file__).resolve().parents[1] / "recorded").glob("*/run.json"):
+            state = json.loads(path.read_text())
+            v = state.get("verification")
+            if not v:
+                continue
+            checked += 1
+            seen = {c for name, rows in v["traces"].items() if name.startswith("sim:")
+                    for row in rows for c in row["mismatches"]}
+            for o in v["obligations"]:
+                if o["method"] == "simulation":
+                    expected = "counterexample" if o["check"] in seen else "simulation_passed"
+                    self.assertEqual(o["status"], expected, (state["id"], o["id"]))
+            self.assertEqual(state["verdict"], runs.verdict(v))
+            for correction in state.get("evidence_corrections", []):
+                for name, digest in correction["input_hashes"].items():
+                    actual = "sha256:" + hashlib.sha256((path.parent / name).read_bytes()).hexdigest()
+                    self.assertEqual(actual, digest)
+                self.assertTrue(correction["changes"])
+        self.assertGreater(checked, 0)
+
     def test_repair_links_resolve_in_a_clean_read_only_checkout(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

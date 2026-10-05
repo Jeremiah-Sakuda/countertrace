@@ -1,5 +1,7 @@
 # Evaluation eval-v2 (October 4, 2026)
 
+**October 4 derived-evidence correction:** the simulation summarizer originally retained only each test's first failure, so some later property failures could be labeled passed. Overall faulty-design detection and repair rejection remained intact. The published recordings now derive each property's summary from all preserved trace rows, with provenance; see [the correction record](../../../recorded/README.md#corrected-derived-summaries). These historical evaluation outputs and model responses have not been rerun or rewritten.
+
 The second pre-registered run, measuring the repair agent as it now ships (exact-match edits, each failed candidate's counterexample fed back to the model, and a reasoning-off retry when a reply hits the output limit) on fresh and harder cases. Like eval-v1, it is a single run of assistant-authored cases with no external review.
 
 ## Protocol

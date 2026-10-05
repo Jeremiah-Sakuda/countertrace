@@ -18,6 +18,8 @@ Dates are in 2026. A checked item has evidence in [STATUS.md](STATUS.md); develo
 
 ## October 5 to 8 — first complete diagnosis
 
+Impact priority selected October 4: help instructors and FPGA club mentors reuse a short debugging lab. The [teaching guide](TEACHING.md) and worksheet are prepared. Next, observe one facilitator and three learners where available; measure transfer answers, assistance, and instructor preparation before expanding scope. This is a proposed pilot, not a completed milestone or additional entry requirement.
+
 - [ ] Contract review, a compact trace, grounded explanation, and a readable report form a usable journey.
 - [x] Demonstrate one nontrivial proof, or explicitly select bounded-only scope. (abc pdr proves the flag and data-ordering properties for depth 2 and 4 controls; reachability covers reached. Expert review pending.)
 - [x] Attempt one unchanged-contract repair and measure a CPU verification batch. (October 3: one real candidate passed all ten unchanged obligations; 8.92-second warm candidate verification.)
@@ -43,7 +45,7 @@ Dates are in 2026. A checked item has evidence in [STATUS.md](STATUS.md); develo
 ## October 26 to 30 — submission
 
 - [ ] Record the 2:45 demonstration using actual results and the selected release profile. (Owner will record/post; internal reviewers assessed the revised script as intended content, not finished footage.)
-- [ ] Finish setup instructions, provenance, sponsor feedback, and public project description. (Drafted in [SUBMISSION.md](SUBMISSION.md); hosted URL and video pending.)
+- [ ] Finish setup instructions, provenance, sponsor feedback, and public project description. (Drafted in [SUBMISSION.md](SUBMISSION.md); recorded Vercel URL live, free live inference access and video pending.)
 - [ ] Test the judge route free of charge without the owner's login or a judge-supplied paid API key.
 - [ ] Verify funding, credit expiry, release preservation, and recovery steps through December 15.
 - [ ] Rehearse the submission on October 29 and submit before October 30 at 1:00 p.m. EDT.

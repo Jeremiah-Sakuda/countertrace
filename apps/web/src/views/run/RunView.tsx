@@ -155,6 +155,7 @@ function RunHeader({ run, now, onCancel, cancelling, cancelError }: { run: Run; 
         </aside>}
       </div>
       <UnresolvedNote run={run} />
+      {!!run.evidence_corrections?.length && <p className="callout-inline">Simulation summaries were corrected from the preserved traces. Original execution timings and model responses are retained; details are in run provenance.</p>}
       <div className="case-facts">
         <span><small>Configuration</small><strong>{run.depth ? `Depth ${run.depth} · 8-bit` : "Supplemental-check audit"}</strong></span>
         <span><small>{run.recorded ? "Recorded" : "Created"}</small><strong>{formatDateTime(run.created_at)}</strong></span>

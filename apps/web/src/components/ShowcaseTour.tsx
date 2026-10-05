@@ -98,6 +98,7 @@ function TourSteps({ data, profile }: { data: TourData; profile: AsyncState<Prof
             </strong>
             <p>
               {shortModelName(explanation.calls[0]?.model_id)} wrote the explanation. {check ? `${check.valid} citations checked against the recorded trace${check.invalid.length ? `, ${check.invalid.length} flagged` : ", none invalid"}.` : ""}
+              {check && <> Checks references, not reasoning.</>}
             </p>
           </>
         ) : (

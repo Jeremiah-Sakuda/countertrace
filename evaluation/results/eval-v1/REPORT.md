@@ -1,5 +1,7 @@
 # Evaluation eval-v1 (October 4, 2026)
 
+**October 4 derived-evidence correction:** the simulation summarizer originally retained only each test's first failure, so some later property failures could be labeled passed. Overall faulty-design detection and repair rejection remained intact. The published recordings now derive each property's summary from all preserved trace rows, with provenance; see [the correction record](../../../recorded/README.md#corrected-derived-summaries). These historical evaluation outputs and model responses have not been rerun or rewritten.
+
 One pre-registered run of the frozen suite. All outcomes are reported, including failures. This is the project's first evaluation; it is **not** externally reviewed, and every case, label, and brief was authored by the developer's coding assistant.
 
 ## Protocol

@@ -54,6 +54,13 @@ class IntegrationTest(unittest.TestCase):
         self.assertNotIn("proved", statuses(state).values())
         formal = [f for f in state["findings"] if f["source"] == "formal"]
         self.assertEqual(formal[0]["replay"]["status"], "reproduced")
+        # empty_flag first fails after other checks in these tests. It must
+        # still be a counterexample, even though it never owns the headline.
+        seen = {c for name, rows in state["traces"].items() if name.startswith("sim:")
+                for row in rows for c in row["mismatches"]}
+        self.assertEqual(seen, {"empty_flag", "full_flag", "read_data"})
+        for check in seen:
+            self.assertEqual(statuses(state)[f"simulation:{check}"], "counterexample")
 
     def test_altered_harness_hash_never_passes(self):
         image_or_skip()

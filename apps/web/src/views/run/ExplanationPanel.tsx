@@ -37,6 +37,7 @@ function ExplanationBody({ explanation, runId, onCite }: { explanation: Explanat
       {r && (
         <article className="explanation" aria-label="Model-generated explanation">
           <ModelProvenance task="explanation" />
+          {explanation.evidence_notice && <p className="callout-inline warn">{explanation.evidence_notice}</p>}
           {check && check.invalid.length > 0 && (
             <p className="callout-inline warn">
               <TriangleAlert size={14} aria-hidden="true" /> Some citations do not match the recorded evidence and are flagged below.

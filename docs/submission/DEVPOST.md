@@ -51,7 +51,7 @@ Every run exports an evidence bundle with hashes, and `countertrace replay` reru
 - **Trusted checks:** a hand-written SystemVerilog monitor with three assertions and twelve reachability covers, and a separate Python reference queue. Both follow one cycle convention, and formal counterexamples are replayed in simulation to confirm the two engines agree.
 - **Admission gate:** a single ordered lexical pass rejects the known ways to tamper with the checks: assertions or assumptions in the design, system tasks, delays, extra event controls, hidden ports, hierarchical references, and more. The elaborated netlist is the final authority: after Yosys elaborates the design, the host checks the ports, that no input is tied, aliased, or driven inside the design, and that the only properties are the monitor's. Every model patch goes through the same gate.
 - **Interface:** React and TypeScript. It shows the cycle table, citations you can click to jump to a cycle, the repair timeline, a candidate diff with before-and-after checks, and the audit exercise.
-- **Testing:** 89 unit tests and negative controls, 8 Docker integration tests, and a CI job that rebuilds the image on fresh runners and replays three recorded evidence bundles.
+- **Testing:** 93 unit tests and negative controls, 8 Docker integration tests, and a CI job that rebuilds the image on fresh runners and replays three recorded evidence bundles.
 
 ### How Nemotron and Token Factory are used
 
@@ -103,6 +103,7 @@ These are single runs on cases and labels I wrote with my coding assistant; no o
 
 ## What's next for Countertrace
 
+- Pilot the prepared 15-minute debugging lab with instructors and FPGA club mentors. Its worksheet asks learners to explain the failure, predict a different boundary operation, and state the limits of a passing result. The lesson has not yet been tested with learners.
 - A hosted classroom version where students paste their own FIFO, with a port mapping for their naming.
 - Selectable contract policies, such as first-word fall-through and exchange-when-full, so more correct student designs are supported instead of flagged.
 - A second module family after the FIFO, such as a simple UART or arbiter, reusing the same frozen-check repair loop.

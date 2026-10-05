@@ -58,6 +58,10 @@ def report(state: dict, contract: Contract) -> str:
     lines = [f"# Countertrace evidence report — {state.get('title', state['id'])}", ""]
     lines += [f"Run `{state['id']}` · {state.get('created_at')} · state **{state.get('state')}** · "
               f"{'recorded run' if state.get('recorded') else 'live run'}", ""]
+    if state.get("evidence_corrections"):
+        lines += ["## Evidence corrections", "", state.get("recorded_note", ""),
+                  "Original summary values, raw input hashes, and source revision are preserved in "
+                  "`artifacts/evidence_corrections.json`. This is a new derivation, not a new model or RTL run.", ""]
     lines += ["## Intended behavior", "",
               f"Contract `{contract.profile}` v{contract.version}, DEPTH={contract.depth}, WIDTH={contract.width} "
               f"(`{contract.digest()}`).", ""]
@@ -93,6 +97,8 @@ def report(state: dict, contract: Contract) -> str:
                   f"Model: {', '.join(c.get('model_id') or '?' for c in explanation.get('calls', []))}. "
                   f"Citation check: {explanation.get('citation_check', {}).get('valid')} valid, "
                   f"{len(explanation.get('citation_check', {}).get('invalid', []))} invalid.", "", r["summary"], ""]
+        if explanation.get("evidence_notice"):
+            lines += [explanation["evidence_notice"], ""]
         lines += [f"{i}. {s['text']} (cycles {s['cycles']}, signals {s['signals']})" for i, s in enumerate(r["steps"], 1)]
         lines += ["", f"Likely cause: {r['likely_cause']['text']} (lines {r['likely_cause']['lines']})",
                   f"Next action: {r['next_action']}", f"Limits: {r['limits']}"]
@@ -145,6 +151,8 @@ def export(store, run_id: str, *, verifier_root: Path | None = None, output_dir:
         files[name] = data
     v = state.get("verification") or {}
     files["artifacts/normalized_traces.json"] = json.dumps(v.get("traces", {}), indent=1).encode()
+    if state.get("evidence_corrections"):
+        files["artifacts/evidence_corrections.json"] = json.dumps(state["evidence_corrections"], indent=2).encode()
     files["report.md"] = report(state, contract).encode()
     files["REPLAY.md"] = (
         "# Replaying this bundle\n\nNo model call is needed. With Docker running and this repository checked out at "

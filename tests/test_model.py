@@ -148,6 +148,28 @@ class ModelTest(unittest.TestCase):
         self.assertEqual(kinds, {("cycle", 42), ("signal", "made_up_signal"), ("line", 999)})
         self.assertEqual(check["uncited_steps"], 1)
 
+    def test_signal_citations_require_declarations_or_named_trace_fields(self):
+        source = '''// ImaginarySignal; wire comment_net;
+module fifo #(parameter integer DEPTH=4)(input wire a, b, output logic [7:0] data);
+localparam integer AW=2;
+reg [AW:0] head, tail;
+reg [7:0] storage [0:DEPTH-1];
+wire take = a && rhs_only, put = func(a, argument_only);
+always @(*) begin $warning("wire message_net;"); end
+/* reg block_net; */
+endmodule'''
+        self.assertEqual(model.declared_signals(source), {"a", "b", "data", "head", "tail", "storage", "take", "put"})
+        good = ["head", "tail", "storage", "put", "full", "pre_queue", "post_queue"]
+        bad = ["ImaginarySignal", "always", "comment_net", "message_net", "block_net", "rhs_only",
+               "argument_only", "DEPTH", "AW", "queue", "fake.full", "full[999]", "head[garbage]"]
+        result = {"steps": [{"cycles": [0], "signals": good + bad}], "likely_cause": {"lines": []}}
+        check = model.citation_check(result, [{"cycle": 0}], 0, 0, source)
+        self.assertEqual({i["value"] for i in check["invalid"]}, set(bad))
+        self.assertEqual(check["valid"], len(good) + 1)
+
+    def test_unterminated_source_cannot_supply_signal_citations(self):
+        self.assertEqual(model.declared_signals("wire real_net; /* wire invented;"), set())
+
     def test_check_proposals_limited_to_reviewed_templates(self):
         good = {"label": "x", "tests": ["fill_drain"], "checks": [
             {"id": "Full Flag!", "check": "full_flag", "rows": ["write_full"], "requirement": "write_full", "text": "t"}]}

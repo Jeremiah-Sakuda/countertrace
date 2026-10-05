@@ -238,8 +238,8 @@
     "id": "simulation:full_flag",
     "check": "full_flag",
     "method": "simulation",
-    "status": "simulation_passed",
-    "detail": "14 named tests (1386 cycles, seeds random_s1, random_s2, random_s3, random_s4, random_s5, random_s6, random_s7, random_s8).",
+    "status": "counterexample",
+    "detail": "Failed in 10 of 14 tests: random_s1, random_s2, random_s3, random_s4 and 6 more.",
     "tests": [
      "learner_basic",
      "fill_drain",
@@ -257,14 +257,14 @@
      "random_s8"
     ],
     "cycles": 1386,
-    "label": "Simulation passed for these runs"
+    "label": "Counterexample found"
    },
    {
     "id": "simulation:read_data",
     "check": "read_data",
     "method": "simulation",
-    "status": "simulation_passed",
-    "detail": "14 named tests (1386 cycles, seeds random_s1, random_s2, random_s3, random_s4, random_s5, random_s6, random_s7, random_s8).",
+    "status": "counterexample",
+    "detail": "Failed in 10 of 14 tests: random_s1, random_s2, random_s3, random_s4 and 6 more.",
     "tests": [
      "learner_basic",
      "fill_drain",
@@ -282,7 +282,7 @@
      "random_s8"
     ],
     "cycles": 1386,
-    "label": "Simulation passed for these runs"
+    "label": "Counterexample found"
    }
   ],
   "findings": [
@@ -50464,10 +50464,10 @@
  "verdict": {
   "headline": "counterexample",
   "counts": {
-   "simulation_passed": 2,
+   "simulation_passed": 0,
    "bounded_pass": 1,
    "proved": 0,
-   "counterexample": 3,
+   "counterexample": 5,
    "unresolved": 4,
    "tool_error": 0,
    "not_checked": 0,
@@ -50567,7 +50567,8 @@
    "check": "empty_flag",
    "requirement_id": "both_empty",
    "source": "simulation"
-  }
+  },
+  "evidence_notice": "This original model response used simulation summaries that were later corrected. Some claims that a check passed are contradicted by later cycles in the preserved traces. Use the corrected check results below; the model text has not been regenerated."
  },
  "repair": {
   "status": "passed",
@@ -50686,12 +50687,190 @@
  },
  "recorded_from": "20261004-010137-ver-dd43e0",
  "recorded_at": "2026-10-04T05:06:35Z",
- "recorded_note": "eval-v2 case F6 (October 4, 2026): two independent bugs in fifo_wrapbit. Nemotron 3 Ultra explanation; repair candidate 1 fixed one bug and failed the unchanged checks, and its counterexample led candidate 2 to fix both. Assistant-reviewed; evaluation data published in evaluation/results/eval-v2. Assistant review rated this explanation's root cause incomplete: it describes the read-while-empty bug but not the second bug (empty ignores the wrap bit), and it contains one invalid citation ('queue').",
+ "recorded_note": "eval-v2 case F6 (October 4, 2026): two independent bugs in fifo_wrapbit. Nemotron 3 Ultra explanation; repair candidate 1 fixed one bug and failed the unchanged checks, and its counterexample led candidate 2 to fix both. Assistant-reviewed; evaluation data published in evaluation/results/eval-v2. Assistant review rated this explanation's root cause incomplete: it describes the read-while-empty bug but not the second bug (empty ignores the wrap bit), and it contains one invalid citation ('queue'). Derived simulation summaries corrected October 4, 2026 from the preserved traces; see evidence_corrections in run.json. Original timings, raw artifacts, and model text are unchanged.",
  "recorded_versions": {
   "verilator": "Verilator 5.053 devel rev v5.052-258-ga419e9157 (mod)",
   "yosys": "Yosys 0.69+158 (git sha1 a1a0ad7d4-dirty, Release, GNU /usr/bin/aarch64-linux-gnu-g++ 15.2.0)",
   "python": "Python 3.11.2",
   "oss_cad_suite": "2026-09-30"
  },
- "title_original": "eval-v2 F6"
+ "title_original": "eval-v2 F6",
+ "evidence_corrections": [
+  {
+   "id": "simulation-all-edges-and-declared-citations-v1",
+   "date": "2026-10-04",
+   "original_commit": "fd4cdcab1cfe2faf1173fb341148345e054169d2",
+   "original_run_sha256": "sha256:ea0327c9208775decc6a2160c7d02cf71b9f4ea7aa8aa55cbde3a0378d51b52f",
+   "method": "Reparsed preserved raw simulation traces against their recorded stimulus; aggregated all edges. Rechecked citations against declarations. No new RTL execution or model call.",
+   "input_hashes": {
+    "batches/dut-sim/job/stimulus/learner_basic.txt": "sha256:d7ac539195953620c07d04ba0e6abb987e165778da75a05db7fa69a71eff4fd2",
+    "batches/dut-sim/out/dut/sim/learner_basic.trace": "sha256:09400164598d1d19cd2ffdd93dd323bad27d304f975532f793f93148db30dfd3",
+    "batches/dut-sim/job/stimulus/fill_drain.txt": "sha256:974e0747c34a72ef9b5a95c85e4217bbf121da0d79efde1cf4d6519d529071d3",
+    "batches/dut-sim/out/dut/sim/fill_drain.trace": "sha256:fc6902a271ae5e29adb800f8a1e11ec36116f479c8b1fdd59b56c7a6764c86e8",
+    "batches/dut-sim/job/stimulus/write_when_full.txt": "sha256:b32c56086e9f37d6bb45783922374689d5f3d5ddbd51cc2c9356bdb99cbd9425",
+    "batches/dut-sim/out/dut/sim/write_when_full.trace": "sha256:a9f15ba6a5dd606f007bf6afbaf945712d03917a31bfca72b97fb39a4c260eb4",
+    "batches/dut-sim/job/stimulus/simultaneous.txt": "sha256:20dd80e5bbb1219e23c8190af456a6ea513d9a80733928ce8c54cccd8cb7dd0e",
+    "batches/dut-sim/out/dut/sim/simultaneous.trace": "sha256:ffda36ae5e86a4d2afdc33393f9d0b295afdd660010d9ea7551d43210ce044d0",
+    "batches/dut-sim/job/stimulus/wraparound.txt": "sha256:ef1140dc4089cc0e692a959dbec601fcc2dd164222ec2cffd643fb294524afa9",
+    "batches/dut-sim/out/dut/sim/wraparound.trace": "sha256:5d02d255346570482c12d2694f0aa6ccc5480670cedb960cc70354d592bc704a",
+    "batches/dut-sim/job/stimulus/recurrent_reset.txt": "sha256:a2db40e27f439e421383df22877e250e1f5d4cbfd5c40d2dcf77559a160e6f13",
+    "batches/dut-sim/out/dut/sim/recurrent_reset.trace": "sha256:dba6772615fb7dc706b4bef5e5bf4190d3bd882a5af90a56ad464291fbb5b926",
+    "batches/dut-sim/job/stimulus/random_s1.txt": "sha256:2752b0a53e5e5df2b5d674ed48fcf398bf97d6c2d611b18c5acefe4921874dea",
+    "batches/dut-sim/out/dut/sim/random_s1.trace": "sha256:2184c90db1481ae5cb81792149911cd2d09d86a2cb2225ba6491040c8e792072",
+    "batches/dut-sim/job/stimulus/random_s2.txt": "sha256:d22befe0e0ca3e1f477df945aeb2245764d05ccd1de9a10a94c0e33d440fce7e",
+    "batches/dut-sim/out/dut/sim/random_s2.trace": "sha256:f12d1397f239bd0f3f7bdda5abc12b3539bbecd8b055426c97ec341b9ed77f00",
+    "batches/dut-sim/job/stimulus/random_s3.txt": "sha256:ab7e59a4a2f9393a52f2dfd0d8ac67bc5d2650531dac28dcffe3c69f9483e031",
+    "batches/dut-sim/out/dut/sim/random_s3.trace": "sha256:20101d4fdcbaa8063d1c2b35ffd0531e9a33fa7ed80ab6bd2442e87eea543e2f",
+    "batches/dut-sim/job/stimulus/random_s4.txt": "sha256:ae2119d8c694b4de4dc259db3c673412ecdc98f67bec8c140fbc93c9082a3b42",
+    "batches/dut-sim/out/dut/sim/random_s4.trace": "sha256:e85e2e7c4bd1338d66daffb88f888f404bc99fbd694ee5fb2139f80db17b75c1",
+    "batches/dut-sim/job/stimulus/random_s5.txt": "sha256:f5cf271bb2f733b4de6d48187872454bbee6bcdb24b1ac0da51ec3a5d6693ba9",
+    "batches/dut-sim/out/dut/sim/random_s5.trace": "sha256:56ef7aebc234cf3efe38d83963519d68c9c0ecbb9081c43190c054112eaf9731",
+    "batches/dut-sim/job/stimulus/random_s6.txt": "sha256:4dc884b4fc0571a16f9d161846e549dd8442e12029ee1b599ca81777969d8fc8",
+    "batches/dut-sim/out/dut/sim/random_s6.trace": "sha256:bba8436781b3bbd9ac33e6e0a1a0acc7cf37bf079854bd64bfb0e2ea0b200d1c",
+    "batches/dut-sim/job/stimulus/random_s7.txt": "sha256:6954e6801e0e72642310b361ee408aecbd5c6b74da96cfc8e75213780125c077",
+    "batches/dut-sim/out/dut/sim/random_s7.trace": "sha256:4f827c1a4ac96f22e5d16b38b9ed5e2a0debcb94b72b0a45b602d247b5dd3112",
+    "batches/dut-sim/job/stimulus/random_s8.txt": "sha256:53853f53fec2a745accc2d29f995abb57acc3adfe0ca91340d19adab090ad06b",
+    "batches/dut-sim/out/dut/sim/random_s8.trace": "sha256:04673b0465352ca4bcc71af834a9abd32bda928ae8b8796559915fbcdb5021c9"
+   },
+   "changes": [
+    {
+     "field": "verification.obligations.simulation:full_flag",
+     "before": {
+      "id": "simulation:full_flag",
+      "check": "full_flag",
+      "method": "simulation",
+      "status": "simulation_passed",
+      "detail": "14 named tests (1386 cycles, seeds random_s1, random_s2, random_s3, random_s4, random_s5, random_s6, random_s7, random_s8).",
+      "tests": [
+       "learner_basic",
+       "fill_drain",
+       "write_when_full",
+       "simultaneous",
+       "wraparound",
+       "recurrent_reset",
+       "random_s1",
+       "random_s2",
+       "random_s3",
+       "random_s4",
+       "random_s5",
+       "random_s6",
+       "random_s7",
+       "random_s8"
+      ],
+      "cycles": 1386,
+      "label": "Simulation passed for these runs"
+     },
+     "after": {
+      "id": "simulation:full_flag",
+      "check": "full_flag",
+      "method": "simulation",
+      "status": "counterexample",
+      "detail": "Failed in 10 of 14 tests: random_s1, random_s2, random_s3, random_s4 and 6 more.",
+      "tests": [
+       "learner_basic",
+       "fill_drain",
+       "write_when_full",
+       "simultaneous",
+       "wraparound",
+       "recurrent_reset",
+       "random_s1",
+       "random_s2",
+       "random_s3",
+       "random_s4",
+       "random_s5",
+       "random_s6",
+       "random_s7",
+       "random_s8"
+      ],
+      "cycles": 1386,
+      "label": "Counterexample found"
+     }
+    },
+    {
+     "field": "verification.obligations.simulation:read_data",
+     "before": {
+      "id": "simulation:read_data",
+      "check": "read_data",
+      "method": "simulation",
+      "status": "simulation_passed",
+      "detail": "14 named tests (1386 cycles, seeds random_s1, random_s2, random_s3, random_s4, random_s5, random_s6, random_s7, random_s8).",
+      "tests": [
+       "learner_basic",
+       "fill_drain",
+       "write_when_full",
+       "simultaneous",
+       "wraparound",
+       "recurrent_reset",
+       "random_s1",
+       "random_s2",
+       "random_s3",
+       "random_s4",
+       "random_s5",
+       "random_s6",
+       "random_s7",
+       "random_s8"
+      ],
+      "cycles": 1386,
+      "label": "Simulation passed for these runs"
+     },
+     "after": {
+      "id": "simulation:read_data",
+      "check": "read_data",
+      "method": "simulation",
+      "status": "counterexample",
+      "detail": "Failed in 10 of 14 tests: random_s1, random_s2, random_s3, random_s4 and 6 more.",
+      "tests": [
+       "learner_basic",
+       "fill_drain",
+       "write_when_full",
+       "simultaneous",
+       "wraparound",
+       "recurrent_reset",
+       "random_s1",
+       "random_s2",
+       "random_s3",
+       "random_s4",
+       "random_s5",
+       "random_s6",
+       "random_s7",
+       "random_s8"
+      ],
+      "cycles": 1386,
+      "label": "Counterexample found"
+     }
+    },
+    {
+     "field": "verdict",
+     "before": {
+      "headline": "counterexample",
+      "counts": {
+       "simulation_passed": 2,
+       "bounded_pass": 1,
+       "proved": 0,
+       "counterexample": 3,
+       "unresolved": 4,
+       "tool_error": 0,
+       "not_checked": 0,
+       "unsupported": 0
+      },
+      "unresolved": 4
+     },
+     "after": {
+      "headline": "counterexample",
+      "counts": {
+       "simulation_passed": 0,
+       "bounded_pass": 1,
+       "proved": 0,
+       "counterexample": 5,
+       "unresolved": 4,
+       "tool_error": 0,
+       "not_checked": 0,
+       "unsupported": 0
+      },
+      "unresolved": 4
+     }
+    }
+   ]
+  }
+ ]
 }

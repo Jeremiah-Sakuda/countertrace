@@ -38,6 +38,8 @@ The control process reads `.env`; exported variables take precedence. Set `NEBIU
 
 `countertrace record <run-id> --note "..."` copies a completed run into `recorded/rec-<run-id>/`, marks it recorded, and keeps its original timings and versions. The interface labels these as recorded runs. Re-record after changing the harness, stimulus, or model configuration. Parent and candidate links are rewritten to recording IDs; explicitly record every related run intended for publication. Recording a parent never publishes its private candidates automatically.
 
+For the October 4 summary-parser correction, [the recorded-evidence procedure](../recorded/README.md#corrected-derived-summaries) re-derives only affected summaries from unchanged raw inputs, retaining provenance and original model text. Do not use this procedure to disguise changed execution, prompts, or benchmark outcomes as old evidence.
+
 ## Documentation workflow
 
 The requirements live in [PRD.md](PRD.md), mirrored from the [Countertrace PRD Page](https://chatgpt.com/space/page_6c532b87187881918d1a6e23def79098). Version 1.1 matches the Page's content on October 1, 2026, apart from the repository's document heading. Synchronization is manual. For a requirements change, read the latest Page, apply the agreed change, export the read-back Markdown to `docs/PRD.md`, and update the version in both. If the Page is unavailable, record the unsynchronized change explicitly. Implementation details belong in repository-only documents such as [ARCHITECTURE.md](ARCHITECTURE.md), [API.md](API.md), and [STATUS.md](STATUS.md).

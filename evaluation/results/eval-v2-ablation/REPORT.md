@@ -1,5 +1,7 @@
 # Repair ablation on the frozen eval-v2 suite (October 4, 2026)
 
+**October 4 derived-evidence correction:** the simulation summarizer originally retained only each test's first failure, so some later property failures could be labeled passed. Overall faulty-design detection and repair rejection remained intact. The published recordings now derive each property's summary from all preserved trace rows, with provenance; see [the correction record](../../../recorded/README.md#corrected-derived-summaries). These historical evaluation outputs and model responses have not been rerun or rewritten.
+
 Question from an internal review: does the choice of Nemotron tier, or feeding a rejected candidate's counterexample back to the model, actually matter? Each configuration re-ran diagnosis and the bounded repair loop (three candidates) once on the eight faulty eval-v2 cases. Explanation and interpretation were skipped. Prompts, budgets, verifier, and suite are the eval-v2 frozen ones; only the repair model or the feedback switch changed. Raw results: [repair-super.json](repair-super.json), [repair-nano.json](repair-nano.json), [repair-ultra-no-feedback.json](repair-ultra-no-feedback.json); the Ultra-with-feedback row is [eval-v2](../eval-v2/results.json).
 
 | Configuration | Passed unchanged checks | Passed on first candidate | Candidates | Requests | Replies cut off at output limit | Input / output tokens | Median request latency |
@@ -16,7 +18,7 @@ Question from an internal review: does the choice of Nemotron tier, or feeding a
 - **First-candidate counts demonstrate possible run-to-run variation.** Feedback from rejected candidates cannot affect the first proposal, yet the two Ultra runs passed 5 and 7 cases first time. One run per condition cannot estimate that variability or establish a causal treatment effect.
 - **No configuration produced a false acceptance.** Every passed candidate cleared the identical frozen check set, including three unbounded proofs. Every failure was a rejected or unparseable candidate.
 
-Countertrace keeps Ultra as the frozen default for repair. Super is a measured, cheaper alternative (`NEBIUS_REPAIR_MODEL_ID`). Choosing between them would need repeated runs and more cases.
+Countertrace keeps Ultra as the frozen default for repair. Super used fewer tokens on this suite (`NEBIUS_REPAIR_MODEL_ID`); actual cost comparison needs the applicable tier prices. Choosing between them would need repeated runs and more cases.
 
 ## Limits
 

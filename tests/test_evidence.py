@@ -1,7 +1,10 @@
 """Trusted parsers: malformed, truncated, or inconsistent evidence never becomes a pass."""
 
 from pathlib import Path
+import tempfile
+import threading
 import unittest
+from unittest import mock
 
 from countertrace.contract import Contract, Edge
 from countertrace.formal import (
@@ -25,6 +28,29 @@ GOOD = ["0 1 0 0 a1 0 1 0", "1 0 1 0 b2 0 0 0", "2 0 0 1 c3 b2 1 0"]
 
 
 class SimTraceTest(unittest.TestCase):
+    def test_property_verdicts_include_failures_after_the_first_finding(self):
+        from countertrace.verify import Verification
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            out = root / "out/dut/sim"
+            out.mkdir(parents=True)
+            # empty_flag fails first, read_data later; full_flag stays clean.
+            (out / "bad.trace").write_text(trace([GOOD[0], "1 0 1 0 b2 0 1 0", "2 0 0 1 c3 a1 1 0"]))
+            (out / "good.trace").write_text(trace(GOOD))
+            steps = [{"id": f"dut:{step}", "returncode": 0} for step in ("compile", "sim:bad", "sim:good")]
+            for missing in (False, True):
+                v = Verification(root, "dut", "", Contract(depth=2), lambda: None, threading.Event(), {})
+                tests = {"bad": EDGES, "good": EDGES, **({"missing": EDGES} if missing else {})}
+                with mock.patch.object(v, "batch", return_value={"out_dir": "out", "worker": {"steps": steps}}):
+                    v.sim_batch("fifo", tests)
+                obligations = {o["check"]: o for o in v.state["obligations"]}
+                self.assertEqual(v.state["findings"][0]["check"], "empty_flag")
+                for check in ("empty_flag", "read_data"):
+                    self.assertEqual(obligations[check]["status"], "counterexample")
+                    self.assertIn(f"Failed in 1 of {len(tests)} tests: bad.", obligations[check]["detail"])
+                self.assertEqual(obligations["full_flag"]["status"], "tool_error" if missing else "simulation_passed")
+
     def test_good_trace_scores_clean(self):
         rows = normalize(Contract(depth=2), parse_sim_trace(trace(GOOD), 2, 8, EDGES))
         self.assertIsNone(first_finding(rows, "t", "simulation"))

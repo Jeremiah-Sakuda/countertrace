@@ -68,8 +68,9 @@ jobs:
       - name: Build verifier image
         run: PYTHONPATH=src python -m countertrace build-image
       - name: Export and replay recorded bundles
+        shell: bash
         run: |
-          set -e
+          set -euo pipefail
           for id in rec-20261004-003607-ver-4cc749 rec-20261001-193044-ver-f15d50 rec-20261004-003622-ver-d88ef8; do
             bundle=$(PYTHONPATH=src python -m countertrace bundle "$id")
             PYTHONPATH=src python -m countertrace replay "$bundle" | tee "replay-$id.json"
