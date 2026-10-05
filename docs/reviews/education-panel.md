@@ -15,6 +15,7 @@ After a full panel, implement actionable fixes within the current FIFO education
 | 1 | 8.23 | 8.03 | 7.33 | 8.33 | 7.98 | Fix actionable findings and rerun. |
 | 2 | 8.63 | 8.23 | 7.73 | 8.57 | 8.29 | Changes exceed stability thresholds; fix and rerun. |
 | 3 | 8.63 | 8.37 | 7.73 | 8.67 | 8.35 | Numerically stable; fix a trust-boundary finding before stopping. |
+| 4 | 8.73 | 8.57 | 8.13 | 8.77 | 8.55 | Stability thresholds exceeded; fix persistence edge case and run final panel. |
 
 Round 1: [learning](education-round1-learning.md), [hardware](education-round1-hardware.md), [sponsor](education-round1-sponsor.md). Individual means were 8.325, 7.875, and 7.750. Their differences are subjective judgment, not statistical uncertainty bounds.
 
@@ -37,3 +38,9 @@ Reviews: [learning](education-round3-learning.md), [hardware](education-round3-h
 The verifier now requires successful enclosing execution, rejects incomplete/failed elaboration and duplicate step identifiers, and only accepts formal PASS from a successfully completed step. Legitimate SBY FAIL exit code 2 still yields a counterexample. Replay also checks execution and integrity before reporting reproduction. Negative controls use the preserved PASS artifacts and individually altered completion fields; no published proof has been shown false. An audit found all sixteen preserved formal PASS step records, including nested candidates, consistent with successful execution; all root verification batches had clean completion metadata.
 
 Facilitator tables and Markdown notes now retain the selected answer text, keyboard focus moves to the opened bench, and RELEASE_DECISION distinguishes the owner-selected education product from the separate workbench profile gate. Funding/access and human-evidence dependencies remain disclosed.
+
+## Round 4 follow-up
+
+Reviews: [learning](education-round4-learning.md), [hardware](education-round4-hardware.md), [sponsor](education-round4-sponsor.md). Individual means: 8.450, 8.500, 8.700. Overall change is exactly 0.20 and impact mean change is 0.40, exceeding the strict stopping thresholds. Hardware review found no further reproducible trust defect. Its sandboxed Docker invocation skipped; the root's prior Docker-enabled run actually executed all eight tests successfully, as STATUS records.
+
+One learning reviewer reproduced a saved-record mismatch: the backend allowed repeated legal cycle indices, while the browser rejected more than six indices. The backend now returns unique sorted references; the browser also normalizes older duplicated legal references so existing reflections and attempts survive reload. Both server acceptance and legacy JSON restoration have focused regression coverage. Round 5 is the final panel allowed by the owner's cap.

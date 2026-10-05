@@ -1,5 +1,9 @@
 # Implementation status
 
+## October 5 fourth education panel follow-up
+
+Release `794b8d5` deployed successfully; unauthenticated recorded access and bundle checks passed. The next learning-review fix aligns accepted coaching responses with notebook persistence: cycle references are deduplicated and sorted by the server, and old valid duplicated references are normalized on browser restore/import. Before this fix, an unusual model response with more than six repeated legal references could invalidate the saved session and reset its displayed practice. Regression checks retain the existing reflection, attempts, and coaching history when loading such a record. No new inference call or verifier change was needed; the final fifteen-case prompt/model check remains applicable to the unchanged prompt, with its disclosed semantic failures. Validation passed: **101 Python tests**, **3 web tests**, TypeScript, production build, and workspace checks.
+
 ## October 5 third education panel follow-up
 
 Release `6100514` deployed, passed all GitHub CI jobs ([run](https://github.com/Jeremiah-Sakuda/countertrace/actions/runs/37264749802)), and passed unauthenticated recorded-workbench and education access checks. All six workbench bundle hashes and the learning library/archive hashes matched; hosted model writes remained unavailable.

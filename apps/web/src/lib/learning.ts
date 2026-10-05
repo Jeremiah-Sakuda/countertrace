@@ -79,7 +79,7 @@ export function validateSession(value: unknown): Session {
   if (s.version !== 1 || !l || typeof s.started !== 'string' || s.started.length>32 || !Number.isFinite(Date.parse(s.started)) ||
       !(s.completed === null || typeof s.completed === 'string' && s.completed.length<=32 && Number.isFinite(Date.parse(s.completed))) ||
       typeof s.recordedCoachingViewed !== 'boolean' || !Array.isArray(s.coaching) || s.coaching.length > 100 ||
-      s.coaching.some(c=>!c || !/^[wrbx]{1,6}$/.test(c.path) || !['ok','error'].includes(c.status) || typeof c.reflection !== 'string' || c.reflection.length>2000 || typeof c.hint !== 'string' || c.hint.length>1600 || typeof c.model !== 'string' || c.model.length>200 || typeof c.requested !== 'string' || c.requested.length>32 || !Number.isFinite(Date.parse(c.requested)) || !Array.isArray(c.cycles) || c.cycles.length>6 || c.cycles.some(n=>!Number.isInteger(n)||n<1||n>c.path.length) || !(c.latency_ms===null||Number.isFinite(c.latency_ms)&&c.latency_ms>=0)) ||
+      s.coaching.some(c=>!c || !/^[wrbx]{1,6}$/.test(c.path) || !['ok','error'].includes(c.status) || typeof c.reflection !== 'string' || c.reflection.length>2000 || typeof c.hint !== 'string' || c.hint.length>1600 || typeof c.model !== 'string' || c.model.length>200 || typeof c.requested !== 'string' || c.requested.length>32 || !Number.isFinite(Date.parse(c.requested)) || !Array.isArray(c.cycles) || c.cycles.some(n=>!Number.isInteger(n)||n<1||n>c.path.length) || !(c.latency_ms===null||Number.isFinite(c.latency_ms)&&c.latency_ms>=0)) ||
       !Array.isArray(s.attempts) || s.attempts.length > 200 ||
       !Number.isInteger(s.hints) || s.hints < 0 || s.hints > 1000 ||
       !Number.isInteger(s.authoredHints) || s.authoredHints < 0 || s.authoredHints > 3 || s.hints < s.authoredHints ||
@@ -101,7 +101,7 @@ export function validateSession(value: unknown): Session {
       !Number.isInteger(c.coachingCount) || c.coachingCount<0 || c.coachingCount>100 ||
       c.hints<c.authoredHints+Number(c.recordedCoachingViewed)+c.coachingCount ||
       !Number.isInteger(c.attemptCount) || c.attemptCount<1 || c.attemptCount>200)) throw new Error('Invalid completion evidence.');
-  return {...s, initialCorrect:s.initialAnswer === null ? null : s.initialAnswer === l.answer,
+  return {...s, coaching:s.coaching.map(c=>({...c,cycles:[...new Set(c.cycles)].sort((a,b)=>a-b)})), initialCorrect:s.initialAnswer === null ? null : s.initialAnswer === l.answer,
     transferCorrect:s.transferAnswer === null ? null : s.transferAnswer === l.transferAnswer};
 }
 

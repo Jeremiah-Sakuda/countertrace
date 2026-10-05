@@ -75,6 +75,8 @@ def hint(body: dict) -> dict:
         cycles = value.get('cycles')
         if not isinstance(cycles, list) or any(type(c) is not int or not 1 <= c <= len(path) for c in cycles):
             raise ValueError('Citations must name supplied edges')
+        # One stored index per edge: match the browser's bounded session schema.
+        cycles = sorted(set(cycles))
         mentioned = cited_edges(value['hint'], len(path))
         if not mentioned.issubset(set(cycles)):
             raise ValueError('List every numeric edge mentioned in the hint in cycles')

@@ -37,6 +37,12 @@ test('all browser queue states agree with independent executed evidence; errors 
     assert.match(sessionReport(explored),/At transfer submission: 0 assistance/);
     assert.throws(()=>validateSession({...practice,completionEvidence:{...practice.completionEvidence,hints:1}}),/completion evidence/);
     const large=validateSession({...practice,hints:100,coaching:Array.from({length:100},()=>({status:'ok',path:'wwwr',reflection:'語'.repeat(2000),hint:'語'.repeat(1600),cycles:[1,2,3,4],model:'m'.repeat(200),requested:practice.started,latency_ms:1}))});
+    const legacy=structuredClone(large); legacy.coaching[0].cycles=[4,3,3,3,3,3,3,3,4];
+    const restored=validateSession(JSON.parse(JSON.stringify(legacy)));
+    assert.deepEqual(restored.coaching[0].cycles,[3,4]);
+    assert.equal(restored.reflection,legacy.reflection);
+    assert.deepEqual(restored.attempts,legacy.attempts);
+    assert.equal(validateSession(JSON.parse(JSON.stringify(restored))).coaching.length,100);
     const exportBytes=Buffer.byteLength(JSON.stringify(large,null,2));
     assert.ok(exportBytes>128000 && exportBytes<MAX_SESSION_BYTES);
     assert.equal(validateSessionEvidence(validateSession(JSON.parse(JSON.stringify(large))),library).coaching.length,100);

@@ -1,0 +1,26 @@
+# Education review — round 4, learning/product lens
+
+Reviewed commit `794b8d556a5bacc14aa26c773319b6f4dc2207a9` on October 5, 2026. Independent simulated hackathon assessment, not sponsor judging or human learner evidence. Earlier panel scores were not consulted. Read AGENTS, PRD, ROADMAP, teaching/demo materials, learning frontend/backend, tests, archived evidence checks, and evaluation reports. No shared-browser navigation, paid inference, deployment, or product edits. Design assessment concerns the implemented interaction and information structure; this review does not certify visual rendering or footage.
+
+| Equally weighted criterion | Score / 10 | Assessment |
+| --- | ---: | --- |
+| Technological Implementation | 8.6 | Three functioning bounded learning labs replay real isolated RTL observations; browser reference agreement and archived trace integrity are exhaustively checked over the offered library. Independent verification and genuine Nemotron rejected/accepted repair records give the education experience technical substance. One server/persistence schema mismatch remains below. |
+| Design | 8.4 | Prediction precedes exploration; learners construct sequences, compare expected and observed values, explain evidence, and answer a related transfer question. Authored hints, recorded/live coaching, unchecked data, and completion limits are explicit. Facilitator links, answer keys, selected answer text, completion assistance snapshots, and exports support an actual session. Usability remains unobserved with learners. |
+| Potential Impact | 8.1 | Clear, bounded use for digital-design instructors and FPGA mentors: practice choosing revealing tests and interpreting their limits without learner installation or credentials. Reuse is plausible and the facilitator workflow exists. Adoption, preparation-time savings, transfer performance, and learning gains are still hypotheses. |
+| Quality of Idea | 8.7 | The coherent contribution is counterexample construction and scoped evidence reasoning, with a bridge to challenging genuine AI repairs. A correct control and different boundary transfers avoid teaching that every candidate must be faulty. The project makes no unsupported algorithmic novelty claim. |
+
+**Equal-weight mean: 8.45 / 10.** The narrow FIFO/action/horizon scope is appropriate and is not a reason to add modules, accounts, uploads, or an orchestration framework.
+
+## Concrete remaining defect
+
+**P2 — An accepted live coaching response can make saved practice unreadable.** `src/countertrace/learning.py` validates each cycle index but does not constrain list length or remove duplicates. A mocked structured response `{"hint":"Inspect edge 3.","cycles":[3,3,3,3,3,3,3]}` for overflow path `wwwr` is accepted with status `ok`. `LearnView.tsx` saves that response in the session. `apps/web/src/lib/learning.ts` rejects the same record because coaching cycle arrays longer than six are invalid. On reload, `readSaved` catches the rejection and returns a new session; the persistence effect then replaces the old notes. Facilitator import also rejects the exported record. This is a response-schema failure, not a demand for perfect model semantics, and was reproduced without inference.
+
+Narrow fix: after validating every cycle index, normalize the server result to unique sorted indices, or reject overlong lists before returning success. Add one accepted-response-to-session round-trip regression. The displayed hint and verification verdict need no change. This affects a local live-coaching edge case; no archived coaching response was found triggering it, and the hosted authored-hint journey is unaffected.
+
+## Intended video and evidence
+
+The 2:45 script makes the learner action visible: ordinary passing `wr`, boundary `wwwr`, expected `0x11` versus observed `0x33` at edge 4, explanation, depth-4 transfer, practice export, facilitator reuse, and genuine failed/accepted repair. That is a persuasive and feasible intended demonstration. It correctly distinguishes replay from current execution and recorded coaching from a reply to the current learner. The actual footage remains outside this review; no footage penalty is applied.
+
+Fresh validation: `make check` passed all **100 Python tests**, including reparsing every archived learning trace and checking the archive manifest; `npm --prefix apps/web test` passed all **3 web tests**, including all available browser reference paths. The duplicate-cycle mismatch was separately reproduced with the real backend validator under a mocked model response and the real frontend session validator loaded through Vite. These are validation results, not new RTL execution or new model measurements. Docker integration was not rerun for this read-only learning review.
+
+Remaining external dependencies are observed learner/facilitator use, adoption evidence, owner-recorded/published video, and sustained/free judging access where live inference is needed. They should stay visible as dependencies, without inventing outcomes or converting them into new product requirements. Current coaching can still be semantically wrong; its advisory status and disclosed development failures appropriately limit claims. The next useful impact evidence is a small observed teaching session, not broader product scope.

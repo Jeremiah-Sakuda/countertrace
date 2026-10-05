@@ -77,3 +77,13 @@ class LearningTests(unittest.TestCase):
             return {'status':'ok','result':validate({'hint':'Compare edges 1 and 4.','cycles':[1,4]}),'calls':[]}
         with patch('countertrace.model.structured',side_effect=structured):
             learning.hint({'lesson':'overflow','path':'wwwr','reflection':'Check the edge references.'})
+
+    def test_accepted_coaching_citations_fit_persisted_session_schema(self):
+        def structured(task, system, user, validate, **kw):
+            result=validate({'hint':'Compare edges 3 and 4.','cycles':[4,3,3,3,3,3,3,3,4]})
+            self.assertEqual(result['cycles'],[3,4])
+            self.assertLessEqual(len(result['cycles']),len(json.loads(user)['evidence']))
+            return {'status':'ok','result':result,'calls':[]}
+        with patch('countertrace.model.structured',side_effect=structured):
+            result=learning.hint({'lesson':'overflow','path':'wwwr','reflection':'Inspect the write boundary.'})
+        self.assertEqual(result['result']['cycles'],[3,4])
