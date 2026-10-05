@@ -242,10 +242,11 @@ def price_for(cfg: dict, model: str) -> tuple[float, float] | None:
 
 def chat(task: str, system: str, user: str, max_tokens: int | None = None, model_id: str | None = None,
          temperature: float = 0.2, thinking: bool | None = None) -> tuple[str, dict]:
-    """One model call with a worst-case spend reservation and a one-step tier fallback.
+    """One model call with an estimated spend reservation and a one-step tier fallback.
 
-    The reservation covers the estimated input plus the full output cap, so
-    concurrent calls cannot jointly overshoot the threshold. On a network or
+    The reservation includes estimated input plus the full output cap and
+    accounts for concurrent calls. It is not a billing ceiling: token estimates,
+    account prices, and usage missing after transport errors can differ. On a network or
     5xx failure the call is retried once on COUNTERTRACE_FALLBACK_MODEL_ID
     (default: the fast tier); the fallback is recorded in the call metadata.
     """

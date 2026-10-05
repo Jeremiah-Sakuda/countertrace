@@ -1,6 +1,38 @@
-# Hosted deployment (not yet performed)
+# Deployment
 
-No VM has been created or funded. The Caddyfile passed local configuration validation with Caddy 2.11.4 on October 1; this does not test DNS, certificates, systemd, public connectivity, or the judge journey. The rest remains an untested deployment plan and must be rehearsed before submission (see the [roadmap](ROADMAP.md)).
+## Public recorded demo on Vercel
+
+**Available:** https://countertrace.vercel.app. This is the published recorded journey: seven recordings, ten bundled examples, two preserved model interpretations, traces, repair histories, the audit exercise, and six downloadable verification bundles. It does not run RTL or make model calls. The UI labels this mode and disables live actions. The full local Docker build remains available separately.
+
+Vercel container functions are stateless; the current control service uses persistent local run files, in-memory ownership/quotas, background threads, and a Docker daemon. Deploying its HTTP process unchanged would not preserve those guarantees. This static deployment keeps the current isolated verifier intact. A future live deployment needs a separately provisioned compatible worker service or an explicitly tested backend adaptation; a container-image upload alone does not supply that. [Vercel container deployment model](https://vercel.com/kb/guide/docker-on-vercel-vs-render), [function limits](https://vercel.com/docs/functions/limitations).
+
+### Reproduce this deployment
+
+```sh
+make check
+npm --prefix apps/web test
+make static-demo
+vercel link --project countertrace --scope jeremiah-sakudas-projects
+vercel pull --yes --environment=production --scope jeremiah-sakudas-projects
+vercel deploy --prebuilt --prod --yes --scope jeremiah-sakudas-projects
+.venv/bin/python scripts/check_static_demo.py https://countertrace.vercel.app
+```
+
+Build from a clean committed checkout so downloaded bundle manifests identify a replayable commit. `make static-demo` exports the frontend plus API-shaped static data using Vercel's Build Output API. Only Git-tracked curated recordings and verifier files are copied into the export, including the inputs used to assemble bundles. The exporter never loads `.env`, the local run store, or the model usage ledger. Tracked symlinks are refused. No secrets or paid runtime environment variables are required on Vercel.
+
+The Vercel project uses the **Other** framework preset. Its automatic Git deployment was disconnected after linking auto-detected the Python package; publish the explicit prebuilt output above instead of deploying the repository as a Python function. GitHub CI still runs normally. `.vercel/`, CLI environment files, and generated outputs are ignored.
+
+### Public access check, October 4
+
+Unauthenticated HTTP requests (no cookies, CLI bypass token, or owner login) loaded all ten example endpoints and all seven recorded runs. All six verification ZIPs downloaded with matching manifest hashes; mutation requests returned 405 with the recorded-mode explanation. `.env`, `.env.local`, the private model ledger, and an unknown run returned 404. These checks validate the recorded route, not a hosted verifier or a future availability guarantee.
+
+### Remaining live judge access
+
+Judges can inspect and download the recorded evidence free of charge. The local test build runs deterministic verification without an API key, but live Nemotron calls currently need model access. Before submission, provide a project-funded live route or an owner-funded testing arrangement that does not require judges to purchase credits. Preserve the recorded deployment and local release through December 15. Account credit expiry and live-service operating ownership still need verification.
+
+## Optional live CPU service (not deployed)
+
+No VM has been created or funded. The Caddyfile passed local configuration validation with Caddy 2.11.4 on October 1; this does not test DNS, certificates, systemd, public connectivity, or the live judge journey. The following is a retained alternative deployment plan, not work performed by the Vercel release.
 
 ## Proposed shape
 
@@ -22,7 +54,7 @@ Infrastructure rates are the published rates effective October 1, 2026, before t
 
 Use the hackathon credits first; do not treat a cash top-up as a prerequisite. The [hackathon resources](https://nebiusglobalaihackathon.devpost.com/resources) offer a $25 Token Factory promo and a further $25 through the Builders Program. The owner reports claiming credits, but balance, application, and expiry remain unverified. The October 3 model experiments used about $0.082 at public rates; this is not confirmed invoiced spend. No top-up or hosting purchase has been made. Confirm whether Token Factory and Cloud have separate balances and where hackathon credits apply. Delaying VM creation reduces compute cost; storage is still charged while a VM is stopped. The owner has asked for a recommendation and has not yet authorized a dollar limit.
 
-The current `COUNTERTRACE_DEPLOYMENT_SPEND_LIMIT_USD` is an inference-ledger threshold, not a hard total deployment cap. Each in-flight call reserves its worst-case cost, so concurrent calls cannot jointly exceed it; it excludes compute and storage. Configure account billing alerts and record an operating owner before public access. Verify spending and credit validity cover the entire judging window.
+The current `COUNTERTRACE_DEPLOYMENT_SPEND_LIMIT_USD` is an inference-ledger threshold, not a hard total deployment cap. Each in-flight call reserves estimated input cost plus its full output allowance; tokenization, missing usage after transport failures, and actual prices can differ, so this does not guarantee a maximum bill. It excludes compute and storage. Configure account billing alerts and record an operating owner before public access. Verify spending and credit validity cover the entire judging window.
 
 ## Steps
 

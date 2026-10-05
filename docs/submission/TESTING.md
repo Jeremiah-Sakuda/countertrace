@@ -1,49 +1,54 @@
 # Testing instructions (Devpost field)
 
-Paste the section below into the Devpost testing-instructions field. Replace [hosted URL] once the hosted build is live, or delete option A if it is not.
+The recorded Vercel demo is deployed. **Before submitting:** add the project-funded route for live model calls; the local API-key option is for developers and does not fulfill free live judge access by itself. Do not describe the Vercel route as live execution.
 
 ---
 
-## Option A: hosted demo (no setup)
+## Hosted recorded demo (no setup or account)
 
-Include this option only once the hosted build is live. Open [hosted URL]. No account or API key is needed.
+Open https://countertrace.vercel.app. The “Recorded demo” notice describes what is available. No API key or login is needed.
 
-1. **Runs → "Queue that overwrites when full"** (recorded). You will see the first failing cycle (cycle 6: expected 0x21, got 0x65), the probable origin (cycle 5, a write while full that the contract ignores), and the cycle table. Click a cycle in Nemotron's explanation to jump to that row. Scroll to Repair to see the one-line fix and the candidate run where all ten checks pass, including three proofs.
-2. **Runs → "Two bugs: reads while empty, and empty ignores the wrap bit"** (recorded). The repair timeline shows candidate 1 rejected at cycle 4, that counterexample given back to the model, and candidate 2 accepted.
-3. **Contract setup.** Pick an example and read the contract. Two examples carry a recorded Nemotron interpretation you can open without a key: the showcase, and "Accepts a write when full and reading", where a conflict is flagged. Accept the contract and press Run. A live verification took 3 to 11 seconds per example on my laptop and up to about 25 seconds when several runs shared the machine; only one run executes at a time, so you may wait for another visitor's run.
-4. **Check-quality audit.** Open the recorded audit, try the "Which requirements is this check set missing?" exercise, then compare with the seeded faults the weak set let through.
-5. On any run, **Export → Download evidence bundle** gives a zip with the inputs, logs, traces, and a manifest of hashes.
+1. **Open the showcase run.** “Queue that overwrites when full” shows cycle 6: expected 0x21, got 0x65; probable origin is the ignored write at cycle 5. Follow a cycle citation in the recorded Nemotron explanation, then inspect the one-line repair and the candidate's ten unchanged obligations, including three proofs.
+2. **Runs → “Two bugs: reads while empty, and empty ignores the wrap bit.”** The timeline preserves candidate 1's rejection at cycle 4, its counterexample feedback, and candidate 2's acceptance.
+3. **Contract setup.** Inspect the source and contract for any bundled example. The showcase and “Accepts a write when full and reading” include actual recorded Super interpretations; the latter flags a contract conflict. “Set up this example” links keep the selected example when navigating from a recording.
+4. **Check-quality audit → Open the recorded audit.** Try the missing-requirement exercise, then compare with the faults that escaped the deliberately weak named check set. This does not ingest a user's testbench.
+5. **Repair & export → Download evidence bundle.** Verification recordings export ZIPs with inputs, logs, traces, and a manifest of hashes. Replay them locally using the instructions below.
 
-Live Nemotron buttons (Interpret, Explain, Propose a repair) use the project's own Token Factory key and are rate limited per visitor.
+The Vercel deployment is read-only. Live verification, interpretation, explanation, repair, and new audits are disabled there. The recorded model calls are real past Token Factory executions, with their original metadata preserved.
 
-## Option B: local test build
+## Local working test build
 
-Needs Python 3.11 or newer, Git, Docker with BuildKit (the default), and Node 20.19+ or 22.12+. On macOS, run Docker in a VM that shares your home directory (Docker Desktop or colima), and clone under your home directory. On Windows, use WSL2.
+Needs Python 3.11 or newer, Git, Docker with BuildKit, and Node 20.19+ or 22.12+. On macOS, use Docker Desktop or colima with your home directory shared, and clone under your home directory. On Windows, use WSL2.
 
 ```sh
 git clone https://github.com/Jeremiah-Sakuda/countertrace
 cd countertrace
-make setup      # creates .venv and a local .env
-make image      # builds the pinned verifier image (about 700 MB download, checksum-verified)
-make web        # builds the interface
+make setup
+make image      # about 700 MB download; pinned checksum
+make web
 make serve      # http://127.0.0.1:8765
 ```
 
-Then follow steps 1 to 5 above at http://127.0.0.1:8765. Without a key, everything works except the three live Nemotron buttons: recorded runs (with their recorded explanations and repairs), the two recorded interpretations, live verification, the audit, and evidence bundles. To try the live Nemotron buttons, add your own `NEBIUS_API_KEY` to `.env`; the endpoint, model IDs, token caps, and prices are already filled in.
+The local build includes the same recorded journey plus live deterministic verification, new audits, and bundle replay without a model key. Accept a bundled example's contract and press **Run verification**. Warm runs took 3–11 seconds per example on the development laptop and up to about 25 seconds with concurrent work; this is not a hosted latency promise. One run executes at a time.
 
-Command line, after `source .venv/bin/activate`:
+For developers, live Nemotron actions require a Token Factory API key in the local `.env`; never place that key in browser code or a public submission. Endpoint, model IDs, token caps, and estimated prices are supplied in `.env.example`. Judge-specific project-funded live access instructions are pending; judges should not be asked to buy credits or provide a paid key.
 
 ```sh
-countertrace verify --example showcase-overwrite-when-full   # one live verification
-countertrace audit --check-set weak-learner-v1               # the check-quality audit
-countertrace bundle rec-20261004-003607-ver-4cc749           # export the showcase evidence
-countertrace replay <path printed by the previous command>   # rerun its checks, no model call
-make test && make test-integration                           # unit tests and Docker tests
+source .venv/bin/activate
+countertrace verify --example showcase-overwrite-when-full
+countertrace audit --check-set weak-learner-v1
+countertrace bundle rec-20261004-003607-ver-4cc749
+countertrace replay <path-to-downloaded-or-exported-bundle.zip>
+make check
+make test-integration
 ```
 
-## Where to look in the repository
+Use the commit recorded in the bundle manifest and the matching pinned verifier when replaying. The command reports whether deterministic outcomes match; it does not regenerate model text.
 
-- `README.md`: overview, setup, and how Nemotron and Token Factory are used.
-- `evaluation/results/`: both frozen evaluations and the repair ablation, with raw JSON.
-- `recorded/`: the evidence behind every recorded run in the interface.
-- `verifier/harness/`: the trusted simulation driver and formal monitor.
+## Repository guide
+
+- `README.md`: setup and model roles.
+- `evaluation/results/`: both frozen evaluations and the explicitly exploratory reduced-feedback comparison.
+- `recorded/`: published evidence behind the demo.
+- `verifier/harness/`: trusted simulation driver and formal monitor.
+- `docs/DEPLOYMENT.md`: exact deployment capabilities and unauthenticated access checks.

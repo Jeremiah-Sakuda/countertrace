@@ -42,7 +42,7 @@ Every passing repair reverses its seeded fault and passed all ten unchanged obli
 2. **Full-file repairs drop comments**, including the independent author's header. Attribution must survive a repair.
 3. One explanation cited a non-signal (`queue`); several explanations state internal pointer values inferred from RTL rather than sampled.
 
-These are fixed after the evaluation by switching repairs to exact-match edits (see [STATUS](../../../docs/STATUS.md)). The fix is validated only on development cases; eval-v1 numbers above are unchanged and a new evaluation would need fresh cases.
+After eval-v1, repairs switched to exact-match edits to reduce output size and preserve untouched attribution (see [STATUS](../../../docs/STATUS.md)). Initial validation used development cases; the later [eval-v2](../eval-v2/REPORT.md) separately evaluated that workflow on fresh frozen cases. eval-v1 numbers remain unchanged. Citation validation still cannot establish semantic correctness; invalid citations and partly incorrect explanations remain disclosed in the later report.
 
 ## Cost and time
 

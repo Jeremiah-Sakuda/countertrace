@@ -109,7 +109,7 @@ def report(state: dict, contract: Contract) -> str:
     return "\n".join(lines)
 
 
-def export(store, run_id: str) -> Path:
+def export(store, run_id: str, *, verifier_root: Path | None = None, output_dir: Path | None = None) -> Path:
     state = store.load(run_id)
     if state.get("kind") != "verification":
         raise ValueError("Bundles are exported for verification runs.")
@@ -127,9 +127,10 @@ def export(store, run_id: str) -> Path:
     else:
         for name, edges in suite(contract.depth).items():
             files[f"inputs/stimulus/{name}.txt"] = render(edges).encode()
-    for path in sorted((ROOT / "verifier").rglob("*")):
+    verifier_root = verifier_root or ROOT / "verifier"
+    for path in sorted(verifier_root.rglob("*")):
         if path.is_file():
-            files[f"verifier/{path.relative_to(ROOT / 'verifier')}"] = path.read_bytes()
+            files[f"verifier/{path.relative_to(verifier_root)}"] = path.read_bytes()
     truncated = []
     budget = BUNDLE_LIMIT
     for path in sorted((run_dir / "batches").rglob("*")):
@@ -187,7 +188,7 @@ def export(store, run_id: str) -> Path:
     files["manifest.json"] = json.dumps(manifest, indent=2).encode()
     from countertrace.runs import data_dir
 
-    out = data_dir() / "bundles" / f"countertrace-{run_id}.zip"
+    out = (output_dir if output_dir is not None else data_dir() / "bundles") / f"countertrace-{run_id}.zip"
     out.parent.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as zf:
         for name, data in sorted(files.items()):

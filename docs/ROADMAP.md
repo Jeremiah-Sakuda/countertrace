@@ -11,7 +11,7 @@ Dates are in 2026. A checked item has evidence in [STATUS.md](STATUS.md); develo
 - [x] Turn the PRD sampling examples into timing fixtures used by both verification flows. (Depth-2 PRD sequence and depth-4 wraparound; the depth-2 sequence is also a simulation test.)
 - [x] Distinguish a known-good FIFO from a witnessed faulty design with independent checks. (Development fixtures only.)
 - [x] Replay the failure and confirm pre-edge/post-edge cycle alignment.
-- [ ] Recruit an experienced technical reviewer and at least three target users.
+- [ ] Recruit an experienced technical reviewer and at least three target users. (Evidence strengthening, not an official hackathon requirement or a blocker for deployment; no sessions are claimed.)
 - [ ] Rebaseline the 100-hour plan with at least 15 hours of contingency.
 
 **Gate:** an end-to-end witnessed failure plus a useful real model response. *Met on development evidence October 3: the failure, replay, and useful authenticated Ultra explanation exist. Source/trace review was by Codex; independent human validation is pending.* If absent by October 4, stop interface expansion and work on the contract and verifier. The scaffold diagnostic does not satisfy this gate.
@@ -42,7 +42,7 @@ Dates are in 2026. A checked item has evidence in [STATUS.md](STATUS.md); develo
 
 ## October 26 to 30 — submission
 
-- [ ] Record the 2:45 demonstration using actual results and the selected release profile.
+- [ ] Record the 2:45 demonstration using actual results and the selected release profile. (Owner will record/post; internal reviewers assessed the revised script as intended content, not finished footage.)
 - [ ] Finish setup instructions, provenance, sponsor feedback, and public project description. (Drafted in [SUBMISSION.md](SUBMISSION.md); hosted URL and video pending.)
 - [ ] Test the judge route free of charge without the owner's login or a judge-supplied paid API key.
 - [ ] Verify funding, credit expiry, release preservation, and recovery steps through December 15.

@@ -2,6 +2,16 @@
 
 Last updated: October 4, 2026. This page records what has actually run. The October 4 sections report two frozen evaluations (eval-v1 and eval-v2); eval-v1 includes an independently authored FIFO held out of prompt development. Everything else uses **development and showcase fixtures authored for this project**. No user study or external review has happened.
 
+## October 4: review follow-ups and Vercel recorded demo
+
+Published the recorded journey at [countertrace.vercel.app](https://countertrace.vercel.app): seven recordings, ten examples, two recorded interpretations, the audit exercise, and six verification-bundle downloads. This is explicitly a **recorded demo**, with live actions disabled; the local Docker service still supplies live verification and model calls. No VM, paid model experiment, or hosted live worker was added. The exporter admits only tracked curated files and refuses symlinks; it does not read credentials, the local run store, or private usage. The newly linked project's automatic Python Git build was disconnected in favor of an explicit prebuilt static deployment.
+
+Unauthenticated public checks loaded every recorded run and example, validated every file hash in all six downloaded bundles, confirmed mutation requests return 405, and checked that credential/private-ledger paths and unknown runs return 404. The browser walkthrough covered the public landing, recorded showcase/setup link, audit navigation, and mobile audit at 375 pixels (no document overflow); affected navigation links worked by keyboard. Desktop inspection used 1280 × 800. This is interface testing, not a learner study or full screen-reader audit.
+
+The previously landed feedback, prompt-prefix, and atomic-slot fixes are retained. Additional regressions cover provenance after errors/no-new-trace failures, feedback-off versus refreshed trace handling, prefix cost reservation, simultaneous verification/audit creation, and failed audit creation. `make check` passes **89 tests**; web tests pass **2/2**; TypeScript and production build pass; Docker integration passes **8/8**. The first sandboxed integration attempt skipped without daemon access; the later Docker-enabled run actually executed all eight tests successfully.
+
+Remaining claims were corrected: cost reservations are estimates, the historical feedback comparison is exploratory, and eval-v1 follow-up validation now links the separate eval-v2. Recorded explanation/repair views link to the correct setup, the audit has a direct recorded route, and secondary model metadata/rationale is collapsed. Script reviewers assessed the intended video content against the recorded artifacts; their corrections are in [the script](submission/DEMO_SCRIPT.md). The owner will record and publish the actual video. External human review is evidence strengthening, not an official entry requirement or a prerequisite for these fixes. Free live judge access, availability/funding through December 15, and final release declaration remain open; the PRD's human-learning targets have not been claimed or silently waived.
+
 ## October 4: input-drive integrity fix and claim corrections
 
 An internal review found that a design could tie one of its own input bits through a concatenation (`assign {spare, din[7]} = ...`), which the lexical gate missed. With a seeded bit-7 bug, formal then reported bounded pass and proved because the design constrained its own stimulus; simulation failed with a Verilator error, so it could not have become an accepted repair, but the formal results alone were unsound. Fixed: the host now checks the elaborated netlist and fails integrity when any input bit is a constant, aliases another input, or is driven by a cell, for both canonical and mapped designs. Observed: a nested-brace variant that still passes the lexical gate now ends with every obligation a tool error and two integrity notes; the bundled survey and the mapped independent FIFO are unchanged. The lexical gate also now catches input bits in a concatenation, escaped identifiers, `typedef`, `var`, `time`, `real`, `checker`, `let`, wired nets, and initializers in labeled generate blocks, and no longer reads two `always @(*)` blocks as an attribute. `make check` passes 80 unit tests; `make test-integration` passes 8/8.
@@ -18,8 +28,8 @@ Earlier fixes the same day: repair prompts no longer attribute an old finding to
 
 - **Admission hardening** after five constructs were admitted in real pipeline runs (none produced a false pass; the second engine or a tool error caught each): clock-name shadowing and port redeclaration, hidden continuation ports (`input wire a, b`), delays, non-edge or qualified event controls, `wait`, `edge`, `defparam`, `inout`, hierarchical references, and assignments to inputs are now rejected, and the elaborated DUT ports are checked against an interface mapping. Negative-control tests cover each.
 - **Bounded-check label** now states 23 cycles for 24 solver steps.
-- **Repair ablation** ([report](../evaluation/results/eval-v2-ablation/REPORT.md)) on the frozen eval-v2 suite: Super 8/8, Nano 6/8, Ultra without counterexample feedback 7/8, failing only the two-bug case that feedback solved.
-- **Cost control:** worst-case spend reservation per in-flight call and one fallback to the fast tier on network or 5xx errors, both tested.
+- **Repair ablation** ([report](../evaluation/results/eval-v2-ablation/REPORT.md)) on the frozen eval-v2 suite: Super 8/8, Nano 6/8, Ultra with reduced feedback 7/8. The last treatment retained failure summaries and stale trace attribution; its failure on the two-bug case does not establish that feedback caused the full-feedback run's success. The corrected switch has not been reevaluated.
+- **Cost control:** estimated complete-input cost plus full output allowance reserved per in-flight call, and one fallback to the fast tier on network or 5xx errors, both tested. The reservation is not a guaranteed billing ceiling.
 - **Interface:** repair timeline with the fed-back counterexample, honest rejected-candidate wording, code ligatures off, ledger and audit-exercise fixes.
 
 ## October 4: review fixes and eval-v2
@@ -169,7 +179,7 @@ Browser checks confirmed exact-contract acceptance enables execution; the mobile
 
 ## Not yet done
 
-Independent human review of explanations and evaluation labels; reviewer and learner recruitment; the usability study and audit-transfer question; evaluation on real learner-written bugs (all evaluated bugs so far are seeded); selectable contract policies such as fall-through reads; Nebius Serverless Jobs (all verification runs locally in Docker); hosted deployment and judge access; the release decision; the demonstration video.
+Independent human review of explanations and evaluation labels; reviewer and learner recruitment; the usability study and audit-transfer question; evaluation on real learner-written bugs (all evaluated bugs so far are seeded); selectable contract policies such as fall-through reads; Nebius Serverless Jobs (all verification runs locally in Docker); hosted live verification/model access (the recorded Vercel demo is deployed); the release decision; the owner-recorded demonstration video.
 
 ## October 1 follow-up preparation
 

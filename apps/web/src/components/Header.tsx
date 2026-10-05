@@ -4,6 +4,7 @@ import type { AsyncState } from "../lib/hooks";
 import type { Route } from "../lib/route";
 import { href } from "../lib/route";
 import { Badge } from "./StatusBadge";
+import { isRecordedDemo } from "./DeploymentNotice";
 
 export interface RunContextInfo {
   id: string;
@@ -18,6 +19,7 @@ export interface RunContextInfo {
 function VerifierPill({ status }: { status: AsyncState<Status> }) {
   if (status.status === "loading") return <Badge tone="neutral" icon={Container}>Verifier: checking</Badge>;
   if (status.status === "error") return <Badge tone="toolerror" icon={Container}>Verifier: status unavailable</Badge>;
+  if (isRecordedDemo(status)) return <Badge tone="neutral" icon={Container}>Verifier: local test build</Badge>;
   const v = status.data.verifier;
   if (!v.docker)
     return (
@@ -40,6 +42,7 @@ function VerifierPill({ status }: { status: AsyncState<Status> }) {
 
 function ModelPill({ status }: { status: AsyncState<Status> }) {
   if (status.status !== "ok") return <Badge tone="neutral" icon={Bot}>Model: {status.status === "loading" ? "checking" : "status unavailable"}</Badge>;
+  if (isRecordedDemo(status)) return <Badge tone="neutral" icon={Bot}>Model calls: local test build</Badge>;
   const m = status.data.model;
   if (!m.configured)
     return (
@@ -125,7 +128,7 @@ export function Header({ status, route, run }: { status: AsyncState<Status>; rou
           <summary>Runtime & model</summary>
           <div className="header-status" aria-label="Service status"><VerifierPill status={status} /><ModelPill status={status} /></div>
         </details>
-        <p className="rail-edition">COUNTERTRACE / WORKING EDITION</p>
+        <p className="rail-edition">COUNTERTRACE / {isRecordedDemo(status) ? "RECORDED DEMO" : "WORKING EDITION"}</p>
       </div>
     </header>
   );

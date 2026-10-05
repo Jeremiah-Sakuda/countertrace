@@ -1,4 +1,5 @@
 import {
+  ArrowRight,
   Ban,
   Bot,
   CircleCheck,
@@ -91,10 +92,10 @@ function Attempt({ attempt, max }: { attempt: RepairAttempt; max: number }) {
         </p>
       )}
       {attempt.rationale && (
-        <div>
+        <Disclosure summary={attempt.origin === "model" ? "Why Nemotron proposed this change" : "Reason for this edit"}>
           {attempt.origin === "model" && <ModelProvenance task="repair rationale" />}
           <p className="prose">{attempt.rationale}</p>
-        </div>
+        </Disclosure>
       )}
       {attempt.diff && (
         <Disclosure summary="Source diff" defaultOpen>
@@ -376,6 +377,13 @@ export function RepairPanel({
       id="run-repair"
       title={exportOnly ? "Export" : "Repair and export"}
       eyebrow={exportOnly ? "Evidence bundle" : "Candidates are checked against the unchanged contract"}
+      actions={
+        hasFinding && run.recorded && run.example_id && (
+          <a className="btn btn-secondary" href={href.setup(run.example_id)}>
+            Set up this example <ArrowRight size={16} aria-hidden="true" />
+          </a>
+        )
+      }
     >
       <div className="stack">
         {!hasFinding && run.state === "complete" && (
@@ -392,7 +400,7 @@ export function RepairPanel({
             </div>
           </>
         )}
-        {hasFinding && run.recorded && <p className="muted small">Recorded runs are read-only. Start a live run of this example to request or check a repair.</p>}
+        {hasFinding && run.recorded && <p className="muted small">Recorded repair attempts are read-only. A new repair needs a separate live run.</p>}
         {error ? <ErrorNotice error={error} title="Repair request failed" /> : null}
         <div aria-live="polite">{repair && <RepairState repair={repair} obligations={run.verification?.obligations.length ?? 0} />}</div>
         {hasFinding &&

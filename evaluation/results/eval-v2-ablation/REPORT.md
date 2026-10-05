@@ -13,7 +13,7 @@ Question from an internal review: does the choice of Nemotron tier, or feeding a
 
 - **The reduced-feedback run is exploratory, not a clean control.** A later internal review found that the "feedback off" switch stopped refreshing the trace but still passed each rejected candidate's summary, which names its failing check and cycle, and it labeled the old trace as if it came from the current RTL. In that run Ultra failed only F6, the two-bug case, repeating the same one-bug fix three times. With full feedback, F6 passed on the second candidate. This is an observation from one case; it does not establish that feedback caused the fix. The switch was corrected on October 4 (the model now learns only that earlier candidates were rejected) and has not been rerun.
 - **Super matched Ultra on this suite** at about 60% of Ultra's output tokens. Nano repaired 6/8; it hit the output limit more often, and two of its failures included schema errors.
-- **First-candidate counts are within run-to-run variance.** The two Ultra runs differ only in feedback, which cannot affect a first candidate, yet they passed 5 and 7 cases first time. Treat first-candidate differences of one or two cases as noise at n = 8.
+- **First-candidate counts demonstrate possible run-to-run variation.** Feedback from rejected candidates cannot affect the first proposal, yet the two Ultra runs passed 5 and 7 cases first time. One run per condition cannot estimate that variability or establish a causal treatment effect.
 - **No configuration produced a false acceptance.** Every passed candidate cleared the identical frozen check set, including three unbounded proofs. Every failure was a rejected or unparseable candidate.
 
 Countertrace keeps Ultra as the frozen default for repair. Super is a measured, cheaper alternative (`NEBIUS_REPAIR_MODEL_ID`). Choosing between them would need repeated runs and more cases.
@@ -21,3 +21,5 @@ Countertrace keeps Ultra as the frozen default for repair. Super is a measured, 
 ## Limits
 
 One run per configuration on eight assistant-authored cases. Costs are list-price estimates with every model priced as Ultra. No model was tuned on this suite.
+
+See [the corrected feedback-treatment definition](../../REPAIR_FEEDBACK.md) for the current switch semantics and requirements for a separately frozen comparison. The historical raw results above have not been rerun or replaced.

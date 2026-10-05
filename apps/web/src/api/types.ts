@@ -15,6 +15,12 @@ export interface Spend {
 
 export interface Status {
   version: string;
+  /** Omitted by the local control service; supplied by the read-only recorded deployment. */
+  deployment?: {
+    mode: "recorded";
+    live_available: boolean;
+    notice: string;
+  };
   verifier: {
     docker: boolean;
     docker_detail: string | null;

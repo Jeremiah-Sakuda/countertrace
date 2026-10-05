@@ -1,12 +1,13 @@
 import { ArrowRight, ClipboardCheck, History, Server } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { api } from "../api/client";
-import type { RecordedRunSummary, Run, RunSummary, Verdict } from "../api/types";
+import type { RecordedRunSummary, Run, RunSummary, Status, Verdict } from "../api/types";
 import { Disclosure, ErrorNotice, Loading, Section, TableScroll } from "../components/common";
 import { Badge, VerdictBadge } from "../components/StatusBadge";
+import { isRecordedDemo, LOCAL_BUILD_URL } from "../components/DeploymentNotice";
 import { formatDateTime } from "../lib/format";
 import { findingSignal, originLabel, passedAttempt, primaryFinding, signalValue } from "../lib/evidence";
-import { useAsync, useDocumentTitle } from "../lib/hooks";
+import { useAsync, useDocumentTitle, type AsyncState } from "../lib/hooks";
 import { href } from "../lib/route";
 
 function Outcome({ kind, state, verdict }: { kind: string; state: string; verdict: Verdict | null | undefined }) {
@@ -264,11 +265,12 @@ function LocalList({ items, all }: { items: RunSummary[]; all: RunSummary[] }) {
   );
 }
 
-export function RunsView() {
+export function RunsView({ status }: { status: AsyncState<Status> }) {
   useDocumentTitle("Runs");
   const recorded = useAsync(() => api.recorded(), []);
   const runs = useAsync(() => api.runs(), []);
   const local = runs.status === "ok" ? runs.data.filter((r) => !r.recorded) : [];
+  const recordedDemo = isRecordedDemo(status);
   return (
     <div className="stack-lg gallery-page">
       <header className="notebook-hero gallery-hero">
@@ -279,8 +281,8 @@ export function RunsView() {
         </div>
         <aside className="notebook-hero-aside">
           <span className="notebook-margin-label">Your next experiment</span>
-          <p>Choose a bundled FIFO, accept its contract, and create a fresh run.</p>
-          <a className="inline-link" href={href.setup()}>Set up a run <ArrowRight size={16} aria-hidden="true" /></a>
+          <p>{recordedDemo ? "Use the local test build to verify a bundled FIFO and request a new explanation or repair." : "Choose a bundled FIFO, accept its contract, and create a fresh run."}</p>
+          <a className="inline-link" href={recordedDemo ? LOCAL_BUILD_URL : href.setup()}>{recordedDemo ? "Run the local test build" : "Set up a run"} <ArrowRight size={16} aria-hidden="true" /></a>
         </aside>
       </header>
       <section className="gallery-recorded" aria-labelledby="recorded-cases">
@@ -293,7 +295,7 @@ export function RunsView() {
         {recorded.status === "error" && <ErrorNotice error={recorded.error} title="Recorded runs unavailable" onRetry={recorded.reload} />}
         {recorded.status === "ok" && <RecordedList items={recorded.data} />}
       </section>
-      <Section
+      {!recordedDemo && <Section
         title="Runs on this server"
         eyebrow="The working ledger"
         className="gallery-live"
@@ -303,7 +305,7 @@ export function RunsView() {
         {runs.status === "loading" && <Loading label="Loading runs" />}
         {runs.status === "error" && <ErrorNotice error={runs.error} title="Runs unavailable" onRetry={runs.reload} />}
         {runs.status === "ok" && <LocalList items={local} all={runs.data} />}
-      </Section>
+      </Section>}
     </div>
   );
 }

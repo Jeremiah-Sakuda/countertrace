@@ -17,7 +17,7 @@ Coding and Agentic Engineering
 ## Links
 
 - Video: [YouTube URL]
-- Hosted demo: [hosted URL, or "Test build: see testing instructions"]
+- Recorded demo: https://countertrace.vercel.app (read-only evidence; live test build in testing instructions)
 - Code: https://github.com/Jeremiah-Sakuda/countertrace
 
 ## Built with
@@ -51,7 +51,7 @@ Every run exports an evidence bundle with hashes, and `countertrace replay` reru
 - **Trusted checks:** a hand-written SystemVerilog monitor with three assertions and twelve reachability covers, and a separate Python reference queue. Both follow one cycle convention, and formal counterexamples are replayed in simulation to confirm the two engines agree.
 - **Admission gate:** a single ordered lexical pass rejects the known ways to tamper with the checks: assertions or assumptions in the design, system tasks, delays, extra event controls, hidden ports, hierarchical references, and more. The elaborated netlist is the final authority: after Yosys elaborates the design, the host checks the ports, that no input is tied, aliased, or driven inside the design, and that the only properties are the monitor's. Every model patch goes through the same gate.
 - **Interface:** React and TypeScript. It shows the cycle table, citations you can click to jump to a cycle, the repair timeline, a candidate diff with before-and-after checks, and the audit exercise.
-- **Testing:** 80 unit tests and negative controls, 8 Docker integration tests, and a CI job that rebuilds the image on fresh runners and replays three recorded evidence bundles.
+- **Testing:** 89 unit tests and negative controls, 8 Docker integration tests, and a CI job that rebuilds the image on fresh runners and replays three recorded evidence bundles.
 
 ### How Nemotron and Token Factory are used
 
@@ -63,7 +63,7 @@ All model calls are runtime calls to the Nebius Token Factory OpenAI-compatible 
 | Failure explanation | Nemotron 3 Ultra | about 6 s for the showcase, 18 checked citations |
 | Repair proposals | Nemotron 3 Ultra | up to three attempts, counterexample fed back |
 
-I routed the interactive calls to Super after measuring it: on the same briefs it matched Ultra's answers and ran in a few seconds, where Ultra with reasoning on took up to 72 seconds. When a reply runs out of output tokens, Countertrace retries with `chat_template_kwargs: {"enable_thinking": false}`, which turns off Nemotron 3 reasoning on Token Factory. Every response is schema-checked, token caps are required, and each call reserves its worst-case cost against a spending threshold before it runs.
+I routed the interactive calls to Super after measuring it: on the same briefs it matched Ultra's answers and ran in a few seconds, where Ultra with reasoning on took up to 72 seconds. When a reply runs out of output tokens, Countertrace retries with `chat_template_kwargs: {"enable_thinking": false}`, which turns off Nemotron 3 reasoning on Token Factory. Every response is schema-checked, token limits are required, and each call reserves estimated input cost plus its maximum output allowance against an inference spending threshold. This is an estimate rather than a guaranteed bill cap; provider billing controls remain separate.
 
 ### Results
 

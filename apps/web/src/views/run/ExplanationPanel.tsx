@@ -1,12 +1,13 @@
-import { Bot, LoaderCircle, TriangleAlert } from "lucide-react";
+import { ArrowRight, Bot, LoaderCircle, TriangleAlert } from "lucide-react";
 import { useEffect, useState } from "react";
 import { api } from "../../api/client";
 import type { Explanation, Run } from "../../api/types";
 import { CodeView } from "../../components/CodeView";
-import { ErrorNotice, Section } from "../../components/common";
+import { Disclosure, ErrorNotice, Section } from "../../components/common";
 import { ModelCalls, ModelProvenance, ModelStatusNotice } from "../../components/ModelResult";
 import { formatDuration } from "../../lib/format";
 import { useNow } from "../../lib/hooks";
+import { href } from "../../lib/route";
 
 type CiteHandler = (cycle: number, origin?: { element: HTMLElement; label: string }) => void;
 
@@ -100,7 +101,11 @@ function ExplanationBody({ explanation, runId, onCite }: { explanation: Explanat
           </ul>
         </div>
       )}
-      <ModelCalls calls={explanation.calls} />
+      {explanation.calls && explanation.calls.length > 0 && (
+        <Disclosure summary="Model call details" meta="Model, endpoint, timing, and tokens">
+          <ModelCalls calls={explanation.calls} />
+        </Disclosure>
+      )}
     </div>
   );
 }
@@ -133,9 +138,15 @@ export function ExplanationPanel({ run, hasFinding, onCite, onUpdated }: { run: 
     <Section
       id="run-explanation"
       title="Explanation"
-      eyebrow="Model-generated · not part of the verdict"
+      eyebrow={run.recorded ? "Recorded model output · read-only · not part of the verdict" : "Model-generated · not part of the verdict"}
       actions={
-        run.recorded ? undefined : (
+        run.recorded ? (
+          run.example_id && (
+            <a className="btn btn-secondary" href={href.setup(run.example_id)}>
+              Set up this example <ArrowRight size={16} aria-hidden="true" />
+            </a>
+          )
+        ) : (
           <button type="button" className="btn btn-secondary" onClick={explain} disabled={busy || active || !hasFinding} aria-busy={busy}>
             {busy ? <LoaderCircle className="spin" size={16} aria-hidden="true" /> : <Bot size={16} aria-hidden="true" />}
             {busy ? "Explaining…" : explanation?.result ? "Explain again with Nemotron" : "Explain with Nemotron"}
@@ -144,9 +155,6 @@ export function ExplanationPanel({ run, hasFinding, onCite, onUpdated }: { run: 
       }
     >
       <div aria-live="polite">
-        {run.recorded && (
-          <p className="muted small">Recorded runs are read-only: any explanation shown was stored with the recording. Start a live run to request a new one.</p>
-        )}
         {!hasFinding && !explanation && <p className="muted">An explanation is available when the run has a counterexample to explain.</p>}
         {hasFinding && !explanation && !busy && !error && !run.recorded && (
           <p className="muted">

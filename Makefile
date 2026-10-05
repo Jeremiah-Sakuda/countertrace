@@ -3,7 +3,7 @@ PYTHON ?= $(shell [ -x .venv/bin/python ] && echo .venv/bin/python || echo pytho
 VENV_PYTHON := .venv/bin/python
 PYTHON_GUARD = $(PYTHON) -c 'import sys; sys.exit("Countertrace needs Python 3.11 or newer; found " + sys.version.split()[0] + ". Run: make setup PYTHON=python3.12") if sys.version_info < (3, 11) else None'
 
-.PHONY: setup check test test-integration doctor image serve web
+.PHONY: setup check test test-integration doctor image serve web static-demo
 
 setup:
 	@$(PYTHON_GUARD)
@@ -19,7 +19,7 @@ check: test
 # Unit tests and negative controls for trusted parsers; no Docker required.
 test:
 	@$(PYTHON_GUARD)
-	PYTHONPATH=src $(PYTHON) -m unittest tests.test_contract tests.test_admission tests.test_evidence tests.test_model tests.test_audit tests.test_runner tests.test_recording tests.test_interface_map tests.test_server
+	PYTHONPATH=src $(PYTHON) -m unittest tests.test_contract tests.test_admission tests.test_evidence tests.test_model tests.test_audit tests.test_runner tests.test_recording tests.test_interface_map tests.test_server tests.test_repair tests.test_static_demo
 
 # Runs real RTL in the isolated verifier image. Requires Docker and `make image`.
 test-integration:
@@ -33,6 +33,12 @@ image:
 
 web:
 	cd apps/web && npm install && npm run build
+
+# Build only the curated recorded journey; no .env, local runs, or model calls.
+static-demo:
+	npm --prefix apps/web ci
+	npm --prefix apps/web run build
+	PYTHONPATH=src $(PYTHON) scripts/build_static_demo.py
 
 serve:
 	PYTHONPATH=src $(PYTHON) -m countertrace serve

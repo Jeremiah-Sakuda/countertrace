@@ -41,6 +41,7 @@ obj_dir/
 .DS_Store
 .idea/
 .vscode/
+.vercel/
 *.swp
 
 # Small solver traces used as parser test fixtures

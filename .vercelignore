@@ -1,0 +1,10 @@
+.env*
+.countertrace
+.venv
+.git
+artifacts
+evaluation/holdout
+evaluation/study-private
+node_modules
+apps/web/node_modules
+__pycache__

@@ -204,13 +204,13 @@ class ModelTest(unittest.TestCase):
         self.assertEqual(spend["estimated_cost_usd"], 1.25)
         self.assertEqual(spend["models_at_default_price"], ["big"])
 
-    def test_spend_threshold_blocks_calls_including_worst_case_reservation(self):
+    def test_spend_threshold_blocks_calls_including_estimated_reservation(self):
         ledger = Path(self.tmp.name) / "model_usage.jsonl"
         env = {**CONFIG, "COUNTERTRACE_MODEL_PRICE_INPUT_PER_MTOK_USD": "1", "COUNTERTRACE_MODEL_PRICE_OUTPUT_PER_MTOK_USD": "3",
                "COUNTERTRACE_DEPLOYMENT_SPEND_LIMIT_USD": "1"}
         ledger.write_text(json.dumps({"model_id": "nvidia/test-nemotron", "prompt_tokens": 0, "completion_tokens": 332_000}) + "\n")
         with mock.patch.dict(os.environ, env), mock.patch.object(model.request, "urlopen") as call:
-            # $0.996 spent (under $1), but adding this call's worst case (2,000 output tokens, about $0.007) would exceed it.
+            # $0.996 spent, but estimated input plus the output cap would exceed $1.
             result = model.interpret("A FIFO.", Contract(depth=4))
         self.assertEqual(result["status"], "unavailable")
         self.assertIn("spend limit", result["detail"])
@@ -238,6 +238,17 @@ class ModelTest(unittest.TestCase):
             result = model.interpret("A FIFO.", Contract(depth=4))
         self.assertEqual(result["status"], "input_too_large")
         call.assert_not_called()
+
+    def test_system_prefix_is_included_in_spend_reservation(self):
+        env = {**CONFIG, "COUNTERTRACE_MODEL_PRICE_INPUT_PER_MTOK_USD": "1",
+               "COUNTERTRACE_MODEL_PRICE_OUTPUT_PER_MTOK_USD": "0",
+               "COUNTERTRACE_DEPLOYMENT_SPEND_LIMIT_USD": "0.001",
+               "COUNTERTRACE_MODEL_SYSTEM_PREFIX": "x" * 7000}
+        with mock.patch.dict(os.environ, env, clear=True), mock.patch.object(model.request, "urlopen") as call:
+            with self.assertRaisesRegex(model.ModelError, "spend limit"):
+                model.chat("test", "Return JSON.", "short", max_tokens=1)
+        call.assert_not_called()
+        self.assertAlmostEqual(model._RESERVED["usd"], 0)
 
     def test_feedback_off_hides_why_earlier_candidates_failed(self):
         finding = {"window": {"start": 0, "end": 0}, "requirement_id": "write_full", "requirement_text": "Ignore the write.",

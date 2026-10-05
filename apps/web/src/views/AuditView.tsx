@@ -1,9 +1,10 @@
 import { Ban, Bot, CircleCheck, CircleHelp, CircleX, Eye, Equal, EyeOff, FlaskConical, GraduationCap, LoaderCircle, Play, ScanSearch, ShieldAlert, Wrench, type LucideIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import { api } from "../api/client";
-import type { Audit, CheckSet, CheckSetProposal, Mutant, MutantClassification, Profile, Run } from "../api/types";
+import type { Audit, CheckSet, CheckSetProposal, Mutant, MutantClassification, Profile, Run, Status } from "../api/types";
 import { Callout, Disclosure, ErrorNotice, KeyValue, Loading, Section, TableScroll } from "../components/common";
 import { ModelCalls, ModelStatusNotice } from "../components/ModelResult";
+import { isRecordedDemo, liveActionsAvailable, LOCAL_BUILD_URL } from "../components/DeploymentNotice";
 import { Badge, type Tone } from "../components/StatusBadge";
 import { formatDateTime, humanize } from "../lib/format";
 import { useAsync, useDocumentTitle, type AsyncState } from "../lib/hooks";
@@ -666,14 +667,14 @@ function CheckSetCard({ set, selected, onSelect }: { set: CheckSet; selected: bo
   );
 }
 
-function ProposeCheckSet({ depth, onProposed }: { depth: number; onProposed: (set: CheckSet) => void }) {
+function ProposeCheckSet({ depth, onProposed, liveAvailable }: { depth: number; onProposed: (set: CheckSet) => void; liveAvailable: boolean }) {
   const [description, setDescription] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>(null);
   const [result, setResult] = useState<CheckSetProposal | null>(null);
 
   const submit = async () => {
-    if (!description.trim()) return;
+    if (!description.trim() || !liveAvailable) return;
     setBusy(true);
     setError(null);
     setResult(null);
@@ -709,12 +710,13 @@ function ProposeCheckSet({ depth, onProposed }: { depth: number; onProposed: (se
         className="code-input prose-input"
         rows={4}
         value={description}
+        disabled={!liveAvailable}
         maxLength={4000}
         onChange={(e) => setDescription(e.target.value)}
         placeholder="For example: after reset I check empty is high; I fill the FIFO and check full; I read everything back and compare the order."
       />
       <div className="action-row">
-        <button type="submit" className="btn btn-secondary" disabled={busy || !description.trim()} aria-busy={busy}>
+        <button type="submit" className="btn btn-secondary" disabled={busy || !description.trim() || !liveAvailable} aria-busy={busy}>
           {busy ? <LoaderCircle className="spin" size={16} aria-hidden="true" /> : <Bot size={16} aria-hidden="true" />}
           {busy ? "Proposing…" : "Propose a check set with Nemotron"}
         </button>
@@ -736,10 +738,11 @@ function ProposeCheckSet({ depth, onProposed }: { depth: number; onProposed: (se
   );
 }
 
-export function AuditView({ profile }: { profile: AsyncState<Profile> }) {
+export function AuditView({ profile, status }: { profile: AsyncState<Profile>; status: AsyncState<Status> }) {
   useDocumentTitle("Check-quality audit");
   const sets = useAsync(() => api.checkSets(), []);
   const runs = useAsync(() => api.runs(), []);
+  const recorded = useAsync(() => api.recorded(), []);
   const [chosen, setChosen] = useState<string | null>(null);
   const [depth, setDepth] = useState(4);
   const [launch, setLaunch] = useState<{ busy: boolean; error: unknown }>({ busy: false, error: null });
@@ -748,9 +751,12 @@ export function AuditView({ profile }: { profile: AsyncState<Profile> }) {
     (sets.status === "ok" ? (sets.data.find((s) => s.id === "weak-learner-v1") ?? sets.data[0])?.id ?? null : null);
   const depths = profile.status === "ok" ? profile.data.supported_depths : [2, 4];
   const audits = runs.status === "ok" ? runs.data.filter((r) => r.kind === "audit") : [];
+  const recordedAudit = recorded.status === "ok" ? recorded.data.find((r) => r.kind === "audit") : undefined;
+  const recordedDemo = isRecordedDemo(status);
+  const liveAvailable = liveActionsAvailable(status);
 
   const start = async () => {
-    if (!selected) return;
+    if (!selected || !liveAvailable) return;
     setLaunch({ busy: true, error: null });
     try {
       const summary = await api.createAudit(selected, depth);
@@ -773,7 +779,8 @@ export function AuditView({ profile }: { profile: AsyncState<Profile> }) {
         <aside className="notebook-hero-aside">
           <span className="notebook-margin-label">A different kind of evidence</span>
           <p>A surviving fault reveals a gap in the named check set. Independent core checks decide whether that fault violates the contract.</p>
-          <a className="inline-link" href={href.runs()}>Explore the recorded cases</a>
+          {recordedAudit && <a className="btn btn-secondary" href={href.run(recordedAudit.id)}>Open the recorded audit</a>}
+          <a className="inline-link" href={href.runs()}>Browse all recorded cases</a>
         </aside>
       </header>
       <AuditScopeNote />
@@ -801,18 +808,21 @@ export function AuditView({ profile }: { profile: AsyncState<Profile> }) {
                     ))}
                   </select>
                 </label>
-                <button type="button" className="btn btn-primary" onClick={start} disabled={!selected || launch.busy} aria-busy={launch.busy}>
+                <button type="button" className="btn btn-primary" onClick={start} disabled={!selected || launch.busy || !liveAvailable} aria-busy={launch.busy}>
                   {launch.busy ? <LoaderCircle className="spin" size={16} aria-hidden="true" /> : <Play size={16} aria-hidden="true" />}
                   Run audit
                 </button>
               </div>
+              {recordedDemo && <p className="muted small">New audits run in the <a href={LOCAL_BUILD_URL}>local test build</a>. Open the recorded audit above to inspect the preserved results.</p>}
               {launch.error ? <ErrorNotice error={launch.error} title="Could not start the audit" /> : null}
             </div>
           ))}
       </Section>
       <Section title="Propose a check set from your description" eyebrow="Optional · model-assisted">
+        {recordedDemo && <p className="muted small">Model proposals are unavailable in this recorded demo. Use the <a href={LOCAL_BUILD_URL}>local test build</a> to request one.</p>}
         <ProposeCheckSet
           depth={depth}
+          liveAvailable={liveAvailable}
           onProposed={(set) => {
             setChosen(set.id);
             sets.reload();

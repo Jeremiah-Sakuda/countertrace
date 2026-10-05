@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "./api/client";
 import { Callout } from "./components/common";
+import { DeploymentNotice } from "./components/DeploymentNotice";
 import { Header, type RunContextInfo } from "./components/Header";
 import { useAsync, useDocumentTitle } from "./lib/hooks";
 import { href, useRoute } from "./lib/route";
@@ -48,10 +49,11 @@ export function App() {
       </a>
       <Header status={status} route={route} run={route.name === "run" ? runContext : null} />
       <main id="main" ref={mainRef} tabIndex={-1} className="main">
+        <DeploymentNotice status={status} />
         {route.name === "setup" && <SetupView exampleId={route.exampleId} profile={profile} status={status} />}
-        {route.name === "runs" && <RunsView />}
+        {route.name === "runs" && <RunsView status={status} />}
         {route.name === "run" && <RunView key={route.id} id={route.id} profile={profile} status={status} onContext={onContext} />}
-        {route.name === "audit" && <AuditView profile={profile} />}
+        {route.name === "audit" && <AuditView profile={profile} status={status} />}
         {route.name === "notFound" && <NotFound hash={route.hash} />}
       </main>
       <footer className="site-footer">

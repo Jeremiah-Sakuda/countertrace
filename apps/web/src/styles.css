@@ -101,6 +101,7 @@ code { font-size: .84em; padding: 2px 4px; background: var(--color-muted); borde
 .header-status { display: grid; gap: 8px; padding: 12px 0; }
 .header-status .badge { font-weight: 400; overflow-wrap: anywhere; }
 .main { flex: 1; width: 100%; max-width: 1540px; margin-inline: auto; padding: 36px 28px 64px; outline: none; }
+.deployment-notice { margin-bottom: 28px; }
 .site-footer { padding: 24px 28px; border-top: 1px solid var(--color-border-subtle); font-size: .72rem; color: var(--color-muted-foreground); }
 .site-footer p { max-width: 85ch; }
 @media(min-width:1100px) {

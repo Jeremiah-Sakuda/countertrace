@@ -6,6 +6,7 @@ import { CodeView } from "../components/CodeView";
 import { Callout, Disclosure, ErrorNotice, Hash, Loading, Section, TableScroll } from "../components/common";
 import { ModelCalls, ModelProvenance, ModelStatusNotice } from "../components/ModelResult";
 import { ShowcaseTour } from "../components/ShowcaseTour";
+import { isRecordedDemo, liveActionsAvailable, LOCAL_BUILD_URL } from "../components/DeploymentNotice";
 import { Badge, VerdictBadge } from "../components/StatusBadge";
 import { formatDate, formatDateTime, hex, modelName, shortHash } from "../lib/format";
 import { useAsync, useDocumentTitle, type AsyncState } from "../lib/hooks";
@@ -393,9 +394,12 @@ function ExampleDetailView({ detail, profile, status }: { detail: ExampleDetail;
   const needsAck = blocking.length > 0;
   const version = detail.contract.version;
   const isAccepted = accepted === detail.contract_hash;
+  const recordedDemo = isRecordedDemo(status);
+  const liveAvailable = liveActionsAvailable(status);
   const verifierReady = status.status === "ok" && status.data.verifier.docker && status.data.verifier.image_built;
 
   const interpret = async () => {
+    if (!liveAvailable) return;
     setInterp({ busy: true, result: null, error: null });
     try {
       const result = await api.interpret(detail.id);
@@ -418,7 +422,7 @@ function ExampleDetailView({ detail, profile, status }: { detail: ExampleDetail;
   };
 
   const run = async () => {
-    if (!isAccepted) return;
+    if (!isAccepted || !liveAvailable) return;
     setLaunch({ busy: true, error: null });
     try {
       const summary = await api.createRun(detail.id, detail.contract_hash);
@@ -494,13 +498,13 @@ function ExampleDetailView({ detail, profile, status }: { detail: ExampleDetail;
           )}
         </Disclosure>
         {recorded && <RecordedInterpretationView recorded={recorded} />}
-        <Disclosure summary={recorded ? "Interpret the brief live with Nemotron" : "Ask Nemotron to interpret the brief"} meta={recorded ? "Needs a model key" : "Optional"}>
+        <Disclosure summary={recorded ? "Interpret the brief live with Nemotron" : "Ask Nemotron to interpret the brief"} meta={recordedDemo ? "Local test build" : recorded ? "Needs a model key" : "Optional"}>
           <p className="prose">
             Compare the brief with the fixed contract to surface matches, conflicts, and open decisions. The model cannot change the contract.
             {recorded ? " A live result appears below and replaces the recorded one for the conflict check." : ""}
           </p>
-          <p className="muted small">This sends the brief, RTL, and contract to the model endpoint; see the data notice above.</p>
-          <button type="button" className="btn btn-secondary" onClick={interpret} disabled={interp.busy} aria-busy={interp.busy}>
+          <p className="muted small">{recordedDemo ? "Live interpretation is unavailable in this recorded demo. Use the local test build to request a new interpretation." : "This sends the brief, RTL, and contract to the model endpoint; see the data notice above."}</p>
+          <button type="button" className="btn btn-secondary" onClick={interpret} disabled={interp.busy || !liveAvailable} aria-busy={interp.busy}>
             {interp.busy ? <LoaderCircle className="spin" size={16} aria-hidden="true" /> : <Bot size={16} aria-hidden="true" />}
             {interp.busy ? "Interpreting…" : "Interpret brief with Nemotron"}
           </button>
@@ -512,7 +516,7 @@ function ExampleDetailView({ detail, profile, status }: { detail: ExampleDetail;
       </Section>
 
       <Section
-        title="Let the evidence answer."
+        title={recordedDemo ? "Continue in the local test build." : "Let the evidence answer."}
         className={`notebook-step notebook-launch${isAccepted ? " is-accepted" : ""}`}
         eyebrow={<><span className="notebook-step-number">03</span> Accept & run</>}
       >
@@ -543,7 +547,7 @@ function ExampleDetailView({ detail, profile, status }: { detail: ExampleDetail;
               ref={acceptRef}
               type="button"
               className={`btn btn-secondary${accepting ? " is-pressed" : ""}`}
-              disabled={needsAck && !ackConflict}
+              disabled={!liveAvailable || (needsAck && !ackConflict)}
               aria-busy={accepting}
               aria-disabled={accepting || undefined}
               onClick={accept}
@@ -552,13 +556,15 @@ function ExampleDetailView({ detail, profile, status }: { detail: ExampleDetail;
               {accepting ? `Accepting contract v${version}…` : `Accept contract v${version} (${shortHash(detail.contract_hash)})`}
             </button>
           )}
-          <button type="button" className="btn btn-primary" disabled={!isAccepted || launch.busy || !verifierReady} onClick={run} aria-busy={launch.busy}>
+          <button type="button" className="btn btn-primary" disabled={!isAccepted || launch.busy || !verifierReady || !liveAvailable} onClick={run} aria-busy={launch.busy}>
             {launch.busy ? <LoaderCircle className="spin" size={16} aria-hidden="true" /> : <Play size={16} aria-hidden="true" />}
             {launch.busy ? "Starting…" : "Run verification"}
           </button>
         </div>
-        {!isAccepted && <p className="muted small">Accept the exact contract version before running. A later contract change creates a new baseline.</p>}
-        {!verifierReady && status.status === "ok" && (
+        {recordedDemo ? (
+          <p className="muted small">This demo preserves the contract for inspection. <a href={LOCAL_BUILD_URL}>Open the local test-build instructions</a> to accept it and run live verification.</p>
+        ) : !isAccepted && <p className="muted small">Accept the exact contract version before running. A later contract change creates a new baseline.</p>}
+        {!verifierReady && status.status === "ok" && !recordedDemo && (
           <Callout kind="warn" title="Verifier not ready">
             <p>Docker and the verifier image are required for a live run. <a href={href.runs()}>Recorded case files</a> remain inspectable.</p>
           </Callout>
@@ -619,8 +625,8 @@ export function SetupView({
         <ShowcaseTour profile={profile} />
       </header>
       <div className="setup-intro">
-        <h2 className="setup-intro-title">Or run one yourself</h2>
-        <p className="muted small">Choose a bundled FIFO, review its contract, accept it, and run it in the local verifier.</p>
+        <h2 className="setup-intro-title">{isRecordedDemo(status) ? "Inspect a bundled example" : "Or run one yourself"}</h2>
+        <p className="muted small">{isRecordedDemo(status) ? "Choose a FIFO and review its source, contract, and any recorded interpretation. Live runs are available in the local test build." : "Choose a bundled FIFO, review its contract, accept it, and run it in the local verifier."}</p>
         {status.status === "ok" && (
           <p className="data-notice small">
             <ShieldAlert size={14} aria-hidden="true" /> <span>{status.data.data_notice}</span>

@@ -129,14 +129,14 @@ class App:
             })
         return items
 
-    def example_detail(self, example_id: str) -> dict:
+    def example_detail(self, example_id: str, *, include_recorded: bool = True) -> dict:
         item = catalog.example(example_id)
         contract = Contract(depth=item["depth"])
         summary = next(e for e in self.examples() if e["id"] == example_id)
         recorded = RECORDED / "interpretations" / f"{example_id}.json"
         return {**summary, "source": catalog.example_source(item), "contract": contract.document(),
                 "contract_hash": contract.digest(),
-                "recorded_interpretation": json.loads(recorded.read_text()) if recorded.is_file() else None}
+                "recorded_interpretation": json.loads(recorded.read_text()) if include_recorded and recorded.is_file() else None}
 
     def profile(self) -> dict:
         timing = json.loads((catalog.FIXTURES / "timing" / "depth2_prd_sequence.json").read_text())

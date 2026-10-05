@@ -1,66 +1,68 @@
 # Demo video script (target 2:45, limit 3:00)
 
-Seven segments. Narration totals about 330 words, roughly 2:15 of speech, which leaves time for pauses and for viewers to read the screen. Everything on screen except the live run is a recorded run, so no live model call is needed during recording. Record at 1440 × 900 or larger, with browser zoom at 100%.
+The owner will record and publish the video. Internal simulated reviewers assessed this script and the supporting artifacts as the intended video content; they did not assess footage, audio, or a finished upload. Keep the public-video requirement separate from that script assessment.
+
+Use the Vercel recorded demo for the evidence walkthrough. Capture the live verification and CLI replay in the local Docker build, clearly labeled **Local live run**. The static Vercel deployment does not execute RTL or call a model. No paid inference is needed while filming: the authentic recorded calls and their metadata demonstrate Nemotron use.
 
 ## Before recording
 
-- `make serve`, then open http://127.0.0.1:8765 (or the hosted URL) in a clean browser window with no other tabs or bookmarks visible.
-- Open these tabs in order:
+- Run `make serve` locally and warm the verifier with one showcase verification.
+- Record at 1440 × 900 or larger, at 100% browser zoom. Keep recorded-run labels visible.
+- Open these routes in order (use the local base URL for tab 3):
   1. `#/runs/rec-20261004-003607-ver-4cc749` (showcase)
-  2. `#/examples/dev-full-exchange` (contract setup with a recorded interpretation)
-  3. `#/` (setup, for the live run)
+  2. `#/examples/dev-full-exchange` (contract and recorded interpretation)
+  3. `#/examples/showcase-overwrite-when-full` (local setup)
   4. `#/runs/rec-20261004-010137-ver-dd43e0` (two-bug repair)
   5. `#/runs/rec-20261001-193049-aud-7cf847` (audit)
-- Have a terminal ready with `.venv` activated, in the repository folder, with the bundle already exported: `countertrace bundle rec-20261004-003607-ver-4cc749`.
-- Do one practice live run of `showcase-overwrite-when-full` so the verifier image is warm.
-- No background music, or only music you have rights to. No third-party logos beyond the sponsor names in narration.
+- Export the showcase bundle locally before filming: `countertrace bundle rec-20261004-003607-ver-4cc749`. Keep the printed path ready for replay.
+- Use only music and visual assets you have rights to; music is unnecessary.
 
 ## Script
 
 ### 1. The bug (0:00 to 0:15)
 
-**Screen:** Tab 1, showcase run hero. Hover over "Expected 0x21 → Observed 0x65", then the "Probable origin: cycle 5" line.
+**Screen:** Showcase finding, expected/observed values, probable origin. Scope caption: “Synchronous FIFO · 8-bit words · depths 2 and 4.”
 
-**Narration:** "This queue passes its author's tests. This copy has a seeded bug, and Countertrace pins it down: the byte written at cycle one is gone, and the read at cycle six returns a different byte."
+**Narration:** “This four-entry FIFO has a seeded bug. At cycle six, it returns 0x65 instead of 0x21. Countertrace traces the corruption to a write while full.”
 
 ### 2. The contract and Nemotron 3 Super (0:15 to 0:38)
 
-**Screen:** Tab 2. Scroll slowly past the contract rows (simultaneous read and write, write while full). Open the recorded interpretation and point at the blocking conflict on "simultaneous_full". Then go to Tab 3, pick the showcase example, and click Accept contract.
+**Screen:** Tab 2. Open “Read the complete contract” for the full/empty simultaneous-operation rows, then “Decisions by topic” in the recorded interpretation to show `simultaneous_full`. Briefly show the recorded model identity. Cut to tab 3 and accept its contract.
 
-**Narration:** "Before anything runs, you see the exact behavior the checks enforce, cycle by cycle. Nemotron 3 Super reads the designer's plain-English brief and flags where it conflicts with the contract. Here it caught a request to accept writes when the queue is full. It flags the conflict instead of changing the rules."
+**Narration:** “First, choose the exact behavior to check. Nemotron 3 Super compares a plain-English brief with that contract. Here, the brief requests a write alongside a read while full. Super flags the conflict; it cannot quietly change the rules.”
 
 ### 3. A live run and the failing cycle (0:38 to 1:05)
 
-**Screen:** Press Run. Show the stages for two or three seconds, then cut (put a small "sped up" caption on the cut). Land on the finding: the cycle table with cycle 6 highlighted and the reference queue. Then open the formal panel and show "Reproduced in simulation."
+**Screen:** Caption “Local live run · warm Docker verifier.” Click **Run verification**. Show the real stages, then cut the wait with an “Elapsed wait shortened” caption. Show the cycle-6 simulation finding. Show formal replay separately, labeled “Separate solver-generated sequence: full_flag at cycle 5.”
 
-**Narration:** "The design runs in an isolated container: Verilator simulation, then bounded and unbounded formal checks with SymbiYosys, judged by two separately written references. Seconds later, the cycle table shows exactly where it breaks. At cycle five the design writes while full, which the contract says to ignore. The formal counterexample replays in simulation, so both engines agree."
+**Narration:** “The design runs through isolated simulation and formal checks, with separate reference monitors. The cycle table shows the accepted inputs and expected output. A solver-generated failing sequence also reproduces in simulation. These are scoped results for this contract and configuration.”
 
 ### 4. Explanation and repair with Nemotron 3 Ultra (1:05 to 1:40)
 
-**Screen:** Tab 1. Scroll to the explanation. Click the "cycle 5" citation and let it jump to the row. Scroll to Repair: the one-line diff `wr_en && !full`. Click through to the candidate and show "3 proved · 0 counterexamples · frozen hashes match." Then Tab 4: show the repair timeline with "candidate 1 rejected", "counterexample fed back: empty_flag at cycle 4", and "candidate 2 passed".
+**Screen:** Return to the recorded showcase. Use the Explanation shortcut; click cycle 5, then “Back to explanation step 1.” Use **Repair & export** to show the one-line diff and candidate comparison. Cut to tab 4's two-attempt timeline. Keep the counterexample at cycle 4 readable. Avoid opening secondary metadata during the timeline.
 
-**Narration:** "Nemotron 3 Ultra explains the failure for a student, and every cycle and signal it cites is checked against the trace. Then it proposes a patch: one line. Countertrace reruns the identical checks, compared by hash, and accepts the fix only because the proofs pass. When a patch fails, its own counterexample goes back to the model. In this design with two bugs, the first patch still failed at cycle four, and the second passed every check."
+**Narration:** “Nemotron 3 Ultra explains the failure and proposes a one-line patch. Citation checks validate references, not the reasoning itself. The patch passes all ten unchanged obligations, including three proofs. In this two-bug case, the first patch still fails. Its new counterexample goes back to Nemotron, and the second candidate passes. The model never approves its own fix.”
 
-### 5. Auditing the learner's checks (1:40 to 2:00)
+### 5. Auditing a named check set (1:40 to 2:00)
 
-**Screen:** Tab 5. Show the headline "3 of 6 real bugs slip past this check set." Tick an answer in the exercise and reveal the missing requirements.
+**Screen:** Tab 5. Show “3 of 6 real bugs slip past this check set,” try the exercise, and reveal the missing requirements. Keep the equivalent-mutant count visible. Caption: “Named supplemental set · not imported student testbenches.”
 
-**Narration:** "Countertrace can also grade a student's checks instead of their design. A deliberately weak, learner-style check set misses three of six seeded bugs, and each miss points to the requirement it never drives, like a write while full."
+**Narration:** “The audit exposes gaps in a named learner-style check set. This deliberately weak set misses three of six valid seeded bugs. Each survivor points to a requirement the set never exercises, such as writing while full.”
 
 ### 6. Evidence anyone can rerun (2:00 to 2:15)
 
-**Screen:** Terminal. Run `countertrace replay <bundle path>` and show `"matches": true`.
+**Screen:** Local terminal, caption “Local deterministic replay.” Run `countertrace replay <exported bundle path>` and show the actual `"matches": true`. Shorten the wait only with a visible caption; do not paste a fabricated result.
 
-**Narration:** "Every run exports a hashed evidence bundle. Replay reruns the deterministic checks with no model call, on any machine."
+**Narration:** “An evidence bundle preserves inputs, traces, logs, and hashes. With Docker and the matching verifier, replay reruns the deterministic checks without a model call.”
 
-### 7. Results and how the models are used (2:15 to 2:45)
+### 7. Results and model roles (2:15 to 2:45)
 
-**Screen:** A simple slide with the results table from the Devpost write-up: eval-v1 and eval-v2 side by side (8 of 8 bugs found, 0 false alarms, repairs 7 of 8 and 8 of 8). Then the model routing table. End on the repository URL.
+**Screen:** Results for eval-v1/eval-v2: diagnosis 8/8 and 8/8; false alarms 0/4 and 0/4; repair 7/8 and 8/8. Caption throughout: “One run per suite · assistant-authored cases and labels · no external review or learner study.” Then show Super → interpretation; Ultra → explanation/repair; Token Factory → model inference; isolated CPU containers → verification. End on the repository and demo links.
 
-**Narration:** "In two frozen evaluations, Countertrace found every seeded bug with no false alarms, and Nemotron's repairs passed the unchanged checks in seven of eight and then eight of eight cases. Every model call goes through Nebius Token Factory, while verification runs in CPU containers: Super with reasoning off for fast calls, Ultra for explanations and repairs. Nemotron proposes every fix, and checks it cannot change decide whether it counts."
+**Narration:** “Each frozen evaluation used eight faults and four controls. Diagnosis found all faults without false alarms; repairs passed in seven of eight and then eight of eight cases. These are small, single-run engineering results. All model calls use Nebius Token Factory. Nemotron proposes patches; unchanged independent checks decide whether they count.”
 
 ## After recording
 
-- Keep it under 3:00; trim pauses rather than speeding up narration.
-- Add captions for the sped-up wait in segment 3 and label recorded runs as "recorded" where they first appear.
-- Upload to YouTube as Public (the rules require a publicly visible video), title "Countertrace: a FIFO bug-finding and repair agent on NVIDIA Nemotron", and paste the link into Devpost.
+- Rehearse with the actual clicks and pauses; word count alone cannot establish runtime. Keep the final video under three minutes and captions readable.
+- Keep recorded evidence and local live execution labeled. Do not suggest the Vercel recorded demo runs the verifier.
+- Upload to YouTube as Public and fill the video URL in the submission. Suggested title: “Countertrace: FIFO debugging and repair with NVIDIA Nemotron.”
