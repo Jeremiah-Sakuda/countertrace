@@ -16,6 +16,7 @@ After a full panel, implement actionable fixes within the current FIFO education
 | 2 | 8.63 | 8.23 | 7.73 | 8.57 | 8.29 | Changes exceed stability thresholds; fix and rerun. |
 | 3 | 8.63 | 8.37 | 7.73 | 8.67 | 8.35 | Numerically stable; fix a trust-boundary finding before stopping. |
 | 4 | 8.73 | 8.57 | 8.13 | 8.77 | 8.55 | Stability thresholds exceeded; fix persistence edge case and run final panel. |
+| 5 | 8.80 | 8.57 | 8.00 | 8.77 | 8.53 | Stop: stable and five-round cap reached. |
 
 Round 1: [learning](education-round1-learning.md), [hardware](education-round1-hardware.md), [sponsor](education-round1-sponsor.md). Individual means were 8.325, 7.875, and 7.750. Their differences are subjective judgment, not statistical uncertainty bounds.
 
@@ -44,3 +45,13 @@ Facilitator tables and Markdown notes now retain the selected answer text, keybo
 Reviews: [learning](education-round4-learning.md), [hardware](education-round4-hardware.md), [sponsor](education-round4-sponsor.md). Individual means: 8.450, 8.500, 8.700. Overall change is exactly 0.20 and impact mean change is 0.40, exceeding the strict stopping thresholds. Hardware review found no further reproducible trust defect. Its sandboxed Docker invocation skipped; the root's prior Docker-enabled run actually executed all eight tests successfully, as STATUS records.
 
 One learning reviewer reproduced a saved-record mismatch: the backend allowed repeated legal cycle indices, while the browser rejected more than six indices. The backend now returns unique sorted references; the browser also normalizes older duplicated legal references so existing reflections and attempts survive reload. Both server acceptance and legacy JSON restoration have focused regression coverage. Round 5 is the final panel allowed by the owner's cap.
+
+## Final round and stopping decision
+
+Round 5 reviewed application `2ce3f15`: [learning](education-round5-learning.md), [hardware](education-round5-hardware.md), [sponsor](education-round5-sponsor.md). Individual means: 8.825, 8.500, 8.275. Overall changed from 8.5500 to 8.5333 (absolute 0.0167). Technology changed by 0.0667, design by 0, impact by 0.1333, and idea by 0; all are below the declared thresholds. No new blocking in-scope product or hardware-verdict defect was reproduced. Both numerical stability and the owner's five-round cap are met; no sixth panel was run.
+
+The final learning reviewer noted a P3 disclosure issue: retained history silently drops older entries after 200 experiments. After the fifth panel, the UI and exports now label the count as saved experiments and disclose the 200-experiment/100-coaching-reply retention bounds. The teaching guide carries the same explanation. This small wording fix was checked by the root; the scores above are for the reviewed candidate, not a fabricated subsequent review.
+
+Fifteen fresh role reviews were completed across five panels. All actionable software/documentation findings from them were addressed. The current education release includes three working labs, actual isolated simulation evidence for the finite action library, an instructor route, local practice records, optional local advisory coaching, and an extension to genuine rejected/accepted Nemotron repairs. The PRD Page and repository are aligned on education as the primary product.
+
+Remaining dependencies are deliberately not scored away: observed learner/facilitator usefulness, a project-funded route for advertised live model use maintained through December 15, and owner video recording/publication. The public Vercel learning lab remains usable free of charge with recorded RTL and authored hints. No VM, cash top-up, or ongoing hosting budget was inferred from this task; no synthetic learner outcome was created. Scores are assistant judgments with visible reviewer variation, not official rankings or measured impact.

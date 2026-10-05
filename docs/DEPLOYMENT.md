@@ -22,6 +22,10 @@ Build from a clean committed checkout so downloaded bundle manifests identify a 
 
 The Vercel project uses the **Other** framework preset. Its automatic Git deployment was disconnected after linking auto-detected the Python package; publish the explicit prebuilt output above instead of deploying the repository as a Python function. GitHub CI still runs normally. `.vercel/`, CLI environment files, and generated outputs are ignored.
 
+### Education access check, October 5
+
+The education release was published through the same explicit prebuilt deployment. Unauthenticated requests matched the release-pinned learning library and every raw evidence archive hash, loaded the recorded coaching examples, and confirmed `/api/learn/hint` is unavailable on the hosted site (405). Browser interaction completed prediction, a learner-composed overflow experiment, explanation and transfer, with a link to actual rejected/accepted Nemotron repairs. All six workbench bundles also passed hash checks. The current deployment and CI history are recorded in [STATUS.md](STATUS.md).
+
 ### Public access check, October 4
 
 Unauthenticated HTTP requests (no cookies, CLI bypass token, or owner login) loaded all ten example endpoints and all seven recorded runs. All six verification ZIPs downloaded with matching manifest hashes; mutation requests returned 405 with the recorded-mode explanation. `.env`, `.env.local`, the private model ledger, and an unknown run returned 404. These checks validate the recorded route, not a hosted verifier or a future availability guarantee.

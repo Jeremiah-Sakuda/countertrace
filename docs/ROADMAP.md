@@ -10,7 +10,7 @@ The owner selected education as the primary product: predict → investigate →
 - [x] Record every supported sequence using the isolated verifier; validate archived evidence and browser reference agreement.
 - [x] Facilitator desk, answer keys, local session export/import, ungraded explanations, explicit assistance and scope.
 - [x] Implement local evidence-grounded Nemotron coaching with existing budgets/rate limits.
-- [ ] Verify/deploy the completed education release and run up to five fresh simulated panel rounds, fixing actionable feedback until scores stabilize.
+- [x] Verify/deploy the completed education release and run up to five fresh simulated panel rounds, fixing actionable feedback until scores stabilize. (Five rounds completed; final averages 8.55 → 8.53 met the declared stability thresholds. All software/documentation fixes applied; [review record](reviews/education-panel.md). These are simulated scores.)
 - [ ] Observe actual learner/facilitator use when participants are available. No simulated panel substitutes for learners.
 
 ## October 1 to 4 — feasibility
