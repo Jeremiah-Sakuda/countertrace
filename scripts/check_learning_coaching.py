@@ -29,7 +29,12 @@ def main():
   'frozen_at':datetime.now(timezone.utc).isoformat(), 'learning_source_sha256':hashlib.sha256(Path(learning.__file__).read_bytes()).hexdigest(),
   'model_id':cfg['model_id'], 'rubric':['Factual statements agree with supplied contract/source/trace','Responds to learner misconception or reasoning','Gives a nudge without a complete patch/transfer answer','No unsupported proof, invented failure, or general learning claim'],
   'cases':[{'lesson':k,'path':v[0],'category':category,'reflection':reflection} for k,v in CASES.items() for category,reflection in v[1]]}
- if len(sys.argv)>2:
+ if '--fresh' in sys.argv:
+  protocol['cases'] += [
+   {'lesson':'overflow','path':'wrwwbr','category':'fresh-reset-free','reflection':'An ordinary read worked earlier. Does that mean the later simultaneous request must also work?'},
+   {'lesson':'exchange','path':'bwwbr','category':'fresh-empty-to-full','reflection':'Both requests occur when empty at first and when full later. I think they should always accept both.'},
+   {'lesson':'control','path':'wwxbr','category':'fresh-reset','reflection':'Reset erased the queued words. Is this data loss a bug, or should I only compare the word accepted after reset?'}]
+ if '--targeted' in sys.argv:
   selected={('exchange','overclaim'),('control','mistaken'),('control','correct'),('control','overclaim')}
   protocol['cases']=[c for c in protocol['cases'] if (c['lesson'],c['category']) in selected]
   protocol['kind']='Targeted development regression on four known weak cases; not a fresh general evaluation or learner study'

@@ -60,3 +60,20 @@ class LearningTests(unittest.TestCase):
             lib.write_text(json.dumps(data))
             with patch('countertrace.learning.LIBRARY',lib):
                 with self.assertRaisesRegex(ValueError,'integrity'): learning.hint({'lesson':'overflow','path':'wwwr','reflection':'Changed evidence'})
+
+    def test_numeric_citation_lists_ranges_aliases_and_bounds(self):
+        def structured(task, system, user, validate, **kw):
+            for hint, cycles in [
+                ('Compare edges 1 and 99', [1]), ('Inspect cycle 99', []),
+                ('Compare edges 4-1', []), ('Inspect edges 1, 3 and 99', [1,3]),
+                ('Inspect cycles 1 through 999999999999999999999', [1]),
+                ('Inspect edge -1', []), ('Inspect cycle 1.5', [1]),
+                ('Inspect edges 1 to 3', [1,3]), ('Inspect edges 1 and cycle 4', [1]),
+            ]:
+                with self.subTest(hint=hint), self.assertRaises(ValueError):
+                    validate({'hint':hint,'cycles':cycles})
+            for hint, cycles in [('Compare edges 1–3', [1,2,3]), ('Compare cycles 1, 2 and 4', [1,2,4]), ('Inspect edge 3: data is 0x33.', [3]), ('What does full mean?', [])]:
+                self.assertEqual(validate({'hint':hint,'cycles':cycles})['cycles'],cycles)
+            return {'status':'ok','result':validate({'hint':'Compare edges 1 and 4.','cycles':[1,4]}),'calls':[]}
+        with patch('countertrace.model.structured',side_effect=structured):
+            learning.hint({'lesson':'overflow','path':'wwwr','reflection':'Check the edge references.'})

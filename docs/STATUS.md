@@ -1,5 +1,13 @@
 # Implementation status
 
+## October 5 second education panel follow-up
+
+Release `0fd4317` deployed successfully to the public Vercel alias. The next fixes reject numeric edge/cycle citation lists with missing, impossible, or reversed references before accepting a hint; range expansion is bounded before allocation. Facilitator imports now accept up to 2 MB per bounded record, revalidate every mismatch against the pinned RTL library, and display assistance before transfer separately from total assistance. Completion stores the selected sequence and assistance snapshot; later exploration does not rewrite it. The opening demo narration now identifies the authored implementation precisely.
+
+Observed: **98 Python tests**, **3 web tests**, TypeScript and production build passed. A maximum-sized Unicode coaching history round-tripped below the shared import limit; forged mismatch claims and impossible completion snapshots were rejected. Browser interaction completed the exchange transfer with zero assistance, then opened a hint: the completion snapshot remained zero while the notebook total became one. The previous iteration also passed all eight Docker integration tests in 92.088 seconds; these record/citation changes do not modify the verifier.
+
+The [fifteen-case coaching development check](evidence/learning-coaching-check-2026-10-05-v4.json) retains the twelve-case matrix and three fresh paths/reflections under one frozen prompt/model configuration. All responses were structurally valid, but a new exchange case contained a factual contradiction about write acceptance. The exchange specification-overclaim response now explicitly distinguishes valid alternative policies; the overflow blanket claim remained insufficiently challenged. This mixed evidence supports advisory coaching with inspection, not a broad tutoring-success claim. Earlier failures and source snapshots remain preserved.
+
 ## October 5 panel feedback implementation
 
 The education release `cff82df` deployed to Vercel and passed all GitHub CI jobs, including both fresh replay jobs and Docker integration ([CI](https://github.com/Jeremiah-Sakuda/countertrace/actions/runs/37262857299)). Unauthenticated HTTP checks passed for seven recordings, ten examples, six hash-validated workbench bundles, all learning files and their archive hashes, and unavailable hosted model writes (405). Browser checks confirmed overflow, simultaneous-operation and correct-control outcomes, transfer feedback, the facilitator desk, and mobile evidence scrolling without page overflow.

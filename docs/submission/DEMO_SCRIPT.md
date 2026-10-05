@@ -4,7 +4,7 @@ Target length: 2:45. This is a script, not recorded or published footage. The ow
 
 | Time | Screen and action | Spoken point |
 | --- | --- | --- |
-| 0:00–0:20 | Learning home, open The disappearing word, commit a prediction | “This authored exercise shows how a convincing hardware fix can still lose your data. Countertrace teaches digital-design students to ask the question that exposes it.” |
+| 0:00–0:20 | Learning home, open The disappearing word, commit a prediction | “This authored exercise shows how a plausible FIFO implementation can still lose your data. Countertrace teaches digital-design students to ask the question that exposes it.” |
 | 0:20–0:40 | Write → Read, predict no mismatch, run | “This ordinary test passes. What have we left untested?” |
 | 0:40–1:00 | Clear; Write → Write → Write → Read, predict mismatch, run | “At edge four we expected 0x11 and got 0x33. The full queue should have ignored the third write.” Show the recorded-simulation label. |
 | 1:00–1:25 | Write a learner explanation; show actual live local Nemotron coaching or the preserved recorded coaching example | “In the recorded branch, this is a preserved response to the displayed example explanation. Nemotron responds to learner reasoning using these exact observations. The independent checker owns the result.” Keep model identity and recorded/live status visible. |

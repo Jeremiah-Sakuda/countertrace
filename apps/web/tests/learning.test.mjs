@@ -7,7 +7,7 @@ import {renderToStaticMarkup} from 'react-dom/server';
 test('all browser queue states agree with independent executed evidence; errors never pass', async()=>{
   const vite=await createServer({server:{middlewareMode:true,hmr:false,ws:false,watch:null}});
   try {
-    const {evidenceRows,lessons,newSession,sessionReport,validateSession,parseLibrary}=await vite.ssrLoadModule('/src/lib/learning.ts');
+    const {evidenceRows,lessons,newSession,sessionReport,validateSession,validateSessionEvidence,MAX_SESSION_BYTES,parseLibrary}=await vite.ssrLoadModule('/src/lib/learning.ts');
     const raw=await readFile(new URL('../public/learning/library.json',import.meta.url),'utf8');
     const library=await parseLibrary(raw);
     const altered=JSON.parse(raw); altered.designs.overflow.nodes.wwwr[3]=17;
@@ -27,6 +27,17 @@ test('all browser queue states agree with independent executed evidence; errors 
     assert.throws(()=>validateSession({...newSession('overflow'),attempts:[{path:42}]}));
     assert.throws(()=>validateSession({...newSession('overflow'),reflection:{}}));
     assert.equal(validateSession({...newSession('overflow'),initialAnswer:1,initialCorrect:true}).initialCorrect,false);
+    const practice={...newSession('overflow'),initialAnswer:0,attempts:[{path:'wwwr',prediction:'mismatch',firstMismatch:4}],reflection:'The full write overwrote the oldest word.',transferAnswer:1,completed:new Date().toISOString(),completionEvidence:{path:'wwwr',hints:0,authoredHints:0,recordedCoachingViewed:false,coachingCount:0,attemptCount:1}};
+    assert.equal(validateSessionEvidence(validateSession(practice),library).completionEvidence.path,'wwwr');
+    assert.throws(()=>validateSessionEvidence(validateSession({...practice,attempts:[{path:'wwwr',prediction:'mismatch',firstMismatch:null}]}),library),/disagrees/);
+    const explored=validateSession({...practice,hints:1,authoredHints:1});
+    assert.equal(explored.completionEvidence.hints,0);
+    assert.match(sessionReport(explored),/At transfer submission: 0 assistance/);
+    assert.throws(()=>validateSession({...practice,completionEvidence:{...practice.completionEvidence,hints:1}}),/completion evidence/);
+    const large=validateSession({...practice,hints:100,coaching:Array.from({length:100},()=>({status:'ok',path:'wwwr',reflection:'語'.repeat(2000),hint:'語'.repeat(1600),cycles:[1,2,3,4],model:'m'.repeat(200),requested:practice.started,latency_ms:1}))});
+    const exportBytes=Buffer.byteLength(JSON.stringify(large,null,2));
+    assert.ok(exportBytes>128000 && exportBytes<MAX_SESSION_BYTES);
+    assert.equal(validateSessionEvidence(validateSession(JSON.parse(JSON.stringify(large))),library).coaching.length,100);
     for(const l of lessons) assert.match(sessionReport(newSession(l.id)),/not a certificate/);
     const {LearnHome,TeachView}=await vite.ssrLoadModule('/src/views/LearnView.tsx');
     assert.match(renderToStaticMarkup(createElement(LearnHome)),/does not execute RTL/);
