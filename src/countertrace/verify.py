@@ -39,6 +39,13 @@ STATUS_LABELS = {
 FORMAL_TASKS = ("bmc", "prove", "cover")
 
 
+def require_completed_batch(record: dict) -> None:
+    """Saved artifacts cannot override a failed or incomplete enclosing process."""
+    if (type(record.get('container_returncode')) is not int or record['container_returncode'] != 0 or
+            record.get('timed_out') is not False or record.get('cancelled') is not False):
+        raise runner.RunnerError('Worker execution failed, timed out, was cancelled, or lacks completion metadata.')
+
+
 def now() -> str:
     return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
 
@@ -205,6 +212,14 @@ class Verification:
         if worker is None:
             problems.append(f"{kind}: {record.get('worker_error', 'no worker result')}")
         else:
+            steps = worker.get('steps', [])
+            ids = [step.get('id') for step in steps]
+            if len(ids) != len(set(ids)):
+                problems.append(f"{kind}: duplicate worker step identifiers")
+            for name in ('ports', 'properties'):
+                step = next((step for step in steps if step.get('id') == f'{self.design_id}:{name}'), None)
+                if not step or type(step.get('returncode')) is not int or step['returncode'] != 0 or step.get('timed_out') is not False:
+                    problems.append(f"{kind}: {name} elaboration did not complete successfully")
             if worker.get("harness_hashes") != runner.harness_hashes():
                 problems.append(f"{kind}: verifier harness hashes differ from the trusted copy (stale or altered image)")
             ports_path = out / self.design_id / "ports.json"
@@ -240,6 +255,7 @@ class Verification:
         stimulus = {name: render(edges) for name, edges in tests.items()}
         try:
             record = self.batch("sim", top, {"sim_tests": list(tests), "formal": []}, stimulus)
+            require_completed_batch(record)
         except runner.Cancelled:
             self.stage("simulating", "cancelled")
             return
@@ -252,7 +268,7 @@ class Verification:
             return
         steps = {s["id"]: s for s in record["worker"]["steps"]}
         compile_step = steps.get(f"{self.design_id}:compile")
-        if not compile_step or compile_step.get("returncode") != 0:
+        if not compile_step or compile_step.get("timed_out") is not False or type(compile_step.get("returncode")) is not int or compile_step["returncode"] != 0:
             self.sim_error("Verilator compilation failed or timed out.", log=f"{record['out_dir']}/{self.design_id}/logs/compile.log")
             return
         failures, cycles, errors = [], 0, []
@@ -261,7 +277,7 @@ class Verification:
         for name, edges in tests.items():
             step = steps.get(f"{self.design_id}:sim:{name}")
             path = out / "sim" / f"{name}.trace"
-            if not step or step.get("timed_out") or step.get("returncode") != 0 or not path.is_file():
+            if not step or step.get("timed_out") is not False or type(step.get("returncode")) is not int or step["returncode"] != 0 or not path.is_file():
                 errors.append(f"{name}: simulation did not complete")
                 continue
             try:
@@ -317,6 +333,7 @@ class Verification:
         self.stage("checking_properties", "running")
         try:
             record = self.batch("formal", top, {"sim_tests": [], "formal": list(self.formal_tasks)}, {})
+            require_completed_batch(record)
         except runner.Cancelled:
             self.stage("checking_properties", "cancelled")
             return
@@ -338,8 +355,13 @@ class Verification:
             log_path = task_dir / "logfile.txt"
             log = log_path.read_text() if log_path.is_file() else ""
             log_ref = f"{rel}/{task}/logfile.txt"
-            if step is None or step.get("timed_out"):
-                status = "TIMEOUT" if step else None
+            if step is None or step.get("timed_out") is not False:
+                status = "TIMEOUT" if step and step.get('timed_out') is True else None
+            elif (type(step.get('returncode')) is not int or
+                    (status == 'PASS' and step['returncode'] != 0) or
+                    (status == 'FAIL' and step['returncode'] != 2)):
+                # SBY uses exit 2 for a real counterexample; never require zero for FAIL.
+                status = 'ERROR'
             if task == "cover":
                 covers = parse_covers(log)
                 with self.lock:
@@ -433,6 +455,14 @@ class Verification:
             stim_name = "formal_replay"
             try:
                 record = self.batch("replay", top, {"sim_tests": [stim_name], "formal": []}, {stim_name: render(edges)})
+                require_completed_batch(record)
+                if not self.integrity_ok('replay'):
+                    raise runner.RunnerError('Replay integrity check failed.')
+                steps = {s['id']: s for s in record['worker']['steps']}
+                for name in ('compile', f'sim:{stim_name}'):
+                    step = steps.get(f'{self.design_id}:{name}')
+                    if not step or step.get('timed_out') is not False or type(step.get('returncode')) is not int or step['returncode'] != 0:
+                        raise runner.RunnerError('Replay execution did not complete successfully.')
                 path = self.run_dir / record["out_dir"] / self.design_id / "sim" / f"{stim_name}.trace"
                 sim_rows = normalize(self.contract, parse_sim_trace(path.read_text(), self.contract.depth,
                                                                     self.contract.width, parse_stimulus(render(edges))))

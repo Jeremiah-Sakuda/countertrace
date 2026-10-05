@@ -32,6 +32,8 @@ test('all browser queue states agree with independent executed evidence; errors 
     assert.throws(()=>validateSessionEvidence(validateSession({...practice,attempts:[{path:'wwwr',prediction:'mismatch',firstMismatch:null}]}),library),/disagrees/);
     const explored=validateSession({...practice,hints:1,authoredHints:1});
     assert.equal(explored.completionEvidence.hints,0);
+    assert.ok(sessionReport(explored).includes(lessons[0].choices[0]));
+    assert.ok(sessionReport(explored).includes(lessons[0].transferChoices[1]));
     assert.match(sessionReport(explored),/At transfer submission: 0 assistance/);
     assert.throws(()=>validateSession({...practice,completionEvidence:{...practice.completionEvidence,hints:1}}),/completion evidence/);
     const large=validateSession({...practice,hints:100,coaching:Array.from({length:100},()=>({status:'ok',path:'wwwr',reflection:'語'.repeat(2000),hint:'語'.repeat(1600),cycles:[1,2,3,4],model:'m'.repeat(200),requested:practice.started,latency_ms:1}))});

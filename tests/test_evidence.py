@@ -1,6 +1,8 @@
 """Trusted parsers: malformed, truncated, or inconsistent evidence never becomes a pass."""
 
 from pathlib import Path
+import copy
+import json
 import tempfile
 import threading
 import unittest
@@ -38,11 +40,11 @@ class SimTraceTest(unittest.TestCase):
             # empty_flag fails first, read_data later; full_flag stays clean.
             (out / "bad.trace").write_text(trace([GOOD[0], "1 0 1 0 b2 0 1 0", "2 0 0 1 c3 a1 1 0"]))
             (out / "good.trace").write_text(trace(GOOD))
-            steps = [{"id": f"dut:{step}", "returncode": 0} for step in ("compile", "sim:bad", "sim:good")]
+            steps = [{"id": f"dut:{step}", "returncode": 0, "timed_out": False} for step in ("compile", "sim:bad", "sim:good")]
             for missing in (False, True):
                 v = Verification(root, "dut", "", Contract(depth=2), lambda: None, threading.Event(), {})
                 tests = {"bad": EDGES, "good": EDGES, **({"missing": EDGES} if missing else {})}
-                with mock.patch.object(v, "batch", return_value={"out_dir": "out", "worker": {"steps": steps}}):
+                with mock.patch.object(v, "batch", return_value={"out_dir": "out", "worker": {"steps": steps}, "container_returncode":0,"timed_out":False,"cancelled":False}):
                     v.sim_batch("fifo", tests)
                 obligations = {o["check"]: o for o in v.state["obligations"]}
                 self.assertEqual(v.state["findings"][0]["check"], "empty_flag")
@@ -86,6 +88,34 @@ class SimTraceTest(unittest.TestCase):
 
 
 class FormalParsingTest(unittest.TestCase):
+    def test_preserved_formal_pass_never_overrides_execution_failure(self):
+        from countertrace.verify import Verification
+        root=DATA.parents[1]/'recorded/rec-20261001-193044-ver-f15d50'
+        worker=json.loads((root/'batches/dut-formal/out/worker_result.json').read_text())
+        base={'out_dir':'batches/dut-formal/out','worker':worker,'container_returncode':0,'timed_out':False,'cancelled':False}
+        for field, value in [('clean',None),('container_returncode',1),('timed_out',True),('cancelled',True),('container_returncode',None),('step_returncode',1),('step_returncode',None),('step_timed_out',True),('step_timed_out',None)]:
+            with self.subTest(field=field,value=value):
+                record=copy.deepcopy(base)
+                if field.startswith('step_'):
+                    for step in record['worker']['steps']:
+                        if ':formal:' in step['id']: step[field[5:]]=value
+                elif field!='clean': record[field]=value
+                v=Verification(root,'dut','',Contract(depth=4),lambda:None,threading.Event(),{})
+                with mock.patch.object(v,'batch',return_value=record): v.formal_batch('fifo')
+                states={o['status'] for o in v.state['obligations']}
+                if field=='clean': self.assertEqual(states,{'proved','bounded_pass'})
+                else: self.assertFalse(states & {'proved','bounded_pass'},states)
+
+    def test_legitimate_nonzero_formal_fail_retains_counterexample(self):
+        from countertrace.verify import Verification
+        root=DATA.parents[1]/'recorded/rec-20261004-010137-ver-dd43e0'
+        worker=json.loads((root/'batches/dut-formal/out/worker_result.json').read_text())
+        record={'out_dir':'batches/dut-formal/out','worker':worker,'container_returncode':0,'timed_out':False,'cancelled':False}
+        v=Verification(root,'dut','',Contract(depth=4),lambda:None,threading.Event(),{})
+        with mock.patch.object(v,'batch',return_value=record): v.formal_batch('fifo')
+        self.assertIn('counterexample',{o['status'] for o in v.state['obligations']})
+        self.assertNotIn('proved',{o['status'] for o in v.state['obligations']})
+
     def test_counterexample_normalization_matches_solver_report(self):
         vcd = (DATA / "overwrite_bmc_trace.vcd").read_text()
         edges, observations = counterexample_observations(vcd, 6)

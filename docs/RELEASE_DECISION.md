@@ -1,6 +1,8 @@
 # Release decision record
 
-**Current commitment: diagnosis (unchanged until the owner decides). Evidence now supports primary.** On October 4 the frozen eval-v1 suite met every measured primary target: repair 7/8 within three candidates (bar 5/8), diagnosis 8/8 across four classes, 0/4 false alarms, interpretation 4/4 and 4/4 ([report](../evaluation/results/eval-v1/REPORT.md)). Caveats: one run, assistant-authored cases and labels, assistant review only, and no learner evidence yet.
+**Education direction selected by the owner, October 5:** the primary product is the learning lab for instructors, FPGA club mentors, and digital-design learners: predict → investigate → explain → transfer. The maintained verification workbench remains an extension with recorded actual model repairs. PRD v1.2 records this decision; the current education deployment and checks are in [STATUS.md](STATUS.md). This product choice does not claim measured learner outcomes or complete project-funded live judge access.
+
+**Separate workbench profile gate:** diagnosis remains the engineering delivery baseline until the final maintained diagnosis/repair profile is declared by October 14. The historical engineering term “primary” below means the workbench profile with independently checked repair, not the primary education product. Evidence now supports retaining repair. On October 4 the frozen eval-v1 suite met every measured primary target: repair 7/8 within three candidates (bar 5/8), diagnosis 8/8 across four classes, 0/4 false alarms, interpretation 4/4 and 4/4 ([report](../evaluation/results/eval-v1/REPORT.md)). Caveats: one run, assistant-authored cases and labels, assistant review only, and no learner evidence yet.
 
 **Recommendation (assistant, for the owner to accept or reject), revised October 4:** retain diagnosis plus repair in the hackathon demonstration. Two frozen evaluations met the engineering repair target (7/8 and 8/8 within three candidates), and the submission materials present those observed results with their limitations. External label review and learner sessions are not hackathon entry requirements and are not blockers for implementing fixes or deploying the recorded demonstration. They remain unperformed; do not claim the PRD's learning targets, independent validation, or complete primary-release acceptance have been achieved. This recommendation does not silently waive those internal targets.
 
@@ -16,7 +18,7 @@ The primary repair target is at least 5 of 8 faulty cases repaired within three 
 
 Both profiles still require the PRD's diagnosis, explanation, audit, reproducibility, and user-study evidence. External FIFO acquisition is not independent validation. Either profile is blocked by persistent false acceptance or an untrustworthy oracle. Declare proof versus bounded-only scope separately, using actual named obligations and assumptions.
 
-## Fill when deciding
+## Fill when deciding the maintained workbench profile
 
 - Decision date and owner: pending.
 - Profile (primary / diagnosis): pending final decision; diagnosis is the delivery baseline.

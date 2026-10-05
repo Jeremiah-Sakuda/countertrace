@@ -14,6 +14,7 @@ After a full panel, implement actionable fixes within the current FIFO education
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
 | 1 | 8.23 | 8.03 | 7.33 | 8.33 | 7.98 | Fix actionable findings and rerun. |
 | 2 | 8.63 | 8.23 | 7.73 | 8.57 | 8.29 | Changes exceed stability thresholds; fix and rerun. |
+| 3 | 8.63 | 8.37 | 7.73 | 8.67 | 8.35 | Numerically stable; fix a trust-boundary finding before stopping. |
 
 Round 1: [learning](education-round1-learning.md), [hardware](education-round1-hardware.md), [sponsor](education-round1-sponsor.md). Individual means were 8.325, 7.875, and 7.750. Their differences are subjective judgment, not statistical uncertainty bounds.
 
@@ -28,3 +29,11 @@ Reviews: [learning](education-round2-learning.md), [hardware](education-round2-h
 Implemented numeric edge/cycle list and range validation (including reversed and excessively large ranges), a shared 2 MB import limit with bounded record fields and a large Unicode export round trip, a completion snapshot binding selected evidence and pre-transfer assistance, imported mismatch validation against the pinned library, and precise authored-candidate wording in the script. Later exploration remains available and is distinguished from assistance at transfer submission.
 
 The full final-prompt coaching matrix plus three fresh development paths ran, preserving all fifteen responses. The previously indirect exchange policy overclaim was corrected in this response. One fresh exchange response still contradicts the evidence, the overflow blanket claim is not directly challenged, and several hints reveal much of the diagnosis. These remaining model-quality limits are disclosed rather than relabeled as passing checks. Live coaching remains advisory/local; hosted authored hints remain the dependable baseline. Project-funded live judge access and funding/credit expiry require a deployment arrangement beyond the existing static Vercel release; no new spend ceiling or VM is assumed authorized. Owner video and human evidence remain external delivery dependencies.
+
+## Round 3 follow-up
+
+Reviews: [learning](education-round3-learning.md), [hardware](education-round3-hardware.md), [sponsor](education-round3-sponsor.md). Individual means: 8.400, 8.450, 8.200. Overall changed by 0.0583 and every criterion mean by less than 0.3. Although numerical stability is met, the hardware reviewer reproduced a parser trust-boundary defect: preserved solver PASS artifacts could override contradictory worker failure metadata. This merits repair and one final fresh assessment before applying the no-critical-finding stopping condition, even though the reviewer classified its likelihood as P2.
+
+The verifier now requires successful enclosing execution, rejects incomplete/failed elaboration and duplicate step identifiers, and only accepts formal PASS from a successfully completed step. Legitimate SBY FAIL exit code 2 still yields a counterexample. Replay also checks execution and integrity before reporting reproduction. Negative controls use the preserved PASS artifacts and individually altered completion fields; no published proof has been shown false. An audit found all sixteen preserved formal PASS step records, including nested candidates, consistent with successful execution; all root verification batches had clean completion metadata.
+
+Facilitator tables and Markdown notes now retain the selected answer text, keyboard focus moves to the opened bench, and RELEASE_DECISION distinguishes the owner-selected education product from the separate workbench profile gate. Funding/access and human-evidence dependencies remain disclosed.

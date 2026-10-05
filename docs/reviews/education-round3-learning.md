@@ -1,0 +1,26 @@
+# Independent simulated panel — learning and usability
+
+Reviewed source `6100514` on October 5, 2026. This is an assistant's simulated assessment, not sponsor judging or a learner study. No earlier review files or scores were read. Scope: current PRD/roadmap, learning UI and records, teaching guide, archived engineering/coaching evidence, and the intended video in `docs/submission/DEMO_SCRIPT.md`. The shared browser was not navigated; current deployment and rendered interactions were not independently verified here.
+
+| Equally weighted criterion | Score / 10 | Assessment |
+| --- | ---: | --- |
+| Technological Implementation | 8.8 | The finite experiment library contains executed RTL observations, checks integrity, and compares them with an independent reference. The retained workbench supplies actual rejected/accepted model repair evidence. Coaching remains separate from verdicts. The recorded hosted/local live distinction is unusually clear. Current coaching development evidence still contains semantic errors, appropriately disclosed. |
+| Design | 8.3 | Prediction → constructed sequence → evidence → explanation → transfer is a coherent activity. A correct control teaches restraint; assistance and completion snapshots support discussion without pretending to grade free text. Native controls, labels, explicit error states and scoped result language are strong. Facilitator review could expose the actual misconception more directly; keyboard stage transitions need attention. |
+| Potential Impact | 7.7 | A facilitator can share one browser link and obtain inspectable practice records without installing a simulator or requiring learner credentials. The bounded audience and reusable lessons make the adoption hypothesis credible. Actual willingness to reuse, independent transfer, assistance needs and preparation time remain unobserved. Those are external evidence gaps, not software failures or reasons to expand scope. |
+| Quality of Idea | 8.8 | Having learners construct a counterexample and defend its scope is a clear educational use of the verification engine. The contrast between a passing ordinary test and a revealing boundary test is compelling. Connecting that habit to an actual rejected AI repair gives the product a coherent differentiator without a first-of-kind claim. |
+
+**Equal-weight mean: 8.40 / 10.** The software is sufficiently complete for a small facilitated pilot. No P0/P1 learning blocker was established in this review.
+
+## Narrow remaining fixes
+
+1. **P2 — Show selected answers in the facilitator review and readable export.** In `apps/web/src/views/LearnView.tsx:131`, both initial and transfer answers collapse to “Matched” or “Revisit.” `apps/web/src/lib/learning.ts:71` exports only answer numbers. Reproduction: complete the overflow activity twice with its two different wrong initial choices, export/import the JSON records, and compare the initial-prediction cells; both read “Revisit,” although replacing the oldest word and emptying the queue are different misconceptions. Downloaded notes require manually looking up choice order. **Narrow fix:** render the stored choice text beside its status, and include the question/selected choice text in Markdown. Existing indices and grading remain unchanged. This is a presentation gap; the JSON already preserves the answers.
+
+2. **P3 — Preserve keyboard position when committing the initial prediction.** `LearnView.tsx` conditionally removes the focused “Commit prediction & open the bench” button and inserts the experiment stage without transferring focus or announcing that stage. The route-level focus handler does not run because the route is unchanged. **Reproduction to verify in browser:** select an initial answer with the keyboard, activate Commit, and inspect focus/next Tab; the removed control has no explicit focus destination. **Narrow fix:** focus the newly revealed experiment heading (`tabIndex=-1`) or first action after committing. This is a source-established focus-management omission; screen-reader impact was not measured here.
+
+## Evidence and demo judgment
+
+Fresh read-only checks passed: all **98 Python tests** through `make check`, and all **3 web tests**. The latter checks browser-reference agreement across the recorded prefixes and rejection of corrupted evidence. These checks establish software behavior, not fresh RTL execution, hardware proof or educational efficacy. No paid inference or Docker verification was run for this review.
+
+The intended 2:45 video tells the right story: ordinary test, revealing boundary sequence, scoped model coaching, transfer/export, facilitator use, then a rejected and accepted real repair. It identifies authored fixtures and recorded replay accurately. Assessing this intended content does not require penalizing unavailable footage; actual pacing and legibility remain unobserved. Keep the selected live/recorded coaching branch explicit during recording.
+
+The next evidence investment should be one facilitator and a few learners using this existing journey, with exact answers and assistance recorded. Further interface breadth, arbitrary uploads, more module families or perfect model semantics are not required to make this release useful. Coaching should retain its advisory status and documented limitations.

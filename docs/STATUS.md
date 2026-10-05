@@ -1,5 +1,13 @@
 # Implementation status
 
+## October 5 third education panel follow-up
+
+Release `6100514` deployed, passed all GitHub CI jobs ([run](https://github.com/Jeremiah-Sakuda/countertrace/actions/runs/37264749802)), and passed unauthenticated recorded-workbench and education access checks. All six workbench bundle hashes and the learning library/archive hashes matched; hosted model writes remained unavailable.
+
+A fresh simulated review reproduced a fail-closed edge case by retaining genuine formal PASS files while injecting failed process metadata. Formal parsing could still report proof. The updated verifier requires successful batch completion and elaboration, rejects duplicate steps, and checks formal PASS process status. Legitimate counterexamples retain SBY's exit code 2 semantics. Replay checks completion and integrity before declaring reproduction. No preserved proof is shown false: all sixteen archived formal PASS steps, including nested repair candidates, had consistent successful metadata; every root verification batch also had clean completion metadata.
+
+The same iteration adds selected answer text to facilitator tables/Markdown notes, focuses the experiment heading after prediction, and aligns RELEASE_DECISION with the owner-selected education product. Browser inspection confirmed focus on `investigate-heading`. **100 Python tests**, **3 web tests**, TypeScript and the production build passed; **all eight Docker integration tests actually executed and passed in 92.573 seconds**, including clean proof, witnessed-fault replay, isolation negatives, audit, and unchanged-check repair.
+
 ## October 5 second education panel follow-up
 
 Release `0fd4317` deployed successfully to the public Vercel alias. The next fixes reject numeric edge/cycle citation lists with missing, impossible, or reversed references before accepting a hint; range expansion is bounded before allocation. Facilitator imports now accept up to 2 MB per bounded record, revalidate every mismatch against the pinned RTL library, and display assistance before transfer separately from total assistance. Completion stores the selected sequence and assistance snapshot; later exploration does not rewrite it. The opening demo narration now identifies the authored implementation precisely.
