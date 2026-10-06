@@ -1,6 +1,6 @@
-# Devpost submission Countertrace
+# Devpost submission: Countertrace
 
-Paste each section into the matching field. The YouTube URL remains owner-supplied; no video has been published by this workflow.
+Paste each section into the matching Devpost field. Replace the video placeholder once the video is published.
 
 ## Project name
 
@@ -23,82 +23,79 @@ NVIDIA Nemotron, Nebius Token Factory, Python, React, TypeScript, Verilator, Yos
 - Learning lab: https://countertrace.vercel.app
 - Facilitator desk: https://countertrace.vercel.app/#/teach
 - Code: https://github.com/Jeremiah-Sakuda/countertrace
-- Video: [YouTube URL — owner to record and publish]
+- Video: [YouTube URL]
 
 ## Inspiration
 
-A passing test can give a hardware learner confidence without revealing which boundary cases were missed. A plausible AI repair adds another claim to evaluate. We wanted a small lab where students construct a revealing sequence themselves, see actual circuit outputs, and explain what those observations establish.
+Hardware students learn to trust a passing testbench too early. A FIFO passes their tests, then fails on the cases they never drove: a write when the queue is full, a read and a write in the same cycle, a reset in the middle of traffic. AI coding assistants make this worse in a new way. Ask one to fix the RTL and it returns a plausible patch and says it works.
 
-Our initial audience is digital-design instructors and FPGA club mentors working with students who already understand clocks, reset, and basic RTL. The need and educational benefit remain hypotheses; no classroom study or adoption is claimed.
+Digital-design instructors and FPGA club mentors already teach "a passing test is not a proof," but they rarely have a ready exercise that shows it on a real circuit with a real AI fix. I built Countertrace to be that exercise: the model proposes, the learner investigates, and checks the model cannot change decide.
 
 ## What it does
 
-1. **Inspect.** Read the fixed four-slot FIFO contract and an actual Nemotron RTL patch.
-2. **Predict.** Commit an expected result and rationale before revealing the recorded checks.
-3. **Challenge.** The first patch still produces a counterexample. Inspect the expected and observed empty flag at edge 4, then investigate the revised proposal. The final candidate passed the same frozen checks; simulation, bounded results, property proofs, and covers stay distinct.
-4. **Explain and transfer.** State which evidence supports the decision, answer whether the result applies to eight slots, and download field notes. Free text is ungraded; practice is not measured learning gain.
-5. **Teach.** Share the repair link and discussion plan. Three smaller authored practice exercises let learners build short sequences on overflow, simultaneous operations, and evidence limits. Instructors can review voluntarily shared notes and locally import practice-bench JSON.
+1. **Inspect.** Read the FIFO contract and an actual Nemotron 3 Ultra RTL patch.
+2. **Predict.** Commit an expected result and a reason before the checks are revealed.
+3. **Challenge.** The first patch still fails: the recorded counterexample shows the expected and observed empty flag at edge 4. The revised patch then passes the same frozen checks, with simulation, bounded checking, unbounded proofs, and reachability reported separately.
+4. **Explain and transfer.** Say which evidence supports the decision, answer whether the result still holds for an eight-slot queue, and download field notes.
+5. **Teach.** Instructors share the repair lab with a discussion plan. Three practice labs, built on hand-written FIFO designs, let learners construct their own input sequences for overflow, simultaneous operations, and the limits of a passing test. The facilitator desk lets instructors review the notes learners choose to share.
 
-The repair patches are actual NVIDIA Nemotron responses through Nebius Token Factory. The hosted experience reveals their recorded tool evidence; it performs no live RTL execution or inference. Live repair, interpretation, verification, explanation, coaching, and auditing remain available in the configured local workbench.
-
-The three depth-2 practice candidates are authored exercises, not model outputs. Their library contains 4,096 executed six-edge paths per candidate and checked repeatable shorter prefixes. This is finite simulation with fixed 8-bit values, not an unbounded proof.
+Behind the lab is a full verification workbench. It runs any bundled FIFO in an isolated container, shows the first failing cycle with expected and observed values, asks Nemotron to explain the failure with checked citations, and runs the repair agent: Nemotron proposes an edit, Countertrace verifies it against the unchanged checks, and a failed candidate's own counterexample goes back to the model for the next attempt.
 
 ## How I built it
 
-- **Learning interface:** React and TypeScript; committed predictions, action builder, actual expected/observed values, authored hints, saved practice, transfer questions, and local facilitator review. A release-pinned SHA-256 binds replay to the checked evidence bytes.
-- **Evidence library:** the pinned, network-isolated Docker verifier ran all permitted sequences for three candidates. Independent Python scoring checked complete traces and prefix repeatability. Tests reparse every archived observation and compare all browser reference states with those results.
-- **Verification workbench:** Verilator plus Yosys/SymbiYosys, ABC and Yices. A separate formal monitor and Python queue own the checks. Admission rejects unsupported or checker-tampering RTL; every model patch is re-admitted and compared under frozen inputs. Exported workbench bundles replay without a model call.
-- **Coaching service:** Python routes through the existing token/spend limits and visitor quotas. The server chooses the evidence; client-supplied verification claims are ignored. Cited edges and structured output are validated, but semantic accuracy is not guaranteed.
+- **Learning interface:** React and TypeScript, with committed predictions, an action builder, expected and observed values, hints, transfer questions, and a local facilitator review. The practice library replays 4,096 executed six-edge input sequences per design, pinned by SHA-256 (finite simulation, not a proof).
+- **Verifier:** Verilator, Yosys, SymbiYosys, ABC, and Yices in a Docker image built from a digest-pinned base, run with no network. A hand-written formal monitor and a separate Python reference queue own every check.
+- **Admission and integrity:** RTL that could tamper with the checks is rejected before it runs, and the elaborated netlist is checked for the expected ports, free inputs, and exactly the monitor's properties. Every model patch goes through the same gate.
+- **Repair judging:** a candidate counts only if a separate run with hash-identical contract, harness, stimulus, limits, and formal tasks passes every obligation. Exported evidence bundles replay without a model call.
 
 ## NVIDIA Nemotron and Nebius Token Factory
 
-All live model calls use the Nebius Token Factory API from the control service. Hosted authored hints are not model output.
+Every live model call goes to the Nebius Token Factory API from the control service.
 
-| Task | Model configuration | Role |
+| Task | Model | Role |
 | --- | --- | --- |
-| Learning coaching | Nemotron 3 Ultra | Responds to an explanation using recorded evidence, source, and authored facilitator focus; advisory only. |
-| Brief interpretation | Nemotron 3 Super | Compares natural-language intent with the fixed contract and flags conflicts. |
-| Failure explanation | Nemotron 3 Ultra | Explains recorded failing cycles with checked references. |
-| Repair proposals | Nemotron 3 Ultra | Proposes constrained edits; independent unchanged checks accept or reject each candidate. |
+| Repair proposals | Nemotron 3 Ultra | Proposes exact-match RTL edits; unchanged checks accept or reject each one, up to three attempts with counterexample feedback. |
+| Failure explanation | Nemotron 3 Ultra | Explains the failing cycles; every cited cycle, signal, and line is checked against the trace. |
+| Learning coaching | Nemotron 3 Ultra | Responds to a learner's explanation using the recorded evidence; advisory only. |
+| Brief interpretation | Nemotron 3 Super, reasoning off | Compares a plain-English design brief with the fixed contract and flags conflicts in 1.7 to 3.7 s. |
 
-The initial coaching development record preserves two unhelpful Super responses and a useful revised Ultra response. Both prompt and model changed, so this is not a tier comparison. Four further development checks contain 12, 12, 4 targeted, and 15 cases, with prompt/source changes between versions. The final 15-case check still contains a factual contradiction in an exchange response and insufficient challenge of an overflow overclaim. All outcomes are preserved; adaptation or tutoring efficacy is not established. Neither exercise is a learner study or proof of improvement over authored hints.
+When a reply runs out of output tokens, Countertrace retries with `enable_thinking: false`. Every call has required token caps, a schema check, a usage record, and a cost reservation against a spending limit. In a repair comparison on eight cases, Nemotron 3 Super repaired 8 of 8 and Nano 6 of 8.
 
-Model requests have required token caps, bounded retries, usage records, and estimated cost reservations. Provider billing controls remain separate. Verification runs on CPU in the isolated Docker worker; Nebius Serverless Jobs are not used.
+## Results
 
-## Results and limits
+I froze the model configuration and prompts, recorded a hash of the test cases, and ran each evaluation once.
 
-The education interaction and finite replay evidence work. Learning gains, instructor adoption, preparation-time savings, and demand remain unmeasured. Practice records are self-reported and are not authenticated assessments.
-
-The underlying workbench has two separately frozen single-run engineering evaluations:
-
-| Outcome | eval-v1 | eval-v2 |
+| | eval-v1 | eval-v2 |
 | --- | --- | --- |
-| Bugs detected | 8/8 | 8/8 |
-| False alarms on four controls | 0/4 | 0/4 |
-| Repairs passing unchanged checks | 7/8 | 8/8 |
-| Conflicting briefs flagged | 4/4 | 3/4 |
-| Compatible briefs accepted | 4/4 | 4/4 |
+| Bugs found | 8 of 8 | 8 of 8 |
+| False alarms on 4 correct designs | 0 | 0 |
+| Repairs that passed the unchanged checks | 7 of 8 | 8 of 8 |
+| Conflicting briefs flagged | 4 of 4 | 3 of 4 |
+| Compatible briefs accepted | 4 of 4 | 4 of 4 |
 
-The first suite includes an independently authored MIT FIFO held out of prompt development. The second suite’s additional FIFO was written by the coding assistant shortly before freezing and held out of prompt development; it is not independent-author evidence. Cases and labels were prepared by the coding assistant. These are engineering outcomes, not educational outcomes. See the full evaluation reports and their limitations, including corrected derived summaries in some recorded evidence. Original model text and correction provenance remain visible.
+eval-v1 includes an MIT-licensed FIFO by another author. eval-v2 adds multi-line and two-bug cases. Full reports: https://github.com/Jeremiah-Sakuda/countertrace/tree/main/evaluation/results
+
+**Limits.** One synchronous FIFO profile (8-bit, depth 2 and 4). The hosted lab replays recorded evidence; live verification and Nemotron calls run in the local build. Evaluation cases were prepared with my coding assistant, and learning outcomes have not been measured yet.
 
 ## Challenges and lessons
 
-A model can repeat a learner's mistaken cause even when its cited edge exists. We retained those unsuccessful coaching calls, added candidate source and facilitator guidance, and tested the revised configuration. Reference validity alone never certifies reasoning.
+- **Making simulation and formal checking agree on what a cycle means.** I wrote down one sampling convention, built both references to it, and replay every formal counterexample in simulation.
+- **Keeping the model from moving the goalposts.** A patch could add assumptions, hide ports, or drive its own inputs. Admission, netlist checks, and hash-frozen check sets close those paths.
+- **Reasoning tokens eating the answer.** Nemotron 3 Ultra sometimes spent its whole budget reasoning. Short exact-edit patches and a reasoning-off retry recovered every such case in eval-v2.
+- **Coaching that sounds right but is not.** A model can repeat a learner's mistaken cause while citing a real edge, so citation checks are not enough. Coaching stays advisory and never changes a result.
 
-Recorded execution makes the classroom exercise immediate, but its scope must stay visible. We preserve raw RTL/stimulus/traces, check library integrity before replay, and distinguish a passing sequence from a universal proof. The correct-control lesson makes that distinction part of the activity.
+## What's next
 
-## Next steps
-
-Observe instructor and learner use, record exact answers and assistance, and improve confusing interactions. Complete project-funded access for advertised live model capabilities and preserve judge availability through December 15. The owner will record and publish the script-based demo. Public arbitrary uploads, additional module families, and LMS integration remain deferred.
+Classroom sessions with instructors, project-funded live model access on the hosted site, more recorded repair investigations from the evaluation cases, and a second module family such as a UART or an arbiter.
 
 ## Testing instructions
 
-Use [TESTING.md](TESTING.md). The hosted lesson needs no account or API key. Live local inference requires configuration; a judge should not be asked to purchase credits.
+See https://github.com/Jeremiah-Sakuda/countertrace/blob/main/docs/submission/TESTING.md. The hosted lab needs no account or API key.
 
 ## Feedback
 
-See [FEEDBACK.md](FEEDBACK.md) for sponsor-tool observations and reproducible issues.
+See https://github.com/Jeremiah-Sakuda/countertrace/blob/main/docs/submission/FEEDBACK.md.
 
 ## Created during the submission period
 
-Countertrace is a new implementation started October 1, 2026. No historical AKILI code was reused. The independently authored evaluation FIFO retains its MIT attribution. Third-party tools and dependencies retain their licenses.
+Countertrace is a new implementation started October 1, 2026. No earlier code was reused. The independently authored evaluation FIFO keeps its MIT attribution, and third-party tools keep their licenses.
