@@ -4,7 +4,7 @@ Dates are in 2026. A checked item has evidence in [STATUS.md](STATUS.md); develo
 
 ## October 5 education release
 
-The owner selected education as the primary product: predict → investigate → explain → transfer. The verification workbench remains available. PRD v1.2 and the Page are synchronized.
+The owner selected education as the primary product: predict → investigate → explain → transfer. The verification workbench remains available. PRD v1.3 and the Page are synchronized. The primary activity now centers on challenging actual Nemotron repairs; the three sequence lessons remain the practice bench.
 
 - [x] Three interactive bounded labs, including a correct control; authored hint ladder and per-experiment predictions.
 - [x] Record every supported sequence using the isolated verifier; validate archived evidence and browser reference agreement.

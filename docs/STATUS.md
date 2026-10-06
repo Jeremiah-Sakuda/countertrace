@@ -1,5 +1,15 @@
 # Implementation status
 
+## October 5 repair studio and admission hardening
+
+Rebuilt the primary education journey around the actual two-attempt Nemotron repair at depth 4. The new home, horizontal navigation, patch/judgment workbench, prediction-before-reveal gate, source-linked counterexample, scoped method counts, parameter-transfer question, and locally saved Markdown field notes make model repair the central activity. The practice bench retains all three sequence lessons, now compares committed predictions with observations and renders full expected/observed edge cards on phones. The teaching desk distinguishes repair notes from practice-session JSON. Candidate runs link forward to the next real proposal.
+
+A local overlapping-case probe confirmed that an admitted `synopsys parallel_case` comment could change formal synthesis semantics and hide an actual fault. Admission now rejects semantic tool comments and unique/unique0/priority promises. Variable initialization is rejected after endfunction/generate as well as ordinary declarations, and elaborated DUT netlists independently reject initialization attributes, including mapped interfaces. All six published verification DUT sources pass the hardened admission gate; no raw historical recording was rewritten. The original probe artifacts remain ignored/local.
+
+PRD v1.3 is synchronized with Page sequence 5. README, teaching instructions, submission narrative, testing instructions, and the demo script now lead with the repair lab. Coaching claims distinguish the four development checks and retained failures; eval-v2’s additional FIFO is explicitly assistant-authored, not independent-author evidence. New review reports remain local. No new inference calls, learner observations, or paid infrastructure are claimed.
+
+Validation: 103 Python tests, four web tests, TypeScript and production build passed. Browser checks completed both repair predictions, rejected and accepted results, reflection, transfer, return-to-lab persistence, and the mobile overflow experiment. At 375 px the page and evidence cards had no horizontal overflow; the desktop home was inspected at 1440 px. These answers are assistant test data. Docker initially skipped tests because the existing Colima VM was unresponsive; the VM was recovered without deleting its disk. The overlapping-case test fixture required one correction and its targeted rerun passed. The final full Docker suite passed all **10 tests in 99.071 seconds**, including rejection of the overlapping-case directives, a witnessed failure for the ordinary-case control, and rejection of elaborated initialization after deliberately bypassing the lexical gate. Deployment verification is recorded separately below.
+
 ## October 5 education release complete and panel loop closed
 
 Five fresh three-reviewer simulated panels are complete. The final two averages met the predeclared stability thresholds, and the five-round cap was reached; all per-review scores, concrete fixes, and the stopping calculation are preserved in [the panel record](reviews/education-panel.md). These are assistant judgments, not official judging or learner evidence. The last P3 wording fix makes the retained 200-experiment/100-coaching-reply history limit explicit in UI, notes, and teaching guidance.
@@ -47,7 +57,7 @@ Local `POST /api/learn/hint` uses server-owned recorded evidence, candidate sour
 Validation so far: **96 Python tests**, **3 web tests**, TypeScript and production build pass; **8 Docker integration tests actually executed and passed** in 93.003 seconds. Browser walkthrough confirmed the overflow result (expected 0x11, observed 0x33 at edge 4), locked first answers, and transfer feedback. Homepage checks at 375 and 1440 px showed no page overflow. PRD v1.2 was read back from Page sequence 4 and mirrored into the repository. Deployment and repeated panel results are recorded below when observed.
 
 
-Last updated: October 4, 2026. This page records what has actually run. The October 4 sections report two frozen evaluations (eval-v1 and eval-v2); eval-v1 includes an independently authored FIFO held out of prompt development. Everything else uses **development and showcase fixtures authored for this project**. No user study or external review has happened.
+Historical baseline recorded October 4, 2026. This page records what has actually run. The October 4 sections report two frozen evaluations (eval-v1 and eval-v2); eval-v1 includes an independently authored FIFO held out of prompt development. Everything else uses **development and showcase fixtures authored for this project**. No user study or external review has happened.
 
 ## October 4 correction of simulation summaries and citation checks
 

@@ -1,6 +1,6 @@
 # Feedback on Nebius and NVIDIA tools (Devpost field)
 
-Paste the section below into the feedback field. Every item comes from something observed while building Countertrace between October 1 and October 4, 2026. Raw records are in `evaluation/results/` and `docs/evidence/`.
+Paste the section below into the feedback field. Items distinguish hands-on observations from documentation-only assessments while building Countertrace between October 1 and October 5, 2026. Raw records are in `evaluation/results/` and `docs/evidence/`.
 
 ---
 
@@ -17,3 +17,5 @@ Paste the section below into the feedback field. Every item comes from something
 **5. Serverless Jobs for interactive agent loops (from the documentation).** My verification batch takes 5 to 20 seconds. The documented multi-minute startup and one-hour minimum timeout make a Job per run a poor fit for that, so verification runs in Docker on a CPU host. I did not run Jobs, so this is based on the documentation only. A warm pool or a short-job mode would make Jobs a natural home for this kind of tool-checking agent.
 
 **6. Instruction following on a negative rule.** I asked Ultra not to state internal register values that are not in the sampled trace. It mostly complied but still sometimes wrote values inferred from the RTL. Citation checks catch references to cycles and signals that do not exist, but not this kind of over-claiming, so the prompt guidance on this would be worth testing on future model versions.
+
+**7. Coaching references do not ensure factual accuracy.** Four development checks (12, 12, 4 targeted, and 15 cases) used changing prompt/source configurations. The final check still included a contradiction about exchange write acceptance and insufficient challenge of an overflow overclaim. A response can cite real edges while explaining them incorrectly. We keep coaching advisory and preserve the failed responses; we have not measured learning benefit.

@@ -1,8 +1,8 @@
 # Countertrace design system
 
-**Direction:** Evidence notebook · October 3, 2026
+**Direction:** Repair studio · October 5, 2026
 
-The owner requested a complete creative redesign after rejecting the blue and charcoal dashboard treatments. The interface now draws on editorial layouts and laboratory notebooks: warm paper, ink, rust, a pale sage navigation rail, serif headlines, numbered workflows, and precise data tables. This replaces the earlier generated dark developer-tool preset. UI/UX Pro Max's Editorial Grid / Magazine and Minimalism & Swiss Style guidance informed the layout; Countertrace's evidence rules remain authoritative.
+The owner requested a complete creative redesign after rejecting the blue and charcoal dashboard treatments. The interface now draws on editorial layouts and laboratory notebooks: warm paper, ink, rust, a pale sage patch exhibit, serif headlines, numbered workflows, and precise data tables. This replaces the earlier generated dark developer-tool preset. UI/UX Pro Max's Editorial Grid / Magazine and Minimalism & Swiss Style guidance informed the layout; Countertrace's evidence rules remain authoritative.
 
 ## Evidence semantics
 
@@ -16,13 +16,13 @@ The owner requested a complete creative redesign after rejecting the blue and ch
 
 ## Visual tokens
 
-The implemented source of truth is `src/styles.css`.
+The implemented source of truth is `src/styles.css` with the repair studio in `src/studio.css`.
 
 | Role | Color |
 | --- | --- |
-| Page paper | `#F5F2EB` |
-| Card paper | `#FFFDF8` |
-| Navigation rail | `#E9EBDF` |
+| Page paper | `#F7F5EF` |
+| Card paper | `#FFFEFA` |
+| Neutral patch exhibit | `#E8ECDF` |
 | Ink | `#252824` |
 | Secondary text | `#484C43` |
 | Muted text | `#66695F` |
@@ -41,8 +41,8 @@ Use Newsreader for editorial headings and short explanatory statements, DM Sans 
 
 ## Layout and interaction
 
-- Desktop at 1100 px and above: a 232 px navigation rail, numbered destinations, expandable runtime/model details, and persistent run context. Short viewports can scroll the rail.
-- Smaller screens: compact horizontal navigation. At widths below 950 px the setup examples use a labelled native select, keeping the chosen input close to its contract.
+- A horizontal masthead links Repair lab, Practice bench, Teach, and Workbench. Runtime details open as a popover. Workbench routes expose their secondary navigation. Actual patch diffs are the primary visual exhibit.
+- Smaller screens: a wrapping masthead, stacked patch/judgment panes, full expected/observed edge cards, and no page-level overflow. At widths below 950 px the setup examples use a labelled native select, keeping the chosen input close to its contract.
 - Setup: an editorial introduction, three-step workflow, example index, input specimen, contract review, and acceptance before execution. Optional model interpretation is a disclosure.
 - Runs: a collection of recorded case cards followed by a live-run ledger. Counts derive from each recorded verdict. Recording notes and original metadata remain available on each card.
 - Run detail: case title and result, a sourced failing-cycle card, compact facts, provenance disclosure, section shortcuts, reference queue, trace, explanation, repair, and method-specific evidence.

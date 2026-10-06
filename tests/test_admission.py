@@ -24,6 +24,19 @@ class AdmissionTest(unittest.TestCase):
         self.assertIn(find, source)
         return source.replace(find, replace, 1)
 
+    def test_tool_comments_and_case_promises_are_rejected(self):
+        for directive in ('/* synopsys parallel_case */', '/* synthesis full_case */', '// synthesis translate_off\n', '/* verilator lint_off CASEOVERLAP */', '/* pragma translate_off */'):
+            with self.subTest(directive=directive):
+                self.assert_rejected(self.mutate('case ({do_write, do_read})', 'case ({do_write, do_read}) '+directive), 'lexical')
+        for keyword in ('unique', 'unique0', 'priority'):
+            self.assert_rejected(self.mutate('case (', keyword+' case ('), 'construct')
+        # Literal messages are not tool comments.
+        self.assertTrue(admit(self.mutate('assign empty', 'if (DEPTH < 2) begin $error("synopsys parallel_case"); end\n    assign empty')).accepted)
+
+    def test_initializers_after_endfunction_and_in_generate_are_rejected(self):
+        for addition in ('function automatic f; input x; begin f=x; end endfunction reg poison = 1;', 'generate reg poison = 1; endgenerate'):
+            self.assert_rejected(self.mutate('assign empty',addition+'\n    assign empty'),'construct')
+
     def test_rejects_system_tasks(self):
         self.assert_rejected(self.mutate("assign empty", "always @(posedge clk) $display(1);\n    assign empty"), "system_task")
         self.assert_rejected(self.mutate("assign empty", "always @(posedge clk) $finish;\n    assign empty"), "system_task")
@@ -145,6 +158,10 @@ class AdmissionTest(unittest.TestCase):
             "din": {"direction": "input", "bits": list(range(6, 14))}, "dout": {"direction": "output", "bits": list(range(20, 28))},
             "full": {"direction": "output", "bits": [30]}, "empty": {"direction": "output", "bits": [31]}}}}}
         self.assertEqual(check_ports_json(good, "fifo", 8), [])
+        import copy
+        initialized = copy.deepcopy(good)
+        next(iter(initialized['modules'].values()))['netnames']={'poison':{'bits':[40],'attributes':{'init':'1'}}}
+        self.assertTrue(any('initialization attribute' in d.message for d in check_ports_json(initialized,'fifo',8)))
         bad = {"modules": {"fifo": {"ports": {**good["modules"]["$paramod\\fifo\\DEPTH=4"]["ports"],
                                               "dout": {"direction": "output", "bits": [1]}}}}}
         self.assertTrue(check_ports_json(bad, "fifo", 8))

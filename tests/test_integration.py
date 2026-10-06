@@ -37,6 +37,38 @@ def statuses(state: dict) -> dict:
 
 
 class IntegrationTest(unittest.TestCase):
+    def test_case_semantic_directives_never_reach_execution(self):
+        import re
+        base = catalog.base_source("fifo_count.v")
+        base = base.replace("assign empty", "reg [7:0] prev_din;\n    always @(posedge clk) if (rst) prev_din <= 0; else prev_din <= din;\n    wire trig = do_write && do_read && prev_din == 8'h5A && din == 8'hA5;\n    wire [AW:0] next_count = count + do_write - do_read;\n    assign empty", 1)
+        # Overlapping branches once let parallel_case hide the bad count update
+        # from formal synthesis while the ordinary procedural case still failed.
+        body = "case (1'b1) MARKER\n                trig: count <= 0;\n                do_write || do_read: count <= next_count;\n                default: count <= count;\n            endcase"
+        probe = re.sub(r"case \(.*?endcase", lambda _: body, base, count=1, flags=re.S)
+        self.assertIn("MARKER", probe)
+        for marker in ('/* synopsys parallel_case */', '/* synthesis parallel_case */'):
+            state=verify(probe.replace('MARKER',marker),4)
+            self.assertEqual(set(statuses(state).values()),{'unsupported'})
+            self.assertEqual(state['batches'],{})
+        for keyword in ('unique','unique0','priority'):
+            state=verify(probe.replace('MARKER','').replace("case (1'b1)",keyword+" case (1'b1)"),4)
+            self.assertEqual(set(statuses(state).values()),{'unsupported'})
+            self.assertEqual(state['batches'],{})
+        plain=verify(probe.replace('MARKER','/* ordinary case */'),4)
+        self.assertEqual(plain['integrity'],[])
+        self.assertTrue(any(f['source']=='formal' for f in plain['findings']))
+        self.assertIn('counterexample',statuses(plain).values())
+
+
+    def test_elaborated_init_is_rejected_even_if_lexical_gate_is_bypassed(self):
+        from countertrace.admission import admit
+        source=catalog.base_source("fifo_count.v").replace('reg [AW:0]      count;', "reg [AW:0]      count = 1;")
+        admitted=admit(catalog.base_source("fifo_count.v"))
+        with mock.patch('countertrace.verify.admit',return_value=admitted):
+            state=verify(source,4,formal=('prove',))
+        self.assertTrue(any('initialization attribute' in p for p in state['integrity']))
+        self.assertFalse(set(statuses(state).values()) & {'proved','simulation_passed','bounded_pass'})
+
     def test_known_good_control_is_proved_and_clean(self):
         state = verify(catalog.base_source("fifo_count.v"), 2)
         self.assertEqual(state["findings"], [])

@@ -1,5 +1,14 @@
 # Facilitate the Countertrace learning lab
 
+## Start with the Nemotron repair lab
+
+Share https://countertrace.vercel.app/#/repair. Read the depth-4 contract, inspect the real proposed diff, and ask learners to commit both a prediction and a reason before revealing each recorded outcome. After the first counterexample, ask what the guard failed to address. After the revised patch passes, ask whether that evidence establishes a depth-8 version. Review the learner’s own answer before opening the facilitator explanation.
+
+The key is to distinguish read acceptance from pointer-based empty detection. The first patch guards reads but leaves the low-bit pointer alias. The revised patch also compares the full pointers and passes the frozen depth-4 checks. Depth 8 is outside the current supported profile. It would need a reviewed profile extension, fresh elaboration, and a check run; the recorded depth-4 pass does not establish it. Have learners retain a regression sequence and discuss what simulation alone leaves uncertain.
+
+Repair notes download as Markdown for direct discussion, not the practice-bench JSON importer. They are anonymous, self-reported, and ungraded. Collect only voluntarily shared notes. The plan is unpiloted; no learning or preparation-time benefit is established. The three practice-bench lessons below offer focused sequence construction.
+
+
 The primary audience is instructors and FPGA club mentors teaching learners who know clocks, reset, and basic RTL. Open the [facilitator desk](https://countertrace.vercel.app/#/teach) for shareable learner links and answer keys. The three interactive labs replace the worksheet as the primary journey. The worksheet below remains an optional workbench activity.
 
 ## Suggested 20 minute session

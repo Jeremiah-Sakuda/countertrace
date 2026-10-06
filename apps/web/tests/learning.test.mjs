@@ -51,7 +51,7 @@ test('all browser queue states agree with independent executed evidence; errors 
     assert.match(renderToStaticMarkup(createElement(LearnHome)),/does not execute RTL/);
     assert.match(renderToStaticMarkup(createElement(TeachView)),/not yet been piloted/);
     const {parseHash,href}=await vite.ssrLoadModule('/src/lib/route.ts');
-    assert.deepEqual(parseHash('#/'),{name:'learn',id:null});
+    assert.deepEqual(parseHash('#/learn'),{name:'learn',id:null});
     assert.deepEqual(parseHash(href.setup()),{name:'setup',exampleId:null});
   } finally {await vite.close();}
 });

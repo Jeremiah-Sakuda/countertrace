@@ -23,6 +23,9 @@ ALLOWED_DIRECTIVES = {"default_nettype", "timescale"}
 # Keywords that could add verification semantics, bypass the harness, reach the
 # host, or make simulation and formal tools see different behavior.
 PROHIBITED_KEYWORDS = {
+    "unique": "Case exclusivity promises can change synthesis semantics; use ordinary case.",
+    "unique0": "Case exclusivity promises can change synthesis semantics; use ordinary case.",
+    "priority": "Priority promises can change synthesis semantics; use ordinary case or explicit if/else.",
     "assert": "DUT-authored assertions are not accepted; the trusted monitor owns all checks.",
     "assume": "DUT-authored assumptions could constrain the check; they are not accepted.",
     "restrict": "DUT-authored restrictions could constrain the check; they are not accepted.",
@@ -96,7 +99,10 @@ class LexError(ValueError):
     pass
 
 
-def strip_comments(text: str) -> str:
+TOOL_COMMENT = re.compile(r"^(?://|/\*)\s*(?:synopsys|synthesis|pragma|verilator|yosys|synplify|cadence|altera|xilinx|ambit|exemplar|quartus|full_case|parallel_case|translate_off|translate_on)\b", re.I)
+
+
+def strip_comments(text: str, *, reject_tool_comments: bool = False) -> str:
     """Blank comments and string contents in one left-to-right pass, as a compiler reads them.
 
     Comments, strings, and their delimiters are recognized in source order, so
@@ -113,6 +119,8 @@ def strip_comments(text: str) -> str:
         if two == "//":
             j = text.find("\n", i)
             j = n if j < 0 else j
+            if reject_tool_comments and TOOL_COMMENT.search(text[i:j]):
+                raise LexError("Tool-directive comments are outside the supported RTL subset.")
             out.append(" " * (j - i))
             i = j
         elif two == "/*":
@@ -120,6 +128,8 @@ def strip_comments(text: str) -> str:
             if j < 0:
                 raise LexError("Unterminated block comment.")
             chunk = text[i:j + 2]
+            if reject_tool_comments and TOOL_COMMENT.search(chunk):
+                raise LexError("Tool-directive comments are outside the supported RTL subset.")
             out.append("".join("\n" if ch == "\n" else " " for ch in chunk))
             i = j + 2
         elif c == '"':
@@ -220,7 +230,7 @@ def admit(source: bytes | str, mapping: dict | None = None) -> Admission:
     # One ordered lexical pass: comments are blanked and string contents (only
     # meaningful as severity-task messages) are never scanned as code.
     try:
-        code = strip_comments(text)
+        code = strip_comments(text, reject_tool_comments=True)
     except LexError as exc:
         diag(Diagnostic("lexical", str(exc)))
         return result
@@ -307,10 +317,10 @@ def admit(source: bytes | str, mapping: dict | None = None) -> Admission:
                             alternative="Declare them as unused outputs in an interface mapping, if they are outputs."))
         clock = mapping["ports"]["clk"] if mapping else "clk"
         body = code[(header_end + 2) if header_end >= 0 else len(code):]
-        for chunk_start, chunk in _statements(body):
-            if re.search(r"(?:^|\b(?:begin|end)\b(?:\s*:\s*[A-Za-z_]\w*)?)\s*(?:reg|logic|integer|bit|int|byte|shortint|longint)\b[^=;]*=(?!=)", chunk):
-                diag(Diagnostic("construct", "Variable declaration initializers act like initial blocks; set values in reset instead.",
-                                line_of(code, header_end + 2 + chunk_start)))
+        declarations = re.sub(r"\b(?:localparam|parameter)\b[^;]*;", lambda m: " " * len(m[0]), body)
+        for match in re.finditer(r"\b(?:reg|logic|integer|bit|int|byte|shortint|longint)\b[^;]*?(?<![<>!=])=(?!=)", declarations):
+            diag(Diagnostic("construct", "Variable declaration initializers act like initial blocks; set values in reset instead.",
+                            line_of(code, header_end + 2 + match.start())))
         for name, port in result.ports.items():
             redeclared = re.search(rf"\b(?:wire|reg|logic|integer|genvar|tri|supply0|supply1)\b[^;]*?\b{name}\b\s*(?:\[[^\]]*\]\s*)?(?:=|;|,)", body)
             if redeclared and re.search(rf"\b{name}\b", redeclared.group().split("=")[0]):
@@ -360,5 +370,11 @@ def check_ports_json(ports_json: dict, module: str, width: int) -> list[Diagnost
         port = ports.get(name)
         if port and (port.get("direction") != direction or len(port.get("bits", [])) != bits):
             problems.append(Diagnostic("elaboration", f"Elaborated port {name} is not a {bits}-bit {direction}."))
+    # ports.json contains only the DUT and its optional trusted interface wrapper,
+    # before the monitor is added. Inspect every module so mapped DUTs cannot hide init.
+    for module_name, design in modules.items():
+        for name, net in design.get("netnames", {}).items():
+            if "init" in net.get("attributes", {}):
+                problems.append(Diagnostic("elaboration", f"DUT net {module_name}.{name} has an initialization attribute; reset must establish state."))
     problems.extend(Diagnostic("elaboration", message) for message in input_drive_problems(mod))
     return problems

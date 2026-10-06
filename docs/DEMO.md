@@ -20,4 +20,4 @@ Recording prerequisites: complete the [model gate and showcase refresh](MODEL_GA
 
 ## Education release update — October 5
 
-The current narrative and timings are in [the education demo script](submission/DEMO_SCRIPT.md). Start at the learning lab, build an ordinary test and an overflow counterexample, then show explanation, transfer, and facilitator reuse. The earlier workbench shot list remains background. The owner records/uploads; script review is not footage review.
+The current narrative and timings are in [the education demo script](submission/DEMO_SCRIPT.md). Start at the repair lab, predict and reveal both actual Nemotron candidate outcomes, then show explanation, depth transfer, sequence-building practice, and facilitator reuse. The earlier workbench shot list remains background. The owner records/uploads; script review is not footage review.

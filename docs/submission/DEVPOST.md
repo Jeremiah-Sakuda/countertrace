@@ -8,11 +8,15 @@ Countertrace
 
 ## Elevator pitch (200 characters max)
 
-An interactive hardware debugging lab: predict, build a counterexample, and justify a fix. Nemotron coaches your reasoning; independent verification checks the evidence.
+A hardware debugging lab where learners challenge real Nemotron repairs: predict, inspect counterexamples, and defend the fix. Independent checks decide; instructors reuse the lesson.
 
 ## Track
 
 Coding and Agentic Engineering
+
+## Built with
+
+NVIDIA Nemotron, Nebius Token Factory, Python, React, TypeScript, Verilator, Yosys, SymbiYosys, ABC, Yices, Docker, Vercel.
 
 ## Links
 
@@ -29,15 +33,15 @@ Our initial audience is digital-design instructors and FPGA club mentors working
 
 ## What it does
 
-1. **Predict.** Read a fixed two-slot FIFO contract and commit an answer before seeing the result.
-2. **Investigate.** Build up to six edges using write, read, simultaneous read/write, and reset. Compare actual recorded RTL outputs with an independently computed reference queue. An ordinary write/read sequence passes; an overflow sequence returns 0x33 where 0x11 was expected.
-3. **Explain.** Write the governing rule and evidence in your own words. Authored hints work on the hosted site. In the configured local build, Nemotron responds to the learner explanation using server-selected observations, candidate RTL, and an authored facilitator focus. AI feedback is advisory; free text is ungraded.
-4. **Transfer.** Answer a related boundary or evidence-scope question. Preserve the initial answer, experiment predictions, assistance, and first transfer answer in a downloadable practice record. Completion is not mastery or a measured learning gain.
-5. **Teach.** A facilitator shares lesson links, opens answer keys, and reviews voluntarily shared anonymous session JSON locally in the browser. Nothing is uploaded during import.
+1. **Inspect.** Read the fixed four-slot FIFO contract and an actual Nemotron RTL patch.
+2. **Predict.** Commit an expected result and rationale before revealing the recorded checks.
+3. **Challenge.** The first patch still produces a counterexample. Inspect the expected and observed empty flag at edge 4, then investigate the revised proposal. The final candidate passed the same frozen checks; simulation, bounded results, property proofs, and covers stay distinct.
+4. **Explain and transfer.** State which evidence supports the decision, answer whether the result applies to eight slots, and download field notes. Free text is ungraded; practice is not measured learning gain.
+5. **Teach.** Share the repair link and discussion plan. Three smaller authored practice exercises let learners build short sequences on overflow, simultaneous operations, and evidence limits. Instructors can review voluntarily shared notes and locally import practice-bench JSON.
 
-Three lessons cover overflow, simultaneous operations, and evidence limits with a correct control. Every permitted action sequence was actually run in the isolated verifier: 4,096 six-edge paths per candidate, plus all shorter prefixes. This is finite simulation with fixed data values, depth 2 and width 8. Hosted playback is clearly labeled; it performs no live RTL execution or model call. Learner candidates are authored exercises, not claimed AI outputs.
+The repair patches are actual NVIDIA Nemotron responses through Nebius Token Factory. The hosted experience reveals their recorded tool evidence; it performs no live RTL execution or inference. Live repair, interpretation, verification, explanation, coaching, and auditing remain available in the configured local workbench.
 
-After the lab, learners can inspect a separate recorded Nemotron repair that initially failed and later passed the same frozen checks. The underlying workbench supports diagnosis, explanation, up to three repair candidates, supplemental-check auditing, and hashed evidence export. The model cannot alter the contract, checker, or acceptance decision. Simulation, bounded checks, property proofs, unresolved results, and errors remain distinct.
+The three depth-2 practice candidates are authored exercises, not model outputs. Their library contains 4,096 executed six-edge paths per candidate and checked repeatable shorter prefixes. This is finite simulation with fixed 8-bit values, not an unbounded proof.
 
 ## How I built it
 
@@ -57,7 +61,7 @@ All live model calls use the Nebius Token Factory API from the control service. 
 | Failure explanation | Nemotron 3 Ultra | Explains recorded failing cycles with checked references. |
 | Repair proposals | Nemotron 3 Ultra | Proposes constrained edits; independent unchanged checks accept or reject each candidate. |
 
-The initial coaching development record preserves two unhelpful Super responses and a useful revised Ultra response. Both prompt and model changed, so this is not a tier comparison. A separate declared development check uses the fixed coaching configuration across all three lessons; its results and assistant review are in the repository. Neither exercise is a learner study or proof of improvement over authored hints.
+The initial coaching development record preserves two unhelpful Super responses and a useful revised Ultra response. Both prompt and model changed, so this is not a tier comparison. Four further development checks contain 12, 12, 4 targeted, and 15 cases, with prompt/source changes between versions. The final 15-case check still contains a factual contradiction in an exchange response and insufficient challenge of an overflow overclaim. All outcomes are preserved; adaptation or tutoring efficacy is not established. Neither exercise is a learner study or proof of improvement over authored hints.
 
 Model requests have required token caps, bounded retries, usage records, and estimated cost reservations. Provider billing controls remain separate. Verification runs on CPU in the isolated Docker worker; Nebius Serverless Jobs are not used.
 
@@ -75,7 +79,7 @@ The underlying workbench has two separately frozen single-run engineering evalua
 | Conflicting briefs flagged | 4/4 | 3/4 |
 | Compatible briefs accepted | 4/4 | 4/4 |
 
-The first suite includes an independently authored MIT FIFO held out of prompt development; cases and labels were prepared by the coding assistant. These are engineering outcomes, not educational outcomes. See the full evaluation reports and their limitations, including corrected derived summaries in some recorded evidence. Original model text and correction provenance remain visible.
+The first suite includes an independently authored MIT FIFO held out of prompt development. The second suite’s additional FIFO was written by the coding assistant shortly before freezing and held out of prompt development; it is not independent-author evidence. Cases and labels were prepared by the coding assistant. These are engineering outcomes, not educational outcomes. See the full evaluation reports and their limitations, including corrected derived summaries in some recorded evidence. Original model text and correction provenance remain visible.
 
 ## Challenges and lessons
 

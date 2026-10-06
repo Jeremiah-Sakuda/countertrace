@@ -1,8 +1,8 @@
 # Countertrace PRD
 
-**Version:** 1.2 · **Date:** October 5, 2026 · **Status:** Education is the primary product direction. The verification engine and recorded model repairs have run; learning outcomes remain unmeasured. See repository STATUS.md for current execution evidence.
+**Version:** 1.3 · **Date:** October 5, 2026 · **Status:** Education centers on investigating real Nemotron repairs. The verification engine and recorded model repairs have run; learning outcomes remain unmeasured. See repository STATUS.md for current execution evidence.
 
-Countertrace is an interactive hardware debugging lab for digital-design students, instructors, and FPGA club mentors. Learners predict behavior, construct a short experiment, inspect an actual counterexample, and explain what their evidence establishes. The first release supports one synchronous FIFO contract and reusable lessons on overflow, simultaneous operations, and evidence limits. The existing verification workbench remains available for diagnosis, model-proposed repair, and reproducible evidence export. Public arbitrary uploads and user testbench ingestion remain deferred. The project was built from scratch; historical AKILI code is not a dependency.
+Countertrace is a hardware debugging lab where digital-design learners challenge real NVIDIA Nemotron repairs using counterexamples and unchanged independent checks. The primary activity asks learners to inspect a model-proposed RTL patch, commit a prediction and reason, reveal recorded verifier evidence, and explain whether the result transfers to another parameter. Instructors and FPGA club mentors can reuse this activity and three smaller sequence-building exercises. The verification workbench retains diagnosis, model-proposed repair, and reproducible export. Public arbitrary uploads and user testbench ingestion remain deferred. The project was built from scratch; historical AKILI code is not a dependency.
 
 The recommended entry is in Coding and Agentic Engineering. The submission deadline is October 30, 2026 at 1:00 p.m. EDT. The working project must remain available for judging through December 15, 2026. These dates and the requirement to use an NVIDIA open model with Nebius come from the [official rules](https://nebiusglobalaihackathon.devpost.com/rules).
 
@@ -10,11 +10,11 @@ Coding and Agentic Engineering remains the recommended track: learners investiga
 
 ## Product decision
 
-Commit to one learning journey: read a fixed contract → commit a prediction → build a short test sequence → compare expected and observed behavior → explain the evidence → answer a transfer question → export a practice record. The instructor journey is choose a lesson → share its link → facilitate experiments → review voluntarily shared anonymous practice records.
+Commit to one primary journey: read a fixed contract → inspect an actual Nemotron patch → commit a prediction and rationale → reveal independent recorded checks → investigate the next proposal → explain the evidence → answer a parameter-transfer question → download field notes. Keep the three sequence-building exercises as the practice bench. The instructor journey is share the repair-lab link → facilitate predictions and evidence discussion → review voluntarily shared notes → select a focused practice exercise.
 
-The distinctive product hypothesis is that constructing counterexamples helps learners challenge plausible hardware fixes and recognize the limits of passing tests. The learning lab is the primary experience. A passing sequence is not complete correctness, and a practice score is not a learning gain. The existing check-quality audit and real Nemotron repair records support advanced discussion. Agentic RTL repair, educational HDL exercises, formal verification, and mutation testing have precedents; make no first-of-kind research claim.
+The distinctive product hypothesis is that asking learners to challenge real AI repair attempts helps them reason about hardware behavior and the limits of evidence. Nemotron generates the investigated patches through Nebius; independent tools decide their verification outcomes. The education interface never substitutes a model judgment for a tool result. A passing sequence is not complete correctness, and completing an activity is not a learning gain. Agentic RTL repair, educational HDL exercises, formal verification, and mutation testing have precedents; make no first-of-kind research claim.
 
-Keep the scope narrow: one fixed FIFO contract, three reusable lessons, a finite set of recorded experiments, and optional live advisory coaching. The verification workbench retains eligible RTL input in the local build. Generic SystemVerilog support, arbitrary public uploads, course catalogs, accounts, grading automation, and LMS integrations are deferred.
+Keep the scope narrow: one fixed FIFO contract, one recorded two-attempt Nemotron repair investigation at depth 4, three depth-2 practice lessons, a finite recorded experiment library, and optional local advisory coaching. The local verification workbench retains eligible RTL input. Generic SystemVerilog support, arbitrary public uploads, course catalogs, accounts, grading automation, and LMS integrations are deferred.
 
 ## Audience and problem
 
@@ -106,15 +106,15 @@ The product remains useful if automatic repair is cut: it can still diagnose a r
 
 ## User experience
 
-The learning lab is the default landing experience, with a facilitator desk and the existing verification workbench accessible separately.
+The default landing page introduces the repair investigation. Primary navigation exposes Repair lab, Practice bench, Teach, and Workbench. In the repair lab, predictions and rationale precede each result reveal. Show actual patch diffs and source-linked counterexample evidence, preserve unresolved obligations, and identify recorded playback explicitly. Verify candidate-parent linkage and unchanged comparison metadata before presenting the curated result; missing or inconsistent evidence must fail closed. Store anonymous field notes locally and export readable Markdown. Free-text reasoning is ungraded; a facilitator explanation follows the learner’s own reflection and depth-transfer response.
 
-**Learning bench.** Offer three lessons: overflow/data order, simultaneous operations, and evidence limits with a correct control. Collect an initial prediction before showing results. Let learners compose one to six actions (write, read, simultaneous read/write, reset). Use depth 2 and deterministic 8-bit offered values for these exercises. Each available sequence must have actually executed in the isolated RTL verifier. The hosted site may replay a finite recorded library, clearly labeling its action alphabet, horizon, original method, and provenance. No browser-computed DUT behavior may be presented as executed RTL evidence. Missing, corrupt, or mismatching library evidence is an error, never a passing result.
+**Practice bench.** Offer three lessons: overflow/data order, simultaneous operations, and evidence limits with a correct control. Collect an initial prediction before showing results. Let learners compose one to six actions (write, read, simultaneous read/write, reset), then compare their per-experiment prediction with the observation. Use depth 2 and deterministic 8-bit offered values. Each available sequence must be either a complete isolated RTL execution or a checked, repeatable prefix of one; label that distinction. The hosted finite library states its action alphabet, horizon, method, and provenance. No browser-computed DUT behavior may be presented as executed RTL evidence. Missing, corrupt, or mismatching evidence is an error, never a passing result. Expected and observed values must remain readable on mobile.
 
 **Explanation and transfer.** Show the independent reference queue and sampled outputs, including the first mismatch and unobserved/unchecked values. Require a learner explanation before the transfer answer is revealed. Grade only fixed-choice answers against the contract. Free text is ungraded discussion material. Keep initial answers, experiment predictions, sequences, assistance, and transfer outcomes in downloadable local practice records. No certificate, inferred mastery, or population learning claim.
 
 **Coaching.** Authored hint ladders remain available without model access and must be labeled as authored. In the configured local build, Nemotron can respond to the learner explanation using server-selected recorded evidence. Model output is advisory and cannot change an answer key or verification verdict. Validate structured output and cited edges, disclose inference destination, and retain bounded retries, budgets, and per-visitor rate limits. A recorded coaching example, if shown, must preserve its actual request and response and cannot impersonate a live response.
 
-**Facilitator desk.** Provide shareable lesson routes, a suggested session plan, prerequisites, facilitator answer keys, and voluntary import of anonymous practice records. Imported files remain local to the browser, are validated and bounded, and are self-reported practice rather than independent study evidence. Report record counts, not unique participants or demonstrated gains. No outreach or collection happens automatically.
+**Facilitator desk.** Provide shareable repair and practice routes, session plans, prerequisites, facilitator explanations, and voluntary review of anonymous notes. Repair notes export as Markdown for discussion; practice-bench sessions export as bounded, validated JSON for local import. Imported files remain in the browser and are self-reported practice, not independent study evidence. Report record counts, not unique participants or demonstrated gains. No outreach or collection happens automatically.
 
 The workbench retains its three existing surfaces:
 
@@ -150,7 +150,7 @@ A formal counterexample is replayed through the independently authored simulatio
 
 ## Verification and repair requirements
 
-**Input admission.** Validate encoding, size, supported ports, parameters, syntax subset, and prohibited constructs before launching expensive work. Reject unsupported blackboxes, external includes, DPI/VPI, native extensions, user build scripts, executable system tasks, DUT-authored assumptions, and configurations that could bypass the trusted harness. Preflight diagnostics identify the unsupported construct and supported alternative where available. Apply the same admission pipeline to every model-generated repair and supplemental check, including runs that began from bundled examples. Reject interface or parameter changes, injected assumptions, and preprocessing or tool-specific constructs that make simulation and formal verification see different behavior. Model output cannot edit the harness, build policy, or command line.
+**Input admission.** Validate encoding, size, supported ports, parameters, syntax subset, and prohibited constructs before launching expensive work. Reject unsupported blackboxes, external includes, DPI/VPI, native extensions, user build scripts, executable system tasks, DUT-authored assumptions, and configurations that could bypass the trusted harness. Preflight diagnostics identify the unsupported construct and supported alternative where available. Apply the same admission pipeline to every model-generated repair and supplemental check, including runs that began from bundled examples. Reject interface or parameter changes, injected assumptions, and preprocessing or tool-specific constructs that make simulation and formal verification see different behavior. Model output cannot edit the harness, build policy, or command line. Reject semantic tool-comment directives, unique/unique0/priority promises, and variable declaration initialization. Independently reject initialization attributes in the elaborated DUT netlist, including mapped interfaces.
 
 **Contract compilation.** Nemotron proposes a structured contract and supplemental checks. A backend-owned compiler maps accepted fields to reviewed templates. The core FIFO simulation scoreboard and formal monitors are authored and reviewed independently of the model that repairs the DUT. Candidate model-generated checks are supplemental and cannot replace the core checks. Before promotion, validate them against reviewed correct controls and known faults, check their mapping to the contract, and obtain technical review. Failure of an unreviewed candidate is a possible issue, not an authoritative defect. Unsupported temporal syntax is rejected rather than approximated.
 
@@ -261,13 +261,13 @@ Target a 2 minute 45 second public video, leaving room below the three-minute li
 
 | Time | What the judge sees |
 | --- | --- |
-| 0:00 to 0:20 | A learner predicts what happens to the oldest word when a full queue receives a write. State the audience and fixed FIFO scope. |
-| 0:20 to 1:00 | Build an ordinary passing sequence, then a boundary sequence. Label recorded simulation replay and inspect expected versus observed outputs. |
-| 1:00 to 1:30 | Explain the failure. Show actual Nemotron coaching from the configured local build or an explicitly recorded response; never portray authored hints as model output. |
-| 1:30 to 1:55 | Answer a related transfer question and export the practice record. Explain that free text is ungraded and the activity is not a measured learning gain. |
-| 1:55 to 2:15 | Open the facilitator desk, answer key, and voluntarily imported example records labeled as demonstrations. |
-| 2:15 to 2:35 | Show genuine rejected and accepted Nemotron repair evidence, unchanged checks, and method-specific limits in the underlying workbench. |
-| 2:35 to 2:45 | State what has run, what remains unmeasured, and how NVIDIA and Nebius contribute. |
+| 0:00 to 0:20 | “A patch is a hypothesis”: introduce the learner audience and actual Nemotron repair at depth 4. |
+| 0:20 to 0:55 | Inspect the first patch, commit a prediction, and reveal its recorded counterexample. |
+| 0:55 to 1:25 | Inspect the revised patch and show the unchanged checks, distinguishing simulation, bounded checks, proofs, and covers. |
+| 1:25 to 1:45 | Explain the decision, answer the depth-8 transfer question, and export field notes. |
+| 1:45 to 2:10 | Build a short boundary experiment in the practice bench; label it as a checked prefix of recorded simulation. |
+| 2:10 to 2:30 | Show the teaching plan and voluntarily shareable practice notes. Demonstration inputs are not real learner results. |
+| 2:30 to 2:45 | State measured engineering scope, unmeasured learning outcomes, and actual NVIDIA/Nebius roles. |
 
 For the diagnosis release, replace the patch segment with a second held-out counterexample and evidence replay. For bounded-only delivery, replace the proof segment with the exact checked horizon and remaining uncertainty. The video follows the selected release profile.
 

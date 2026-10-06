@@ -1,8 +1,18 @@
 # Testing instructions (Devpost field)
 
-The recorded Vercel demo is deployed. **Before submitting:** add the project-funded route for live model calls; the local API-key option is for developers and does not fulfill free live judge access by itself. Do not describe the Vercel route as live execution.
+Open https://countertrace.vercel.app without signing in. The public site provides recorded model repairs and independently executed verification evidence. No account or API key is needed for playback. Live execution is available in the configured local build described below.
 
 ---
+
+## Start with the repair lab
+
+1. Open **Enter the repair lab**, inspect the depth-4 contract and actual Nemotron diff.
+2. Choose a prediction and write a reason, then reveal the recorded checks. The first candidate reports empty at edge 4 while the reference queue is full.
+3. Investigate the revised proposal and commit another prediction. Its ten obligations pass under unchanged comparison inputs: three simulation obligations, three bounded checks, three proved properties, and one cover group containing twelve covers.
+4. Follow **Inspect this run’s trace & methods** for raw evidence and scope. Return to the lab, explain your decision, answer the depth-8 transfer question, and download Markdown notes.
+5. Open **Teach** for the discussion plan. The separate practice-bench exercises below provide sequence construction and JSON session import.
+
+This is recorded playback, not a new model response or solver run. Test answers you enter are demonstration practice data, not participant observations.
 
 ## Hosted learning lab (no setup or account)
 

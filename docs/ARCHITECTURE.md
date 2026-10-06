@@ -56,3 +56,11 @@ A supplemental check set names the frozen-suite tests it observes and the review
 ## Not yet implemented
 
 Hosted deployment, Nebius Serverless Jobs, depth 8, non-ANSI port headers, selectable contract policies (for example fall-through reads), public uploads, and concurrent verification runs beyond the single active-run queue. Interface mappings, model-proposed supplemental checks, and per-visitor limits are implemented.
+
+## Repair investigation interface (October 5)
+
+The default experience is a learner investigation of a curated two-attempt Nemotron repair. `repairLab.ts` validates the parent/candidate links, frozen comparison, expected obligation inventory, clean integrity checks, and reached cover inventory before presenting either outcome. This is an additional presentation guard, not a new verifier or proof authority. The browser never manufactures a successful result from missing data.
+
+`#/repair` commits a prediction and reason before revealing each recorded result. A reflection and parameter-transfer response precede the facilitator explanation. Anonymous notes are stored locally and exported as Markdown; these are self-reported activity, not authenticated study data. `#/learn` retains the finite depth-2 sequence library; `#/teach` distinguishes repair notes from importable practice JSON. All model calls and RTL execution remain in the configured local workbench.
+
+Admission now rejects tool-comment directives and synthesis case promises (`unique`, `unique0`, `priority`), plus declaration initialization regardless of preceding block syntax. The trusted host also rejects `init` attributes across the elaborated DUT/interface netlist. This closes an observed overlapping-case route to simulation/formal semantic divergence; it is not a claim of general Verilog equivalence checking.

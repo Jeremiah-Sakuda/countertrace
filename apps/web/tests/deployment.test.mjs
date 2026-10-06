@@ -25,7 +25,7 @@ test("recorded deployments explain their limits and never offer live model or au
     assert.match(render(DeploymentNotice, { status: recorded }), /github.com\/Jeremiah-Sakuda\/countertrace#quick-start/);
     const header = render(Header, { status: recorded, route: { name: "audit" }, run: null });
     assert.doesNotMatch(header, /Docker unavailable|image not built|Model not configured/);
-    assert.match(header, /RECORDED DEMO/);
+    assert.match(header, /Recorded edition/);
     const audit = render(AuditView, { profile: { status: "loading" }, status: recorded });
     assert.match(audit, /<textarea[^>]*disabled=""/);
     assert.match(audit, /<button[^>]*disabled=""[^>]*>[\s\S]*?Propose a check set with Nemotron/);

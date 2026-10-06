@@ -498,7 +498,7 @@ function ExampleDetailView({ detail, profile, status }: { detail: ExampleDetail;
           )}
         </Disclosure>
         {recorded && <RecordedInterpretationView recorded={recorded} />}
-        <Disclosure summary={recorded ? "Interpret the brief live with Nemotron" : "Ask Nemotron to interpret the brief"} meta={recordedDemo ? "Local test build" : recorded ? "Needs a model key" : "Optional"}>
+        <Disclosure summary={recorded ? "Interpret the brief live with Nemotron" : "Ask Nemotron to interpret the brief"} meta={recordedDemo ? "Local test build" : recorded && !(status.status === "ok" && status.data.model.configured) ? "Needs a model key" : "Optional"}>
           <p className="prose">
             Compare the brief with the fixed contract to surface matches, conflicts, and open decisions. The model cannot change the contract.
             {recorded ? " A live result appears below and replaces the recorded one for the conflict check." : ""}

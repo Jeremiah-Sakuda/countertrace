@@ -16,6 +16,7 @@ export function CandidatePanel({ run }: { run: Run }) {
   const parent = useAsync(() => (parentId ? api.run(parentId) : Promise.resolve(null)), [parentId]);
   if (!parentId) return null;
   const attempt = parent.status === "ok" ? parent.data?.repair?.attempts.find((a) => a.candidate_run_id === run.id) : undefined;
+  const next = parent.status === "ok" ? parent.data?.repair?.attempts.find(a => attempt && a.index === attempt.index + 1) : undefined;
   const rejected = attempt !== undefined && attempt.status !== "passed_unchanged_checks" && attempt.status !== "verifying";
   return (
     <Section
@@ -30,6 +31,7 @@ export function CandidatePanel({ run }: { run: Run }) {
           {parent.status === "ok" && parent.data ? `: ${parent.data.title}` : ""}
         </a>
       </p>
+      {next?.candidate_run_id && <p><a className="inline-link" href={href.run(next.candidate_run_id)}>Follow the next proposal: candidate {next.index} <ArrowRight size={14}/></a></p>}
       {parent.status === "loading" && <Loading label="Loading the parent run" />}
       {parent.status === "error" && <ErrorNotice error={parent.error} title="Parent run unavailable" onRetry={parent.reload} />}
       {parent.status === "ok" && parent.data && <CandidateComparison run={run} parent={parent.data} />}
