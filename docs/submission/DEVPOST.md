@@ -8,7 +8,7 @@ Countertrace
 
 ## Elevator pitch (200 characters max)
 
-A hardware debugging lab where learners challenge real Nemotron repairs: predict, inspect counterexamples, and defend the fix. Independent checks decide; instructors reuse the lesson.
+A hardware debugging lab where learners challenge real Nemotron repairs: predict, inspect counterexamples, and defend the fix. Independent checks decide, and instructors get a ready-made lesson.
 
 ## Track
 
@@ -33,11 +33,11 @@ Digital-design instructors and FPGA club mentors already teach "a passing test i
 
 ## What it does
 
-1. **Inspect.** Read the FIFO contract and an actual Nemotron 3 Ultra RTL patch.
+1. **Inspect.** Read the FIFO contract and an actual Nemotron 3 Ultra patch for a FIFO with two seeded bugs (an evaluation case).
 2. **Predict.** Commit an expected result and a reason before the checks are revealed.
 3. **Challenge.** The first patch still fails: the recorded counterexample shows the expected and observed empty flag at edge 4. The revised patch then passes the same frozen checks, with simulation, bounded checking, unbounded proofs, and reachability reported separately.
 4. **Explain and transfer.** Say which evidence supports the decision, answer whether the result still holds for an eight-slot queue, and download field notes.
-5. **Teach.** Instructors share the repair lab with a discussion plan. Three practice labs, built on hand-written FIFO designs, let learners construct their own input sequences for overflow, simultaneous operations, and the limits of a passing test. The facilitator desk lets instructors review the notes learners choose to share.
+5. **Teach.** Instructors share the repair lab with a discussion plan. Three practice labs, built on hand-written FIFO designs, let learners construct their own input sequences for overflow, simultaneous operations, and the limits of a passing test. The facilitator desk gives instructors a session plan and answer keys, and imports the practice records learners choose to share; repair-lab notes download as Markdown for discussion.
 
 Behind the lab is a full verification workbench. It runs any bundled FIFO in an isolated container, shows the first failing cycle with expected and observed values, asks Nemotron to explain the failure with checked citations, and runs the repair agent: Nemotron proposes an edit, Countertrace verifies it against the unchanged checks, and a failed candidate's own counterexample goes back to the model for the next attempt.
 
@@ -73,9 +73,9 @@ I froze the model configuration and prompts, recorded a hash of the test cases, 
 | Conflicting briefs flagged | 4 of 4 | 3 of 4 |
 | Compatible briefs accepted | 4 of 4 | 4 of 4 |
 
-eval-v1 includes an MIT-licensed FIFO by another author. eval-v2 adds multi-line and two-bug cases. Full reports: https://github.com/Jeremiah-Sakuda/countertrace/tree/main/evaluation/results
+eval-v1 includes an MIT-licensed FIFO by another author. eval-v2 adds multi-line and two-bug cases; in eval-v2, 6 of 8 explanations cited only valid cycles, signals, and lines. Some derived simulation summaries in the recorded evidence were corrected from the preserved traces; the original model text and the correction record remain visible. Full reports: https://github.com/Jeremiah-Sakuda/countertrace/tree/main/evaluation/results
 
-**Limits.** One synchronous FIFO profile (8-bit, depth 2 and 4). The hosted lab replays recorded evidence; live verification and Nemotron calls run in the local build. Evaluation cases were prepared with my coding assistant, and learning outcomes have not been measured yet.
+**Limits.** One synchronous FIFO profile (8-bit, depth 2 and 4). The hosted lab replays recorded evidence; live verification and Nemotron calls run in the local build. Evaluation cases were prepared with my coding assistant, and these numbers measure the tool's diagnosis and repair, not learning; learning outcomes have not been measured yet.
 
 ## Challenges and lessons
 
