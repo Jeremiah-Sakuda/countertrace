@@ -11,16 +11,16 @@ export async function parseLibrary(text: string): Promise<Library> {
 }
 export const actionNames: Record<Action, string> = {w: 'Write', r: 'Read', b: 'Read + write', x: 'Reset'};
 export const hex = (n: number | null) => n === null ? 'Not checked' : `0x${n.toString(16).padStart(2, '0').toUpperCase()}`;
-export function reference(path: string) {
+export function reference(path: string, depth = 2) {
   let queue: number[] = [];
   return [...path].map((a, i) => {
     const before = [...queue], data = 17 * (i + 1);
     const read = (a === 'r' || a === 'b') && before.length > 0;
-    const write = (a === 'w' || a === 'b') && before.length < 2;
+    const write = (a === 'w' || a === 'b') && before.length < depth;
     if (a === 'x') queue = [];
     else { if (read) queue.shift(); if (write) queue.push(data); }
     return { cycle: i + 1, action: a as Action, data, before, queue: [...queue], read, write,
-      expected: [read ? before[0]! : null, Number(queue.length === 0), Number(queue.length === 2)] };
+      expected: [read ? before[0]! : null, Number(queue.length === 0), Number(queue.length === depth)] };
   });
 }
 export function evidenceRows(library: Library, id: string, path: string) {

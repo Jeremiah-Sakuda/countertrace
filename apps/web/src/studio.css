@@ -205,3 +205,18 @@
 .testbench-bugs p { margin:0; }
 .link-button { justify-self:start; background:none; border:0; padding:0; color:var(--color-accent); text-decoration:underline; cursor:pointer; font:inherit; font-size:.8rem; }
 @media(max-width:700px) { .testbench-result { padding:20px; } .testbench-result h2 b { font-size:2.4rem; } }
+
+.repair-probe { border-bottom:1px solid var(--color-border); padding:18px 0; display:grid; gap:14px; }
+.repair-probe summary { cursor:pointer; display:flex; flex-wrap:wrap; gap:6px 14px; align-items:baseline; min-height:40px; }
+.repair-probe summary b { font:500 1.2rem var(--font-heading); }
+.repair-probe summary span { font-size:.82rem; color:var(--color-soft-foreground); }
+.repair-probe[open] > * + * { margin-top:12px; }
+.probe-actions { display:flex; flex-wrap:wrap; gap:8px; }
+.probe-table { width:100%; border-collapse:collapse; font-size:.8rem; }
+.probe-table th, .probe-table td { text-align:left; padding:7px 10px; border-bottom:1px solid var(--color-border-subtle); white-space:nowrap; }
+.probe-table th { font:.62rem var(--font-mono); letter-spacing:.04em; color:var(--color-muted-foreground); }
+.probe-table code { font-variant-ligatures:none; }
+.probe-table small { color:var(--color-muted-foreground); font-family:var(--font-mono); }
+.probe-mismatch { background:#f6e3dc; }
+.probe-mismatch strong { color:var(--color-accent); font-size:.75rem; }
+.probe-verdict { font-size:.86rem; }
