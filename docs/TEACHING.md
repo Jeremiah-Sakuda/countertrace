@@ -2,11 +2,22 @@
 
 ## Start with the Nemotron repair lab
 
-Share https://countertrace.vercel.app/#/repair. Read the depth-4 contract, inspect the real proposed diff, and ask learners to commit both a prediction and a reason before revealing each recorded outcome. After the first counterexample, ask what the guard failed to address. After the revised patch passes, ask whether that evidence establishes a depth-8 version. Review the learner’s own answer before opening the facilitator explanation.
+Share https://countertrace.vercel.app/#/repair. The lab is a casebook of four recorded Nemotron 3 Ultra repairs of seeded bugs, all on the depth-4 contract. For each proposed patch, learners commit a prediction and a reason, can probe the candidate with their own input sequences, and then reveal the recorded checks. Ask for the reason before anyone opens the probe; finding the counterexample is the skill. Review the learner’s own answer before opening the facilitator explanation.
 
-The key is to distinguish read acceptance from pointer-based empty detection. The first patch guards reads but leaves the low-bit pointer alias. The revised patch also compares the full pointers and passes the frozen depth-4 checks. Depth 8 is outside the current supported profile. It would need a reviewed profile extension, fresh elaboration, and a check run; the recorded depth-4 pass does not establish it. Have learners retain a regression sequence and discuss what simulation alone leaves uncertain.
+| Case | What happened | What to draw out |
+| --- | --- | --- |
+| 01 Two bugs, one bug report | The first patch guards reads but leaves the low-bit pointer alias; four writes expose it. The second compares the full pointers and passes. | Distinguish read acceptance from pointer-based empty detection. |
+| 02 A fix that breaks working code | The first patch fixes the reset but rewrites the idle branch, which had been correct; a single read on an empty queue exposes it. The second holds the idle flags and passes. | Check every changed line against the contract, not only the line the bug report points to. |
+| 03 Three rounds on one flag | Patch 1 clears both flags on idle cycles; patch 2 compares against the advanced write pointer on a read-only cycle; patch 3 passes. | Enumerate all four read and write combinations before trusting a flag update. |
+| 04 When the model is right | One added condition, `!full` on the write, passes on the first attempt. | Accepting a fix also needs evidence: which checks would you ask for in a review? |
 
-Repair notes download as Markdown for direct discussion, not the practice-bench JSON importer. They are anonymous, self-reported, and ungraded. Collect only voluntarily shared notes. The plan is unpiloted; no learning or preparation-time benefit is established. The three practice-bench lessons below offer focused sequence construction.
+Every case ends with the same transfer question: does the depth-4 result establish a depth-8 version? It does not. Depth 8 is outside the current supported profile and would need a reviewed profile extension, fresh elaboration, and a check run. Have learners retain a regression sequence and discuss what simulation alone leaves uncertain.
+
+Repair notes download as Markdown for direct discussion, not the practice-bench JSON importer. They are anonymous, self-reported, and ungraded. Collect only voluntarily shared notes. The three practice-bench lessons below offer focused sequence construction.
+
+## Then: will your testbench catch it?
+
+Share https://countertrace.vercel.app/#/testbench. Learners choose which test sequences a testbench runs and which signals it checks, predict how many of six seeded bugs it catches, and run it against the recorded audit. Start them with **Load a typical first testbench**: it catches 3 of 6, and each miss names a situation its tests never produced (a write while full, a read and write while full or while empty). Then challenge them to catch all six with the fewest edges. The directed `simultaneous` test alone does it in 15 edges, and the seeded random runs do it in 1,280. Discuss why a directed test tells you which rule broke while random traffic only tells you something did, and why neither proves the design correct. A seventh change in the same set is behaviorally equivalent and cannot be caught by any test.
 
 
 The primary audience is instructors and FPGA club mentors teaching learners who know clocks, reset, and basic RTL. Open the [facilitator desk](https://countertrace.vercel.app/#/teach) for shareable learner links and answer keys. The three interactive labs replace the worksheet as the primary journey. The worksheet below remains an optional workbench activity.

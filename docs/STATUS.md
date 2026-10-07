@@ -1,5 +1,15 @@
 # Implementation status
 
+## October 7 repair casebook, probe, and testbench lab
+
+The hosted repair lab is now a casebook of four recorded Nemotron 3 Ultra repairs at depth 4: eval-v2 F6 (two candidates), F2 (two), F1 (three), and the showcase overwrite-when-full fix (one). F1 and F2 were recorded from their preserved October 4 evaluation runs with `countertrace record`; `scripts/refresh_recorded_evidence.py` applied the same derived-summary correction as the earlier recordings, now stamped with its actual date. Every case still fails closed in `validateRepairCase` unless each rejected candidate has a counterexample and the accepted one passes all ten obligations under the parent's frozen checks.
+
+`scripts/build_repair_probes.py` ran every six-action sequence (write, read, read and write, reset) on all eight candidates in the pinned isolated verifier at depth 4: 33.5 s, 4,096 paths each. Each path is recorded through its first disagreement, because a faulty candidate can later read memory a previous sequence wrote (the first build failed its repeatability check on F2 candidate 1 for that reason). Observed: every rejected candidate shows a counterexample within six edges (shortest: a single read for F1 candidate 1 and F2 candidate 1, write then read for F1 candidate 2, four writes for F6 candidate 1), and no accepted candidate disagrees with the reference on any of its 5,461 prefixes. The library is SHA-256 pinned; learners can probe any candidate after committing a prediction.
+
+The testbench lab (`#/testbench`) scores a learner's choice of suite tests and checked signals against the six valid faults of the recorded `weak-learner-v1` audit. `scripts/build_audit_matrix.py` reparses the audit's 112 raw simulation traces; the build fails unless it reproduces every recorded core result and the weak set's 3 of 6. Observed from the matrix: the directed `simultaneous` test alone (15 edges) catches all six, as do the eight seeded random runs (1,280 edges); checking only the flags misses the two data-corruption faults, and checking only read data misses the lost-occupancy fault on several tests.
+
+Also fixed in the lab: code ligatures in diffs, scrolling to the next proposal instead of the page top, and clearer check counts. `make check` passes 105 Python tests; the web suite passes 6 test files. The hosted demo has not been redeployed with these changes yet.
+
 ## October 5 repair studio and admission hardening
 
 Rebuilt the primary education journey around the actual two-attempt Nemotron repair at depth 4. The new home, horizontal navigation, patch/judgment workbench, prediction-before-reveal gate, source-linked counterexample, scoped method counts, parameter-transfer question, and locally saved Markdown field notes make model repair the central activity. The practice bench retains all three sequence lessons, now compares committed predictions with observations and renders full expected/observed edge cards on phones. The teaching desk distinguishes repair notes from practice-session JSON. Candidate runs link forward to the next real proposal.

@@ -6,11 +6,13 @@ Open https://countertrace.vercel.app without signing in. The public site provide
 
 ## Start with the repair lab
 
-1. Open **Enter the repair lab**, inspect the depth-4 contract and actual Nemotron diff.
-2. Choose a prediction and write a reason, then reveal the recorded checks. The first candidate reports empty at edge 4 while the reference queue is full.
+1. Open **Enter the repair lab**. Case 01 is selected; the other three cases are in the row above it. Inspect the depth-4 contract and the actual Nemotron diff.
+2. Choose a prediction and write a reason. Open **Test it yourself first**, add Write four times, and see the candidate report empty at edge 4 while the reference queue is full. Then reveal the recorded checks, which show the same kind of counterexample.
 3. Investigate the revised proposal and commit another prediction. Its ten obligations pass under unchanged comparison inputs: three simulation obligations, three bounded checks, three proved properties, and one cover group containing twelve covers.
 4. Follow **Inspect this run’s trace & methods** for raw evidence and scope. Return to the lab, explain your decision, answer the depth-8 transfer question, and download Markdown notes.
-5. Open **Teach** for the discussion plan. The separate practice-bench exercises below provide sequence construction and JSON session import.
+5. Try case 02 (a fix that breaks working code: a single Read exposes it) or case 03 (three rounds on one flag).
+6. Open **Practice bench → Will your testbench catch it?** Load a typical first testbench, predict, and run: it catches 3 of 6 seeded bugs, and each miss names the situation its tests never produced. Select only **simultaneous** with all three signals: 6 of 6 in 15 edges.
+7. Open **Teach** for the discussion plan. The separate practice-bench exercises below provide sequence construction and JSON session import.
 
 This is recorded playback, not a new model response or solver run. Test answers you enter are demonstration practice data, not participant observations.
 

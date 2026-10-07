@@ -33,17 +33,18 @@ Digital-design instructors and FPGA club mentors already teach "a passing test i
 
 ## What it does
 
-1. **Inspect.** Read the FIFO contract and an actual Nemotron 3 Ultra patch for a FIFO with two seeded bugs (an evaluation case).
-2. **Predict.** Commit an expected result and a reason before the checks are revealed.
-3. **Challenge.** The first patch still fails: the recorded counterexample shows the expected and observed empty flag at edge 4. The revised patch then passes the same frozen checks, with simulation, bounded checking, unbounded proofs, and reachability reported separately.
+1. **Pick a case.** The repair lab is a casebook of four real Nemotron 3 Ultra repairs of seeded FIFO bugs from the evaluation: a patch that misses a second bug, a patch that fixes the reported bug but breaks code that was working, three rounds on one flag, and a one-line fix that was right the first time.
+2. **Predict, then probe.** For each proposed patch, commit an expected result and a reason. Then build your own input sequence and replay what that candidate actually did on it. Every sequence of up to six actions was run on every candidate in the isolated verifier.
+3. **Challenge.** Reveal the recorded checks. A rejected patch shows its counterexample with expected and observed values; an accepted one passes the same frozen checks, with simulation, bounded checking, unbounded proofs, and reachability reported separately.
 4. **Explain and transfer.** Say which evidence supports the decision, answer whether the result still holds for an eight-slot queue, and download field notes.
-5. **Teach.** Instructors share the repair lab with a discussion plan. Three practice labs, built on hand-written FIFO designs, let learners construct their own input sequences for overflow, simultaneous operations, and the limits of a passing test. The facilitator desk gives instructors a session plan and answer keys, and imports the practice records learners choose to share; repair-lab notes download as Markdown for discussion.
+5. **Test your own testbench.** In the testbench lab, choose which test sequences a testbench runs and which signals it checks, predict how many of six seeded bugs it catches, and see each miss explained as a situation the tests never produced or a signal they never checked. A typical first testbench catches 3 of 6; one well-chosen directed test catches all six. Results come from the raw traces of a recorded audit.
+6. **Teach.** Instructors share any case with a discussion plan. Three practice labs, built on hand-written FIFO designs, let learners construct input sequences for overflow, simultaneous operations, and the limits of a passing test. The facilitator desk gives instructors a session plan and answer keys, and imports the practice records learners choose to share; repair-lab notes download as Markdown for discussion.
 
 Behind the lab is a full verification workbench. It runs any bundled FIFO in an isolated container, shows the first failing cycle with expected and observed values, asks Nemotron to explain the failure with checked citations, and runs the repair agent: Nemotron proposes an edit, Countertrace verifies it against the unchanged checks, and a failed candidate's own counterexample goes back to the model for the next attempt.
 
 ## How I built it
 
-- **Learning interface:** React and TypeScript, with committed predictions, an action builder, expected and observed values, hints, transfer questions, and a local facilitator review. The practice library replays 4,096 executed six-edge input sequences per design, pinned by SHA-256 (finite simulation, not a proof).
+- **Learning interface:** React and TypeScript, with committed predictions, an action builder, expected and observed values, hints, transfer questions, and a local facilitator review. The practice library replays 4,096 executed six-edge input sequences per design, and the repair probe library does the same for each of the eight Nemotron candidates at depth 4. Both are pinned by SHA-256 (finite simulation, not a proof).
 - **Verifier:** Verilator, Yosys, SymbiYosys, ABC, and Yices in a Docker image built from a digest-pinned base, run with no network. A hand-written formal monitor and a separate Python reference queue own every check.
 - **Admission and integrity:** RTL that could tamper with the checks is rejected before it runs, and the elaborated netlist is checked for the expected ports, free inputs, and exactly the monitor's properties. Every model patch goes through the same gate.
 - **Repair judging:** a candidate counts only if a separate run with hash-identical contract, harness, stimulus, limits, and formal tasks passes every obligation. Exported evidence bundles replay without a model call.
@@ -86,7 +87,7 @@ eval-v1 includes an MIT-licensed FIFO by another author. eval-v2 adds multi-line
 
 ## What's next
 
-Classroom sessions with instructors, project-funded live model access on the hosted site, more recorded repair investigations from the evaluation cases, and a second module family such as a UART or an arbiter.
+Classroom sessions with instructors, project-funded live model access on the hosted site, more repair cases, and a second module family such as a UART or an arbiter.
 
 ## Testing instructions
 
