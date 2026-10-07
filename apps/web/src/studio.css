@@ -26,7 +26,7 @@
 .patch-exhibit { background:#e8ecdf; border:1px solid #b6bea8; padding:28px; transform:rotate(-1deg); box-shadow:10px 10px 0 #e8e3d7; }
 .specimen-label { display:flex; align-items:center; justify-content:space-between; gap:12px; font:.62rem/1.6 var(--font-mono); letter-spacing:.06em; padding-bottom:16px; border-bottom:1px solid var(--color-border); }
 .exhibit-question { font:500 clamp(2rem,3vw,3rem)/1.03 var(--font-heading); padding:32px 0 28px; }
-.repair-diff { margin:0; padding:20px 0; max-width:100%; overflow-x:auto; font:.8rem/1.85 var(--font-mono); tab-size:2; background:transparent; border:0; }
+.repair-diff { font-variant-ligatures:none; font-feature-settings:'liga' 0,'calt' 0; margin:0; padding:20px 0; max-width:100%; overflow-x:auto; font:.8rem/1.85 var(--font-mono); tab-size:2; background:transparent; border:0; }
 .repair-diff code { padding:0; background:transparent; font:inherit; border:0; }
 .diff-added { background:#dce8d2; color:#204d2d; }
 .diff-removed { background:#f3e0d5; color:#852f1c; }
@@ -50,7 +50,7 @@
 .repair-contract { display:grid; grid-template-columns:180px 1fr; gap:12px 28px; padding:22px 0; border-block:1px solid var(--color-border); font-size:.85rem; }
 .repair-contract strong { font:500 1.4rem/1.15 var(--font-heading); }
 .repair-contract a { grid-column:2; display:flex; gap:6px; align-items:center; font-size:.77rem; }
-.repair-tabs { display:flex; gap:10px; align-items:center; margin:34px 0 0; border-bottom:1px solid var(--color-border); }
+.repair-tabs { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin:34px 0 0; border-bottom:1px solid var(--color-border); }
 .repair-tabs button { display:flex; gap:12px; align-items:center; background:transparent; border:0; border-bottom:3px solid transparent; padding:16px; color:var(--color-muted-foreground); font: .75rem var(--font-mono); }
 .repair-tabs button span { font:500 .95rem var(--font-body); }
 .repair-tabs button[aria-current] { color:var(--color-foreground); border-bottom-color:var(--color-accent); }
@@ -153,3 +153,28 @@
 .repair-studio .actions { display:flex; flex-wrap:wrap; align-items:center; gap:12px; }
 .repair-diff { white-space:pre-wrap; overflow-wrap:anywhere; }
 .repair-diff code { white-space:inherit; }
+
+.repair-casebook { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); border-bottom:1px solid var(--color-border); margin-bottom:8px; }
+.repair-casebook a { display:grid; gap:4px; padding:16px 18px 14px 0; color:var(--color-soft-foreground); text-decoration:none; border-bottom:3px solid transparent; min-width:0; }
+.repair-casebook a b { font:.65rem var(--font-mono); color:var(--color-accent); }
+.repair-casebook a span { font:500 1rem/1.25 var(--font-heading); color:var(--color-foreground); }
+.repair-casebook a small { font:.62rem var(--font-mono); color:var(--color-muted-foreground); }
+.repair-casebook a[aria-current] { border-bottom-color:var(--color-accent); }
+.repair-casebook a:hover span { color:var(--color-accent); }
+.repair-report { display:grid; grid-template-columns:180px 1fr; gap:12px 28px; padding:18px 0; border-bottom:1px solid var(--color-border); font-size:.85rem; }
+.repair-report strong { font:500 1.4rem/1.15 var(--font-heading); }
+.repair-casebook-home { padding:30px 0; border-bottom:1px solid var(--color-border); }
+.repair-casebook-home ol { list-style:none; margin:16px 0 0; padding:0; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:24px; }
+.repair-casebook-home a { display:grid; gap:6px; text-decoration:none; color:var(--color-foreground); }
+.repair-casebook-home a b { font:.67rem var(--font-mono); color:var(--color-accent); }
+.repair-casebook-home a span { font:500 1.3rem/1.2 var(--font-heading); }
+.repair-casebook-home a small { font-size:.78rem; color:var(--color-soft-foreground); }
+.repair-casebook-home a:hover span { color:var(--color-accent); }
+.repair-proposal:focus { outline:none; }
+@media(max-width:900px) {
+  .repair-casebook, .repair-casebook-home ol { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media(max-width:700px) {
+  .repair-report { grid-template-columns:1fr; }
+  .repair-check-counts { grid-template-columns:repeat(2,1fr); }
+}

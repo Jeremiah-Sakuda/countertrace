@@ -1,0 +1,38 @@
+{
+  "schema": "countertrace-job/1",
+  "job_id": "a226d0b48d71",
+  "limits": {
+    "compile_s": 60,
+    "sim_s": 30,
+    "solver_s": 120,
+    "bmc_depth": 24,
+    "cover_depth": 24
+  },
+  "batch_limit_s": 900,
+  "designs": [
+    {
+      "id": "dut",
+      "top": "fifo",
+      "depth": 4,
+      "width": 8,
+      "seed": 1,
+      "sim_tests": [
+        "learner_basic",
+        "fill_drain",
+        "write_when_full",
+        "simultaneous",
+        "wraparound",
+        "recurrent_reset",
+        "random_s1",
+        "random_s2",
+        "random_s3",
+        "random_s4",
+        "random_s5",
+        "random_s6",
+        "random_s7",
+        "random_s8"
+      ],
+      "formal": []
+    }
+  ]
+}

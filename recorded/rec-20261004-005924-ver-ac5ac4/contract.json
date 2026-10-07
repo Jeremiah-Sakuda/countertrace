@@ -1,0 +1,98 @@
+{
+  "profile": "sync-fifo-v1",
+  "version": "1.0.0",
+  "parameters": {
+    "DEPTH": 4,
+    "WIDTH": 8
+  },
+  "ports": {
+    "clk": {
+      "direction": "input",
+      "width": 1
+    },
+    "rst": {
+      "direction": "input",
+      "width": 1
+    },
+    "wr_en": {
+      "direction": "input",
+      "width": 1
+    },
+    "rd_en": {
+      "direction": "input",
+      "width": 1
+    },
+    "din": {
+      "direction": "input",
+      "width": "WIDTH"
+    },
+    "dout": {
+      "direction": "output",
+      "width": "WIDTH"
+    },
+    "full": {
+      "direction": "output",
+      "width": 1
+    },
+    "empty": {
+      "direction": "output",
+      "width": 1
+    }
+  },
+  "requirements": {
+    "reset": {
+      "title": "Reset asserted at a rising edge",
+      "text": "Reset wins over read and write. Occupancy becomes zero; empty is true and full is false after the edge."
+    },
+    "write_not_full": {
+      "title": "Write requested while not full",
+      "text": "Accept one input word."
+    },
+    "read_not_empty": {
+      "title": "Read requested while not empty",
+      "text": "Remove the oldest word. dout holds that word after the edge."
+    },
+    "read_empty": {
+      "title": "Read requested while empty",
+      "text": "Ignore the read. Nothing is consumed and nothing is bypassed."
+    },
+    "write_full": {
+      "title": "Write requested while full",
+      "text": "Ignore the write."
+    },
+    "both_mid": {
+      "title": "Read and write between empty and full",
+      "text": "Accept both. Occupancy stays constant; the old head is read and the new word joins the tail."
+    },
+    "both_empty": {
+      "title": "Read and write while empty",
+      "text": "Accept only the write. The new word is not bypassed to dout."
+    },
+    "both_full": {
+      "title": "Read and write while full",
+      "text": "Accept only the read. The write is ignored even though the read frees a slot."
+    },
+    "idle": {
+      "title": "No request",
+      "text": "Occupancy and stored words are unchanged."
+    },
+    "wraparound": {
+      "title": "Wraparound",
+      "text": "Preserve accepted-word ordering and capacity across pointer wraparound."
+    }
+  },
+  "checks": {
+    "empty_flag": "empty equals (reference occupancy == 0) after every edge",
+    "full_flag": "full equals (reference occupancy == DEPTH) after every edge",
+    "read_data": "dout equals the reference head removed by an accepted read"
+  },
+  "assumptions": [
+    "Reset is asserted at the first sampled edge; no pre-reset state is claimed.",
+    "Later reset pulses are legal and are exercised.",
+    "Inputs are driven while the clock is low and held stable through the rising edge.",
+    "Two-state digital semantics; X-propagation, timing closure, and synthesized behavior are not checked.",
+    "No requirement is imposed on dout unless the preceding edge accepted a read.",
+    "Results apply only to the exact instantiated DEPTH and WIDTH."
+  ],
+  "sampling": "Cycle k names a rising edge. Accepted operations come from the reference queue before the edge; reset has priority; flags are checked after the edge; dout is checked only after an accepted read."
+}

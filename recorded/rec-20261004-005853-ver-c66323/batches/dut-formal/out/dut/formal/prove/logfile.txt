@@ -1,0 +1,107 @@
+SBY  4:58:57 [ct_prove] Removing directory '/tmp/work/dut/ct_prove'.
+SBY  4:58:57 [ct_prove] Copy '/tmp/work/dut/dut.v' to '/tmp/work/dut/ct_prove/src/dut.v'.
+SBY  4:58:57 [ct_prove] Copy '/tmp/work/dut/ct_formal_top.sv' to '/tmp/work/dut/ct_prove/src/ct_formal_top.sv'.
+SBY  4:58:57 [ct_prove] engine_0: abc pdr
+SBY  4:58:57 [ct_prove] base: starting process "cd ct_prove/src; yosys -ql ../model/design.log ../model/design.ys"
+SBY  4:58:57 [ct_prove] base: finished (returncode=0)
+SBY  4:58:57 [ct_prove] prep: starting process "cd ct_prove/model; yosys -ql design_prep.log design_prep.ys"
+SBY  4:58:57 [ct_prove] prep: finished (returncode=0)
+SBY  4:58:57 [ct_prove] aig: starting process "cd ct_prove/model; yosys -ql design_aiger.log design_aiger.ys"
+SBY  4:58:57 [ct_prove] aig: Warning: Treating undriven bit ct_formal_top.\clk like $anyseq.
+SBY  4:58:57 [ct_prove] aig: Warning: Treating undriven bit ct_formal_top.\wr_en like $anyseq.
+SBY  4:58:57 [ct_prove] aig: Warning: Treating undriven bit ct_formal_top.\rst like $anyseq.
+SBY  4:58:57 [ct_prove] aig: Warning: Treating undriven bit ct_formal_top.\rd_en like $anyseq.
+SBY  4:58:57 [ct_prove] aig: Warning: Treating undriven bit ct_formal_top.\din [0] like $anyseq.
+SBY  4:58:57 [ct_prove] aig: Warning: Treating undriven bit ct_formal_top.\din [1] like $anyseq.
+SBY  4:58:57 [ct_prove] aig: Warning: Treating undriven bit ct_formal_top.\din [2] like $anyseq.
+SBY  4:58:57 [ct_prove] aig: Warning: Treating undriven bit ct_formal_top.\din [3] like $anyseq.
+SBY  4:58:57 [ct_prove] aig: Warning: Treating undriven bit ct_formal_top.\din [4] like $anyseq.
+SBY  4:58:57 [ct_prove] aig: Warning: Treating undriven bit ct_formal_top.\din [5] like $anyseq.
+SBY  4:58:57 [ct_prove] aig: Warning: Treating undriven bit ct_formal_top.\din [6] like $anyseq.
+SBY  4:58:57 [ct_prove] aig: Warning: Treating undriven bit ct_formal_top.\din [7] like $anyseq.
+SBY  4:58:57 [ct_prove] aig: Warning: Treating a total of 12 undriven bits in ct_formal_top like $anyseq.
+SBY  4:58:57 [ct_prove] aig: finished (returncode=0)
+SBY  4:58:57 [ct_prove] engine_0: starting process "cd ct_prove; yosys-abc -c 'read_aiger model/design_aiger.aig; fold; strash; pdr -v -l; write_cex -a engine_0/trace.aiw'"
+SBY  4:58:57 [ct_prove] engine_0: ======== ABC command line "read_aiger model/design_aiger.aig; fold; strash; pdr -v -l; write_cex -a engine_0/trace.aiw"
+SBY  4:58:57 [ct_prove] engine_0: Warning: The last 2 outputs are interpreted as constraints.
+SBY  4:58:57 [ct_prove] engine_0: VarMax = 300. FrameMax = 10000. QueMax = 0. TimeMax = 159. MonoCNF = no. SkipGen = no. SolveAll = no.
+SBY  4:58:57 [ct_prove] engine_0: Frame Clauses                                                     Max Queue Flops Time
+SBY  4:58:57 [ct_prove] engine_0: 1 : 0 7                                                                 1     9      0.00 sec  T/O =  0  PRV =  0
+SBY  4:58:57 [ct_prove] engine_0: 2 : 0 4 9 ~1                                                             2    12      0.01 sec  T/O =  0  PRV =  0
+SBY  4:58:57 [ct_prove] engine_0: 3 : 0 3 103 119 ~1                                                       3    71      0.05 sec  T/O =  0  PRV =  0
+SBY  4:58:57 [ct_prove] engine_0: 4 : 0 3 97 299 242 ~1                                                    4    79      0.16 sec  T/O =  0  PRV =  0
+SBY  4:58:57 [ct_prove] engine_0: 5 : 0 3 97 218 365 169 ~1                                                4    87      0.25 sec  T/O =  0  PRV =  0
+SBY  4:58:57 [ct_prove] engine_0: Timing out on output 2 in frame 5 (retrying in next anytime pass).
+SBY  4:58:57 [ct_prove] engine_0: 5 : 0 3 97 218 365 169 ~1                                                0    87      0.25 sec  T/O =  1  PRV =  0
+SBY  4:58:57 [ct_prove] engine_0: 6 : 0 3 30 95 244 208 18 ~1                                              4    87      0.28 sec  T/O =  1  PRV =  0
+SBY  4:58:57 [ct_prove] engine_0: 7 : 0 3 30 95 213 204 30 18 ~1                                           3    87      0.30 sec  T/O =  1  PRV =  0
+SBY  4:58:57 [ct_prove] engine_0: 8 : 0 3 30 95 197 179 41 9 17 ~2                                         3    87      0.32 sec  T/O =  1  PRV =  0
+SBY  4:58:57 [ct_prove] engine_0: 9 : 0 3 30 95 197 179 40 2 5 21 ~2                                       3    87      0.34 sec  T/O =  1  PRV =  0
+SBY  4:58:58 [ct_prove] engine_0: 10 : 0 3 30 95 197 179 40 1 0 0 23 ~3                                     0    87      0.35 sec  T/O =  1  PRV =  0
+SBY  4:58:58 [ct_prove] engine_0: Proved output 0 in frame -2 (converged).
+SBY  4:58:58 [ct_prove] engine_0: Proved output 1 in frame -2 (converged).
+SBY  4:58:58 [ct_prove] engine_0: Starting new anytime pass, reusing clauses.
+SBY  4:58:58 [ct_prove] engine_0: Frame Clauses                                                     Max Queue Flops Time
+SBY  4:58:58 [ct_prove] engine_0: 1 : 0 284 ~26                                                            0     0      0.03 sec  T/O =  0  PRV =  2
+SBY  4:58:58 [ct_prove] engine_0: 2 : 0 1 283 ~26                                                          0     0      0.03 sec  T/O =  0  PRV =  2
+SBY  4:58:58 [ct_prove] engine_0: 3 : 0 1 3 280 ~26                                                        0     0      0.03 sec  T/O =  0  PRV =  2
+SBY  4:58:58 [ct_prove] engine_0: 4 : 0 1 3 20 260 ~26                                                     0     0      0.03 sec  T/O =  0  PRV =  2
+SBY  4:58:58 [ct_prove] engine_0: 5 : 0 1 3 20 58 220 ~26                                                  4    21      0.04 sec  T/O =  0  PRV =  2
+SBY  4:58:58 [ct_prove] engine_0: 6 : 0 1 3 20 51 314 218 ~26                                              5    86      0.13 sec  T/O =  0  PRV =  2
+SBY  4:58:58 [ct_prove] engine_0: 7 : 0 1 3 20 51 231 432 194 ~26                                          7    91      0.27 sec  T/O =  0  PRV =  2
+SBY  4:58:58 [ct_prove] engine_0: Timing out on output 2 in frame 7 (retrying in next anytime pass).
+SBY  4:58:58 [ct_prove] engine_0: 7 : 0 1 3 20 51 231 432 194 ~26                                          0    91      0.27 sec  T/O =  1  PRV =  2
+SBY  4:58:58 [ct_prove] engine_0: 8 : 0 1 3 20 51 205 218 174 172 ~26                                      0    91      0.31 sec  T/O =  1  PRV =  2
+SBY  4:58:58 [ct_prove] engine_0: All outputs solved or timed out in frame 8.
+SBY  4:58:58 [ct_prove] engine_0: Starting new anytime pass, reusing clauses.
+SBY  4:58:58 [ct_prove] engine_0: Frame Clauses                                                     Max Queue Flops Time
+SBY  4:58:58 [ct_prove] engine_0: 1 : 0 488 ~128                                                           0     0      0.05 sec  T/O =  0  PRV =  2
+SBY  4:58:58 [ct_prove] engine_0: 2 : 0 1 487 ~128                                                         0     0      0.05 sec  T/O =  0  PRV =  2
+SBY  4:58:58 [ct_prove] engine_0: 3 : 0 1 3 484 ~128                                                       0     0      0.05 sec  T/O =  0  PRV =  2
+SBY  4:58:58 [ct_prove] engine_0: 4 : 0 1 3 20 464 ~128                                                    0     0      0.05 sec  T/O =  0  PRV =  2
+SBY  4:58:58 [ct_prove] engine_0: 5 : 0 1 3 20 33 431 ~128                                                 0     0      0.05 sec  T/O =  0  PRV =  2
+SBY  4:58:58 [ct_prove] engine_0: 6 : 0 1 3 20 33 56 375 ~128                                              0     0      0.06 sec  T/O =  0  PRV =  2
+SBY  4:58:58 [ct_prove] engine_0: 7 : 0 1 3 20 33 61 203 298 ~128                                          6    38      0.11 sec  T/O =  0  PRV =  2
+SBY  4:58:58 [ct_prove] engine_0: 8 : 0 1 3 20 33 58 215 366 355 ~123                                      9    86      0.29 sec  T/O =  0  PRV =  2
+SBY  4:58:58 [ct_prove] engine_0: 9 : 0 1 3 20 29 58 181 182 329 430 ~193                                  8    92      0.51 sec  T/O =  0  PRV =  2
+SBY  4:58:58 [ct_prove] engine_0: 10 : 0 1 3 20 29 58 160 93 183 138 241 ~478                              10    92      0.65 sec  T/O =  0  PRV =  2
+SBY  4:58:58 [ct_prove] engine_0: Timing out on output 2 in frame 10 (retrying in next anytime pass).
+SBY  4:58:58 [ct_prove] engine_0: 10 : 0 1 3 20 29 58 160 93 183 138 241 ~478                               0    92      0.65 sec  T/O =  1  PRV =  2
+SBY  4:58:59 [ct_prove] engine_0: 11 : 0 1 3 20 28 59 159 81 136 86 38 44 ~629                              0    92      0.70 sec  T/O =  1  PRV =  2
+SBY  4:58:59 [ct_prove] engine_0: All outputs solved or timed out in frame 11.
+SBY  4:58:59 [ct_prove] engine_0: Starting new anytime pass, reusing clauses.
+SBY  4:58:59 [ct_prove] engine_0: Frame Clauses                                                     Max Queue Flops Time
+SBY  4:58:59 [ct_prove] engine_0: 1 : 0 333 ~593                                                           0     0      0.06 sec  T/O =  0  PRV =  2
+SBY  4:58:59 [ct_prove] engine_0: 2 : 0 1 332 ~593                                                         0     0      0.06 sec  T/O =  0  PRV =  2
+SBY  4:58:59 [ct_prove] engine_0: 3 : 0 1 3 329 ~593                                                       0     0      0.06 sec  T/O =  0  PRV =  2
+SBY  4:58:59 [ct_prove] engine_0: 4 : 0 1 3 19 310 ~593                                                    0     0      0.06 sec  T/O =  0  PRV =  2
+SBY  4:58:59 [ct_prove] engine_0: 5 : 0 1 3 19 28 282 ~593                                                 0     0      0.07 sec  T/O =  0  PRV =  2
+SBY  4:58:59 [ct_prove] engine_0: 6 : 0 1 3 19 28 19 263 ~593                                              0     0      0.07 sec  T/O =  0  PRV =  2
+SBY  4:58:59 [ct_prove] engine_0: 7 : 0 1 3 19 28 19 34 229 ~593                                           0     0      0.07 sec  T/O =  0  PRV =  2
+SBY  4:58:59 [ct_prove] engine_0: 8 : 0 1 3 19 28 19 34 39 190 ~593                                        0     0      0.08 sec  T/O =  0  PRV =  2
+SBY  4:58:59 [ct_prove] engine_0: 9 : 0 1 3 19 28 19 34 39 102 88 ~593                                     0     0      0.08 sec  T/O =  0  PRV =  2
+SBY  4:58:59 [ct_prove] engine_0: 10 : 0 1 3 19 28 19 34 43 127 152 158 ~593                                7    60      0.19 sec  T/O =  0  PRV =  2
+SBY  4:58:59 [ct_prove] engine_0: 11 : 0 1 3 19 28 19 34 18 27 60 82 210 ~627                               7    71      0.29 sec  T/O =  0  PRV =  2
+SBY  4:58:59 [ct_prove] engine_0: 12 : 0 1 3 19 28 19 33 14 11 2 6 8 93 ~799                                7    71      0.34 sec  T/O =  0  PRV =  2
+SBY  4:58:59 [ct_prove] engine_0: 13 : 0 1 3 19 28 19 33 14 10 0 0 0 0 -36 ~865                      0    71      0.37 sec  T/O =  0  PRV =  2
+SBY  4:58:59 [ct_prove] engine_0: Proved output 2 in frame -2 (converged).
+SBY  4:58:59 [ct_prove] engine_0: Block =  181  Oblig =  4936  Clause =  3155  Call = 46085 (sat=70.1%)  Cex =   0  Start = 137
+SBY  4:58:59 [ct_prove] engine_0: SAT solving =     1.18 sec ( 67.19 %)
+SBY  4:58:59 [ct_prove] engine_0: unsat     =     0.20 sec ( 11.61 %)
+SBY  4:58:59 [ct_prove] engine_0: sat       =     0.98 sec ( 55.58 %)
+SBY  4:58:59 [ct_prove] engine_0: Generalize  =     0.79 sec ( 45.05 %)
+SBY  4:58:59 [ct_prove] engine_0: Push clause =     0.39 sec ( 21.91 %)
+SBY  4:58:59 [ct_prove] engine_0: Ternary sim =     0.02 sec (  1.14 %)
+SBY  4:58:59 [ct_prove] engine_0: Containment =     0.00 sec (  0.26 %)
+SBY  4:58:59 [ct_prove] engine_0: CNF compute =     0.03 sec (  1.93 %)
+SBY  4:58:59 [ct_prove] engine_0: Refinement  =     0.00 sec (  0.00 %)
+SBY  4:58:59 [ct_prove] engine_0: TOTAL       =     1.76 sec (100.00 %)
+SBY  4:58:59 [ct_prove] engine_0: Property proved.  Time =     1.76 sec
+SBY  4:58:59 [ct_prove] engine_0: Counter-example is not available.
+SBY  4:58:59 [ct_prove] engine_0: finished (returncode=0)
+SBY  4:58:59 [ct_prove] engine_0: Status returned by engine: PASS
+SBY  4:58:59 [ct_prove] summary: Elapsed clock time [H:MM:SS (secs)]: 0:00:01 (1)
+SBY  4:58:59 [ct_prove] summary: Elapsed process time [H:MM:SS (secs)]: 0:00:01 (1)
+SBY  4:58:59 [ct_prove] summary: engine_0 (abc pdr) returned PASS
+SBY  4:58:59 [ct_prove] summary: engine_0 did not produce any traces
+SBY  4:58:59 [ct_prove] DONE (PASS, rc=0)

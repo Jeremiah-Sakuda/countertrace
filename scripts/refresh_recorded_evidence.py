@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 from copy import deepcopy
+import datetime
 import hashlib
 import json
 from pathlib import Path
@@ -93,15 +94,16 @@ def refresh(path: Path) -> dict | None:
                 "Use the corrected check results below; the model text has not been regenerated.")
     if not changes:
         return None
+    today = datetime.date.today()
     commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
     state.setdefault("evidence_corrections", []).append({
-        "id": CORRECTION_ID, "date": "2026-10-04", "original_commit": commit,
+        "id": CORRECTION_ID, "date": today.isoformat(), "original_commit": commit,
         "original_run_sha256": "sha256:" + hashlib.sha256(original).hexdigest(),
         "method": "Reparsed preserved raw simulation traces against their recorded stimulus; aggregated all edges. "
                   "Rechecked citations against declarations. No new RTL execution or model call.",
         "input_hashes": hashes, "changes": changes,
     })
-    state["recorded_note"] = (state.get("recorded_note", "") + " Derived simulation summaries corrected October 4, 2026 "
+    state["recorded_note"] = (state.get("recorded_note", "") + f" Derived simulation summaries corrected {today:%B} {today.day}, {today.year} "
                               "from the preserved traces; see evidence_corrections in run.json. Original timings, raw artifacts, "
                               "and model text are unchanged.").strip()
     return state

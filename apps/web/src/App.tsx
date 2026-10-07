@@ -52,7 +52,7 @@ export function App() {
       <Header status={status} route={route} run={route.name === "run" ? runContext : null} />
       <main id="main" ref={mainRef} tabIndex={-1} className="main">
         {route.name !== "home" && route.name !== "repair" && route.name !== "learn" && route.name !== "teach" && <DeploymentNotice status={status} />}
-        {(route.name === "home" || route.name === "repair") && <RepairLabView home={route.name === "home"} />}
+        {(route.name === "home" || route.name === "repair") && <RepairLabView home={route.name === "home"} caseId={route.name === "repair" ? route.caseId : null} />}
         {route.name === "learn" && (route.id ? <LearnView key={route.id} id={route.id} status={status} /> : <LearnHome />)}
         {route.name === "teach" && <TeachView />}
         {route.name === "setup" && <SetupView exampleId={route.exampleId} profile={profile} status={status} />}

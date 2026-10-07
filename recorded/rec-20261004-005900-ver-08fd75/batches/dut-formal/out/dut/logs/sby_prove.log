@@ -1,0 +1,69 @@
+SBY  4:59:00 [ct_prove] Removing directory '/tmp/work/dut/ct_prove'.
+SBY  4:59:00 [ct_prove] Copy '/tmp/work/dut/dut.v' to '/tmp/work/dut/ct_prove/src/dut.v'.
+SBY  4:59:00 [ct_prove] Copy '/tmp/work/dut/ct_formal_top.sv' to '/tmp/work/dut/ct_prove/src/ct_formal_top.sv'.
+SBY  4:59:00 [ct_prove] engine_0: abc pdr
+SBY  4:59:00 [ct_prove] base: starting process "cd ct_prove/src; yosys -ql ../model/design.log ../model/design.ys"
+SBY  4:59:00 [ct_prove] base: finished (returncode=0)
+SBY  4:59:00 [ct_prove] prep: starting process "cd ct_prove/model; yosys -ql design_prep.log design_prep.ys"
+SBY  4:59:00 [ct_prove] prep: finished (returncode=0)
+SBY  4:59:00 [ct_prove] aig: starting process "cd ct_prove/model; yosys -ql design_aiger.log design_aiger.ys"
+SBY  4:59:00 [ct_prove] aig: Warning: Treating undriven bit ct_formal_top.\clk like $anyseq.
+SBY  4:59:00 [ct_prove] aig: Warning: Treating undriven bit ct_formal_top.\wr_en like $anyseq.
+SBY  4:59:00 [ct_prove] aig: Warning: Treating undriven bit ct_formal_top.\rst like $anyseq.
+SBY  4:59:00 [ct_prove] aig: Warning: Treating undriven bit ct_formal_top.\rd_en like $anyseq.
+SBY  4:59:00 [ct_prove] aig: Warning: Treating undriven bit ct_formal_top.\din [0] like $anyseq.
+SBY  4:59:00 [ct_prove] aig: Warning: Treating undriven bit ct_formal_top.\din [1] like $anyseq.
+SBY  4:59:00 [ct_prove] aig: Warning: Treating undriven bit ct_formal_top.\din [2] like $anyseq.
+SBY  4:59:00 [ct_prove] aig: Warning: Treating undriven bit ct_formal_top.\din [3] like $anyseq.
+SBY  4:59:00 [ct_prove] aig: Warning: Treating undriven bit ct_formal_top.\din [4] like $anyseq.
+SBY  4:59:00 [ct_prove] aig: Warning: Treating undriven bit ct_formal_top.\din [5] like $anyseq.
+SBY  4:59:00 [ct_prove] aig: Warning: Treating undriven bit ct_formal_top.\din [6] like $anyseq.
+SBY  4:59:00 [ct_prove] aig: Warning: Treating undriven bit ct_formal_top.\din [7] like $anyseq.
+SBY  4:59:00 [ct_prove] aig: Warning: Treating a total of 12 undriven bits in ct_formal_top like $anyseq.
+SBY  4:59:00 [ct_prove] aig: finished (returncode=0)
+SBY  4:59:00 [ct_prove] engine_0: starting process "cd ct_prove; yosys-abc -c 'read_aiger model/design_aiger.aig; fold; strash; pdr -v -l; write_cex -a engine_0/trace.aiw'"
+SBY  4:59:00 [ct_prove] engine_0: ======== ABC command line "read_aiger model/design_aiger.aig; fold; strash; pdr -v -l; write_cex -a engine_0/trace.aiw"
+SBY  4:59:00 [ct_prove] engine_0: Warning: The last 2 outputs are interpreted as constraints.
+SBY  4:59:00 [ct_prove] engine_0: VarMax = 300. FrameMax = 10000. QueMax = 0. TimeMax = 159. MonoCNF = no. SkipGen = no. SolveAll = no.
+SBY  4:59:00 [ct_prove] engine_0: Frame Clauses                                                     Max Queue Flops Time
+SBY  4:59:00 [ct_prove] engine_0: 1 : 0 5                                                                 2     7      0.00 sec  T/O =  0  PRV =  0
+SBY  4:59:00 [ct_prove] engine_0: Block =    6  Oblig =     8  Clause =     5  Call =    22 (sat=59.1%)  Cex =   0  Start =   0
+SBY  4:59:00 [ct_prove] engine_0: SAT solving =     0.00 sec (  1.89 %)
+SBY  4:59:00 [ct_prove] engine_0: unsat     =     0.00 sec (  0.05 %)
+SBY  4:59:00 [ct_prove] engine_0: sat       =     0.00 sec (  1.84 %)
+SBY  4:59:00 [ct_prove] engine_0: Generalize  =     0.00 sec (  1.35 %)
+SBY  4:59:00 [ct_prove] engine_0: Push clause =     0.00 sec (  0.00 %)
+SBY  4:59:00 [ct_prove] engine_0: Ternary sim =     0.00 sec (  0.45 %)
+SBY  4:59:00 [ct_prove] engine_0: Containment =     0.00 sec (  0.00 %)
+SBY  4:59:00 [ct_prove] engine_0: CNF compute =     0.00 sec (  0.13 %)
+SBY  4:59:00 [ct_prove] engine_0: Refinement  =     0.00 sec (  0.17 %)
+SBY  4:59:00 [ct_prove] engine_0: TOTAL       =     0.01 sec (100.00 %)
+SBY  4:59:00 [ct_prove] engine_0: Output 1 of miter "model/design_aiger" was asserted in frame 1.  Time =     0.01 sec
+SBY  4:59:00 [ct_prove] engine_0: finished (returncode=0)
+SBY  4:59:00 [ct_prove] engine_0: Status returned by engine: FAIL
+SBY  4:59:00 [ct_prove] smt2: starting process "cd ct_prove/model; yosys -ql design_smt2.log design_smt2.ys"
+SBY  4:59:00 [ct_prove] engine_0: starting process "cd ct_prove; yosys-witness aiw2yw engine_0/trace.aiw model/design_aiger.ywa engine_0/trace_aiw.yw"
+SBY  4:59:00 [ct_prove] smt2: finished (returncode=0)
+SBY  4:59:00 [ct_prove] engine_0: Converting AIGER witness trace 'engine_0/trace.aiw' to Yosys witness trace 'engine_0/trace_aiw.yw'...
+SBY  4:59:00 [ct_prove] engine_0: Using Yosys witness AIGER map file 'model/design_aiger.ywa'
+SBY  4:59:00 [ct_prove] engine_0: Converted 2 time steps.
+SBY  4:59:00 [ct_prove] engine_0: finished (returncode=0)
+SBY  4:59:00 [ct_prove] engine_0: starting process "cd ct_prove; yosys-smtbmc -s yices --noprogress --append 0 --dump-vcd engine_0/trace.vcd --dump-yw engine_0/trace.yw --dump-vlogtb engine_0/trace_tb.v --dump-smtc engine_0/trace.smtc --yw engine_0/trace_aiw.yw model/design_smt2.smt2"
+SBY  4:59:00 [ct_prove] engine_0: ##   0:00:00  Solver: yices
+SBY  4:59:00 [ct_prove] engine_0: ##   0:00:00  Skipping step 0..
+SBY  4:59:00 [ct_prove] engine_0: ##   0:00:00  Checking assertions in step 1..
+SBY  4:59:00 [ct_prove] engine_0: ##   0:00:00  BMC failed!
+SBY  4:59:00 [ct_prove] engine_0: ##   0:00:00  Assert failed in ct_formal_top: ct_full_flag
+SBY  4:59:00 [ct_prove] engine_0: ##   0:00:00  Writing trace to VCD file: engine_0/trace.vcd
+SBY  4:59:00 [ct_prove] engine_0: ##   0:00:00  Writing trace to Verilog testbench: engine_0/trace_tb.v
+SBY  4:59:00 [ct_prove] engine_0: ##   0:00:00  Writing trace to constraints file: engine_0/trace.smtc
+SBY  4:59:00 [ct_prove] engine_0: ##   0:00:00  Writing trace to Yosys witness file: engine_0/trace.yw
+SBY  4:59:00 [ct_prove] engine_0: ##   0:00:00  Status: FAILED
+SBY  4:59:00 [ct_prove] engine_0: finished (returncode=1)
+SBY  4:59:00 [ct_prove] summary: Elapsed clock time [H:MM:SS (secs)]: 0:00:00 (0)
+SBY  4:59:00 [ct_prove] summary: Elapsed process time [H:MM:SS (secs)]: 0:00:00 (0)
+SBY  4:59:00 [ct_prove] summary: engine_0 (abc pdr) returned FAIL
+SBY  4:59:00 [ct_prove] summary: counterexample trace: ct_prove/engine_0/trace.vcd
+SBY  4:59:00 [ct_prove] summary:   failed assertion ct_formal_top.ct_full_flag at ct_formal_top.sv:76.13-76.53 step 1
+SBY  4:59:00 [ct_prove] DONE (FAIL, rc=2)
+SBY  4:59:00 The following tasks failed: ['prove']

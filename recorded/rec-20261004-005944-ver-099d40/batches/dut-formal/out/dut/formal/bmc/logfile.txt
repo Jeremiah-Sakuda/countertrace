@@ -1,0 +1,64 @@
+SBY  4:59:45 [ct_bmc] Removing directory '/tmp/work/dut/ct_bmc'.
+SBY  4:59:45 [ct_bmc] Copy '/tmp/work/dut/dut.v' to '/tmp/work/dut/ct_bmc/src/dut.v'.
+SBY  4:59:45 [ct_bmc] Copy '/tmp/work/dut/ct_formal_top.sv' to '/tmp/work/dut/ct_bmc/src/ct_formal_top.sv'.
+SBY  4:59:45 [ct_bmc] engine_0: abc bmc3
+SBY  4:59:45 [ct_bmc] base: starting process "cd ct_bmc/src; yosys -ql ../model/design.log ../model/design.ys"
+SBY  4:59:45 [ct_bmc] base: finished (returncode=0)
+SBY  4:59:45 [ct_bmc] prep: starting process "cd ct_bmc/model; yosys -ql design_prep.log design_prep.ys"
+SBY  4:59:45 [ct_bmc] prep: finished (returncode=0)
+SBY  4:59:45 [ct_bmc] aig: starting process "cd ct_bmc/model; yosys -ql design_aiger.log design_aiger.ys"
+SBY  4:59:45 [ct_bmc] aig: Warning: Treating undriven bit ct_formal_top.\clk like $anyseq.
+SBY  4:59:45 [ct_bmc] aig: Warning: Treating undriven bit ct_formal_top.\wr_en like $anyseq.
+SBY  4:59:45 [ct_bmc] aig: Warning: Treating undriven bit ct_formal_top.\rst like $anyseq.
+SBY  4:59:45 [ct_bmc] aig: Warning: Treating undriven bit ct_formal_top.\rd_en like $anyseq.
+SBY  4:59:45 [ct_bmc] aig: Warning: Treating undriven bit ct_formal_top.\din [0] like $anyseq.
+SBY  4:59:45 [ct_bmc] aig: Warning: Treating undriven bit ct_formal_top.\din [1] like $anyseq.
+SBY  4:59:45 [ct_bmc] aig: Warning: Treating undriven bit ct_formal_top.\din [2] like $anyseq.
+SBY  4:59:45 [ct_bmc] aig: Warning: Treating undriven bit ct_formal_top.\din [3] like $anyseq.
+SBY  4:59:45 [ct_bmc] aig: Warning: Treating undriven bit ct_formal_top.\din [4] like $anyseq.
+SBY  4:59:45 [ct_bmc] aig: Warning: Treating undriven bit ct_formal_top.\din [5] like $anyseq.
+SBY  4:59:45 [ct_bmc] aig: Warning: Treating undriven bit ct_formal_top.\din [6] like $anyseq.
+SBY  4:59:45 [ct_bmc] aig: Warning: Treating undriven bit ct_formal_top.\din [7] like $anyseq.
+SBY  4:59:45 [ct_bmc] aig: Warning: Treating a total of 12 undriven bits in ct_formal_top like $anyseq.
+SBY  4:59:45 [ct_bmc] aig: finished (returncode=0)
+SBY  4:59:45 [ct_bmc] engine_0: starting process "cd ct_bmc; yosys-abc -c 'read_aiger model/design_aiger.aig; fold; strash; bmc3 -F 24 -v; write_cex -a engine_0/trace.aiw'"
+SBY  4:59:45 [ct_bmc] engine_0: ======== ABC command line "read_aiger model/design_aiger.aig; fold; strash; bmc3 -F 24 -v; write_cex -a engine_0/trace.aiw"
+SBY  4:59:45 [ct_bmc] engine_0: Warning: The last 2 outputs are interpreted as constraints.
+SBY  4:59:45 [ct_bmc] engine_0: Running "bmc3". PI/PO/Reg = 144/3/95. And =   1011. Lev =    15. ObjNums =   657.
+SBY  4:59:45 [ct_bmc] engine_0: Params: FramesMax = 24. Start = 0. ConfLimit = 0. TimeOut = 0. SolveAll = 0.
+SBY  4:59:45 [ct_bmc] engine_0: 0 + : Var =       1. Cla =        0. Conf =      0. Learn =      0.    0 MB   4 MB     0.02 sec
+SBY  4:59:45 [ct_bmc] engine_0: 1 + : Var =     229. Cla =      480. Conf =      0. Learn =      0.    0 MB   4 MB     0.02 sec
+SBY  4:59:45 [ct_bmc] engine_0: 2 + : Var =     600. Cla =     1445. Conf =      2. Learn =      1.    0 MB   4 MB     0.02 sec
+SBY  4:59:45 [ct_bmc] engine_0: 3 + : Var =     971. Cla =     2410. Conf =     30. Learn =     26.    0 MB   4 MB     0.02 sec
+SBY  4:59:45 [ct_bmc] engine_0: 4 + : Var =    1342. Cla =     3375. Conf =    133. Learn =    126.    0 MB   4 MB     0.02 sec
+SBY  4:59:45 [ct_bmc] engine_0: 5 + : Var =    1713. Cla =     4340. Conf =    370. Learn =    360.    0 MB   4 MB     0.02 sec
+SBY  4:59:45 [ct_bmc] engine_0: 6 + : Var =    2084. Cla =     5305. Conf =    917. Learn =    904.    0 MB   4 MB     0.03 sec
+SBY  4:59:45 [ct_bmc] engine_0: 7 + : Var =    2455. Cla =     6270. Conf =   1796. Learn =   1780.    0 MB   4 MB     0.03 sec
+SBY  4:59:45 [ct_bmc] engine_0: 8 + : Var =    2826. Cla =     7235. Conf =   3266. Learn =   3247.    0 MB   4 MB     0.04 sec
+SBY  4:59:45 [ct_bmc] engine_0: 9 + : Var =    3197. Cla =     8200. Conf =   5151. Learn =   5129.    0 MB   4 MB     0.06 sec
+SBY  4:59:45 [ct_bmc] engine_0: 10 + : Var =    3568. Cla =     9165. Conf =   8109. Learn =   8084.    0 MB   5 MB     0.10 sec
+SBY  4:59:45 [ct_bmc] engine_0: 11 + : Var =    3939. Cla =    10130. Conf =  12622. Learn =  10312.    0 MB   6 MB     0.16 sec
+SBY  4:59:45 [ct_bmc] engine_0: 12 + : Var =    4310. Cla =    11095. Conf =  17109. Learn =  12396.    0 MB   6 MB     0.24 sec
+SBY  4:59:45 [ct_bmc] engine_0: 13 + : Var =    4681. Cla =    12060. Conf =  22665. Learn =  15154.    0 MB   6 MB     0.34 sec
+SBY  4:59:45 [ct_bmc] engine_0: 14 + : Var =    5052. Cla =    13025. Conf =  28949. Learn =  14647.    0 MB   6 MB     0.46 sec
+SBY  4:59:45 [ct_bmc] engine_0: 15 + : Var =    5423. Cla =    13990. Conf =  35982. Learn =  17647.    0 MB   7 MB     0.60 sec
+SBY  4:59:45 [ct_bmc] engine_0: 16 + : Var =    5794. Cla =    14955. Conf =  44359. Learn =  21695.    0 MB   7 MB     0.77 sec
+SBY  4:59:46 [ct_bmc] engine_0: 17 + : Var =    6165. Cla =    15920. Conf =  51759. Learn =  24351.    0 MB   8 MB     0.93 sec
+SBY  4:59:46 [ct_bmc] engine_0: 18 + : Var =    6536. Cla =    16885. Conf =  60063. Learn =  27420.    0 MB   8 MB     1.11 sec
+SBY  4:59:46 [ct_bmc] engine_0: 19 + : Var =    6907. Cla =    17850. Conf =  69355. Learn =  25199.    0 MB   9 MB     1.32 sec
+SBY  4:59:46 [ct_bmc] engine_0: 20 + : Var =    7278. Cla =    18815. Conf =  78739. Learn =  28163.    0 MB   9 MB     1.55 sec
+SBY  4:59:46 [ct_bmc] engine_0: 21 + : Var =    7649. Cla =    19780. Conf =  87584. Learn =  30199.    0 MB   9 MB     1.76 sec
+SBY  4:59:47 [ct_bmc] engine_0: 22 + : Var =    8020. Cla =    20745. Conf =  96539. Learn =  31469.    0 MB  10 MB     1.97 sec
+SBY  4:59:47 [ct_bmc] engine_0: 23 + : Var =    8391. Cla =    21710. Conf = 106585. Learn =  34038.    0 MB  10 MB     2.21 sec
+SBY  4:59:47 [ct_bmc] engine_0: Runtime:  CNF = 0.0 sec (0.1 %)  UNSAT = 2.2 sec (98.9 %)  SAT = 0.0 sec (0.0 %)  UNDEC = 0.0 sec (0.0 %)
+SBY  4:59:47 [ct_bmc] engine_0: LStart(P) = 10000  LDelta(Q) = 2000  LRatio(R) = 80  ReduceDB = 15  Vars = 8391  Used = 8360 (99.63 %)
+SBY  4:59:47 [ct_bmc] engine_0: Buffs = 2137. Dups = 0.   Hash hits = 0.  Hash misses = 5103.  UniProps = 0.
+SBY  4:59:47 [ct_bmc] engine_0: No output asserted in 24 frames. Resource limit reached (conf limit 0). Time =     2.21 sec
+SBY  4:59:47 [ct_bmc] engine_0: Counter-example is not available.
+SBY  4:59:47 [ct_bmc] engine_0: finished (returncode=0)
+SBY  4:59:47 [ct_bmc] engine_0: Status returned by engine: PASS
+SBY  4:59:47 [ct_bmc] summary: Elapsed clock time [H:MM:SS (secs)]: 0:00:02 (2)
+SBY  4:59:47 [ct_bmc] summary: Elapsed process time [H:MM:SS (secs)]: 0:00:02 (2)
+SBY  4:59:47 [ct_bmc] summary: engine_0 (abc bmc3) returned PASS
+SBY  4:59:47 [ct_bmc] summary: engine_0 did not produce any traces
+SBY  4:59:47 [ct_bmc] DONE (PASS, rc=0)
