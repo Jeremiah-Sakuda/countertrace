@@ -1,0 +1,1264 @@
+{
+ "schema": "countertrace-testbench-lab-v1",
+ "source_run": "rec-20261001-193049-aud-7cf847",
+ "contract_hash": "sha256:d8c9a8e739585556ac4f0931dbbbcc14b75d4f197cd000be00d91a1af4a58ce3",
+ "depth": 4,
+ "checks": [
+  "empty_flag",
+  "full_flag",
+  "read_data"
+ ],
+ "rows": {
+  "reset": "Reset asserted at a rising edge",
+  "write_not_full": "Write requested while not full",
+  "read_not_empty": "Read requested while not empty",
+  "read_empty": "Read requested while empty",
+  "write_full": "Write requested while full",
+  "both_mid": "Read and write between empty and full",
+  "both_empty": "Read and write while empty",
+  "both_full": "Read and write while full",
+  "idle": "No request",
+  "wraparound": "Wraparound"
+ },
+ "tests": [
+  {
+   "id": "learner_basic",
+   "edges": 20,
+   "rows": [
+    "idle",
+    "read_not_empty",
+    "reset",
+    "write_not_full"
+   ],
+   "description": "Fill exactly, drain exactly, wrap once. The usual first testbench: no boundary requests."
+  },
+  {
+   "id": "fill_drain",
+   "edges": 12,
+   "rows": [
+    "idle",
+    "read_empty",
+    "read_not_empty",
+    "reset",
+    "write_full",
+    "write_not_full"
+   ],
+   "description": "Write one past full, then read one past empty."
+  },
+  {
+   "id": "write_when_full",
+   "edges": 12,
+   "rows": [
+    "read_empty",
+    "read_not_empty",
+    "reset",
+    "write_full",
+    "write_not_full"
+   ],
+   "description": "Fill the queue, keep writing while full, then drain it."
+  },
+  {
+   "id": "simultaneous",
+   "edges": 15,
+   "rows": [
+    "both_empty",
+    "both_full",
+    "both_mid",
+    "idle",
+    "read_empty",
+    "read_not_empty",
+    "reset",
+    "write_not_full"
+   ],
+   "description": "Read and write in the same cycle while empty, at occupancy 1, while full, and mid-queue."
+  },
+  {
+   "id": "wraparound",
+   "edges": 27,
+   "rows": [
+    "both_full",
+    "both_mid",
+    "read_empty",
+    "read_not_empty",
+    "reset",
+    "write_full",
+    "write_not_full"
+   ],
+   "description": "Several fill and drain rounds so both pointers wrap, including simultaneous operations."
+  },
+  {
+   "id": "recurrent_reset",
+   "edges": 20,
+   "rows": [
+    "read_empty",
+    "read_not_empty",
+    "reset",
+    "write_not_full"
+   ],
+   "description": "Reset in the middle of traffic, including a reset with read and write requested."
+  },
+  {
+   "id": "random_s1",
+   "edges": 160,
+   "rows": [
+    "both_empty",
+    "both_full",
+    "both_mid",
+    "idle",
+    "read_empty",
+    "read_not_empty",
+    "reset",
+    "write_full",
+    "write_not_full"
+   ],
+   "description": "Seeded random traffic (seed 1): 160 edges of mixed reads, writes, and occasional resets."
+  },
+  {
+   "id": "random_s2",
+   "edges": 160,
+   "rows": [
+    "both_empty",
+    "both_full",
+    "both_mid",
+    "idle",
+    "read_empty",
+    "read_not_empty",
+    "reset",
+    "write_full",
+    "write_not_full"
+   ],
+   "description": "Seeded random traffic (seed 2): 160 edges of mixed reads, writes, and occasional resets."
+  },
+  {
+   "id": "random_s3",
+   "edges": 160,
+   "rows": [
+    "both_empty",
+    "both_full",
+    "both_mid",
+    "idle",
+    "read_empty",
+    "read_not_empty",
+    "reset",
+    "write_full",
+    "write_not_full"
+   ],
+   "description": "Seeded random traffic (seed 3): 160 edges of mixed reads, writes, and occasional resets."
+  },
+  {
+   "id": "random_s4",
+   "edges": 160,
+   "rows": [
+    "both_empty",
+    "both_full",
+    "both_mid",
+    "idle",
+    "read_empty",
+    "read_not_empty",
+    "reset",
+    "write_full",
+    "write_not_full"
+   ],
+   "description": "Seeded random traffic (seed 4): 160 edges of mixed reads, writes, and occasional resets."
+  },
+  {
+   "id": "random_s5",
+   "edges": 160,
+   "rows": [
+    "both_empty",
+    "both_full",
+    "both_mid",
+    "idle",
+    "read_empty",
+    "read_not_empty",
+    "reset",
+    "write_full",
+    "write_not_full"
+   ],
+   "description": "Seeded random traffic (seed 5): 160 edges of mixed reads, writes, and occasional resets."
+  },
+  {
+   "id": "random_s6",
+   "edges": 160,
+   "rows": [
+    "both_empty",
+    "both_full",
+    "both_mid",
+    "idle",
+    "read_empty",
+    "read_not_empty",
+    "reset",
+    "write_full",
+    "write_not_full"
+   ],
+   "description": "Seeded random traffic (seed 6): 160 edges of mixed reads, writes, and occasional resets."
+  },
+  {
+   "id": "random_s7",
+   "edges": 160,
+   "rows": [
+    "both_empty",
+    "both_full",
+    "both_mid",
+    "idle",
+    "read_empty",
+    "read_not_empty",
+    "reset",
+    "write_full",
+    "write_not_full"
+   ],
+   "description": "Seeded random traffic (seed 7): 160 edges of mixed reads, writes, and occasional resets."
+  },
+  {
+   "id": "random_s8",
+   "edges": 160,
+   "rows": [
+    "both_empty",
+    "both_full",
+    "both_mid",
+    "idle",
+    "read_empty",
+    "read_not_empty",
+    "reset",
+    "write_full",
+    "write_not_full"
+   ],
+   "description": "Seeded random traffic (seed 8): 160 edges of mixed reads, writes, and occasional resets."
+  }
+ ],
+ "faults": [
+  {
+   "id": "count-overwrite-when-full",
+   "summary": "A write while full is not ignored: it overwrites the oldest unread word.",
+   "category": "flags_boundaries",
+   "target": "write_full",
+   "matrix": {
+    "fill_drain": {
+     "read_data": {
+      "read_not_empty": 6
+     }
+    },
+    "write_when_full": {
+     "read_data": {
+      "read_not_empty": 7
+     }
+    },
+    "simultaneous": {
+     "full_flag": {
+      "both_full": 6,
+      "both_mid": 7
+     },
+     "empty_flag": {
+      "read_not_empty": 10
+     },
+     "read_data": {
+      "read_not_empty": 10
+     }
+    },
+    "wraparound": {
+     "read_data": {
+      "read_not_empty": 10,
+      "both_full": 18,
+      "both_mid": 19
+     },
+     "full_flag": {
+      "both_full": 18,
+      "both_mid": 19
+     },
+     "empty_flag": {
+      "read_not_empty": 24
+     }
+    },
+    "random_s1": {
+     "full_flag": {
+      "both_full": 7,
+      "idle": 8,
+      "both_mid": 82
+     },
+     "read_data": {
+      "both_full": 10,
+      "read_not_empty": 12,
+      "both_mid": 25
+     }
+    },
+    "random_s2": {
+     "read_data": {
+      "read_not_empty": 12,
+      "both_full": 60,
+      "both_mid": 65
+     },
+     "full_flag": {
+      "both_full": 29,
+      "idle": 30
+     },
+     "empty_flag": {
+      "read_not_empty": 66
+     }
+    },
+    "random_s3": {
+     "read_data": {
+      "read_not_empty": 12,
+      "both_mid": 18,
+      "both_full": 59
+     },
+     "full_flag": {
+      "both_full": 57,
+      "write_not_full": 61,
+      "idle": 129,
+      "both_mid": 130
+     },
+     "empty_flag": {
+      "read_not_empty": 64,
+      "idle": 65
+     }
+    },
+    "random_s4": {
+     "full_flag": {
+      "both_full": 12,
+      "idle": 13,
+      "write_not_full": 117,
+      "both_mid": 152
+     },
+     "read_data": {
+      "both_full": 12,
+      "read_not_empty": 16,
+      "both_mid": 22
+     },
+     "empty_flag": {
+      "read_not_empty": 111
+     }
+    },
+    "random_s5": {
+     "full_flag": {
+      "both_full": 10,
+      "idle": 11,
+      "both_mid": 29
+     },
+     "read_data": {
+      "both_full": 10,
+      "read_not_empty": 12,
+      "both_mid": 15
+     },
+     "empty_flag": {
+      "read_not_empty": 16,
+      "idle": 17
+     }
+    },
+    "random_s6": {
+     "read_data": {
+      "read_not_empty": 10,
+      "both_mid": 41,
+      "both_full": 59
+     },
+     "full_flag": {
+      "both_full": 34,
+      "both_mid": 35,
+      "write_not_full": 77,
+      "idle": 78
+     },
+     "empty_flag": {
+      "read_not_empty": 71
+     }
+    },
+    "random_s7": {
+     "full_flag": {
+      "both_full": 32,
+      "idle": 53,
+      "both_mid": 104
+     },
+     "read_data": {
+      "both_full": 52,
+      "read_not_empty": 61,
+      "both_mid": 73
+     },
+     "empty_flag": {
+      "read_not_empty": 64
+     }
+    },
+    "random_s8": {
+     "full_flag": {
+      "both_full": 6,
+      "idle": 14,
+      "both_mid": 15,
+      "write_not_full": 20
+     },
+     "read_data": {
+      "both_full": 10,
+      "both_mid": 15,
+      "read_not_empty": 32
+     },
+     "empty_flag": {
+      "read_not_empty": 116,
+      "idle": 117
+     }
+    }
+   }
+  },
+  {
+   "id": "count-full-exchange",
+   "summary": "A simultaneous read and write while full accepts both (full-capacity exchange).",
+   "category": "simultaneous",
+   "target": "both_full",
+   "matrix": {
+    "simultaneous": {
+     "full_flag": {
+      "both_full": 6,
+      "both_mid": 7
+     },
+     "empty_flag": {
+      "read_not_empty": 10
+     },
+     "read_data": {
+      "read_not_empty": 10
+     }
+    },
+    "wraparound": {
+     "full_flag": {
+      "both_full": 18,
+      "both_mid": 19
+     },
+     "read_data": {
+      "read_not_empty": 22
+     },
+     "empty_flag": {
+      "read_not_empty": 24
+     }
+    },
+    "random_s1": {
+     "full_flag": {
+      "both_full": 7,
+      "idle": 8,
+      "both_mid": 82
+     },
+     "read_data": {
+      "read_not_empty": 15,
+      "both_mid": 63
+     }
+    },
+    "random_s2": {
+     "full_flag": {
+      "both_full": 29,
+      "idle": 30
+     },
+     "read_data": {
+      "read_not_empty": 63,
+      "both_mid": 65
+     },
+     "empty_flag": {
+      "read_not_empty": 66
+     }
+    },
+    "random_s3": {
+     "full_flag": {
+      "both_full": 57,
+      "write_not_full": 61,
+      "idle": 129,
+      "both_mid": 130
+     },
+     "read_data": {
+      "read_not_empty": 63,
+      "both_mid": 134,
+      "both_full": 140
+     },
+     "empty_flag": {
+      "read_not_empty": 64,
+      "idle": 65
+     }
+    },
+    "random_s4": {
+     "full_flag": {
+      "both_full": 12,
+      "idle": 13,
+      "write_not_full": 117,
+      "both_mid": 152
+     },
+     "read_data": {
+      "both_mid": 22,
+      "read_not_empty": 110
+     },
+     "empty_flag": {
+      "read_not_empty": 111
+     }
+    },
+    "random_s5": {
+     "full_flag": {
+      "both_full": 10,
+      "idle": 11,
+      "both_mid": 29
+     },
+     "read_data": {
+      "both_mid": 15,
+      "read_not_empty": 16
+     },
+     "empty_flag": {
+      "read_not_empty": 16,
+      "idle": 17
+     }
+    },
+    "random_s6": {
+     "full_flag": {
+      "both_full": 34,
+      "both_mid": 35,
+      "write_not_full": 77,
+      "idle": 78
+     },
+     "read_data": {
+      "both_mid": 41,
+      "read_not_empty": 44
+     },
+     "empty_flag": {
+      "read_not_empty": 71
+     }
+    },
+    "random_s7": {
+     "full_flag": {
+      "both_full": 32,
+      "idle": 53,
+      "both_mid": 104
+     },
+     "empty_flag": {
+      "read_not_empty": 64
+     },
+     "read_data": {
+      "read_not_empty": 64
+     }
+    },
+    "random_s8": {
+     "full_flag": {
+      "both_full": 6,
+      "idle": 14,
+      "both_mid": 15,
+      "write_not_full": 20
+     },
+     "read_data": {
+      "both_mid": 16,
+      "read_not_empty": 18
+     },
+     "empty_flag": {
+      "read_not_empty": 116,
+      "idle": 117
+     }
+    }
+   }
+  },
+  {
+   "id": "count-empty-bypass",
+   "summary": "A read while empty consumes a simultaneous write by bypassing it to dout.",
+   "category": "simultaneous",
+   "target": "both_empty",
+   "matrix": {
+    "simultaneous": {
+     "empty_flag": {
+      "both_empty": 1,
+      "both_mid": 2
+     },
+     "read_data": {
+      "both_mid": 2,
+      "both_full": 6,
+      "read_not_empty": 8
+     },
+     "full_flag": {
+      "write_not_full": 5
+     }
+    },
+    "random_s1": {
+     "empty_flag": {
+      "both_empty": 3,
+      "idle": 95,
+      "both_mid": 97
+     },
+     "full_flag": {
+      "write_not_full": 6
+     },
+     "read_data": {
+      "both_full": 7,
+      "read_not_empty": 12,
+      "both_mid": 97
+     }
+    },
+    "random_s2": {
+     "empty_flag": {
+      "both_empty": 1,
+      "both_mid": 25,
+      "read_not_empty": 37,
+      "idle": 42
+     },
+     "read_data": {
+      "both_mid": 7,
+      "read_not_empty": 12,
+      "both_full": 29
+     },
+     "full_flag": {
+      "write_not_full": 8
+     }
+    },
+    "random_s3": {
+     "empty_flag": {
+      "both_empty": 48,
+      "both_mid": 147
+     },
+     "read_data": {
+      "both_mid": 52,
+      "read_not_empty": 53,
+      "both_full": 57
+     },
+     "full_flag": {
+      "write_not_full": 55,
+      "idle": 56
+     }
+    },
+    "random_s4": {
+     "empty_flag": {
+      "both_empty": 24,
+      "read_not_empty": 75,
+      "both_mid": 93
+     },
+     "read_data": {
+      "both_mid": 74,
+      "read_not_empty": 75,
+      "both_full": 84
+     },
+     "full_flag": {
+      "write_not_full": 78
+     }
+    },
+    "random_s5": {
+     "empty_flag": {
+      "both_empty": 2,
+      "both_mid": 3,
+      "idle": 4
+     },
+     "read_data": {
+      "both_mid": 3,
+      "both_full": 10,
+      "read_not_empty": 12
+     },
+     "full_flag": {
+      "write_not_full": 7
+     }
+    },
+    "random_s6": {
+     "empty_flag": {
+      "both_empty": 25,
+      "idle": 98,
+      "both_mid": 100
+     },
+     "read_data": {
+      "both_mid": 28,
+      "read_not_empty": 30,
+      "both_full": 34
+     },
+     "full_flag": {
+      "write_not_full": 33
+     }
+    },
+    "random_s7": {
+     "empty_flag": {
+      "both_empty": 24,
+      "idle": 71,
+      "both_mid": 94,
+      "read_not_empty": 148
+     },
+     "read_data": {
+      "both_mid": 29,
+      "both_full": 32,
+      "read_not_empty": 148
+     },
+     "full_flag": {
+      "write_not_full": 31
+     }
+    },
+    "random_s8": {
+     "empty_flag": {
+      "both_empty": 26
+     },
+     "full_flag": {
+      "write_not_full": 30
+     },
+     "read_data": {
+      "read_not_empty": 32,
+      "both_mid": 33
+     }
+    }
+   }
+  },
+  {
+   "id": "count-reset-keeps-wrptr",
+   "summary": "Reset clears the read pointer and count but not the write pointer.",
+   "category": "reset",
+   "target": "reset",
+   "matrix": {
+    "learner_basic": {
+     "read_data": {
+      "read_not_empty": 5
+     }
+    },
+    "fill_drain": {
+     "read_data": {
+      "read_not_empty": 6
+     }
+    },
+    "write_when_full": {
+     "read_data": {
+      "read_not_empty": 7
+     }
+    },
+    "simultaneous": {
+     "read_data": {
+      "both_mid": 2,
+      "both_full": 6,
+      "read_not_empty": 8
+     }
+    },
+    "wraparound": {
+     "read_data": {
+      "read_not_empty": 4,
+      "both_full": 18,
+      "both_mid": 19
+     }
+    },
+    "recurrent_reset": {
+     "read_data": {
+      "read_not_empty": 6
+     }
+    },
+    "random_s1": {
+     "read_data": {
+      "read_not_empty": 2,
+      "both_full": 7,
+      "both_mid": 25
+     }
+    },
+    "random_s2": {
+     "read_data": {
+      "read_not_empty": 2,
+      "both_mid": 7,
+      "both_full": 29
+     }
+    },
+    "random_s3": {
+     "read_data": {
+      "both_mid": 2,
+      "read_not_empty": 12,
+      "both_full": 57
+     }
+    },
+    "random_s4": {
+     "read_data": {
+      "both_mid": 4,
+      "both_full": 12,
+      "read_not_empty": 16
+     }
+    },
+    "random_s5": {
+     "read_data": {
+      "both_mid": 3,
+      "both_full": 10,
+      "read_not_empty": 12
+     }
+    },
+    "random_s6": {
+     "read_data": {
+      "both_mid": 5,
+      "read_not_empty": 10,
+      "both_full": 34
+     }
+    },
+    "random_s7": {
+     "read_data": {
+      "both_mid": 5,
+      "read_not_empty": 12,
+      "both_full": 32
+     }
+    },
+    "random_s8": {
+     "read_data": {
+      "both_full": 6,
+      "both_mid": 15,
+      "read_not_empty": 18
+     }
+    }
+   }
+  },
+  {
+   "id": "count-lost-occupancy",
+   "summary": "A read-only operation does not decrement the occupancy count.",
+   "category": "accounting",
+   "target": "read_not_empty",
+   "matrix": {
+    "learner_basic": {
+     "full_flag": {
+      "read_not_empty": 5,
+      "write_not_full": 9,
+      "idle": 19
+     },
+     "empty_flag": {
+      "read_not_empty": 8,
+      "idle": 19
+     },
+     "read_data": {
+      "read_not_empty": 11
+     }
+    },
+    "fill_drain": {
+     "full_flag": {
+      "read_not_empty": 6,
+      "read_empty": 10,
+      "idle": 11
+     },
+     "empty_flag": {
+      "read_not_empty": 9,
+      "read_empty": 10,
+      "idle": 11
+     }
+    },
+    "write_when_full": {
+     "full_flag": {
+      "read_not_empty": 7,
+      "read_empty": 11
+     },
+     "empty_flag": {
+      "read_not_empty": 10,
+      "read_empty": 11
+     }
+    },
+    "simultaneous": {
+     "full_flag": {
+      "both_full": 6,
+      "both_mid": 7,
+      "read_not_empty": 8,
+      "read_empty": 11,
+      "both_empty": 12,
+      "idle": 14
+     },
+     "empty_flag": {
+      "read_not_empty": 10,
+      "read_empty": 11,
+      "idle": 14
+     },
+     "read_data": {
+      "read_not_empty": 10
+     }
+    },
+    "wraparound": {
+     "full_flag": {
+      "write_not_full": 6,
+      "read_not_empty": 10,
+      "both_full": 18,
+      "both_mid": 19,
+      "read_empty": 25
+     },
+     "read_data": {
+      "read_not_empty": 12,
+      "both_full": 18,
+      "both_mid": 19
+     },
+     "empty_flag": {
+      "read_not_empty": 13,
+      "read_empty": 25
+     }
+    },
+    "recurrent_reset": {
+     "empty_flag": {
+      "read_not_empty": 6,
+      "read_empty": 7
+     },
+     "full_flag": {
+      "write_not_full": 10
+     }
+    },
+    "random_s1": {
+     "empty_flag": {
+      "read_not_empty": 2,
+      "idle": 18,
+      "read_empty": 23
+     },
+     "full_flag": {
+      "both_full": 7,
+      "idle": 8,
+      "read_not_empty": 12,
+      "both_empty": 19,
+      "read_empty": 23,
+      "write_not_full": 24,
+      "both_mid": 25
+     },
+     "read_data": {
+      "both_full": 7,
+      "read_not_empty": 12,
+      "both_mid": 25
+     }
+    },
+    "random_s2": {
+     "empty_flag": {
+      "read_not_empty": 2,
+      "idle": 3,
+      "read_empty": 18
+     },
+     "read_data": {
+      "both_mid": 7,
+      "read_not_empty": 12,
+      "both_full": 29
+     },
+     "full_flag": {
+      "read_not_empty": 12,
+      "idle": 13,
+      "both_mid": 15,
+      "read_empty": 18,
+      "write_not_full": 19,
+      "both_full": 29,
+      "both_empty": 67
+     }
+    },
+    "random_s3": {
+     "full_flag": {
+      "read_not_empty": 12,
+      "idle": 14,
+      "both_mid": 17,
+      "read_empty": 21,
+      "write_not_full": 24,
+      "both_full": 57,
+      "both_empty": 89
+     },
+     "read_data": {
+      "both_mid": 18,
+      "read_not_empty": 20,
+      "both_full": 105
+     },
+     "empty_flag": {
+      "read_not_empty": 20,
+      "read_empty": 21,
+      "idle": 65
+     }
+    },
+    "random_s4": {
+     "full_flag": {
+      "both_full": 12,
+      "idle": 13,
+      "read_not_empty": 16,
+      "both_mid": 22,
+      "both_empty": 24,
+      "write_not_full": 34,
+      "read_empty": 137
+     },
+     "read_data": {
+      "both_mid": 22,
+      "read_not_empty": 23,
+      "both_full": 84
+     },
+     "empty_flag": {
+      "read_not_empty": 23,
+      "read_empty": 47
+     }
+    },
+    "random_s5": {
+     "full_flag": {
+      "both_full": 10,
+      "idle": 11,
+      "read_not_empty": 12,
+      "both_mid": 13,
+      "read_empty": 19,
+      "both_empty": 20,
+      "write_not_full": 25
+     },
+     "read_data": {
+      "both_mid": 15,
+      "read_not_empty": 16,
+      "both_full": 28
+     },
+     "empty_flag": {
+      "read_not_empty": 16,
+      "idle": 17,
+      "read_empty": 19
+     }
+    },
+    "random_s6": {
+     "full_flag": {
+      "read_not_empty": 10,
+      "write_not_full": 31,
+      "both_mid": 32,
+      "both_full": 34,
+      "idle": 43
+     },
+     "read_data": {
+      "read_not_empty": 39,
+      "both_mid": 41,
+      "both_full": 59
+     },
+     "empty_flag": {
+      "read_not_empty": 47,
+      "idle": 96,
+      "read_empty": 114
+     }
+    },
+    "random_s7": {
+     "full_flag": {
+      "read_not_empty": 12,
+      "idle": 15,
+      "both_mid": 16,
+      "write_not_full": 17,
+      "both_empty": 24,
+      "both_full": 32,
+      "read_empty": 65
+     },
+     "read_data": {
+      "read_not_empty": 20,
+      "both_mid": 22,
+      "both_full": 32
+     },
+     "empty_flag": {
+      "read_not_empty": 23,
+      "idle": 38,
+      "read_empty": 39
+     }
+    },
+    "random_s8": {
+     "full_flag": {
+      "both_full": 6,
+      "idle": 14,
+      "both_mid": 15,
+      "read_not_empty": 18,
+      "write_not_full": 20,
+      "read_empty": 73,
+      "both_empty": 120
+     },
+     "read_data": {
+      "both_mid": 16,
+      "read_not_empty": 18,
+      "both_full": 81
+     },
+     "empty_flag": {
+      "read_not_empty": 65,
+      "read_empty": 73,
+      "idle": 117
+     }
+    }
+   }
+  },
+  {
+   "id": "count-wrong-wrap",
+   "summary": "The read pointer wraps to slot 1 instead of slot 0.",
+   "category": "ordering_wraparound",
+   "target": "wraparound",
+   "matrix": {
+    "learner_basic": {
+     "read_data": {
+      "read_not_empty": 11
+     }
+    },
+    "simultaneous": {
+     "read_data": {
+      "read_not_empty": 9
+     }
+    },
+    "wraparound": {
+     "read_data": {
+      "read_not_empty": 12,
+      "both_full": 18,
+      "both_mid": 19
+     }
+    },
+    "random_s1": {
+     "read_data": {
+      "read_not_empty": 13,
+      "both_mid": 25,
+      "both_full": 56
+     }
+    },
+    "random_s2": {
+     "read_data": {
+      "both_mid": 15,
+      "read_not_empty": 16,
+      "both_full": 58
+     }
+    },
+    "random_s3": {
+     "read_data": {
+      "read_not_empty": 13,
+      "both_mid": 17,
+      "both_full": 105
+     }
+    },
+    "random_s4": {
+     "read_data": {
+      "read_not_empty": 21,
+      "both_mid": 22,
+      "both_full": 104
+     }
+    },
+    "random_s5": {
+     "read_data": {
+      "read_not_empty": 14,
+      "both_mid": 15,
+      "both_full": 28
+     }
+    },
+    "random_s6": {
+     "read_data": {
+      "both_mid": 35,
+      "read_not_empty": 39,
+      "both_full": 149
+     }
+    },
+    "random_s7": {
+     "read_data": {
+      "both_mid": 10,
+      "read_not_empty": 12,
+      "both_full": 60
+     }
+    },
+    "random_s8": {
+     "read_data": {
+      "both_mid": 16,
+      "read_not_empty": 18
+     }
+    }
+   }
+  }
+ ],
+ "equivalent": [
+  {
+   "id": "count-equivalent-compare",
+   "summary": "Replaces count != DEPTH with count < DEPTH. Intended to be behaviorally equivalent on reachable states."
+  }
+ ],
+ "weak_set": {
+  "id": "weak-learner-v1",
+  "tests": [
+   "learner_basic"
+  ],
+  "checks": [
+   "empty_flag",
+   "full_flag",
+   "read_data"
+  ]
+ },
+ "method": "Reparsed the recorded audit's raw simulation traces against its frozen stimulus. No new RTL execution. A fault counts as caught when a selected test shows a selected check disagreeing with the reference on any edge.",
+ "input_hashes": {
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/job/stimulus/learner_basic.txt": "sha256:d7ac539195953620c07d04ba0e6abb987e165778da75a05db7fa69a71eff4fd2",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/job/stimulus/fill_drain.txt": "sha256:974e0747c34a72ef9b5a95c85e4217bbf121da0d79efde1cf4d6519d529071d3",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/job/stimulus/write_when_full.txt": "sha256:b32c56086e9f37d6bb45783922374689d5f3d5ddbd51cc2c9356bdb99cbd9425",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/job/stimulus/simultaneous.txt": "sha256:20dd80e5bbb1219e23c8190af456a6ea513d9a80733928ce8c54cccd8cb7dd0e",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/job/stimulus/wraparound.txt": "sha256:ef1140dc4089cc0e692a959dbec601fcc2dd164222ec2cffd643fb294524afa9",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/job/stimulus/recurrent_reset.txt": "sha256:a2db40e27f439e421383df22877e250e1f5d4cbfd5c40d2dcf77559a160e6f13",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/job/stimulus/random_s1.txt": "sha256:2752b0a53e5e5df2b5d674ed48fcf398bf97d6c2d611b18c5acefe4921874dea",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/job/stimulus/random_s2.txt": "sha256:d22befe0e0ca3e1f477df945aeb2245764d05ccd1de9a10a94c0e33d440fce7e",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/job/stimulus/random_s3.txt": "sha256:ab7e59a4a2f9393a52f2dfd0d8ac67bc5d2650531dac28dcffe3c69f9483e031",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/job/stimulus/random_s4.txt": "sha256:ae2119d8c694b4de4dc259db3c673412ecdc98f67bec8c140fbc93c9082a3b42",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/job/stimulus/random_s5.txt": "sha256:f5cf271bb2f733b4de6d48187872454bbee6bcdb24b1ac0da51ec3a5d6693ba9",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/job/stimulus/random_s6.txt": "sha256:4dc884b4fc0571a16f9d161846e549dd8442e12029ee1b599ca81777969d8fc8",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/job/stimulus/random_s7.txt": "sha256:6954e6801e0e72642310b361ee408aecbd5c6b74da96cfc8e75213780125c077",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/job/stimulus/random_s8.txt": "sha256:53853f53fec2a745accc2d29f995abb57acc3adfe0ca91340d19adab090ad06b",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m00/sim/learner_basic.trace": "sha256:36b1a7a039c4230be850297ff2c4e91f0754b2f8dc3dd142cbf793dbaf09657d",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m00/sim/fill_drain.trace": "sha256:e72dc4ef18f932edc52140d2896b2d0bdfdde053bca287bc8749d8e0de629bf0",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m00/sim/write_when_full.trace": "sha256:4ba2267cbb114ba0d8cf194a1d21c0440fabc1d19b97edc1c9954ac06f62d4bd",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m00/sim/simultaneous.trace": "sha256:990fd3a72e63fed6de63c3b7b71e4ac83311b800e28d49854ef0482ef7371128",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m00/sim/wraparound.trace": "sha256:c83bbc694c3558162fb13ebccc53138a7cc2e612f7e843c1f5774e735c154054",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m00/sim/recurrent_reset.trace": "sha256:0ba8f49eeb9cfb3288d2350eb80339c7c909de79b0eff6f4be4305732dc8bdec",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m00/sim/random_s1.trace": "sha256:f669917b8fcccf6220ebc51644ee4e147c23d82fd5efd30d3fbab2fa6f06d565",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m00/sim/random_s2.trace": "sha256:763ce379b6e6db65fda814f5e5dbb0689880fb290cef511cad9d5226af95fc6b",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m00/sim/random_s3.trace": "sha256:b0921875b24ceaa74b51560739e56865c8e601d5c240aa6ba71ba1b695525773",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m00/sim/random_s4.trace": "sha256:82ffae44487d49fb67fe0a71293d942a9c60338e6fdafe5b124f42f0ddd3358f",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m00/sim/random_s5.trace": "sha256:5647409972ad878dad138e9d53373e733b04184bd9f20dbf1f341c326d8ebe8d",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m00/sim/random_s6.trace": "sha256:ff343a15fc169780ee20efb17029f3f28f790f71a7b9ab0ebeee2a5ba850bc31",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m00/sim/random_s7.trace": "sha256:2612c09433c7db8a228e8789629eae86251a66fd1861bbc13cd3e27c4f057741",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m00/sim/random_s8.trace": "sha256:4526e2cd53882ccb30f4bffd5651bb9b03eda54d7fbe15b982c9ac831b1fa10e",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m01/sim/learner_basic.trace": "sha256:36b1a7a039c4230be850297ff2c4e91f0754b2f8dc3dd142cbf793dbaf09657d",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m01/sim/fill_drain.trace": "sha256:acac09a196360bb4c6c17ef137c4f5b23720bf614442e233f2a0b564b6efd504",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m01/sim/write_when_full.trace": "sha256:606d412c43404568f48806db6a6ae03fe849e7ebb611225d5cf4db226ee59c9a",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m01/sim/simultaneous.trace": "sha256:a8aabb7aa7a33273354e10037a6239d128975403b122a7fcdda94b886527de9e",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m01/sim/wraparound.trace": "sha256:e400b724d89805d99b0440e5e82f8b141d8d0372460d3f9ecb8a3a6a4ad75254",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m01/sim/recurrent_reset.trace": "sha256:0ba8f49eeb9cfb3288d2350eb80339c7c909de79b0eff6f4be4305732dc8bdec",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m01/sim/random_s1.trace": "sha256:17f872c5362762b0af80443aeed1015c31fb6533cc527fa0f0cd7fb2a7a5fe1d",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m01/sim/random_s2.trace": "sha256:dea05845fb7e85c4b7997662df3f64e9fce87e17e75b331a5a8f47c923b51496",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m01/sim/random_s3.trace": "sha256:94cb8589b5ef5f6b44afbd664599baf7a606be64e1d361da5c91eda364858c09",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m01/sim/random_s4.trace": "sha256:f8fb1c610667f9f8cf24906e20db91059ff303d452ed81f3cc424a6916ca9b8c",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m01/sim/random_s5.trace": "sha256:5a2745d9d165c5b54784ef946fca997c9cd34f28e35a9c32536bdc00547ceff1",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m01/sim/random_s6.trace": "sha256:d7c80103711160043b12ec5f36f09a60d1fa00f2eb8425bafc67276267f773bc",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m01/sim/random_s7.trace": "sha256:aef97619d7626c97b614c823c56a86f1007f32ca0f2be2f88e16c69cbc9b2f24",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m01/sim/random_s8.trace": "sha256:5bb7d5b3782e8d14f43de823ac1e8d9c760b3d82399226f0a844c48563ff4fec",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m02/sim/learner_basic.trace": "sha256:36b1a7a039c4230be850297ff2c4e91f0754b2f8dc3dd142cbf793dbaf09657d",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m02/sim/fill_drain.trace": "sha256:e72dc4ef18f932edc52140d2896b2d0bdfdde053bca287bc8749d8e0de629bf0",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m02/sim/write_when_full.trace": "sha256:4ba2267cbb114ba0d8cf194a1d21c0440fabc1d19b97edc1c9954ac06f62d4bd",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m02/sim/simultaneous.trace": "sha256:a8aabb7aa7a33273354e10037a6239d128975403b122a7fcdda94b886527de9e",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m02/sim/wraparound.trace": "sha256:cef656a8b8b6ddb156851cf9880c586beba3bb722550758b41245b25da28a4d5",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m02/sim/recurrent_reset.trace": "sha256:0ba8f49eeb9cfb3288d2350eb80339c7c909de79b0eff6f4be4305732dc8bdec",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m02/sim/random_s1.trace": "sha256:f5b42ce2bc38e5be4f292dd3a58f8207488a1d0c935fc6151bb8c0f6fe939ca8",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m02/sim/random_s2.trace": "sha256:31157d19f9f54d2ac292d944b69dc068f5651bdba1fdd69ca7a3339032dd9040",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m02/sim/random_s3.trace": "sha256:39f3358940d08ce1af6f8d7c367ab382fb581a583580b0442dff54b8928ff942",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m02/sim/random_s4.trace": "sha256:1596444a7c29c1db3a284ccfc527cebd5f2f1465e0b57f78f9ed5beb3cbe9210",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m02/sim/random_s5.trace": "sha256:90732dcedc0ec7e0a45f08012e217552e298fedf43161866f140022495f886e9",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m02/sim/random_s6.trace": "sha256:a93600dbbeb0342687dfb86d7553a545bd1b4591b903707de80e16da974e29be",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m02/sim/random_s7.trace": "sha256:1a08b1dc4c6ff492776a7b779634d11a14f535dcc635872ee6c8d9af392759ea",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m02/sim/random_s8.trace": "sha256:4efdcbfaa25b1f87671ea8a967fbfcaf9e67f4fbfbed1146b0825fd1f123e1b5",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m03/sim/learner_basic.trace": "sha256:36b1a7a039c4230be850297ff2c4e91f0754b2f8dc3dd142cbf793dbaf09657d",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m03/sim/fill_drain.trace": "sha256:e72dc4ef18f932edc52140d2896b2d0bdfdde053bca287bc8749d8e0de629bf0",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m03/sim/write_when_full.trace": "sha256:4ba2267cbb114ba0d8cf194a1d21c0440fabc1d19b97edc1c9954ac06f62d4bd",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m03/sim/simultaneous.trace": "sha256:bf7db66210b32d1a61e9b6aa5170181263ab292e23c3b7bc6951c496df26c4f1",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m03/sim/wraparound.trace": "sha256:c83bbc694c3558162fb13ebccc53138a7cc2e612f7e843c1f5774e735c154054",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m03/sim/recurrent_reset.trace": "sha256:0ba8f49eeb9cfb3288d2350eb80339c7c909de79b0eff6f4be4305732dc8bdec",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m03/sim/random_s1.trace": "sha256:aae2f63a78f05041abbe3a172d44b37d88c9bb74ce476673a3485c279ee4af72",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m03/sim/random_s2.trace": "sha256:5b29a01edbb3778493b8a7bd0596de870111dcd6205df64863f6e920b9f0b040",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m03/sim/random_s3.trace": "sha256:86e3cd947ea483a34dc3b67d900d61e94e00a8642721e1eb5af84ac7229d8182",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m03/sim/random_s4.trace": "sha256:73e4fbca0a120baa552a612b3fe2515f0362ee51f44101f469506c77d4d0882d",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m03/sim/random_s5.trace": "sha256:0914f605181313458b75f0eac073737b4f1cddbcfcbc8b99343e2f18c8ea54b4",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m03/sim/random_s6.trace": "sha256:6193e14649e788965cee03cf1346cf2ea7fe71b5c19150317e3d0fa7609cb8eb",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m03/sim/random_s7.trace": "sha256:749a55f0486d16f69b8f7b1920fa3ebfabb5e2f100d5eafb8f7613f2b0cf4c0b",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m03/sim/random_s8.trace": "sha256:807c53687039195c9af04f479bda9422e936433b4affd86b5f2ea4a8d4d35123",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m04/sim/learner_basic.trace": "sha256:4a4d6afca0c43923ea5899f485fce2b3e400df893fb0ebc792c9acb6413d1a13",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m04/sim/fill_drain.trace": "sha256:86e32afb0d9c46bbc69a68019dcb75e0c665f1b55aecdb0d5d708a41a09890eb",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m04/sim/write_when_full.trace": "sha256:7b6d061e0f4acb5282764cb052ada4004f97539f815fcd7e42f57980045c6c24",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m04/sim/simultaneous.trace": "sha256:4c372111305b8c08827c897fcf5a3205c4407dd8d90b19fb8e7ad8f79fa4bbbc",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m04/sim/wraparound.trace": "sha256:29fc7cdb37132f4dbc39c0157cba1420aa21e498dddf477bb2420e7052de0c65",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m04/sim/recurrent_reset.trace": "sha256:8a18763416c4751a0ffc6efe63d82a2df132c6f5c024dc51e8edd528ce111144",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m04/sim/random_s1.trace": "sha256:9718bb1ffe9f1de6b8e962ea533b0e25972f65dc078aa3a68e6974edd1322f4b",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m04/sim/random_s2.trace": "sha256:4d7be33f7b3b705985b176202ddd26a9a478fd7101bcdee083a9cd966e97d472",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m04/sim/random_s3.trace": "sha256:2802a0646c82c8efacbf91061fd664676513922422cf5c5ed39867a39a17c0b7",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m04/sim/random_s4.trace": "sha256:8929086815a9726b8c8d487222a4090b9797104617fe31b6f960cc6d209db5f7",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m04/sim/random_s5.trace": "sha256:4592e278a59e56ea1a95ccffb23f460fcb3b4efb217ed7819dbac687d6210a92",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m04/sim/random_s6.trace": "sha256:e8d1e9ee11466d2dc3b511f577763c7c226cd03754329b55d6ca72aaaf2126ee",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m04/sim/random_s7.trace": "sha256:fc7930bef09d18e768355ca726e5ae8fedc064586d20a1934e74da14726e4b1f",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m04/sim/random_s8.trace": "sha256:4be67799cc9a9b9ef20fc0beaa4ab8a9f0314639803e5755d1099a4838827eb5",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m05/sim/learner_basic.trace": "sha256:ec66ecf5a15cdaa7880738ce8dfb22f144a6f745d051b8d2e2ff3f2d9ca51c1c",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m05/sim/fill_drain.trace": "sha256:eec06d0cab3d24c13382f04a4cb101b35105a47ef4fb8e3c8d9b430b9711f9d6",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m05/sim/write_when_full.trace": "sha256:a35380847a98d28946f6ed52b1ac463a8f057d3771db6418c79d0b7ba7420ede",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m05/sim/simultaneous.trace": "sha256:72cc265ec785495c54ce12c8394da2f5e77256c8b332757a254cddfce60e1d4e",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m05/sim/wraparound.trace": "sha256:dfd88dfeea52c8ca879908bdb7b3189a820c55694241e459420ddbd1a46417de",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m05/sim/recurrent_reset.trace": "sha256:e9083501034269408e135d67b03f5a2c264dc76a80efaa8b7fb5b003ad512e59",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m05/sim/random_s1.trace": "sha256:c8b1c95911e253b6586871eae5d8fb7f398ed312aaa76f9a39037fbaf989b5c5",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m05/sim/random_s2.trace": "sha256:c37b44e86826fe16b2f6ba3917dd6b45b0dab56ac9d225996708ba7837ed79e3",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m05/sim/random_s3.trace": "sha256:d331cbd12f32925ac6321e8ff05a13a30d6df6d82fc748b70e81258ee2d13f28",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m05/sim/random_s4.trace": "sha256:6561769950217050473638032050eac73518833e2aabf11cc599fc36c4e890a6",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m05/sim/random_s5.trace": "sha256:aa1c2e19d491a4f1329559c400acb6ff5b966b5d05243a26a55e4d3182e755f2",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m05/sim/random_s6.trace": "sha256:f9051d9410495f5077ecaf0044c1501ac6882b8a66ac3a4199773a44b504536e",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m05/sim/random_s7.trace": "sha256:8e389d72f3dc4ba35d1973eb89b683855504e12e540ec9dc2f9b6635fad5566b",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m05/sim/random_s8.trace": "sha256:2daa3491b6fd6d53444c172bac2cc1d2788c20f8d83bc406036d7e59d9c46316",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m06/sim/learner_basic.trace": "sha256:7b1883872c4eb98df489397bd8754907997b120cd2dac447a5296a0ce628d640",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m06/sim/fill_drain.trace": "sha256:e72dc4ef18f932edc52140d2896b2d0bdfdde053bca287bc8749d8e0de629bf0",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m06/sim/write_when_full.trace": "sha256:4ba2267cbb114ba0d8cf194a1d21c0440fabc1d19b97edc1c9954ac06f62d4bd",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m06/sim/simultaneous.trace": "sha256:23565c07871c7ff1891b6c0104ffe0c8ced0663eb13dcd4a8f62e404fdad2cb1",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m06/sim/wraparound.trace": "sha256:ee083d7e3f6bac26dd5edb08c4ea70290ecb9d86bd0e6d6bd7dafc568624b401",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m06/sim/recurrent_reset.trace": "sha256:0ba8f49eeb9cfb3288d2350eb80339c7c909de79b0eff6f4be4305732dc8bdec",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m06/sim/random_s1.trace": "sha256:592712f813b28bd4f28e2f33e2172883a9cfbf067ee5696037173d3083f975e3",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m06/sim/random_s2.trace": "sha256:7ea01a52245371f347963f306b779a726572a503866749e95ad5fabe9ccff16b",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m06/sim/random_s3.trace": "sha256:24be43e18ff90d4f474276a5b02a28638ba4ebdba69666ad54b8ffa4f5c44782",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m06/sim/random_s4.trace": "sha256:18200aef5b670e3997cb5435896227443931a5e75e18b2b5bfec95b11eb015ad",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m06/sim/random_s5.trace": "sha256:8a1f66a29dfe92b9d78be47313f81e23f989150f5d156e824b06265962ae7b7e",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m06/sim/random_s6.trace": "sha256:85e1c3ce030d744e4728ba3eb55856df64a46d3a279c6c5cdce847cde069b0d2",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m06/sim/random_s7.trace": "sha256:615b550aec31e68e2a952fa21288921bb9f32bc3dfc8f3120cbf0aaf1a6a1b77",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m06/sim/random_s8.trace": "sha256:2448a00f8a3801c7200f71748535ada523f99d96908fd1b24ca95b51f8c02498",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m07/sim/learner_basic.trace": "sha256:36b1a7a039c4230be850297ff2c4e91f0754b2f8dc3dd142cbf793dbaf09657d",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m07/sim/fill_drain.trace": "sha256:e72dc4ef18f932edc52140d2896b2d0bdfdde053bca287bc8749d8e0de629bf0",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m07/sim/write_when_full.trace": "sha256:4ba2267cbb114ba0d8cf194a1d21c0440fabc1d19b97edc1c9954ac06f62d4bd",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m07/sim/simultaneous.trace": "sha256:990fd3a72e63fed6de63c3b7b71e4ac83311b800e28d49854ef0482ef7371128",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m07/sim/wraparound.trace": "sha256:c83bbc694c3558162fb13ebccc53138a7cc2e612f7e843c1f5774e735c154054",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m07/sim/recurrent_reset.trace": "sha256:0ba8f49eeb9cfb3288d2350eb80339c7c909de79b0eff6f4be4305732dc8bdec",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m07/sim/random_s1.trace": "sha256:f669917b8fcccf6220ebc51644ee4e147c23d82fd5efd30d3fbab2fa6f06d565",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m07/sim/random_s2.trace": "sha256:763ce379b6e6db65fda814f5e5dbb0689880fb290cef511cad9d5226af95fc6b",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m07/sim/random_s3.trace": "sha256:b0921875b24ceaa74b51560739e56865c8e601d5c240aa6ba71ba1b695525773",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m07/sim/random_s4.trace": "sha256:82ffae44487d49fb67fe0a71293d942a9c60338e6fdafe5b124f42f0ddd3358f",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m07/sim/random_s5.trace": "sha256:5647409972ad878dad138e9d53373e733b04184bd9f20dbf1f341c326d8ebe8d",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m07/sim/random_s6.trace": "sha256:ff343a15fc169780ee20efb17029f3f28f790f71a7b9ab0ebeee2a5ba850bc31",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m07/sim/random_s7.trace": "sha256:2612c09433c7db8a228e8789629eae86251a66fd1861bbc13cd3e27c4f057741",
+  "recorded/rec-20261001-193049-aud-7cf847/batches/sim/out/m07/sim/random_s8.trace": "sha256:4526e2cd53882ccb30f4bffd5651bb9b03eda54d7fbe15b982c9ac831b1fa10e"
+ }
+}

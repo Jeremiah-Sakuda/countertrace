@@ -5,6 +5,7 @@ export type Route =
   | { name: "repair"; caseId: string | null }
   | { name: "learn"; id: string | null }
   | { name: "teach" }
+  | { name: "testbench" }
   | { name: "setup"; exampleId: string | null }
   | { name: "runs" }
   | { name: "run"; id: string }
@@ -18,6 +19,7 @@ export function parseHash(hash: string): Route {
   if (parts[0] === "repair" && parts.length <= 2) return { name: "repair", caseId: parts[1] ?? null };
   if (parts[0] === "learn" && parts.length <= 2) return { name: "learn", id: parts[1] ?? null };
   if (parts[0] === "teach" && parts.length === 1) return { name: "teach" };
+  if (parts[0] === "testbench" && parts.length === 1) return { name: "testbench" };
   if (parts[0] === "examples" && parts.length <= 2) return { name: "setup", exampleId: parts[1] ?? null };
   if (parts[0] === "runs" && parts.length === 1) return { name: "runs" };
   if (parts[0] === "runs" && parts.length === 2 && parts[1]) return { name: "run", id: parts[1] };

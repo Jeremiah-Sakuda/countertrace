@@ -83,7 +83,7 @@ function ModelPill({ status }: { status: AsyncState<Status> }) {
 
 const NAV: { label: string; to: string; match: (r: Route) => boolean }[] = [
   { label: "Repair lab", to: "#/repair", match: r => r.name === "home" || r.name === "repair" },
-  { label: "Practice bench", to: "#/learn", match: r => r.name === "learn" },
+  { label: "Practice bench", to: "#/learn", match: r => r.name === "learn" || r.name === "testbench" },
   { label: "Teach", to: "#/teach", match: r => r.name === "teach" },
   { label: "Workbench", to: href.setup(), match: r => ["setup","runs","run","audit"].includes(r.name) },
 ];

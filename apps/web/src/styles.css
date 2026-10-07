@@ -502,7 +502,7 @@ code,pre,kbd,samp,textarea,.mono,.code,.code-input,.json,.waveform,.diff-line,.c
 .learning-method { display:flex; flex-wrap:wrap; justify-content:space-between; gap:16px; border-block:1px solid var(--color-border); padding:20px 0; }
 .learning-method b { font-family:var(--font-mono); color:var(--color-accent); margin-right:10px; }
 .section-heading { display:flex; justify-content:space-between; align-items:end; gap:18px; margin-bottom:24px; }
-.lesson-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; }
+.lesson-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:20px; }
 .lesson-card { display:flex; flex-direction:column; align-items:start; gap:16px; color:var(--color-foreground); text-decoration:none; border:1px solid var(--color-border-subtle); border-top:3px solid var(--color-accent); padding:26px; background:var(--color-card); }
 a.lesson-card:hover { border-color:var(--color-accent); color:var(--color-foreground); }
 .lesson-card h3 { font:500 1.65rem/1.15 var(--font-heading); }
