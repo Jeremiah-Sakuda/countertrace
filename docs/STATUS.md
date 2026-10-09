@@ -10,7 +10,7 @@ Observed on the round-robin arbiter (development data):
 - A later run hit the 16,384-token cap while reasoning; the reasoning-off retry gave a state register the width "N", which the format did not yet accept. Widths may now name a parameter.
 - The next run promoted in round 0: 10,149 output tokens, 41 s of model time, proved on the golden at N = 4 and N = 3, every trigger reached, 27 of 27 non-equivalent mutants killed, 13 proved equivalent, none invalid or unresolved.
 
-`make check` passes 116 Python tests; `make test-integration` passes 15 of 15.
+Stubbed unit tests cover the loop: feedback names the failing stage and setting and never includes golden source lines, format errors use a round, surviving mutants keep the loop going, and the best passing round is promoted. `make check` passes 120 Python tests; `make test-integration` passes 15 of 15.
 
 ## October 9 golden gate in the product
 

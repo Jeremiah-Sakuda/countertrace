@@ -121,3 +121,60 @@ class InventoryTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class AgentLoopTest(unittest.TestCase):
+    """Loop control and feedback with a stubbed model and gate (no Docker, no API key)."""
+
+    def run_loop(self, replies, results, max_rounds=4):
+        import tempfile
+        from pathlib import Path
+        from unittest import mock
+
+        from countertrace.checks import agent
+
+        replies, results, prompts = list(replies), list(results), []
+
+        def structured(task, system, user, validate, max_tokens=None, model_id=None):
+            prompts.append(user)
+            return replies.pop(0)
+
+        with tempfile.TemporaryDirectory() as tmp, \
+                mock.patch.object(agent, "output_cap", return_value=16384), \
+                mock.patch.object(agent.model, "structured", structured), \
+                mock.patch.object(agent.gate, "run_gate", side_effect=lambda *a, **k: results.pop(0)):
+            return agent.run_loop(ARB, Path(tmp), {"tag": "test"}, max_rounds=max_rounds), prompts
+
+    ok = {"status": "ok", "result": props(("1'b1", "grant == 0 || |req")), "calls": []}
+
+    def test_feedback_names_the_failure_and_never_includes_the_golden(self):
+        golden_fail = {"stage": "golden", "passed": False, "failed": ["subset"], "config": {"id": "p1", "params": {"N": 3}},
+                       "trace": [{"step": 0, "inputs": {"rst": 1, "req": 5}, "outputs": {"grant": 0}}]}
+        promoted = {"stage": "mutants", "passed": True, "killed": 27, "nonequivalent": 27, "survived": []}
+        result, prompts = self.run_loop([self.ok, self.ok], [golden_fail, promoted])
+        self.assertEqual((result["status"], result["promoted_round"]), ("promoted", 1))
+        self.assertIn("violates subset at N = 3", prompts[1])
+        self.assertIn("edge | rst | req | grant", prompts[1])
+        golden = ARB.golden
+        for line in [l.strip() for l in golden.splitlines() if len(l.strip()) > 20]:
+            self.assertNotIn(line, prompts[1])
+
+    def test_format_errors_use_a_round_and_go_back_as_feedback(self):
+        bad = {"status": "schema_error", "calls": [{"schema_error": "state 'x' needs a width"}], "detail": "rejected"}
+        result, prompts = self.run_loop([bad, bad], [], max_rounds=2)
+        self.assertEqual(result["status"], "not_promoted")
+        self.assertEqual([r["gate"]["stage"] for r in result["rounds"]], ["format", "format"])
+        self.assertIn("state 'x' needs a width", prompts[1])
+
+    def test_survivors_keep_the_loop_going_and_the_best_passing_round_is_promoted(self):
+        surviving = {"stage": "mutants", "passed": True, "killed": 25, "nonequivalent": 27, "unresolved": 0,
+                     "survived": [{"mutant": 3, "trace": [{"step": 0, "inputs": {"rst": 0, "req": 1}, "outputs_g": {"grant": 1}, "outputs_o": {"grant": 0}}]}]}
+        weaker = {**surviving, "killed": 24}
+        result, prompts = self.run_loop([self.ok, self.ok], [surviving, weaker], max_rounds=2)
+        self.assertEqual((result["status"], result["promoted_round"]), ("promoted", 0))
+        self.assertIn("grant (faulty)", prompts[1])
+
+    def test_model_unavailable_stops_without_a_promotion(self):
+        result, _ = self.run_loop([{"status": "unavailable", "detail": "no key", "calls": []}], [])
+        self.assertEqual(result["status"], "not_promoted")
+        self.assertEqual(len(result["rounds"]), 1)
