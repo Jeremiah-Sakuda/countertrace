@@ -1,0 +1,36 @@
+{
+  "defs": [
+    {
+      "name": "top",
+      "width": "WIDTH",
+      "expr": "(1 << WIDTH) - 1"
+    }
+  ],
+  "state": [
+    {
+      "name": "ref",
+      "width": "WIDTH",
+      "next": "rst ? 0 : load ? load_value : (inc && !dec && ref != top) ? ref + 1 : (dec && !inc && ref != 0) ? ref - 1 : ref"
+    }
+  ],
+  "properties": [
+    {
+      "id": "count_value",
+      "when": "1'b1",
+      "then": "count == ref",
+      "why": "load, saturating increment and decrement"
+    },
+    {
+      "id": "max_flag",
+      "when": "1'b1",
+      "then": "at_max == (ref == top)",
+      "why": "all ones"
+    },
+    {
+      "id": "min_flag",
+      "when": "1'b1",
+      "then": "at_min == (ref == 0)",
+      "why": "zero"
+    }
+  ]
+}

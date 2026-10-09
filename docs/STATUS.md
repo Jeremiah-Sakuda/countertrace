@@ -1,5 +1,15 @@
 # Implementation status
 
+## October 9 module catalog
+
+The catalog now has seven modules, each with a reviewed specification, two parameter settings, a hand-written golden, and hand-written reference properties derived from the specification (never sent to the model). Development modules: synchronous FIFO, round-robin arbiter, skid buffer. Held-out modules, frozen for the evaluation and not run through the agent before it: saturating up/down counter, UART transmitter (8N1, 32-cycle check depth so a full frame fits), debouncer, and 4-bit pattern detector.
+
+Every golden passes the full gate with its reference properties (`CatalogGoldenTest`): proved at both settings, every trigger reached, all non-equivalent mutants killed, none invalid, unresolved, or surviving. Non-equivalent mutants per module: 23 to 39.
+
+The saturating counter first returned all 40 mutants as invalid: two Yosys mutations targeted the register's clock pin, and in the combined mutant design the clock then passes through a selection multiplexer, which the formal flow rejects as a derived clock for every mutant. The worker now skips mutations on clock pins and the clock wire and records how many it skipped (2 here).
+
+`make check` passes 121 Python tests; `make test-integration` passes 16 of 16.
+
 ## October 9 check-writing agent
 
 `countertrace write-checks --module <id>` (and `POST /api/check-runs`, quota-gated like repair) runs the agent as a recorded `checks` run: Nemotron 3 Ultra writes a property set from the specification, ports, and parameter settings; the golden gate decides; failures go back as feedback for up to four rounds. Writing checks has its own explicit output cap (`COUNTERTRACE_CHECKS_OUTPUT_TOKEN_LIMIT`, 16,384); every other task keeps the global 4,096 cap. A reply in the wrong format uses a round and its validator message goes back as feedback.

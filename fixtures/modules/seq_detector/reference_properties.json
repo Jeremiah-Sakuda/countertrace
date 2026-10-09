@@ -1,0 +1,27 @@
+{
+  "state": [
+    {
+      "name": "h",
+      "width": 4,
+      "next": "rst ? 0 : {h[2:0], bit_in}"
+    },
+    {
+      "name": "n",
+      "width": 3,
+      "next": "rst ? 0 : (n == 4) ? n : n + 1"
+    },
+    {
+      "name": "m",
+      "width": 1,
+      "next": "rst ? 1'b0 : (n >= 3) && ({h[2:0], bit_in} == (PATTERN & 15))"
+    }
+  ],
+  "properties": [
+    {
+      "id": "match_value",
+      "when": "1'b1",
+      "then": "match == m",
+      "why": "last four bits since reset equal PATTERN"
+    }
+  ]
+}

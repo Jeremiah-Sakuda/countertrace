@@ -252,3 +252,18 @@ class ChecksGateTest(unittest.TestCase):
         self.assertEqual(result["stage"], "mutants")
         self.assertEqual(result["killed"], 0)
         self.assertFalse(result["passed"])
+
+
+class CatalogGoldenTest(unittest.TestCase):
+    """Every golden reference must satisfy its spec-derived reference properties through the full gate."""
+
+    def test_every_golden_meets_its_reference_properties(self):
+        from countertrace.checks import gate, modules
+
+        image = image_or_skip()
+        for module in modules.catalog():
+            with self.subTest(module=module.id), tempfile.TemporaryDirectory(dir=Path.home()) as tmp:
+                result = gate.run_gate(module, module.reference_properties, Path(tmp), image)
+                self.assertEqual(result["stage"], "mutants", result.get("error") or result)
+                self.assertTrue(result["passed"])
+                self.assertEqual((result["invalid"], result["unresolved"], len(result["survived"])), (0, 0, 0))

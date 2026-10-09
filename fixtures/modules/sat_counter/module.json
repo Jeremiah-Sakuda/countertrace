@@ -1,0 +1,19 @@
+{
+  "id": "sat_counter",
+  "title": "Saturating up/down counter",
+  "split": "heldout",
+  "top": "sat_counter",
+  "clock": "clk",
+  "reset": "rst",
+  "params": [{"WIDTH": 4}, {"WIDTH": 3}],
+  "inputs": {"rst": 1, "inc": 1, "dec": 1, "load": 1, "load_value": "WIDTH"},
+  "outputs": {"count": "WIDTH", "at_max": 1, "at_min": 1},
+  "observe": {},
+  "golden": "modules/sat_counter/golden.v",
+  "spec": [
+    "A WIDTH-bit unsigned up/down counter with load, with one rising-edge clock clk. count is a registered output.",
+    "rst is a synchronous active-high reset: at a rising edge with rst high, count becomes 0.",
+    "At each rising edge without reset: if load is high, count becomes load_value, whatever inc and dec are. Otherwise, if inc is high and dec is low, count increases by one unless it is already at its maximum value (all ones), where it stays. If dec is high and inc is low, count decreases by one unless it is already 0, where it stays. If inc and dec are both high or both low, count does not change.",
+    "at_max is high exactly when count is at its maximum value; at_min is high exactly when count is 0. Both follow count within the same cycle."
+  ]
+}

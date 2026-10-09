@@ -1,0 +1,40 @@
+{
+  "defs": [
+    {
+      "name": "flip",
+      "width": 1,
+      "expr": "(noisy != c) && (k == STABLE - 1)"
+    }
+  ],
+  "state": [
+    {
+      "name": "c",
+      "width": 1,
+      "next": "rst ? 1'b0 : flip ? noisy : c"
+    },
+    {
+      "name": "k",
+      "width": 6,
+      "next": "rst ? 0 : (noisy == c || flip) ? 0 : k + 1"
+    },
+    {
+      "name": "ch",
+      "width": 1,
+      "next": "rst ? 1'b0 : flip"
+    }
+  ],
+  "properties": [
+    {
+      "id": "clean_value",
+      "when": "1'b1",
+      "then": "clean == c",
+      "why": "changes after STABLE consecutive differing edges"
+    },
+    {
+      "id": "changed_pulse",
+      "when": "1'b1",
+      "then": "changed == ch",
+      "why": "one cycle after each change"
+    }
+  ]
+}

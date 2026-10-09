@@ -1,0 +1,20 @@
+{
+  "id": "skid_buffer",
+  "title": "Skid buffer (valid/ready)",
+  "split": "development",
+  "top": "skid_buffer",
+  "clock": "clk",
+  "reset": "rst",
+  "params": [{"WIDTH": 8}, {"WIDTH": 4}],
+  "inputs": {"rst": 1, "in_valid": 1, "in_data": "WIDTH", "out_ready": 1},
+  "outputs": {"in_ready": 1, "out_valid": 1, "out_data": "WIDTH"},
+  "observe": {"out_data": "out_valid"},
+  "golden": "modules/skid_buffer/golden.v",
+  "spec": [
+    "A skid buffer that passes WIDTH-bit words from an upstream valid/ready interface (in_valid, in_data, in_ready) to a downstream one (out_valid, out_data, out_ready), with one rising-edge clock clk. It holds at most two words.",
+    "rst is a synchronous active-high reset: at a rising edge with rst high the buffer becomes empty and nothing is accepted or delivered at that edge.",
+    "At each rising edge without reset, a word is accepted when in_valid and in_ready are both high, and the word on out_data is delivered when out_valid and out_ready are both high. Both can happen at the same edge.",
+    "in_ready is high exactly when the buffer holds fewer than two words. out_valid is high exactly when the buffer holds at least one word, and out_data is then the oldest word held. in_ready, out_valid, and out_data depend only on the buffer's contents, never directly on the inputs in the same cycle.",
+    "Words are delivered in the order they were accepted, each exactly once, with nothing lost or duplicated. While out_valid is high and out_ready is low, out_valid stays high and out_data stays the same. out_data is only meaningful while out_valid is high."
+  ]
+}

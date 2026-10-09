@@ -1,0 +1,20 @@
+{
+  "id": "uart_tx",
+  "title": "UART transmitter (8N1)",
+  "split": "heldout",
+  "top": "uart_tx",
+  "clock": "clk",
+  "reset": "rst",
+  "params": [{"CLKS_PER_BIT": 2}, {"CLKS_PER_BIT": 1}],
+  "inputs": {"rst": 1, "start": 1, "data": 8},
+  "outputs": {"tx": 1, "busy": 1},
+  "observe": {},
+  "limits": {"bmc_depth": 32, "cover_depth": 32},
+  "golden": "modules/uart_tx/golden.v",
+  "spec": [
+    "A UART transmitter that sends 8-bit words as frames of one start bit, eight data bits, and one stop bit, with one rising-edge clock clk. Each bit lasts CLKS_PER_BIT clock cycles; a cycle is the interval between two consecutive rising edges. tx and busy are registered outputs that change only at rising edges.",
+    "rst is a synchronous active-high reset: at a rising edge with rst high, the transmitter becomes idle: tx becomes 1 and busy becomes 0.",
+    "While idle, tx is 1 and busy is 0. At a rising edge without reset where busy is low and start is high, the transmitter accepts data (sampled at that edge) and starts a frame. start is ignored at edges where busy is high.",
+    "During a frame, starting right after the accepting edge: tx is 0 for CLKS_PER_BIT cycles (the start bit), then data bit 0, data bit 1, and so on up to data bit 7 for CLKS_PER_BIT cycles each (least significant bit first), then 1 for CLKS_PER_BIT cycles (the stop bit). busy is high for the whole frame, 10 times CLKS_PER_BIT cycles, and goes low together with the end of the stop bit, when the transmitter is idle again."
+  ]
+}

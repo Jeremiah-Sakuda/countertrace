@@ -56,6 +56,8 @@ class Module:
     observe: dict[str, str]
     spec: str
     golden_path: Path
+    split: str = "development"
+    limits: tuple = ()
 
     @property
     def golden(self) -> str:
@@ -72,10 +74,15 @@ class Module:
         params = params or self.primary
         return {name: width_value(w, params) for name, w in {**self.inputs, **self.outputs}.items()}
 
+    @property
+    def reference_properties(self) -> dict:
+        """Hand-written properties derived from the specification; they validate the golden and are never sent to the model."""
+        return json.loads((MODULES / self.id / "reference_properties.json").read_text())
+
     def public(self) -> dict:
         """What the model and the interface may see: never the golden source."""
         return {"id": self.id, "title": self.title, "top": self.top, "clock": self.clock, "reset": self.reset,
-                "params": self.params, "inputs": self.inputs, "outputs": self.outputs, "spec": self.spec}
+                "params": self.params, "inputs": self.inputs, "outputs": self.outputs, "spec": self.spec, "split": self.split}
 
 
 def load(module_id: str) -> Module:
@@ -90,7 +97,8 @@ def load(module_id: str) -> Module:
         raise CatalogError("golden reference must be a file inside fixtures/")
     module = Module(id=data["id"], title=data["title"], top=data["top"], clock=data["clock"], reset=data["reset"],
                     params=[dict(p) for p in data["params"]], inputs=dict(data["inputs"]), outputs=dict(data["outputs"]),
-                    observe=dict(data.get("observe", {})), spec="\n".join(data["spec"]), golden_path=golden)
+                    observe=dict(data.get("observe", {})), spec="\n".join(data["spec"]), golden_path=golden,
+                    split=data.get("split", "development"), limits=tuple(sorted((data.get("limits") or {}).items())))
     validate(module)
     return module
 
@@ -111,6 +119,11 @@ def validate(module: Module) -> None:
         if set(setting) != keys or not all(IDENT.match(k) and isinstance(v, int) and 1 <= v <= 64 for k, v in setting.items()):
             raise CatalogError("every parameter setting must give the same integer parameters")
         module.widths(setting)
+    if module.split not in ("development", "heldout"):
+        raise CatalogError("split must be development or heldout")
+    for key, value in module.limits:
+        if key not in ("bmc_depth", "cover_depth", "solver_s") or not isinstance(value, int) or not 1 <= value <= (600 if key == "solver_s" else 64):
+            raise CatalogError(f"invalid limit {key}")
     for name in module.observe:
         if name not in module.outputs:
             raise CatalogError(f"observation qualifier for unknown output {name!r}")

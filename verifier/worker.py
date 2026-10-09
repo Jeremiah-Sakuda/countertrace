@@ -221,6 +221,8 @@ def validate_checks(job: dict) -> None:
         fail("invalid checks stage")
     if not IDENT.match(str(job.get("top", ""))):
         fail("invalid top module name")
+    if not IDENT.match(str(job.get("clock", ""))):
+        fail("invalid clock name")
     limits = job.get("limits", {})
     for key, bound in (("solver_s", 600), ("bmc_depth", 64), ("cover_depth", 64)):
         if not isinstance(limits.get(key), int) or not 1 <= limits[key] <= bound:
@@ -312,10 +314,16 @@ def run_checks(job: dict, steps: list, deadline: float) -> None:
         work, limits["solver_s"], OUT / "logs" / "mutate_list.log", steps)
     (OUT / "mutants").mkdir(exist_ok=True)
     lines = [l for l in (work / "mutations.ys").read_text().splitlines() if l.strip()] if (work / "mutations.ys").is_file() else []
+    # A single-clock design has no meaningful clock fault, and a mutated clock path becomes a
+    # derived clock for every mutant in the combined design. Skip those; record how many.
+    clock = job["clock"]
+    kept = [l for l in lines if " -port CLK " not in f"{l} " and f" -wire {clock} " not in f"{l} "]
+    OUT.joinpath("mutants", "skipped_clock_mutations.txt").write_text(str(len(lines) - len(kept)) + "\n")
+    lines = kept
     if not lines or any(not MUTATE_LINE.match(l) for l in lines):
         OUT.joinpath("mutants", "mutations_rejected.txt").write_text("\n".join(lines) + "\n")
         return
-    shutil.copy(work / "mutations.ys", OUT / "mutants" / "mutations.ys")
+    (OUT / "mutants" / "mutations.ys").write_text("\n".join(lines) + "\n")
     if (work / "mutation_sources.txt").is_file():
         shutil.copy(work / "mutation_sources.txt", OUT / "mutants" / "mutation_sources.txt")
     (work / "all_mut.ys").write_text("\n".join([*elaborate.split("; "), *[f"{l} -ctrl mutsel 8 {i + 1}" for i, l in enumerate(lines)],

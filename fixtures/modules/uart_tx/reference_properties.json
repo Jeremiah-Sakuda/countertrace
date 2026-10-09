@@ -1,0 +1,63 @@
+{
+  "defs": [
+    {
+      "name": "bitn",
+      "width": 8,
+      "expr": "t / CLKS_PER_BIT"
+    },
+    {
+      "name": "dbit",
+      "width": 1,
+      "expr": "(d >> (bitn - 1)) & 1"
+    }
+  ],
+  "state": [
+    {
+      "name": "active",
+      "width": 1,
+      "next": "rst ? 1'b0 : active ? (t != 10 * CLKS_PER_BIT - 1) : start"
+    },
+    {
+      "name": "t",
+      "width": 8,
+      "next": "rst ? 0 : active ? t + 1 : 0"
+    },
+    {
+      "name": "d",
+      "width": 8,
+      "next": "(!rst && !active && start) ? data : d"
+    }
+  ],
+  "properties": [
+    {
+      "id": "busy_during_frame",
+      "when": "1'b1",
+      "then": "busy == active",
+      "why": "10 bit times from the accepting edge"
+    },
+    {
+      "id": "idle_line_high",
+      "when": "!active",
+      "then": "tx",
+      "why": "idle"
+    },
+    {
+      "id": "start_bit",
+      "when": "active && bitn == 0",
+      "then": "!tx",
+      "why": "start bit"
+    },
+    {
+      "id": "data_bits",
+      "when": "active && bitn >= 1 && bitn <= 8",
+      "then": "tx == dbit",
+      "why": "LSB first"
+    },
+    {
+      "id": "stop_bit",
+      "when": "active && bitn == 9",
+      "then": "tx",
+      "why": "stop bit"
+    }
+  ]
+}

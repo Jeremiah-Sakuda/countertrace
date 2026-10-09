@@ -138,7 +138,7 @@ def run_gate(module: Module, props: dict, workdir: Path, image: dict, cancel: th
     """Run both stages and return a decision-ready, model-safe result. Never raises for model errors."""
     from countertrace.checks.compile import PropertyError
 
-    limits = dict(limits or LIMITS)
+    limits = dict(limits or {**LIMITS, **dict(module.limits)})
     try:
         props = validate(props, module)
         checker = compile_checker(props, module)
@@ -148,7 +148,7 @@ def run_gate(module: Module, props: dict, workdir: Path, image: dict, cancel: th
     result: dict = {"stage": "gate", "passed": False, "configs": configs, "limits": limits}
     try:
         batch = _prepare(workdir / "gate", {"golden.v": module.golden, "props.sv": checker},
-                         {"stage": "gate", "top": module.top, "configs": configs, "limits": limits})
+                         {"stage": "gate", "top": module.top, "clock": module.clock, "configs": configs, "limits": limits})
         result["gate_run"] = {k: v for k, v in _run(batch, image, cancel).items() if k in ("wall_s", "image")}
         out = batch.out_dir
         for cfg in configs:
@@ -177,7 +177,7 @@ def run_gate(module: Module, props: dict, workdir: Path, image: dict, cancel: th
         mutation = dict(mutants or MUTANTS)
         batch = _prepare(workdir / "mutants", {"golden.v": module.golden, "props.sv": checker, "miter.sv": compile_miter(module),
                                                "mutant.sv": compile_mutant_wrapper(module)},
-                         {"stage": "mutants", "top": module.top, "configs": configs[:1], "limits": limits, "mutation": mutation})
+                         {"stage": "mutants", "top": module.top, "clock": module.clock, "configs": configs[:1], "limits": limits, "mutation": mutation})
         result["mutant_run"] = {k: v for k, v in _run(batch, image, cancel).items() if k in ("wall_s", "image")}
     except GateToolError as exc:
         return {**result, "stage": "tool", "error": str(exc)}

@@ -1,0 +1,61 @@
+{
+  "state": [
+    {
+      "name": "count",
+      "width": 4,
+      "next": "rst ? 4'd0 : count + (wr_en && (count != DEPTH)) - (rd_en && (count != 0))"
+    },
+    {
+      "name": "head",
+      "width": 3,
+      "next": "rst ? 3'd0 : (rd_en && (count != 0)) ? ((head + 3'd1) % DEPTH) : head"
+    },
+    {
+      "name": "tail",
+      "width": 3,
+      "next": "rst ? 3'd0 : (wr_en && (count != DEPTH)) ? ((tail + 3'd1) % DEPTH) : tail"
+    },
+    {
+      "name": "dout_ref",
+      "width": 8,
+      "next": "rst ? 8'd0 : (rd_en && (count != 0)) ? mem[head] : dout_ref"
+    },
+    {
+      "name": "has_read",
+      "width": 1,
+      "next": "rst ? 1'd0 : has_read || (rd_en && (count != 0))"
+    }
+  ],
+  "memories": [
+    {
+      "name": "mem",
+      "width": 8,
+      "depth": 4
+    }
+  ],
+  "writes": [
+    {
+      "memory": "mem",
+      "when": "wr_en && (count != DEPTH) && !rst",
+      "index": "tail",
+      "value": "din"
+    }
+  ],
+  "properties": [
+    {
+      "id": "full_flag",
+      "when": "1'b1",
+      "then": "full == (count == DEPTH)"
+    },
+    {
+      "id": "empty_flag",
+      "when": "1'b1",
+      "then": "empty == (count == 0)"
+    },
+    {
+      "id": "dout_matches",
+      "when": "has_read",
+      "then": "dout == dout_ref"
+    }
+  ]
+}

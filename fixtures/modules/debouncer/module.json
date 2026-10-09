@@ -1,0 +1,19 @@
+{
+  "id": "debouncer",
+  "title": "Debouncer",
+  "split": "heldout",
+  "top": "debouncer",
+  "clock": "clk",
+  "reset": "rst",
+  "params": [{"STABLE": 3}, {"STABLE": 2}],
+  "inputs": {"rst": 1, "noisy": 1},
+  "outputs": {"clean": 1, "changed": 1},
+  "observe": {},
+  "golden": "modules/debouncer/golden.v",
+  "spec": [
+    "A debouncer for one input, noisy, with one rising-edge clock clk. clean and changed are registered outputs that change only at rising edges.",
+    "rst is a synchronous active-high reset: at a rising edge with rst high, clean becomes 0, changed becomes 0, and any count in progress is discarded.",
+    "noisy is sampled at each rising edge. clean changes to the value of noisy at the STABLE-th consecutive edge without reset at which noisy differs from clean. An edge at which noisy equals clean restarts the count, so clean only changes after noisy has held the other value at STABLE consecutive edges.",
+    "changed is high for exactly the cycle after each edge at which clean changes, and low otherwise."
+  ]
+}

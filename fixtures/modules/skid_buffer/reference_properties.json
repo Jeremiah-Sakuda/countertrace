@@ -1,0 +1,51 @@
+{
+  "defs": [
+    {
+      "name": "acc",
+      "width": 1,
+      "expr": "in_valid && (cnt != 2)"
+    },
+    {
+      "name": "dlv",
+      "width": 1,
+      "expr": "(cnt != 0) && out_ready"
+    }
+  ],
+  "state": [
+    {
+      "name": "cnt",
+      "width": 2,
+      "next": "rst ? 2'd0 : cnt + acc - dlv"
+    },
+    {
+      "name": "q0",
+      "width": "WIDTH",
+      "next": "rst ? q0 : dlv ? ((cnt == 2) ? q1 : (acc ? in_data : q0)) : ((cnt == 0 && acc) ? in_data : q0)"
+    },
+    {
+      "name": "q1",
+      "width": "WIDTH",
+      "next": "rst ? q1 : (!dlv && cnt == 1 && acc) ? in_data : q1"
+    }
+  ],
+  "properties": [
+    {
+      "id": "ready_when_room",
+      "when": "1'b1",
+      "then": "in_ready == (cnt != 2)",
+      "why": "fewer than two words held"
+    },
+    {
+      "id": "valid_when_held",
+      "when": "1'b1",
+      "then": "out_valid == (cnt != 0)",
+      "why": "at least one word held"
+    },
+    {
+      "id": "head_word",
+      "when": "out_valid",
+      "then": "out_data == q0",
+      "why": "oldest word, in order, exactly once"
+    }
+  ]
+}

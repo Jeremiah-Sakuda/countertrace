@@ -1,0 +1,18 @@
+{
+  "id": "seq_detector",
+  "title": "Pattern detector",
+  "split": "heldout",
+  "top": "seq_detector",
+  "clock": "clk",
+  "reset": "rst",
+  "params": [{"PATTERN": 11}, {"PATTERN": 9}],
+  "inputs": {"rst": 1, "bit_in": 1},
+  "outputs": {"match": 1},
+  "observe": {},
+  "golden": "modules/seq_detector/golden.v",
+  "spec": [
+    "A detector for a 4-bit pattern in a serial bit stream, with one rising-edge clock clk. PATTERN is a 4-bit value (for example 11 is binary 1011); its most significant bit is the oldest of the four bits. match is a registered output that changes only at rising edges.",
+    "rst is a synchronous active-high reset: at a rising edge with rst high, match becomes 0 and all previously sampled bits are forgotten.",
+    "bit_in is sampled at each rising edge without reset. match is high for the cycle after an edge exactly when the four most recently sampled bits since reset, oldest first and including the one sampled at that edge, equal PATTERN. Occurrences may overlap, and no match is possible until four bits have been sampled since reset."
+  ]
+}

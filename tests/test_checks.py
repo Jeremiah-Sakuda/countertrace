@@ -25,6 +25,13 @@ class CatalogTest(unittest.TestCase):
             self.assertNotIn(module.golden.strip()[:60], str(public))
             self.assertGreaterEqual(len(module.params), 2, "the gate needs two parameter settings")
 
+    def test_every_module_ships_compilable_reference_properties_and_a_split(self):
+        splits = {m.split for m in modules.catalog()}
+        self.assertEqual(splits, {"development", "heldout"})
+        for module in modules.catalog():
+            with self.subTest(module=module.id):
+                self.assertIn("p_", compile_checker(module.reference_properties, module))
+
     def test_widths_follow_parameters(self):
         self.assertEqual(ARB.widths({"N": 3})["req"], 3)
         self.assertEqual(FIFO.widths({"DEPTH": 2, "WIDTH": 8})["din"], 8)

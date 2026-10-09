@@ -1,0 +1,54 @@
+{
+  "defs": [
+    {
+      "name": "c1",
+      "width": 3,
+      "expr": "(last + 1) % N"
+    },
+    {
+      "name": "c2",
+      "width": 3,
+      "expr": "(last + 2) % N"
+    },
+    {
+      "name": "c3",
+      "width": 3,
+      "expr": "(last + 3) % N"
+    },
+    {
+      "name": "c4",
+      "width": 3,
+      "expr": "(last + 4) % N"
+    },
+    {
+      "name": "any",
+      "width": 1,
+      "expr": "req != 0"
+    },
+    {
+      "name": "pick",
+      "width": 3,
+      "expr": "req[c1] ? c1 : req[c2] ? c2 : req[c3] ? c3 : c4"
+    }
+  ],
+  "state": [
+    {
+      "name": "last",
+      "width": 3,
+      "next": "rst ? N - 1 : any ? pick : last"
+    },
+    {
+      "name": "g",
+      "width": "N",
+      "next": "rst ? 0 : any ? (1 << pick) : 0"
+    }
+  ],
+  "properties": [
+    {
+      "id": "grant_value",
+      "when": "1'b1",
+      "then": "grant == g",
+      "why": "first requester after the last grant, one-hot, registered"
+    }
+  ]
+}
