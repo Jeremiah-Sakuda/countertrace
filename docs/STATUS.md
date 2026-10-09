@@ -1,5 +1,17 @@
 # Implementation status
 
+## October 9 check-writing agent
+
+`countertrace write-checks --module <id>` (and `POST /api/check-runs`, quota-gated like repair) runs the agent as a recorded `checks` run: Nemotron 3 Ultra writes a property set from the specification, ports, and parameter settings; the golden gate decides; failures go back as feedback for up to four rounds. Writing checks has its own explicit output cap (`COUNTERTRACE_CHECKS_OUTPUT_TOKEN_LIMIT`, 16,384); every other task keeps the global 4,096 cap. A reply in the wrong format uses a round and its validator message goes back as feedback.
+
+Observed on the round-robin arbiter (development data):
+
+- The first end-to-end run spent all four rounds on a tool error: at N = 3 the model's properties read `req[ptr]` beyond the vector, which Yosys models as a `$shiftx` cell whose undefined bits the proof engine cannot represent. The checks flows now map shift cells and turn undefined bits into arbitrary values (`setundef -anyseq`), so such a property fails with a counterexample instead. Re-gating those saved rounds: all promote.
+- A later run hit the 16,384-token cap while reasoning; the reasoning-off retry gave a state register the width "N", which the format did not yet accept. Widths may now name a parameter.
+- The next run promoted in round 0: 10,149 output tokens, 41 s of model time, proved on the golden at N = 4 and N = 3, every trigger reached, 27 of 27 non-equivalent mutants killed, 13 proved equivalent, none invalid or unresolved.
+
+`make check` passes 116 Python tests; `make test-integration` passes 15 of 15.
+
 ## October 9 golden gate in the product
 
 `src/countertrace/checks/` now holds the module catalog (`fixtures/modules/`: the FIFO and a round-robin arbiter, each with two parameter settings), the trusted property compiler, and the two-stage gate. The worker gained a `countertrace-checks-job/1` type that renders every tool script itself and generates mutants from a count and seed; job data never supplies commands. The verifier harness is unchanged, so existing bundles still replay; the image digest is now `929586e183d87dab`.

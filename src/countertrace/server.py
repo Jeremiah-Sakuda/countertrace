@@ -198,6 +198,16 @@ class App:
         self.store.start(state["id"])
         return state
 
+    def create_checks(self, body: dict, visitor: str) -> dict:
+        self.claim_run_slot(visitor)
+        try:
+            state = self.store.create_checks(str(body.get("module_id", "")))
+            self.note_run(visitor, state["id"])
+            self.store.start(state["id"])
+            return state
+        finally:
+            self.release_run_slot(visitor)
+
     def create_audit(self, body: dict, visitor: str) -> dict:
         self.claim_run_slot(visitor)
         try:
@@ -330,6 +340,14 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_json(app.examples())
         if m := re.fullmatch(r"/api/examples/([\w-]+)", path):
             return self.send_json(app.example_detail(m.group(1)))
+        if path == "/api/modules":
+            from countertrace.checks import modules
+
+            return self.send_json([m.public() for m in modules.catalog()])
+        if m := re.fullmatch(r"/api/modules/([\w-]+)", path):
+            from countertrace.checks import modules
+
+            return self.send_json(modules.load(m.group(1)).public())
         if path == "/api/check-sets":
             from countertrace import audit
 
@@ -362,6 +380,11 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_json(app.create_run(body, visitor), HTTPStatus.CREATED)
         if path == "/api/audits":
             return self.send_json(app.create_audit(body, visitor), HTTPStatus.CREATED)
+        if path == "/api/check-runs":
+            from countertrace.checks import agent
+
+            app.claim_model_call(visitor, units=agent.MAX_ROUNDS * 2)  # each round may retry once
+            return self.send_json(app.create_checks(body, visitor), HTTPStatus.CREATED)
         if path == "/api/check-sets/propose":
             from countertrace import audit
 

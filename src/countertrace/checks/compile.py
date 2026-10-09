@@ -147,8 +147,10 @@ def validate(props: dict, module: Module) -> dict:
                 raise PropertyError(f"{group} name {name!r} collides with a port, parameter, or another helper")
             taken.add(name)
             width = item.get("width")
-            if not isinstance(width, int) or not 1 <= width <= 64:
-                raise PropertyError(f"{group} {name!r} needs an integer width from 1 to 64")
+            # A width is an integer or a parameter name, checked at every parameter setting.
+            sizes = [width] if isinstance(width, int) else [p[width] for p in module.params] if isinstance(width, str) and width in module.primary else []
+            if isinstance(width, bool) or not sizes or not all(1 <= v <= 64 for v in sizes):
+                raise PropertyError(f"{group} {name!r} needs a width from 1 to 64: an integer or a parameter name such as {next(iter(module.primary))}")
             if group == "memories" and (not isinstance(item.get("depth"), int) or not 1 <= item["depth"] <= 64):
                 raise PropertyError(f"memory {name!r} needs an integer depth from 1 to 64")
         groups[group] = items
@@ -204,11 +206,11 @@ def compile_checker(props: dict, module: Module) -> str:
               f"    // Environment assumption owned by this template: reset at the first edge, inputs only.",
               f"    always @(*) if (!past_valid) assume ({module.reset});"]
     for m in props["memories"]:
-        lines.append(f"    reg [{m['width'] - 1}:0] {m['name']} [0:{m['depth'] - 1}];")
+        lines.append(f"    reg {width_decl(m['width'])}{m['name']} [0:{m['depth'] - 1}];")
     for s in props["state"]:
-        lines.append(f"    reg [{s['width'] - 1}:0] {s['name']};")
+        lines.append(f"    reg {width_decl(s['width'])}{s['name']};")
     for d in props["defs"]:
-        lines.append(f"    wire [{d['width'] - 1}:0] {d['name']};")
+        lines.append(f"    wire {width_decl(d['width'])}{d['name']};")
     body = []
     for d in props["defs"]:
         body.append(f"    assign {d['name']} = {ex(d['expr'])};")

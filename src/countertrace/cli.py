@@ -149,6 +149,26 @@ def cmd_audit(args) -> int:
     return 0
 
 
+def cmd_write_checks(args) -> int:
+    from countertrace import runs
+
+    store = runs.RunStore()
+    run = store.create_checks(args.module, max_rounds=args.rounds)
+    store.execute(run["id"])
+    state = store.load(run["id"])
+    checks = state.get("checks", {})
+    for r in checks.get("rounds", []):
+        calls = r.get("calls", [])
+        tokens = sum(c.get("completion_tokens") or 0 for c in calls)
+        seconds = sum((c.get("latency_ms") or 0) for c in calls) / 1000
+        print(json.dumps({"round": r["index"], "model": r.get("model_status"), "output_tokens": tokens, "model_s": round(seconds, 1),
+                          "properties": len((r.get("properties") or {}).get("properties", [])), "gate": r.get("gate")}))
+    print(json.dumps({"status": checks.get("status"), "promoted_round": checks.get("promoted_round"), "state": state.get("state"),
+                      "error": state.get("error")}))
+    print(f"\nRun directory: {store.run_dir(run['id'])}")
+    return 0 if checks.get("status") == "promoted" else 1
+
+
 def cmd_model_check(args) -> int:
     from countertrace import model
 
@@ -222,6 +242,11 @@ def main() -> int:
     audit.add_argument("--check-set", default="weak-learner-v1")
     audit.add_argument("--depth", type=int, choices=(2, 4), default=4)
     audit.set_defaults(func=cmd_audit)
+
+    write_checks = commands.add_parser("write-checks", help="Have Nemotron write properties for a catalog module; the golden gate decides")
+    write_checks.add_argument("--module", required=True, help="Catalog module id, for example rr_arbiter")
+    write_checks.add_argument("--rounds", type=int, default=None, help="Maximum rounds (default 4)")
+    write_checks.set_defaults(func=cmd_write_checks)
 
     model_check = commands.add_parser("model-check", help="Explain a local failure with Nemotron and preserve the result")
     model_check.add_argument("--run-id", help="Completed local counterexample run (defaults to the newest)")

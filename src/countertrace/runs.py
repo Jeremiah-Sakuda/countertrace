@@ -109,6 +109,19 @@ class RunStore:
         self.save(state)
         return state
 
+    def create_checks(self, module_id: str, max_rounds: int | None = None) -> dict:
+        """A model-written checks run: Nemotron writes properties for a catalog module; the golden gate decides."""
+        from countertrace.checks import agent, modules
+
+        module = modules.load(module_id)
+        run_id = self.new_id("checks")
+        self.run_dir(run_id).mkdir(parents=True)
+        state = {"id": run_id, "kind": "checks", "title": f"Model-written checks: {module.title}", "module_id": module.id,
+                 "module": module.public(), "max_rounds": max_rounds or agent.MAX_ROUNDS, "state": "queued",
+                 "created_at": now(), "recorded": False, "checks": {"status": "pending", "rounds": []}}
+        self.save(state)
+        return state
+
     def create_audit(self, check_set: str, depth: int = 4) -> dict:
         from countertrace import audit
 
@@ -158,6 +171,8 @@ class RunStore:
                 from countertrace import audit
 
                 audit.execute(self, state, cancel, image)
+            elif state["kind"] == "checks":
+                self.execute_checks(state, cancel, lock, image)
             state["state"] = "cancelled" if cancel.is_set() else "complete"
         except Exception as exc:  # noqa: BLE001 - record every failure explicitly
             state["state"] = "failed"
@@ -169,6 +184,21 @@ class RunStore:
             with lock:
                 self.save(state)
             self.cancels.pop(run_id, None)
+
+    def execute_checks(self, state: dict, cancel: threading.Event, lock: threading.RLock, image: dict) -> None:
+        from countertrace.checks import agent, modules
+
+        module = modules.load(state["module_id"])
+
+        def on_round(record: dict) -> None:
+            with lock:
+                state["checks"]["rounds"].append(record)
+                self.save(state)
+
+        result = agent.run_loop(module, self.run_dir(state["id"]), image, cancel, on_round, max_rounds=state["max_rounds"])
+        with lock:
+            state["checks"] = {**result, "rounds": state["checks"]["rounds"] or result["rounds"]}
+            self.save(state)
 
     def execute_verification(self, state: dict, cancel: threading.Event, lock: threading.RLock, image: dict) -> None:
         run_dir = self.run_dir(state["id"])

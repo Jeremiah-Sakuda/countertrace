@@ -207,6 +207,10 @@ def run_design(design: dict, limits: dict, steps: list, deadline: float) -> None
 # templates; this worker renders every tool script itself and generates mutants
 # from a count and seed. Job data never supplies commands.
 CHECKS_SCHEMA = "countertrace-checks-job/1"
+# Undefined bits (for example a read beyond a vector's range, which Yosys models as a $shiftx
+# cell) become arbitrary values, so a property that relies on one fails with a counterexample
+# instead of stopping the solver.
+UNDEF = "techmap -map +/techmap.v t:$shiftx t:$shift; opt_clean; setundef -anyseq"
 MUTATE_LINE = re.compile(
     r"^mutate -mode (const0|const1|inv|cnot0|cnot1) -module [A-Za-z_][A-Za-z0-9_]* -cell [^\s;]+ -port [A-Za-z]+ -portbit \d+"
     r"( -ctrlbit \d+)?( -wire [^\s;]+ -wirebit \d+)?( -src [^\s;]+)*$")
@@ -295,7 +299,7 @@ def run_checks(job: dict, steps: list, deadline: float) -> None:
                 f"read -formal {dut} golden.v; read -formal {dut} props.sv; {chparams(params, 'ct_props_top')}; "
                 f"prep -top ct_props_top; write_json {OUT}/inventory/{cid}.json"],
                 work, limits["solver_s"], OUT / "logs" / f"inventory_{cid}.log", steps)
-            script = [f"read -formal {dut} golden.v", f"read -formal {dut} props.sv", chparams(params, "ct_props_top"), "prep -top ct_props_top"]
+            script = [f"read -formal {dut} golden.v", f"read -formal {dut} props.sv", chparams(params, "ct_props_top"), "prep -top ct_props_top", UNDEF]
             for mode in ("prove", "cover"):
                 if time.monotonic() < deadline:
                     run_sby(f"golden_{mode}_{cid}", work, mode, limits, ["golden.v", "props.sv"], script, steps, traces=True)
@@ -327,10 +331,10 @@ def run_checks(job: dict, steps: list, deadline: float) -> None:
         files = ["all_mut.v", "mutant.sv", "props.sv"]
         run_sby(f"mutant_{i}_props", work, "bmc", limits, files,
                 ["read -formal all_mut.v", f"read -formal {sel} mutant.sv", f"read -formal {mut} props.sv",
-                 chparams(params, "ct_props_top"), "prep -top ct_props_top"], steps, traces=False)
+                 chparams(params, "ct_props_top"), "prep -top ct_props_top", UNDEF], steps, traces=False)
         run_sby(f"mutant_{i}_equiv", work, "prove", limits, ["golden.v", *files[:2], "miter.sv"],
                 ["read -formal golden.v", "read -formal all_mut.v", f"read -formal {sel} mutant.sv",
-                 f"read -formal -D CT_OTHER={top}_mut miter.sv", chparams(params, "ct_miter"), "prep -top ct_miter"], steps, traces=True)
+                 f"read -formal -D CT_OTHER={top}_mut miter.sv", chparams(params, "ct_miter"), "prep -top ct_miter", UNDEF], steps, traces=True)
     with ThreadPoolExecutor(max_workers=4) as pool:
         list(pool.map(one, range(1, len(lines) + 1)))
 

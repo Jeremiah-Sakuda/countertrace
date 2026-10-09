@@ -97,6 +97,16 @@ def config() -> dict:
     }
 
 
+# Tasks with their own explicit output cap. Writing checks needs room to reason
+# (Nemotron 3 Ultra used about 10,000 to 16,000 tokens on October 8); every other task keeps the global cap.
+TASK_OUTPUT_LIMITS = {"write_checks": "COUNTERTRACE_CHECKS_OUTPUT_TOKEN_LIMIT"}
+
+
+def output_limit(cfg: dict, task: str) -> int | None:
+    env = TASK_OUTPUT_LIMITS.get(task)
+    return env_int(env) if env else cfg["output_limit"]
+
+
 def unavailable_reason(cfg: dict) -> str | None:
     missing = [n for n, k in (("NEBIUS_API_KEY", "api_key"), ("NEBIUS_BASE_URL", "base_url"),
                               ("NEBIUS_MODEL_ID", "model_id")) if not cfg[k]]
@@ -270,7 +280,8 @@ def _reserved_call(cfg, task, system, user, max_tokens, model, temperature, thin
     worst = 0.0
     price = price_for(cfg, model)
     if cfg["spend_limit"] is not None and price is not None:
-        out_cap = min(max_tokens or cfg["output_limit"] or 0, cfg["output_limit"] or 0)
+        limit = output_limit(cfg, task) or 0
+        out_cap = min(max_tokens or limit, limit)
         worst = estimate_tokens(full_system(cfg, system) + user) / 1e6 * price[0] + out_cap / 1e6 * price[1]
         with _RESERVE_LOCK:
             spent = spend_summary(cfg)["estimated_cost_usd"] or 0.0
@@ -298,12 +309,14 @@ def _chat(task: str, system: str, user: str, max_tokens: int | None, model_id: s
     prompt_estimate = estimate_tokens(full_system(cfg, system) + user)
     if prompt_estimate > cfg["input_limit"]:
         raise ModelError("input_too_large", f"Estimated {prompt_estimate} input tokens exceeds the configured limit.")
+    if not output_limit(cfg, task):
+        raise ModelError("unavailable", f"Set {TASK_OUTPUT_LIMITS.get(task, 'COUNTERTRACE_MODEL_OUTPUT_TOKEN_LIMIT')} before this task.")
     model = model_id or cfg["model_id"]
     payload = {
         "model": model,
         "messages": [{"role": "system", "content": full_system(cfg, system)},
                      {"role": "user", "content": user}],
-        "max_tokens": min(max_tokens or cfg["output_limit"], cfg["output_limit"]),
+        "max_tokens": min(max_tokens or output_limit(cfg, task), output_limit(cfg, task)),
         "temperature": temperature,
         "response_format": {"type": "json_object"},
     }

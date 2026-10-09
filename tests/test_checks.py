@@ -64,6 +64,13 @@ class CompileTest(unittest.TestCase):
         self.assert_rejected({"properties": []})
         self.assert_rejected(props(("1'b1", "full"), extra_field=1))
 
+    def test_helper_widths_may_name_a_parameter(self):
+        text = compile_checker(props(("1'b1", "grant == 0 || last != 0"), state=[{"name": "last", "width": "N", "next": "req"}]), ARB)
+        self.assertIn("reg [N-1:0] last;", text)
+        for width in ("M", "$clog2(N)", 0, 65, True):
+            with self.subTest(width=width):
+                self.assert_rejected(props(("1'b1", "last == 0"), state=[{"name": "last", "width": width, "next": "req"}]), ARB)
+
     def test_past_is_lowered_into_named_registers_that_can_be_indexed(self):
         text = compile_checker(props(("|$past(req)", "grant == ($past(req)[0] ? 1 : 0)"), ("$past(req, 2) == 0", "1'b1")), ARB)
         self.assertNotIn("$past", text)
