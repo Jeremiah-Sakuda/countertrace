@@ -1,0 +1,220 @@
+{
+  "protocol_sha256": "b4e57bdb3faed223a9474921ec2c3860135a3322242afb00fd3290c60c6e32aa",
+  "source_commit": "db13724c788535125b0cd1c0e293abd4998bad99",
+  "completed_at": "2026-10-09T19:42:05Z",
+  "promoted": 12,
+  "attempts": 12,
+  "first_round": 10,
+  "modules": [
+    {
+      "module": "debouncer",
+      "title": "Debouncer",
+      "promoted": 3,
+      "attempts": 3,
+      "rounds": [
+        2,
+        1,
+        1
+      ],
+      "gates": [
+        {
+          "stage": "mutants",
+          "passed": true,
+          "total": 40,
+          "killed": 27,
+          "equivalent": 13,
+          "invalid": 0,
+          "unresolved": 0,
+          "nonequivalent": 27,
+          "kill_rate": 1.0,
+          "survived": []
+        },
+        {
+          "stage": "mutants",
+          "passed": true,
+          "total": 40,
+          "killed": 27,
+          "equivalent": 13,
+          "invalid": 0,
+          "unresolved": 0,
+          "nonequivalent": 27,
+          "kill_rate": 1.0,
+          "survived": []
+        },
+        {
+          "stage": "mutants",
+          "passed": true,
+          "total": 40,
+          "killed": 27,
+          "equivalent": 13,
+          "invalid": 0,
+          "unresolved": 0,
+          "nonequivalent": 27,
+          "kill_rate": 1.0,
+          "survived": []
+        }
+      ]
+    },
+    {
+      "module": "sat_counter",
+      "title": "Saturating up/down counter",
+      "promoted": 3,
+      "attempts": 3,
+      "rounds": [
+        1,
+        1,
+        1
+      ],
+      "gates": [
+        {
+          "stage": "mutants",
+          "passed": true,
+          "total": 38,
+          "killed": 35,
+          "equivalent": 3,
+          "invalid": 0,
+          "unresolved": 0,
+          "nonequivalent": 35,
+          "kill_rate": 1.0,
+          "survived": []
+        },
+        {
+          "stage": "mutants",
+          "passed": true,
+          "total": 38,
+          "killed": 35,
+          "equivalent": 3,
+          "invalid": 0,
+          "unresolved": 0,
+          "nonequivalent": 35,
+          "kill_rate": 1.0,
+          "survived": []
+        },
+        {
+          "stage": "mutants",
+          "passed": true,
+          "total": 38,
+          "killed": 35,
+          "equivalent": 3,
+          "invalid": 0,
+          "unresolved": 0,
+          "nonequivalent": 35,
+          "kill_rate": 1.0,
+          "survived": []
+        }
+      ]
+    },
+    {
+      "module": "seq_detector",
+      "title": "Pattern detector",
+      "promoted": 3,
+      "attempts": 3,
+      "rounds": [
+        1,
+        1,
+        1
+      ],
+      "gates": [
+        {
+          "stage": "mutants",
+          "passed": true,
+          "total": 40,
+          "killed": 23,
+          "equivalent": 17,
+          "invalid": 0,
+          "unresolved": 0,
+          "nonequivalent": 23,
+          "kill_rate": 1.0,
+          "survived": []
+        },
+        {
+          "stage": "mutants",
+          "passed": true,
+          "total": 40,
+          "killed": 23,
+          "equivalent": 17,
+          "invalid": 0,
+          "unresolved": 0,
+          "nonequivalent": 23,
+          "kill_rate": 1.0,
+          "survived": []
+        },
+        {
+          "stage": "mutants",
+          "passed": true,
+          "total": 40,
+          "killed": 23,
+          "equivalent": 17,
+          "invalid": 0,
+          "unresolved": 0,
+          "nonequivalent": 23,
+          "kill_rate": 1.0,
+          "survived": []
+        }
+      ]
+    },
+    {
+      "module": "uart_tx",
+      "title": "UART transmitter (8N1)",
+      "promoted": 3,
+      "attempts": 3,
+      "rounds": [
+        1,
+        1,
+        2
+      ],
+      "gates": [
+        {
+          "stage": "mutants",
+          "passed": true,
+          "total": 40,
+          "killed": 26,
+          "equivalent": 14,
+          "invalid": 0,
+          "unresolved": 0,
+          "nonequivalent": 26,
+          "kill_rate": 1.0,
+          "survived": []
+        },
+        {
+          "stage": "mutants",
+          "passed": true,
+          "total": 40,
+          "killed": 26,
+          "equivalent": 14,
+          "invalid": 0,
+          "unresolved": 0,
+          "nonequivalent": 26,
+          "kill_rate": 1.0,
+          "survived": []
+        },
+        {
+          "stage": "mutants",
+          "passed": true,
+          "total": 40,
+          "killed": 26,
+          "equivalent": 14,
+          "invalid": 0,
+          "unresolved": 0,
+          "nonequivalent": 26,
+          "kill_rate": 1.0,
+          "survived": []
+        }
+      ]
+    }
+  ],
+  "calls": 16,
+  "prompt_tokens": 12583,
+  "completion_tokens": 147353,
+  "estimated_cost_usd": 0.4546,
+  "runtime_s": {
+    "median": 43.0,
+    "min": 28.0,
+    "max": 107.0
+  },
+  "feedback_recording": "rec-20261009-153159-che-312266",
+  "scope": "Three runs on each of four assistant-authored modules held out of prompt development. Mutation testing uses the primary setting; golden proof and trigger reachability use both settings. No matched no-feedback control.",
+  "schema_retries": 2,
+  "first_response": 8,
+  "gate_rounds": 14
+}

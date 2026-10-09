@@ -1,0 +1,52 @@
+SBY 19:32:45 [mutant_20_props] Removing directory '/tmp/work/checks/mutant_20_props'.
+SBY 19:32:45 [mutant_20_props] Copy '/tmp/work/checks/all_mut.v' to '/tmp/work/checks/mutant_20_props/src/all_mut.v'.
+SBY 19:32:45 [mutant_20_props] Copy '/tmp/work/checks/mutant.sv' to '/tmp/work/checks/mutant_20_props/src/mutant.sv'.
+SBY 19:32:45 [mutant_20_props] Copy '/tmp/work/checks/props.sv' to '/tmp/work/checks/mutant_20_props/src/props.sv'.
+SBY 19:32:45 [mutant_20_props] engine_0: abc bmc3
+SBY 19:32:45 [mutant_20_props] base: starting process "cd mutant_20_props/src; yosys -ql ../model/design.log ../model/design.ys"
+SBY 19:32:45 [mutant_20_props] base: finished (returncode=0)
+SBY 19:32:45 [mutant_20_props] prep: starting process "cd mutant_20_props/model; yosys -ql design_prep.log design_prep.ys"
+SBY 19:32:45 [mutant_20_props] prep: finished (returncode=0)
+SBY 19:32:45 [mutant_20_props] aig: starting process "cd mutant_20_props/model; yosys -ql design_aiger.log design_aiger.ys"
+SBY 19:32:45 [mutant_20_props] aig: Warning: Treating undriven bit ct_props_top.\clk like $anyseq.
+SBY 19:32:45 [mutant_20_props] aig: Warning: Treating undriven bit ct_props_top.\rst like $anyseq.
+SBY 19:32:45 [mutant_20_props] aig: Warning: Treating undriven bit ct_props_top.\noisy like $anyseq.
+SBY 19:32:45 [mutant_20_props] aig: Warning: Treating a total of 3 undriven bits in ct_props_top like $anyseq.
+SBY 19:32:45 [mutant_20_props] aig: finished (returncode=0)
+SBY 19:32:45 [mutant_20_props] engine_0: starting process "cd mutant_20_props; yosys-abc -c 'read_aiger model/design_aiger.aig; fold; strash; bmc3 -F 20 -v; write_cex -a engine_0/trace.aiw'"
+SBY 19:32:45 [mutant_20_props] engine_0: ======== ABC command line "read_aiger model/design_aiger.aig; fold; strash; bmc3 -F 20 -v; write_cex -a engine_0/trace.aiw"
+SBY 19:32:45 [mutant_20_props] engine_0: Warning: The last 2 outputs are interpreted as constraints.
+SBY 19:32:45 [mutant_20_props] engine_0: Running "bmc3". PI/PO/Reg = 15/1/16. And =     99. Lev =    10. ObjNums =    81.
+SBY 19:32:45 [mutant_20_props] engine_0: Params: FramesMax = 20. Start = 0. ConfLimit = 0. TimeOut = 0. SolveAll = 0.
+SBY 19:32:45 [mutant_20_props] engine_0: 0 + : Var =       1. Cla =        0. Conf =      0. Learn =      0.    0 MB   4 MB     0.01 sec
+SBY 19:32:45 [mutant_20_props] engine_0: 1 + : Var =       1. Cla =        0. Conf =      0. Learn =      0.    0 MB   4 MB     0.01 sec
+SBY 19:32:45 [mutant_20_props] engine_0: 2 + : Var =      36. Cla =       59. Conf =      0. Learn =      0.    0 MB   4 MB     0.01 sec
+SBY 19:32:45 [mutant_20_props] engine_0: 3 + : Var =      71. Cla =      148. Conf =      0. Learn =      0.    0 MB   4 MB     0.01 sec
+SBY 19:32:45 [mutant_20_props] engine_0: 4 + : Var =     106. Cla =      237. Conf =      0. Learn =      0.    0 MB   4 MB     0.01 sec
+SBY 19:32:45 [mutant_20_props] engine_0: 5 + : Var =     141. Cla =      326. Conf =      7. Learn =      6.    0 MB   4 MB     0.01 sec
+SBY 19:32:45 [mutant_20_props] engine_0: 6 + : Var =     176. Cla =      415. Conf =     19. Learn =     17.    0 MB   4 MB     0.01 sec
+SBY 19:32:45 [mutant_20_props] engine_0: 7 + : Var =     211. Cla =      504. Conf =     46. Learn =     43.    0 MB   4 MB     0.01 sec
+SBY 19:32:45 [mutant_20_props] engine_0: 8 + : Var =     246. Cla =      593. Conf =     73. Learn =     69.    0 MB   4 MB     0.01 sec
+SBY 19:32:45 [mutant_20_props] engine_0: 9 + : Var =     281. Cla =      682. Conf =    107. Learn =    102.    0 MB   4 MB     0.01 sec
+SBY 19:32:45 [mutant_20_props] engine_0: 10 + : Var =     316. Cla =      771. Conf =    134. Learn =    128.    0 MB   4 MB     0.01 sec
+SBY 19:32:45 [mutant_20_props] engine_0: 11 + : Var =     351. Cla =      860. Conf =    169. Learn =    162.    0 MB   4 MB     0.01 sec
+SBY 19:32:45 [mutant_20_props] engine_0: 12 + : Var =     386. Cla =      949. Conf =    196. Learn =    188.    0 MB   4 MB     0.01 sec
+SBY 19:32:45 [mutant_20_props] engine_0: 13 + : Var =     421. Cla =     1038. Conf =    228. Learn =    219.    0 MB   4 MB     0.01 sec
+SBY 19:32:45 [mutant_20_props] engine_0: 14 + : Var =     456. Cla =     1127. Conf =    261. Learn =    251.    0 MB   4 MB     0.01 sec
+SBY 19:32:45 [mutant_20_props] engine_0: 15 + : Var =     491. Cla =     1216. Conf =    293. Learn =    282.    0 MB   4 MB     0.01 sec
+SBY 19:32:45 [mutant_20_props] engine_0: 16 + : Var =     526. Cla =     1305. Conf =    326. Learn =    314.    0 MB   4 MB     0.01 sec
+SBY 19:32:45 [mutant_20_props] engine_0: 17 + : Var =     561. Cla =     1394. Conf =    356. Learn =    343.    0 MB   4 MB     0.01 sec
+SBY 19:32:45 [mutant_20_props] engine_0: 18 + : Var =     596. Cla =     1483. Conf =    387. Learn =    373.    0 MB   4 MB     0.01 sec
+SBY 19:32:45 [mutant_20_props] engine_0: 19 + : Var =     631. Cla =     1572. Conf =    416. Learn =    401.    0 MB   4 MB     0.01 sec
+SBY 19:32:45 [mutant_20_props] engine_0: Runtime:  CNF = 0.0 sec (1.4 %)  UNSAT = 0.0 sec (9.5 %)  SAT = 0.0 sec (0.0 %)  UNDEC = 0.0 sec (0.0 %)
+SBY 19:32:45 [mutant_20_props] engine_0: LStart(P) = 10000  LDelta(Q) = 2000  LRatio(R) = 80  ReduceDB = 0  Vars = 1000  Used = 950 (95.00 %)
+SBY 19:32:45 [mutant_20_props] engine_0: Buffs = 198. Dups = 0.   Hash hits = 0.  Hash misses = 372.  UniProps = 0.
+SBY 19:32:45 [mutant_20_props] engine_0: No output asserted in 20 frames. Resource limit reached (conf limit 0). Time =     0.01 sec
+SBY 19:32:45 [mutant_20_props] engine_0: Counter-example is not available.
+SBY 19:32:45 [mutant_20_props] engine_0: finished (returncode=0)
+SBY 19:32:45 [mutant_20_props] engine_0: Status returned by engine: PASS
+SBY 19:32:45 [mutant_20_props] summary: Elapsed clock time [H:MM:SS (secs)]: 0:00:00 (0)
+SBY 19:32:45 [mutant_20_props] summary: Elapsed process time [H:MM:SS (secs)]: 0:00:00 (0)
+SBY 19:32:45 [mutant_20_props] summary: engine_0 (abc bmc3) returned PASS
+SBY 19:32:45 [mutant_20_props] summary: engine_0 did not produce any traces
+SBY 19:32:45 [mutant_20_props] DONE (PASS, rc=0)

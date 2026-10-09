@@ -1,0 +1,318 @@
+{
+ "index": 1,
+ "calls": [
+  {
+   "task": "write_checks",
+   "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+   "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+   "at": "2026-10-09T19:44:34Z",
+   "attempts": 1,
+   "thinking": true,
+   "request_id": "9518454dfd269feb3866c56f016bdc5d",
+   "latency_ms": 17243,
+   "prompt_tokens": 1360,
+   "completion_tokens": 6037,
+   "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+   "status": "ok",
+   "finish_reason": "stop"
+  }
+ ],
+ "model_status": "ok",
+ "properties": {
+  "state": [
+   {
+    "name": "head",
+    "width": 2,
+    "next": "rst ? 0 : (read_accepted ? ((head + 1) % DEPTH) : head)"
+   },
+   {
+    "name": "tail",
+    "width": 2,
+    "next": "rst ? 0 : (write_accepted ? ((tail + 1) % DEPTH) : tail)"
+   },
+   {
+    "name": "count",
+    "width": 3,
+    "next": "rst ? 0 : (count + (write_accepted ? 1 : 0) - (read_accepted ? 1 : 0))"
+   }
+  ],
+  "defs": [
+   {
+    "name": "is_empty",
+    "width": 1,
+    "expr": "count == 0"
+   },
+   {
+    "name": "is_full",
+    "width": 1,
+    "expr": "count == DEPTH"
+   },
+   {
+    "name": "read_accepted",
+    "width": 1,
+    "expr": "!rst && rd_en && !is_empty"
+   },
+   {
+    "name": "write_accepted",
+    "width": 1,
+    "expr": "!rst && wr_en && !is_full"
+   }
+  ],
+  "memories": [
+   {
+    "name": "mem",
+    "width": 8,
+    "depth": 4
+   }
+  ],
+  "writes": [
+   {
+    "memory": "mem",
+    "when": "write_accepted",
+    "index": "tail",
+    "value": "din"
+   }
+  ],
+  "properties": [
+   {
+    "id": "full_matches",
+    "when": "1",
+    "then": "full == is_full",
+    "why": "full output must reflect occupancy before the edge"
+   },
+   {
+    "id": "empty_matches",
+    "when": "1",
+    "then": "empty == is_empty",
+    "why": "empty output must reflect occupancy before the edge"
+   },
+   {
+    "id": "dout_after_read",
+    "when": "$past(read_accepted)",
+    "then": "dout == $past(mem[$past(head)])",
+    "why": "after an accepted read, dout must equal the word that was at the head before the read"
+   }
+  ]
+ },
+ "gate": {
+  "stage": "golden",
+  "passed": false,
+  "status": "FAIL",
+  "failed": [
+   "dout_after_read"
+  ],
+  "config": {
+   "id": "p0",
+   "params": {
+    "DEPTH": 4,
+    "WIDTH": 8
+   }
+  }
+ },
+ "feedback": "A reference implementation that meets the specification violates dout_after_read at DEPTH = 4, WIDTH = 8. Those properties are wrong, not the design. Counterexample (values just before each edge):\nedge | rst | wr_en | rd_en | din | dout | full | empty\n0 | 1 | 1 | 0 | 0 | 0 | 0 | 0\n1 | 0 | 1 | 1 | 128 | 0 | 0 | 1\n2 | 0 | 1 | 1 | 0 | 0 | 0 | 0\n3 | 0 | 0 | 1 | 0 | 128 | 0 | 0\n4 | 0 | 0 | 0 | 0 | 0 | 0 | 1\n5 | 1 | 0 | 0 | 0 | 0 | 0 | 1\n6 | 1 | 0 | 0 | 0 | 0 | 0 | 1\nCorrect or remove them and resubmit the whole set.",
+ "frozen": {
+  "schema": "countertrace-promoted-checks-v1",
+  "module": {
+   "id": "sync_fifo",
+   "title": "Synchronous FIFO",
+   "top": "fifo",
+   "clock": "clk",
+   "reset": "rst",
+   "params": [
+    {
+     "DEPTH": 4,
+     "WIDTH": 8
+    },
+    {
+     "DEPTH": 2,
+     "WIDTH": 8
+    }
+   ],
+   "inputs": {
+    "rst": 1,
+    "wr_en": 1,
+    "rd_en": 1,
+    "din": "WIDTH"
+   },
+   "outputs": {
+    "dout": "WIDTH",
+    "full": 1,
+    "empty": 1
+   },
+   "spec": "A synchronous first-in first-out queue holding up to DEPTH words of WIDTH bits, with one rising-edge clock clk.\nrst is a synchronous active-high reset: at a rising edge with rst high the queue becomes empty, and read and write requests at that edge are ignored.\nAt each rising edge without reset: a write (wr_en high) stores din at the tail unless the queue is full; a read (rd_en high) removes the head word unless the queue is empty. Full and empty are judged from the occupancy before the edge, so a read and a write at the same edge are each accepted or ignored on that basis.\nAfter an accepted read, dout contains the removed word after that edge. Its value is unconstrained at other times, including reset, idle cycles and ignored reads. Do not require it to remain stable between accepted reads.\nempty is high exactly when the queue holds no words; full is high exactly when it holds DEPTH words. Words come out in the order they were accepted.",
+   "split": "development"
+  },
+  "properties_hash": "sha256:9ccf7c89a14ddfb006c6f90c8753091235355ac29bcb7f0479096e6a74d9a8c9",
+  "checker_hash": "sha256:32aecf24077f8b49d92732a45e3a3caf3c053e1e9fae2928ae2f9d0e000738b2",
+  "golden_hash": "sha256:da0e5a92be992d813f92bbf4383fadf92883b24b4c91df621d9261b5565079d6",
+  "harness": {
+   "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+   "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+   "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+  },
+  "verifier_digest": "26a51c6bce5dcf38",
+  "trusted_code": {
+   "bundle.py": "sha256:a29824fd095cbf67c8ab8d2e81522101ceebf67285448a06ff93b950a75092ae",
+   "design.py": "sha256:b31699ceca4534bd7a0033017fd5cef83810a3faf9a9719f667abc957fe86395",
+   "__init__.py": "sha256:b8f3265344eb7ae70d0c1b8687be2390283a0a4d948334c0236f726312f13912",
+   "compile.py": "sha256:ff04ee4c2e1d29afae9fdc04271e231345ebf7a450eefc6825dbaa401b379c67",
+   "gate.py": "sha256:db27e1c32cde7d14d8b82fcb290aabc743a691cfb6f3d084b8da1ee2ea217ae3",
+   "agent.py": "sha256:0cc8c7e7cf6f08acb0b3b9e7f5fa6fcaff6345961e3e5a1a84b436dbc6403c16",
+   "modules.py": "sha256:d0bbeabf053a00261fbd1409ec26abe633320bad3b601bada6e714684c6d6538"
+  },
+  "limits": {
+   "solver_s": 120,
+   "bmc_depth": 20,
+   "cover_depth": 20
+  },
+  "mutants": {
+   "count": 40,
+   "seed": 1
+  },
+  "promotion_threshold": 0.9
+ },
+ "gate_full": {
+  "stage": "golden",
+  "passed": false,
+  "configs": [
+   {
+    "id": "p0",
+    "params": {
+     "DEPTH": 4,
+     "WIDTH": 8
+    }
+   },
+   {
+    "id": "p1",
+    "params": {
+     "DEPTH": 2,
+     "WIDTH": 8
+    }
+   }
+  ],
+  "limits": {
+   "solver_s": 120,
+   "bmc_depth": 20,
+   "cover_depth": 20
+  },
+  "gate_run": {
+   "wall_s": 1.79,
+   "image": {
+    "tag": "countertrace-verifier:26a51c6bce5dcf38",
+    "image_id": "sha256:62dbb264be6153e08c5014540a0a134482d1e29ccfbdd1602385100defa72ce5",
+    "verifier_digest": "26a51c6bce5dcf38"
+   }
+  },
+  "status": "FAIL",
+  "config": {
+   "id": "p0",
+   "params": {
+    "DEPTH": 4,
+    "WIDTH": 8
+   }
+  },
+  "failed": [
+   "dout_after_read"
+  ],
+  "trace": [
+   {
+    "step": 0,
+    "inputs": {
+     "rst": 1,
+     "wr_en": 1,
+     "rd_en": 0,
+     "din": 0
+    },
+    "outputs": {
+     "dout": 0,
+     "full": 0,
+     "empty": 0
+    }
+   },
+   {
+    "step": 1,
+    "inputs": {
+     "rst": 0,
+     "wr_en": 1,
+     "rd_en": 1,
+     "din": 128
+    },
+    "outputs": {
+     "dout": 0,
+     "full": 0,
+     "empty": 1
+    }
+   },
+   {
+    "step": 2,
+    "inputs": {
+     "rst": 0,
+     "wr_en": 1,
+     "rd_en": 1,
+     "din": 0
+    },
+    "outputs": {
+     "dout": 0,
+     "full": 0,
+     "empty": 0
+    }
+   },
+   {
+    "step": 3,
+    "inputs": {
+     "rst": 0,
+     "wr_en": 0,
+     "rd_en": 1,
+     "din": 0
+    },
+    "outputs": {
+     "dout": 128,
+     "full": 0,
+     "empty": 0
+    }
+   },
+   {
+    "step": 4,
+    "inputs": {
+     "rst": 0,
+     "wr_en": 0,
+     "rd_en": 0,
+     "din": 0
+    },
+    "outputs": {
+     "dout": 0,
+     "full": 0,
+     "empty": 1
+    }
+   },
+   {
+    "step": 5,
+    "inputs": {
+     "rst": 1,
+     "wr_en": 0,
+     "rd_en": 0,
+     "din": 0
+    },
+    "outputs": {
+     "dout": 0,
+     "full": 0,
+     "empty": 1
+    }
+   },
+   {
+    "step": 6,
+    "inputs": {
+     "rst": 1,
+     "wr_en": 0,
+     "rd_en": 0,
+     "din": 0
+    },
+    "outputs": {
+     "dout": 0,
+     "full": 0,
+     "empty": 1
+    }
+   }
+  ]
+ }
+}

@@ -617,7 +617,7 @@ export interface CheckRound {
   properties?: WrittenProperties; gate?: CheckGate; feedback?: string | null;
 }
 export interface ChecksResult {
-  status: string; detail?: string; rounds: CheckRound[]; promoted_round?: number | null;
+  status: string; detail?: string; review_note?: string; secondary_audit?: { params: Record<string, number>[]; gate: CheckGate }; rounds: CheckRound[]; promoted_round?: number | null;
   demonstration?: { hunt_run_id?: string; repair_run_id?: string };
 }
 

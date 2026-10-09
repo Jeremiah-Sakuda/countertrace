@@ -1,0 +1,73 @@
+{
+  "source_run": "rec-20261009-130847-che-c5ecc4",
+  "observed_at": "2026-10-09T19:34:41Z",
+  "purpose": "Post-showcase secondary-setting mutation audit; no new model call and no rewrite of original promotion.",
+  "params": [
+    {
+      "DEPTH": 2,
+      "WIDTH": 8
+    }
+  ],
+  "frozen": {
+    "schema": "countertrace-promoted-checks-v1",
+    "module": {
+      "id": "sync_fifo",
+      "title": "Synchronous FIFO",
+      "top": "fifo",
+      "clock": "clk",
+      "reset": "rst",
+      "params": [
+        {
+          "DEPTH": 2,
+          "WIDTH": 8
+        }
+      ],
+      "inputs": {
+        "rst": 1,
+        "wr_en": 1,
+        "rd_en": 1,
+        "din": "WIDTH"
+      },
+      "outputs": {
+        "dout": "WIDTH",
+        "full": 1,
+        "empty": 1
+      },
+      "spec": "A synchronous first-in first-out queue holding up to DEPTH words of WIDTH bits, with one rising-edge clock clk.\nrst is a synchronous active-high reset: at a rising edge with rst high the queue becomes empty, and read and write requests at that edge are ignored.\nAt each rising edge without reset: a write (wr_en high) stores din at the tail unless the queue is full; a read (rd_en high) removes the head word unless the queue is empty. Full and empty are judged from the occupancy before the edge, so a read and a write at the same edge are each accepted or ignored on that basis.\nAfter an accepted read, dout holds the removed word until the next accepted read; dout is only meaningful after an accepted read.\nempty is high exactly when the queue holds no words; full is high exactly when it holds DEPTH words. Words come out in the order they were accepted.",
+      "split": "development"
+    },
+    "properties_hash": "sha256:2fd9521663950621f0ae56f471faf20f11bb82d584d2d3b0be450224b491f233",
+    "checker_hash": "sha256:db36a1d41fa7831fe3bdb49b6b4cd86fe798c322710804d2ca4893249d037657",
+    "golden_hash": "sha256:da0e5a92be992d813f92bbf4383fadf92883b24b4c91df621d9261b5565079d6",
+    "harness": {
+      "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+      "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+      "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+    },
+    "verifier_digest": "26a51c6bce5dcf38",
+    "trusted_code": {
+      "bundle.py": "sha256:a29824fd095cbf67c8ab8d2e81522101ceebf67285448a06ff93b950a75092ae",
+      "design.py": "sha256:b31699ceca4534bd7a0033017fd5cef83810a3faf9a9719f667abc957fe86395",
+      "__init__.py": "sha256:b8f3265344eb7ae70d0c1b8687be2390283a0a4d948334c0236f726312f13912",
+      "compile.py": "sha256:ff04ee4c2e1d29afae9fdc04271e231345ebf7a450eefc6825dbaa401b379c67",
+      "gate.py": "sha256:db27e1c32cde7d14d8b82fcb290aabc743a691cfb6f3d084b8da1ee2ea217ae3",
+      "agent.py": "sha256:0cc8c7e7cf6f08acb0b3b9e7f5fa6fcaff6345961e3e5a1a84b436dbc6403c16",
+      "modules.py": "sha256:d0bbeabf053a00261fbd1409ec26abe633320bad3b601bada6e714684c6d6538"
+    },
+    "limits": {
+      "solver_s": 120,
+      "bmc_depth": 20,
+      "cover_depth": 20
+    },
+    "mutants": {
+      "count": 40,
+      "seed": 1
+    },
+    "promotion_threshold": 0.9
+  },
+  "gate": {
+    "stage": "integrity",
+    "passed": false,
+    "error": "mutant 1 is equivalent but violates properties proved on the golden"
+  }
+}

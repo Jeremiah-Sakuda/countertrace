@@ -1,0 +1,76 @@
+SBY 19:45:48 [golden_prove_p1] Removing directory '/tmp/work/checks/golden_prove_p1'.
+SBY 19:45:48 [golden_prove_p1] Copy '/tmp/work/checks/golden.v' to '/tmp/work/checks/golden_prove_p1/src/golden.v'.
+SBY 19:45:48 [golden_prove_p1] Copy '/tmp/work/checks/props.sv' to '/tmp/work/checks/golden_prove_p1/src/props.sv'.
+SBY 19:45:48 [golden_prove_p1] engine_0: abc pdr
+SBY 19:45:48 [golden_prove_p1] base: starting process "cd golden_prove_p1/src; yosys -ql ../model/design.log ../model/design.ys"
+SBY 19:45:48 [golden_prove_p1] base: finished (returncode=0)
+SBY 19:45:48 [golden_prove_p1] prep: starting process "cd golden_prove_p1/model; yosys -ql design_prep.log design_prep.ys"
+SBY 19:45:48 [golden_prove_p1] prep: finished (returncode=0)
+SBY 19:45:48 [golden_prove_p1] aig: starting process "cd golden_prove_p1/model; yosys -ql design_aiger.log design_aiger.ys"
+SBY 19:45:48 [golden_prove_p1] aig: Warning: Treating undriven bit ct_props_top.\clk like $anyseq.
+SBY 19:45:48 [golden_prove_p1] aig: Warning: Treating undriven bit ct_props_top.\wr_en like $anyseq.
+SBY 19:45:48 [golden_prove_p1] aig: Warning: Treating undriven bit ct_props_top.\rst like $anyseq.
+SBY 19:45:48 [golden_prove_p1] aig: Warning: Treating undriven bit ct_props_top.\rd_en like $anyseq.
+SBY 19:45:48 [golden_prove_p1] aig: Warning: Treating undriven bit ct_props_top.\din [0] like $anyseq.
+SBY 19:45:48 [golden_prove_p1] aig: Warning: Treating undriven bit ct_props_top.\din [1] like $anyseq.
+SBY 19:45:48 [golden_prove_p1] aig: Warning: Treating undriven bit ct_props_top.\din [2] like $anyseq.
+SBY 19:45:48 [golden_prove_p1] aig: Warning: Treating undriven bit ct_props_top.\din [3] like $anyseq.
+SBY 19:45:48 [golden_prove_p1] aig: Warning: Treating undriven bit ct_props_top.\din [4] like $anyseq.
+SBY 19:45:48 [golden_prove_p1] aig: Warning: Treating undriven bit ct_props_top.\din [5] like $anyseq.
+SBY 19:45:48 [golden_prove_p1] aig: Warning: Treating undriven bit ct_props_top.\din [6] like $anyseq.
+SBY 19:45:48 [golden_prove_p1] aig: Warning: Treating undriven bit ct_props_top.\din [7] like $anyseq.
+SBY 19:45:48 [golden_prove_p1] aig: Warning: Treating a total of 12 undriven bits in ct_props_top like $anyseq.
+SBY 19:45:48 [golden_prove_p1] aig: finished (returncode=0)
+SBY 19:45:48 [golden_prove_p1] engine_0: starting process "cd golden_prove_p1; yosys-abc -c 'read_aiger model/design_aiger.aig; fold; strash; pdr -v -l; write_cex -a engine_0/trace.aiw'"
+SBY 19:45:48 [golden_prove_p1] engine_0: ======== ABC command line "read_aiger model/design_aiger.aig; fold; strash; pdr -v -l; write_cex -a engine_0/trace.aiw"
+SBY 19:45:48 [golden_prove_p1] engine_0: Warning: The last 2 outputs are interpreted as constraints.
+SBY 19:45:48 [golden_prove_p1] engine_0: VarMax = 300. FrameMax = 10000. QueMax = 0. TimeMax = 159. MonoCNF = no. SkipGen = no. SolveAll = no.
+SBY 19:45:48 [golden_prove_p1] engine_0: Frame Clauses                                                     Max Queue Flops Time
+SBY 19:45:48 [golden_prove_p1] engine_0: 1 : 0 2                                                                 1     2      0.00 sec  T/O =  0  PRV =  0
+SBY 19:45:48 [golden_prove_p1] engine_0: 2 : 0 2 49                                                              2    51      0.01 sec  T/O =  0  PRV =  0
+SBY 19:45:48 [golden_prove_p1] engine_0: 2 : 0 8 68                                                              5    74      0.01 sec  T/O =  0  PRV =  0
+SBY 19:45:48 [golden_prove_p1] engine_0: 3 : 0 5 6 6 ~58                                                          2    74      0.01 sec  T/O =  0  PRV =  0
+SBY 19:45:48 [golden_prove_p1] engine_0: 4 : 0 6 11 18 4 ~58                                                     14    83      0.01 sec  T/O =  0  PRV =  0
+SBY 19:45:48 [golden_prove_p1] engine_0: Block =    7  Oblig =   200  Clause =   101  Call =   454 (sat=54.6%)  Cex =   0  Start =   0
+SBY 19:45:48 [golden_prove_p1] engine_0: SAT solving =     0.00 sec ( 22.14 %)
+SBY 19:45:48 [golden_prove_p1] engine_0: unsat     =     0.00 sec (  1.44 %)
+SBY 19:45:48 [golden_prove_p1] engine_0: sat       =     0.00 sec ( 20.71 %)
+SBY 19:45:48 [golden_prove_p1] engine_0: Generalize  =     0.00 sec ( 23.64 %)
+SBY 19:45:48 [golden_prove_p1] engine_0: Push clause =     0.00 sec (  2.76 %)
+SBY 19:45:48 [golden_prove_p1] engine_0: Ternary sim =     0.00 sec (  5.32 %)
+SBY 19:45:48 [golden_prove_p1] engine_0: Containment =     0.00 sec (  0.30 %)
+SBY 19:45:48 [golden_prove_p1] engine_0: CNF compute =     0.00 sec (  2.38 %)
+SBY 19:45:48 [golden_prove_p1] engine_0: Refinement  =     0.00 sec (  0.18 %)
+SBY 19:45:48 [golden_prove_p1] engine_0: TOTAL       =     0.02 sec (100.00 %)
+SBY 19:45:48 [golden_prove_p1] engine_0: Output 0 of miter "model/design_aiger" was asserted in frame 5.  Time =     0.02 sec
+SBY 19:45:48 [golden_prove_p1] engine_0: finished (returncode=0)
+SBY 19:45:48 [golden_prove_p1] engine_0: Status returned by engine: FAIL
+SBY 19:45:48 [golden_prove_p1] smt2: starting process "cd golden_prove_p1/model; yosys -ql design_smt2.log design_smt2.ys"
+SBY 19:45:48 [golden_prove_p1] engine_0: starting process "cd golden_prove_p1; yosys-witness aiw2yw engine_0/trace.aiw model/design_aiger.ywa engine_0/trace_aiw.yw"
+SBY 19:45:48 [golden_prove_p1] smt2: finished (returncode=0)
+SBY 19:45:48 [golden_prove_p1] engine_0: Converting AIGER witness trace 'engine_0/trace.aiw' to Yosys witness trace 'engine_0/trace_aiw.yw'...
+SBY 19:45:48 [golden_prove_p1] engine_0: Using Yosys witness AIGER map file 'model/design_aiger.ywa'
+SBY 19:45:48 [golden_prove_p1] engine_0: Converted 6 time steps.
+SBY 19:45:48 [golden_prove_p1] engine_0: finished (returncode=0)
+SBY 19:45:48 [golden_prove_p1] engine_0: starting process "cd golden_prove_p1; yosys-smtbmc -s yices --noprogress --append 0 --dump-vcd engine_0/trace.vcd --dump-yw engine_0/trace.yw --dump-vlogtb engine_0/trace_tb.v --dump-smtc engine_0/trace.smtc --yw engine_0/trace_aiw.yw model/design_smt2.smt2"
+SBY 19:45:48 [golden_prove_p1] engine_0: ##   0:00:00  Solver: yices
+SBY 19:45:48 [golden_prove_p1] engine_0: ##   0:00:00  Skipping step 0..
+SBY 19:45:48 [golden_prove_p1] engine_0: ##   0:00:00  Skipping step 1..
+SBY 19:45:48 [golden_prove_p1] engine_0: ##   0:00:00  Skipping step 2..
+SBY 19:45:48 [golden_prove_p1] engine_0: ##   0:00:00  Skipping step 3..
+SBY 19:45:48 [golden_prove_p1] engine_0: ##   0:00:00  Skipping step 4..
+SBY 19:45:48 [golden_prove_p1] engine_0: ##   0:00:00  Checking assertions in step 5..
+SBY 19:45:48 [golden_prove_p1] engine_0: ##   0:00:00  BMC failed!
+SBY 19:45:48 [golden_prove_p1] engine_0: ##   0:00:00  Assert failed in ct_props_top: p_dout_after_read
+SBY 19:45:48 [golden_prove_p1] engine_0: ##   0:00:00  Writing trace to VCD file: engine_0/trace.vcd
+SBY 19:45:48 [golden_prove_p1] engine_0: ##   0:00:00  Writing trace to Verilog testbench: engine_0/trace_tb.v
+SBY 19:45:48 [golden_prove_p1] engine_0: ##   0:00:00  Writing trace to constraints file: engine_0/trace.smtc
+SBY 19:45:48 [golden_prove_p1] engine_0: ##   0:00:00  Writing trace to Yosys witness file: engine_0/trace.yw
+SBY 19:45:48 [golden_prove_p1] engine_0: ##   0:00:00  Status: FAILED
+SBY 19:45:48 [golden_prove_p1] engine_0: finished (returncode=1)
+SBY 19:45:48 [golden_prove_p1] summary: Elapsed clock time [H:MM:SS (secs)]: 0:00:00 (0)
+SBY 19:45:48 [golden_prove_p1] summary: Elapsed process time [H:MM:SS (secs)]: 0:00:00 (0)
+SBY 19:45:48 [golden_prove_p1] summary: engine_0 (abc pdr) returned FAIL
+SBY 19:45:48 [golden_prove_p1] summary: counterexample trace: golden_prove_p1/engine_0/trace.vcd
+SBY 19:45:48 [golden_prove_p1] summary:   failed assertion ct_props_top.p_dout_after_read at props.sv:43.27-43.71 step 5
+SBY 19:45:48 [golden_prove_p1] DONE (FAIL, rc=2)

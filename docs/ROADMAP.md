@@ -46,7 +46,7 @@ Impact priority selected October 4: help instructors and FPGA club mentors reuse
 - [x] Seven-module gate catalog with golden references, specifications, and hand-written reference properties (October 9). This is not a seven-module model benchmark.
 - [ ] Extend golden-confirmed bug hunt and frozen repair beyond the implemented FIFO adapter (October 16 to 19).
 - [x] Check-writing interface in recorded mode and configured local live mode (October 9); funded public live runtime remains pending.
-- [ ] Frozen held-out evaluation, three runs per module (October 21 to 24).
+- [x] Frozen held-out evaluation, three runs per module (completed October 9): 12/12 promoted across four modules, with all failures/retries preserved in [checks-v1](../evaluation/results/checks-v1/REPORT.md). These fixtures are no longer fresh holdouts for future tuning.
 - [x] Align README, PRD, Devpost draft, and demo script with model-written checks (October 9). Final submission review remains pending.
 
 ## October 9 to 14 — trustworthy release scope

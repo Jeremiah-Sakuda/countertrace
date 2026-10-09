@@ -1,0 +1,92 @@
+SBY 19:48:55 [mutant_30_equiv] Removing directory '/tmp/work/checks/mutant_30_equiv'.
+SBY 19:48:55 [mutant_30_equiv] Copy '/tmp/work/checks/golden.v' to '/tmp/work/checks/mutant_30_equiv/src/golden.v'.
+SBY 19:48:55 [mutant_30_equiv] Copy '/tmp/work/checks/all_mut.v' to '/tmp/work/checks/mutant_30_equiv/src/all_mut.v'.
+SBY 19:48:55 [mutant_30_equiv] Copy '/tmp/work/checks/mutant.sv' to '/tmp/work/checks/mutant_30_equiv/src/mutant.sv'.
+SBY 19:48:55 [mutant_30_equiv] Copy '/tmp/work/checks/miter.sv' to '/tmp/work/checks/mutant_30_equiv/src/miter.sv'.
+SBY 19:48:55 [mutant_30_equiv] engine_0: abc pdr
+SBY 19:48:55 [mutant_30_equiv] base: starting process "cd mutant_30_equiv/src; yosys -ql ../model/design.log ../model/design.ys"
+SBY 19:48:55 [mutant_30_equiv] base: Warning: Encountered `parallel_case' comment! Such legacy hot comments are supported by Yosys, but are not part of any formal language specification. Using the Verilog `parallel_case' attribute or the SystemVerilog `unique' or `priority' keywords is recommended!
+SBY 19:48:55 [mutant_30_equiv] base: finished (returncode=0)
+SBY 19:48:55 [mutant_30_equiv] prep: starting process "cd mutant_30_equiv/model; yosys -ql design_prep.log design_prep.ys"
+SBY 19:48:55 [mutant_30_equiv] prep: finished (returncode=0)
+SBY 19:48:55 [mutant_30_equiv] aig: starting process "cd mutant_30_equiv/model; yosys -ql design_aiger.log design_aiger.ys"
+SBY 19:48:55 [mutant_30_equiv] aig: Warning: Treating undriven bit ct_miter.\clk like $anyseq.
+SBY 19:48:55 [mutant_30_equiv] aig: Warning: Treating undriven bit ct_miter.\wr_en like $anyseq.
+SBY 19:48:55 [mutant_30_equiv] aig: Warning: Treating undriven bit ct_miter.\rst like $anyseq.
+SBY 19:48:55 [mutant_30_equiv] aig: Warning: Treating undriven bit ct_miter.\rd_en like $anyseq.
+SBY 19:48:55 [mutant_30_equiv] aig: Warning: Treating undriven bit ct_miter.\din [0] like $anyseq.
+SBY 19:48:55 [mutant_30_equiv] aig: Warning: Treating undriven bit ct_miter.\din [1] like $anyseq.
+SBY 19:48:55 [mutant_30_equiv] aig: Warning: Treating undriven bit ct_miter.\din [2] like $anyseq.
+SBY 19:48:55 [mutant_30_equiv] aig: Warning: Treating undriven bit ct_miter.\din [3] like $anyseq.
+SBY 19:48:55 [mutant_30_equiv] aig: Warning: Treating undriven bit ct_miter.\din [4] like $anyseq.
+SBY 19:48:55 [mutant_30_equiv] aig: Warning: Treating undriven bit ct_miter.\din [5] like $anyseq.
+SBY 19:48:55 [mutant_30_equiv] aig: Warning: Treating undriven bit ct_miter.\din [6] like $anyseq.
+SBY 19:48:55 [mutant_30_equiv] aig: Warning: Treating undriven bit ct_miter.\din [7] like $anyseq.
+SBY 19:48:55 [mutant_30_equiv] aig: Warning: Treating a total of 12 undriven bits in ct_miter like $anyseq.
+SBY 19:48:55 [mutant_30_equiv] aig: finished (returncode=0)
+SBY 19:48:55 [mutant_30_equiv] engine_0: starting process "cd mutant_30_equiv; yosys-abc -c 'read_aiger model/design_aiger.aig; fold; strash; pdr -v -l; write_cex -a engine_0/trace.aiw'"
+SBY 19:48:55 [mutant_30_equiv] engine_0: ======== ABC command line "read_aiger model/design_aiger.aig; fold; strash; pdr -v -l; write_cex -a engine_0/trace.aiw"
+SBY 19:48:55 [mutant_30_equiv] engine_0: Warning: The last 2 outputs are interpreted as constraints.
+SBY 19:48:55 [mutant_30_equiv] engine_0: VarMax = 300. FrameMax = 10000. QueMax = 0. TimeMax = 159. MonoCNF = no. SkipGen = no. SolveAll = no.
+SBY 19:48:55 [mutant_30_equiv] engine_0: Frame Clauses                                                     Max Queue Flops Time
+SBY 19:48:55 [mutant_30_equiv] engine_0: 1 : 0 2                                                                 1     2      0.00 sec  T/O =  0  PRV =  0
+SBY 19:48:55 [mutant_30_equiv] engine_0: 2 : 0 8 12                                                              5    15      0.00 sec  T/O =  0  PRV =  0
+SBY 19:48:55 [mutant_30_equiv] engine_0: 3 : 0 5 6 6 ~1                                                           2    15      0.01 sec  T/O =  0  PRV =  0
+SBY 19:48:55 [mutant_30_equiv] engine_0: 4 : 0 7 13 30 24 ~1                                                     16    28      0.01 sec  T/O =  0  PRV =  0
+SBY 19:48:55 [mutant_30_equiv] engine_0: 4 : 0 7 13 54 62 ~1                                                      5    64      0.03 sec  T/O =  0  PRV =  0
+SBY 19:48:55 [mutant_30_equiv] engine_0: 4 : 0 7 13 75 101 ~1                                                     5    71      0.05 sec  T/O =  0  PRV =  0
+SBY 19:48:55 [mutant_30_equiv] engine_0: 5 : 0 6 11 28 105 9 ~1                                                   2    71      0.05 sec  T/O =  0  PRV =  0
+SBY 19:48:55 [mutant_30_equiv] engine_0: 6 : 0 6 11 28 105 46 25 ~1                                              14    75      0.08 sec  T/O =  0  PRV =  0
+SBY 19:48:55 [mutant_30_equiv] engine_0: 6 : 0 6 11 28 108 68 64 ~1                                               9    81      0.09 sec  T/O =  0  PRV =  0
+SBY 19:48:55 [mutant_30_equiv] engine_0: 6 : 0 6 11 28 111 91 102 ~1                                              9    83      0.11 sec  T/O =  0  PRV =  0
+SBY 19:48:55 [mutant_30_equiv] engine_0: 6 : 0 6 11 28 115 113 137 ~1                                             9    83      0.12 sec  T/O =  0  PRV =  0
+SBY 19:48:55 [mutant_30_equiv] engine_0: 6 : 0 6 11 28 120 136 172 ~1                                             9    87      0.14 sec  T/O =  0  PRV =  0
+SBY 19:48:55 [mutant_30_equiv] engine_0: 6 : 0 6 11 28 124 160 207 ~1                                             9    95      0.16 sec  T/O =  0  PRV =  0
+SBY 19:48:55 [mutant_30_equiv] engine_0: 6 : 0 6 11 28 128 185 243 ~1                                             9   103      0.19 sec  T/O =  0  PRV =  0
+SBY 19:48:56 [mutant_30_equiv] engine_0: 6 : 0 6 11 28 132 208 271 ~1                                             9   103      0.22 sec  T/O =  0  PRV =  0
+SBY 19:48:56 [mutant_30_equiv] engine_0: Timing out on output 0 in frame 6 (retrying in next anytime pass).
+SBY 19:48:56 [mutant_30_equiv] engine_0: 6 : 0 6 11 28 132 208 272 ~1                                             7   103      0.22 sec  T/O =  1  PRV =  0
+SBY 19:48:56 [mutant_30_equiv] engine_0: Block =   12  Oblig =  1135  Clause =   703  Call =  6802 (sat=64.2%)  Cex =   0  Start =  21
+SBY 19:48:56 [mutant_30_equiv] engine_0: SAT solving =     0.17 sec ( 76.86 %)
+SBY 19:48:56 [mutant_30_equiv] engine_0: unsat     =     0.03 sec ( 12.30 %)
+SBY 19:48:56 [mutant_30_equiv] engine_0: sat       =     0.14 sec ( 64.56 %)
+SBY 19:48:56 [mutant_30_equiv] engine_0: Generalize  =     0.15 sec ( 68.69 %)
+SBY 19:48:56 [mutant_30_equiv] engine_0: Push clause =     0.01 sec (  4.86 %)
+SBY 19:48:56 [mutant_30_equiv] engine_0: Ternary sim =     0.01 sec (  2.23 %)
+SBY 19:48:56 [mutant_30_equiv] engine_0: Containment =     0.00 sec (  0.24 %)
+SBY 19:48:56 [mutant_30_equiv] engine_0: CNF compute =     0.00 sec (  2.05 %)
+SBY 19:48:56 [mutant_30_equiv] engine_0: Refinement  =     0.00 sec (  0.02 %)
+SBY 19:48:56 [mutant_30_equiv] engine_0: TOTAL       =     0.22 sec (100.00 %)
+SBY 19:48:56 [mutant_30_equiv] engine_0: Output 2 of miter "model/design_aiger" was asserted in frame 6.  Time =     0.24 sec
+SBY 19:48:56 [mutant_30_equiv] engine_0: finished (returncode=0)
+SBY 19:48:56 [mutant_30_equiv] engine_0: Status returned by engine: FAIL
+SBY 19:48:56 [mutant_30_equiv] smt2: starting process "cd mutant_30_equiv/model; yosys -ql design_smt2.log design_smt2.ys"
+SBY 19:48:56 [mutant_30_equiv] engine_0: starting process "cd mutant_30_equiv; yosys-witness aiw2yw engine_0/trace.aiw model/design_aiger.ywa engine_0/trace_aiw.yw"
+SBY 19:48:56 [mutant_30_equiv] smt2: finished (returncode=0)
+SBY 19:48:56 [mutant_30_equiv] engine_0: Converting AIGER witness trace 'engine_0/trace.aiw' to Yosys witness trace 'engine_0/trace_aiw.yw'...
+SBY 19:48:56 [mutant_30_equiv] engine_0: Using Yosys witness AIGER map file 'model/design_aiger.ywa'
+SBY 19:48:56 [mutant_30_equiv] engine_0: Converted 7 time steps.
+SBY 19:48:56 [mutant_30_equiv] engine_0: finished (returncode=0)
+SBY 19:48:56 [mutant_30_equiv] engine_0: starting process "cd mutant_30_equiv; yosys-smtbmc -s yices --noprogress --append 0 --dump-vcd engine_0/trace.vcd --dump-yw engine_0/trace.yw --dump-vlogtb engine_0/trace_tb.v --dump-smtc engine_0/trace.smtc --yw engine_0/trace_aiw.yw model/design_smt2.smt2"
+SBY 19:48:56 [mutant_30_equiv] engine_0: ##   0:00:00  Solver: yices
+SBY 19:48:56 [mutant_30_equiv] engine_0: ##   0:00:00  Skipping step 0..
+SBY 19:48:56 [mutant_30_equiv] engine_0: ##   0:00:00  Skipping step 1..
+SBY 19:48:56 [mutant_30_equiv] engine_0: ##   0:00:00  Skipping step 2..
+SBY 19:48:56 [mutant_30_equiv] engine_0: ##   0:00:00  Skipping step 3..
+SBY 19:48:56 [mutant_30_equiv] engine_0: ##   0:00:00  Skipping step 4..
+SBY 19:48:56 [mutant_30_equiv] engine_0: ##   0:00:00  Skipping step 5..
+SBY 19:48:56 [mutant_30_equiv] engine_0: ##   0:00:00  Checking assertions in step 6..
+SBY 19:48:56 [mutant_30_equiv] engine_0: ##   0:00:00  BMC failed!
+SBY 19:48:56 [mutant_30_equiv] engine_0: ##   0:00:00  Assert failed in ct_miter: eq_full
+SBY 19:48:56 [mutant_30_equiv] engine_0: ##   0:00:00  Writing trace to VCD file: engine_0/trace.vcd
+SBY 19:48:56 [mutant_30_equiv] engine_0: ##   0:00:00  Writing trace to Verilog testbench: engine_0/trace_tb.v
+SBY 19:48:56 [mutant_30_equiv] engine_0: ##   0:00:00  Writing trace to constraints file: engine_0/trace.smtc
+SBY 19:48:56 [mutant_30_equiv] engine_0: ##   0:00:00  Writing trace to Yosys witness file: engine_0/trace.yw
+SBY 19:48:56 [mutant_30_equiv] engine_0: ##   0:00:00  Status: FAILED
+SBY 19:48:56 [mutant_30_equiv] engine_0: finished (returncode=1)
+SBY 19:48:56 [mutant_30_equiv] summary: Elapsed clock time [H:MM:SS (secs)]: 0:00:00 (0)
+SBY 19:48:56 [mutant_30_equiv] summary: Elapsed process time [H:MM:SS (secs)]: 0:00:00 (0)
+SBY 19:48:56 [mutant_30_equiv] summary: engine_0 (abc pdr) returned FAIL
+SBY 19:48:56 [mutant_30_equiv] summary: counterexample trace: mutant_30_equiv/engine_0/trace.vcd
+SBY 19:48:56 [mutant_30_equiv] summary:   failed assertion ct_miter.eq_full at miter.sv:24.23-24.57 step 6
+SBY 19:48:56 [mutant_30_equiv] DONE (FAIL, rc=2)

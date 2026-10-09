@@ -1,0 +1,41 @@
+SBY 19:45:48 [golden_cover_p0] Removing directory '/tmp/work/checks/golden_cover_p0'.
+SBY 19:45:48 [golden_cover_p0] Copy '/tmp/work/checks/golden.v' to '/tmp/work/checks/golden_cover_p0/src/golden.v'.
+SBY 19:45:48 [golden_cover_p0] Copy '/tmp/work/checks/props.sv' to '/tmp/work/checks/golden_cover_p0/src/props.sv'.
+SBY 19:45:48 [golden_cover_p0] engine_0: smtbmc yices
+SBY 19:45:48 [golden_cover_p0] base: starting process "cd golden_cover_p0/src; yosys -ql ../model/design.log ../model/design.ys"
+SBY 19:45:48 [golden_cover_p0] base: finished (returncode=0)
+SBY 19:45:48 [golden_cover_p0] prep: starting process "cd golden_cover_p0/model; yosys -ql design_prep.log design_prep.ys"
+SBY 19:45:48 [golden_cover_p0] prep: finished (returncode=0)
+SBY 19:45:48 [golden_cover_p0] smt2: starting process "cd golden_cover_p0/model; yosys -ql design_smt2.log design_smt2.ys"
+SBY 19:45:48 [golden_cover_p0] smt2: finished (returncode=0)
+SBY 19:45:48 [golden_cover_p0] engine_0: starting process "cd golden_cover_p0; yosys-smtbmc -s yices --presat --unroll -c --noprogress -t 20  --append 0 --dump-vcd engine_0/trace%.vcd --dump-yw engine_0/trace%.yw --dump-vlogtb engine_0/trace%_tb.v --dump-smtc engine_0/trace%.smtc model/design_smt2.smt2"
+SBY 19:45:48 [golden_cover_p0] engine_0: ##   0:00:00  Solver: yices
+SBY 19:45:48 [golden_cover_p0] engine_0: ##   0:00:00  Checking cover reachability in step 0..
+SBY 19:45:48 [golden_cover_p0] engine_0: ##   0:00:00  Checking cover reachability in step 1..
+SBY 19:45:48 [golden_cover_p0] engine_0: ##   0:00:00  Checking cover reachability in step 2..
+SBY 19:45:48 [golden_cover_p0] engine_0: ##   0:00:00  Reached cover statement in step 2 at ct_props_top: r_empty_matches
+SBY 19:45:48 [golden_cover_p0] engine_0: ##   0:00:00  Reached cover statement in step 2 at ct_props_top: r_full_matches
+SBY 19:45:48 [golden_cover_p0] engine_0: ##   0:00:00  Writing trace to VCD file: engine_0/trace0.vcd
+SBY 19:45:48 [golden_cover_p0] engine_0: ##   0:00:00  Writing trace to Verilog testbench: engine_0/trace0_tb.v
+SBY 19:45:48 [golden_cover_p0] engine_0: ##   0:00:00  Writing trace to constraints file: engine_0/trace0.smtc
+SBY 19:45:48 [golden_cover_p0] engine_0: ##   0:00:00  Writing trace to Yosys witness file: engine_0/trace0.yw
+SBY 19:45:48 [golden_cover_p0] engine_0: ##   0:00:00  Checking cover reachability in step 2..
+SBY 19:45:48 [golden_cover_p0] engine_0: ##   0:00:00  Checking cover reachability in step 3..
+SBY 19:45:48 [golden_cover_p0] engine_0: ##   0:00:00  Checking cover reachability in step 4..
+SBY 19:45:48 [golden_cover_p0] engine_0: ##   0:00:00  Reached cover statement in step 4 at ct_props_top: r_dout_after_read
+SBY 19:45:48 [golden_cover_p0] engine_0: ##   0:00:00  Writing trace to VCD file: engine_0/trace1.vcd
+SBY 19:45:48 [golden_cover_p0] engine_0: ##   0:00:00  Writing trace to Verilog testbench: engine_0/trace1_tb.v
+SBY 19:45:48 [golden_cover_p0] engine_0: ##   0:00:00  Writing trace to constraints file: engine_0/trace1.smtc
+SBY 19:45:48 [golden_cover_p0] engine_0: ##   0:00:00  Writing trace to Yosys witness file: engine_0/trace1.yw
+SBY 19:45:48 [golden_cover_p0] engine_0: ##   0:00:00  Status: passed
+SBY 19:45:48 [golden_cover_p0] engine_0: finished (returncode=0)
+SBY 19:45:48 [golden_cover_p0] engine_0: Status returned by engine: pass
+SBY 19:45:48 [golden_cover_p0] summary: Elapsed clock time [H:MM:SS (secs)]: 0:00:00 (0)
+SBY 19:45:48 [golden_cover_p0] summary: Elapsed process time [H:MM:SS (secs)]: 0:00:00 (0)
+SBY 19:45:48 [golden_cover_p0] summary: engine_0 (smtbmc yices) returned pass
+SBY 19:45:48 [golden_cover_p0] summary: cover trace: golden_cover_p0/engine_0/trace0.vcd
+SBY 19:45:48 [golden_cover_p0] summary:   reached cover statement ct_props_top.r_empty_matches at props.sv:42.13-42.39 step 2
+SBY 19:45:48 [golden_cover_p0] summary:   reached cover statement ct_props_top.r_full_matches at props.sv:40.13-40.38 step 2
+SBY 19:45:48 [golden_cover_p0] summary: cover trace: golden_cover_p0/engine_0/trace1.vcd
+SBY 19:45:48 [golden_cover_p0] summary:   reached cover statement ct_props_top.r_dout_after_read at props.sv:44.13-44.48 step 4
+SBY 19:45:48 [golden_cover_p0] DONE (PASS, rc=0)

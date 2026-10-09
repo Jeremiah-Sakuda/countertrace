@@ -241,7 +241,8 @@
   "demonstration": {
    "hunt_run_id": "rec-20261009-131125-ver-1d5579",
    "repair_run_id": "rec-20261009-131239-ver-23bb9f"
-  }
+  },
+  "review_note": "After this recording, a separate depth-two mutation audit blocked these properties: an equivalent variant violated an output-retention assertion. The catalog wording was aligned with the existing contract and a new generation was run. The original primary-setting result below is preserved; it must not be read as passing that later audit."
  },
  "started_at": "2026-10-09T17:08:47Z",
  "image": {

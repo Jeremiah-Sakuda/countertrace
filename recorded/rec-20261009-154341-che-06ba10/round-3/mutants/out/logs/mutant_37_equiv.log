@@ -1,0 +1,79 @@
+SBY 19:47:10 [mutant_37_equiv] Removing directory '/tmp/work/checks/mutant_37_equiv'.
+SBY 19:47:10 [mutant_37_equiv] Copy '/tmp/work/checks/golden.v' to '/tmp/work/checks/mutant_37_equiv/src/golden.v'.
+SBY 19:47:10 [mutant_37_equiv] Copy '/tmp/work/checks/all_mut.v' to '/tmp/work/checks/mutant_37_equiv/src/all_mut.v'.
+SBY 19:47:10 [mutant_37_equiv] Copy '/tmp/work/checks/mutant.sv' to '/tmp/work/checks/mutant_37_equiv/src/mutant.sv'.
+SBY 19:47:10 [mutant_37_equiv] Copy '/tmp/work/checks/miter.sv' to '/tmp/work/checks/mutant_37_equiv/src/miter.sv'.
+SBY 19:47:10 [mutant_37_equiv] engine_0: abc pdr
+SBY 19:47:10 [mutant_37_equiv] base: starting process "cd mutant_37_equiv/src; yosys -ql ../model/design.log ../model/design.ys"
+SBY 19:47:10 [mutant_37_equiv] base: Warning: Encountered `parallel_case' comment! Such legacy hot comments are supported by Yosys, but are not part of any formal language specification. Using the Verilog `parallel_case' attribute or the SystemVerilog `unique' or `priority' keywords is recommended!
+SBY 19:47:10 [mutant_37_equiv] base: finished (returncode=0)
+SBY 19:47:10 [mutant_37_equiv] prep: starting process "cd mutant_37_equiv/model; yosys -ql design_prep.log design_prep.ys"
+SBY 19:47:10 [mutant_37_equiv] prep: finished (returncode=0)
+SBY 19:47:10 [mutant_37_equiv] aig: starting process "cd mutant_37_equiv/model; yosys -ql design_aiger.log design_aiger.ys"
+SBY 19:47:10 [mutant_37_equiv] aig: Warning: Treating undriven bit ct_miter.\clk like $anyseq.
+SBY 19:47:10 [mutant_37_equiv] aig: Warning: Treating undriven bit ct_miter.\wr_en like $anyseq.
+SBY 19:47:10 [mutant_37_equiv] aig: Warning: Treating undriven bit ct_miter.\rst like $anyseq.
+SBY 19:47:10 [mutant_37_equiv] aig: Warning: Treating undriven bit ct_miter.\rd_en like $anyseq.
+SBY 19:47:10 [mutant_37_equiv] aig: Warning: Treating undriven bit ct_miter.\din [0] like $anyseq.
+SBY 19:47:10 [mutant_37_equiv] aig: Warning: Treating undriven bit ct_miter.\din [1] like $anyseq.
+SBY 19:47:10 [mutant_37_equiv] aig: Warning: Treating undriven bit ct_miter.\din [2] like $anyseq.
+SBY 19:47:10 [mutant_37_equiv] aig: Warning: Treating undriven bit ct_miter.\din [3] like $anyseq.
+SBY 19:47:10 [mutant_37_equiv] aig: Warning: Treating undriven bit ct_miter.\din [4] like $anyseq.
+SBY 19:47:10 [mutant_37_equiv] aig: Warning: Treating undriven bit ct_miter.\din [5] like $anyseq.
+SBY 19:47:10 [mutant_37_equiv] aig: Warning: Treating undriven bit ct_miter.\din [6] like $anyseq.
+SBY 19:47:10 [mutant_37_equiv] aig: Warning: Treating undriven bit ct_miter.\din [7] like $anyseq.
+SBY 19:47:10 [mutant_37_equiv] aig: Warning: Treating a total of 12 undriven bits in ct_miter like $anyseq.
+SBY 19:47:10 [mutant_37_equiv] aig: finished (returncode=0)
+SBY 19:47:10 [mutant_37_equiv] engine_0: starting process "cd mutant_37_equiv; yosys-abc -c 'read_aiger model/design_aiger.aig; fold; strash; pdr -v -l; write_cex -a engine_0/trace.aiw'"
+SBY 19:47:10 [mutant_37_equiv] engine_0: ======== ABC command line "read_aiger model/design_aiger.aig; fold; strash; pdr -v -l; write_cex -a engine_0/trace.aiw"
+SBY 19:47:10 [mutant_37_equiv] engine_0: Warning: The last 2 outputs are interpreted as constraints.
+SBY 19:47:10 [mutant_37_equiv] engine_0: VarMax = 300. FrameMax = 10000. QueMax = 0. TimeMax = 159. MonoCNF = no. SkipGen = no. SolveAll = no.
+SBY 19:47:10 [mutant_37_equiv] engine_0: Frame Clauses                                                     Max Queue Flops Time
+SBY 19:47:10 [mutant_37_equiv] engine_0: 1 : 0 2                                                                 1     2      0.01 sec  T/O =  0  PRV =  0
+SBY 19:47:10 [mutant_37_equiv] engine_0: 2 : 0 8 12                                                              5    15      0.02 sec  T/O =  0  PRV =  0
+SBY 19:47:10 [mutant_37_equiv] engine_0: 3 : 0 5 7 7 ~1                                                           2    15      0.03 sec  T/O =  0  PRV =  0
+SBY 19:47:10 [mutant_37_equiv] engine_0: 4 : 0 7 10 11 2 ~1                                                      11    23      0.04 sec  T/O =  0  PRV =  0
+SBY 19:47:10 [mutant_37_equiv] engine_0: Block =    7  Oblig =    74  Clause =    37  Call =   235 (sat=64.7%)  Cex =   0  Start =   0
+SBY 19:47:10 [mutant_37_equiv] engine_0: SAT solving =     0.00 sec (  4.78 %)
+SBY 19:47:10 [mutant_37_equiv] engine_0: unsat     =     0.00 sec (  0.39 %)
+SBY 19:47:10 [mutant_37_equiv] engine_0: sat       =     0.00 sec (  4.39 %)
+SBY 19:47:10 [mutant_37_equiv] engine_0: Generalize  =     0.00 sec (  4.00 %)
+SBY 19:47:10 [mutant_37_equiv] engine_0: Push clause =     0.00 sec (  0.88 %)
+SBY 19:47:10 [mutant_37_equiv] engine_0: Ternary sim =     0.00 sec (  0.67 %)
+SBY 19:47:10 [mutant_37_equiv] engine_0: Containment =     0.00 sec (  0.02 %)
+SBY 19:47:10 [mutant_37_equiv] engine_0: CNF compute =     0.00 sec (  0.50 %)
+SBY 19:47:10 [mutant_37_equiv] engine_0: Refinement  =     0.00 sec (  0.07 %)
+SBY 19:47:10 [mutant_37_equiv] engine_0: TOTAL       =     0.05 sec (100.00 %)
+SBY 19:47:10 [mutant_37_equiv] engine_0: Output 0 of miter "model/design_aiger" was asserted in frame 6.  Time =     0.05 sec
+SBY 19:47:10 [mutant_37_equiv] engine_0: finished (returncode=0)
+SBY 19:47:10 [mutant_37_equiv] engine_0: Status returned by engine: FAIL
+SBY 19:47:10 [mutant_37_equiv] smt2: starting process "cd mutant_37_equiv/model; yosys -ql design_smt2.log design_smt2.ys"
+SBY 19:47:10 [mutant_37_equiv] engine_0: starting process "cd mutant_37_equiv; yosys-witness aiw2yw engine_0/trace.aiw model/design_aiger.ywa engine_0/trace_aiw.yw"
+SBY 19:47:10 [mutant_37_equiv] smt2: finished (returncode=0)
+SBY 19:47:10 [mutant_37_equiv] engine_0: Converting AIGER witness trace 'engine_0/trace.aiw' to Yosys witness trace 'engine_0/trace_aiw.yw'...
+SBY 19:47:10 [mutant_37_equiv] engine_0: Using Yosys witness AIGER map file 'model/design_aiger.ywa'
+SBY 19:47:10 [mutant_37_equiv] engine_0: Converted 7 time steps.
+SBY 19:47:10 [mutant_37_equiv] engine_0: finished (returncode=0)
+SBY 19:47:10 [mutant_37_equiv] engine_0: starting process "cd mutant_37_equiv; yosys-smtbmc -s yices --noprogress --append 0 --dump-vcd engine_0/trace.vcd --dump-yw engine_0/trace.yw --dump-vlogtb engine_0/trace_tb.v --dump-smtc engine_0/trace.smtc --yw engine_0/trace_aiw.yw model/design_smt2.smt2"
+SBY 19:47:10 [mutant_37_equiv] engine_0: ##   0:00:00  Solver: yices
+SBY 19:47:10 [mutant_37_equiv] engine_0: ##   0:00:00  Skipping step 0..
+SBY 19:47:10 [mutant_37_equiv] engine_0: ##   0:00:00  Skipping step 1..
+SBY 19:47:10 [mutant_37_equiv] engine_0: ##   0:00:00  Skipping step 2..
+SBY 19:47:10 [mutant_37_equiv] engine_0: ##   0:00:00  Skipping step 3..
+SBY 19:47:10 [mutant_37_equiv] engine_0: ##   0:00:00  Skipping step 4..
+SBY 19:47:10 [mutant_37_equiv] engine_0: ##   0:00:00  Skipping step 5..
+SBY 19:47:10 [mutant_37_equiv] engine_0: ##   0:00:00  Checking assertions in step 6..
+SBY 19:47:10 [mutant_37_equiv] engine_0: ##   0:00:00  BMC failed!
+SBY 19:47:10 [mutant_37_equiv] engine_0: ##   0:00:00  Assert failed in ct_miter: eq_dout
+SBY 19:47:10 [mutant_37_equiv] engine_0: ##   0:00:00  Writing trace to VCD file: engine_0/trace.vcd
+SBY 19:47:10 [mutant_37_equiv] engine_0: ##   0:00:00  Writing trace to Verilog testbench: engine_0/trace_tb.v
+SBY 19:47:10 [mutant_37_equiv] engine_0: ##   0:00:00  Writing trace to constraints file: engine_0/trace.smtc
+SBY 19:47:10 [mutant_37_equiv] engine_0: ##   0:00:00  Writing trace to Yosys witness file: engine_0/trace.yw
+SBY 19:47:11 [mutant_37_equiv] engine_0: ##   0:00:00  Status: FAILED
+SBY 19:47:11 [mutant_37_equiv] engine_0: finished (returncode=1)
+SBY 19:47:11 [mutant_37_equiv] summary: Elapsed clock time [H:MM:SS (secs)]: 0:00:00 (0)
+SBY 19:47:11 [mutant_37_equiv] summary: Elapsed process time [H:MM:SS (secs)]: 0:00:00 (0)
+SBY 19:47:11 [mutant_37_equiv] summary: engine_0 (abc pdr) returned FAIL
+SBY 19:47:11 [mutant_37_equiv] summary: counterexample trace: mutant_37_equiv/engine_0/trace.vcd
+SBY 19:47:11 [mutant_37_equiv] summary:   failed assertion ct_miter.eq_dout at miter.sv:23.51-23.85 step 6
+SBY 19:47:11 [mutant_37_equiv] DONE (FAIL, rc=2)

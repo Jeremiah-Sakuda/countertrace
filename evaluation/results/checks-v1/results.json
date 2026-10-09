@@ -1,0 +1,2161 @@
+{
+  "freeze_sha256": "b4e57bdb3faed223a9474921ec2c3860135a3322242afb00fd3290c60c6e32aa",
+  "execution_commit": "db13724c788535125b0cd1c0e293abd4998bad99",
+  "started_at": "2026-10-09T19:31:59Z",
+  "attempts": [
+    {
+      "module": "debouncer",
+      "repeat": 1,
+      "run_id": "20261009-153159-che-312266",
+      "started_at": "2026-10-09T19:31:59Z",
+      "finished_at": "2026-10-09T19:32:48Z",
+      "outcome": "promoted",
+      "state": "complete",
+      "error": null,
+      "checks": {
+        "status": "promoted",
+        "rounds": [
+          {
+            "index": 0,
+            "calls": [
+              {
+                "task": "write_checks",
+                "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+                "at": "2026-10-09T19:31:59Z",
+                "attempts": 1,
+                "thinking": true,
+                "request_id": "7e6ec8152816cce94315e52a842b13fb",
+                "latency_ms": 17544,
+                "prompt_tokens": 658,
+                "completion_tokens": 5880,
+                "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "status": "ok",
+                "finish_reason": "stop"
+              }
+            ],
+            "model_status": "ok",
+            "properties": {
+              "state": [
+                {
+                  "name": "model_clean",
+                  "width": 1,
+                  "next": "rst ? 1'b0 : ((model_count == STABLE-1 && noisy != model_clean) ? noisy : model_clean)"
+                },
+                {
+                  "name": "model_changed",
+                  "width": 1,
+                  "next": "rst ? 1'b0 : ((model_count == STABLE-1 && noisy != model_clean) ? 1'b1 : 1'b0)"
+                },
+                {
+                  "name": "model_count",
+                  "width": 2,
+                  "next": "rst ? 2'b0 : ((noisy == model_clean) ? 2'b0 : model_count + 1)"
+                }
+              ],
+              "defs": [],
+              "memories": [],
+              "writes": [],
+              "properties": [
+                {
+                  "id": "outputs_match",
+                  "when": "1'b1",
+                  "then": "clean == model_clean && changed == model_changed",
+                  "why": "both outputs should follow the debouncing specification"
+                }
+              ]
+            },
+            "gate": {
+              "stage": "golden",
+              "passed": false,
+              "status": "FAIL",
+              "failed": [
+                "outputs_match"
+              ],
+              "config": {
+                "id": "p0",
+                "params": {
+                  "STABLE": 3
+                }
+              }
+            },
+            "feedback": "A reference implementation that meets the specification violates outputs_match at STABLE = 3. Those properties are wrong, not the design. Counterexample (values just before each edge):\nedge | rst | noisy | clean | changed\n0 | 1 | 1 | 0 | 0\n1 | 0 | 1 | 0 | 0\n2 | 0 | 1 | 0 | 0\n3 | 0 | 1 | 0 | 0\n4 | 0 | 0 | 1 | 1\n5 | 0 | 0 | 1 | 0\n6 | 0 | 0 | 1 | 0\n7 | 0 | 0 | 0 | 1\n8 | 1 | 0 | 0 | 0\n9 | 1 | 0 | 0 | 0\nCorrect or remove them and resubmit the whole set.",
+            "frozen": {
+              "schema": "countertrace-promoted-checks-v1",
+              "module": {
+                "id": "debouncer",
+                "title": "Debouncer",
+                "top": "debouncer",
+                "clock": "clk",
+                "reset": "rst",
+                "params": [
+                  {
+                    "STABLE": 3
+                  },
+                  {
+                    "STABLE": 2
+                  }
+                ],
+                "inputs": {
+                  "rst": 1,
+                  "noisy": 1
+                },
+                "outputs": {
+                  "clean": 1,
+                  "changed": 1
+                },
+                "spec": "A debouncer for one input, noisy, with one rising-edge clock clk. clean and changed are registered outputs that change only at rising edges.\nrst is a synchronous active-high reset: at a rising edge with rst high, clean becomes 0, changed becomes 0, and any count in progress is discarded.\nnoisy is sampled at each rising edge. clean changes to the value of noisy at the STABLE-th consecutive edge without reset at which noisy differs from clean. An edge at which noisy equals clean restarts the count, so clean only changes after noisy has held the other value at STABLE consecutive edges.\nchanged is high for exactly the cycle after each edge at which clean changes, and low otherwise.",
+                "split": "heldout"
+              },
+              "properties_hash": "sha256:0fc6c21f020feaaadd4fdf1af0e9b7f311cac2edb4e75905e97c498f4fa5ae31",
+              "checker_hash": "sha256:e548dfbca902f667e566cfbde511d5083a94542edb5c89a72286d8d498ca5d32",
+              "golden_hash": "sha256:a3b1c3f73250c521e002e0cf71aef9a8f907bee340c030664802e21fdd3e0fb7",
+              "harness": {
+                "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+                "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+                "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+              },
+              "verifier_digest": "26a51c6bce5dcf38",
+              "trusted_code": {
+                "bundle.py": "sha256:a29824fd095cbf67c8ab8d2e81522101ceebf67285448a06ff93b950a75092ae",
+                "design.py": "sha256:b31699ceca4534bd7a0033017fd5cef83810a3faf9a9719f667abc957fe86395",
+                "__init__.py": "sha256:b8f3265344eb7ae70d0c1b8687be2390283a0a4d948334c0236f726312f13912",
+                "compile.py": "sha256:ff04ee4c2e1d29afae9fdc04271e231345ebf7a450eefc6825dbaa401b379c67",
+                "gate.py": "sha256:db27e1c32cde7d14d8b82fcb290aabc743a691cfb6f3d084b8da1ee2ea217ae3",
+                "agent.py": "sha256:0cc8c7e7cf6f08acb0b3b9e7f5fa6fcaff6345961e3e5a1a84b436dbc6403c16",
+                "modules.py": "sha256:d0bbeabf053a00261fbd1409ec26abe633320bad3b601bada6e714684c6d6538"
+              },
+              "limits": {
+                "solver_s": 120,
+                "bmc_depth": 20,
+                "cover_depth": 20
+              },
+              "mutants": {
+                "count": 40,
+                "seed": 1
+              },
+              "promotion_threshold": 0.9
+            }
+          },
+          {
+            "index": 1,
+            "calls": [
+              {
+                "task": "write_checks",
+                "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+                "at": "2026-10-09T19:32:21Z",
+                "attempts": 1,
+                "thinking": true,
+                "request_id": "cb47891e7fb360cbd79bdb3bceba758b",
+                "latency_ms": 19117,
+                "prompt_tokens": 1079,
+                "completion_tokens": 6926,
+                "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "status": "ok",
+                "finish_reason": "stop"
+              }
+            ],
+            "model_status": "ok",
+            "properties": {
+              "state": [
+                {
+                  "name": "model_clean",
+                  "width": 1,
+                  "next": "rst ? 1'b0 : ((noisy != model_clean && model_count + 1 == STABLE) ? noisy : model_clean)"
+                },
+                {
+                  "name": "model_changed",
+                  "width": 1,
+                  "next": "rst ? 1'b0 : (noisy != model_clean && model_count + 1 == STABLE)"
+                },
+                {
+                  "name": "model_count",
+                  "width": 2,
+                  "next": "rst ? 2'b0 : (noisy == model_clean ? 2'b0 : (model_count + 1 == STABLE ? 2'b0 : model_count + 1))"
+                }
+              ],
+              "defs": [],
+              "memories": [],
+              "writes": [],
+              "properties": [
+                {
+                  "id": "outputs_match",
+                  "when": "1'b1",
+                  "then": "clean == model_clean && changed == model_changed",
+                  "why": "both outputs should follow the debouncing specification"
+                }
+              ]
+            },
+            "gate": {
+              "stage": "mutants",
+              "passed": true,
+              "total": 40,
+              "killed": 27,
+              "equivalent": 13,
+              "invalid": 0,
+              "unresolved": 0,
+              "nonequivalent": 27,
+              "kill_rate": 1.0,
+              "survived": []
+            },
+            "feedback": null,
+            "frozen": {
+              "schema": "countertrace-promoted-checks-v1",
+              "module": {
+                "id": "debouncer",
+                "title": "Debouncer",
+                "top": "debouncer",
+                "clock": "clk",
+                "reset": "rst",
+                "params": [
+                  {
+                    "STABLE": 3
+                  },
+                  {
+                    "STABLE": 2
+                  }
+                ],
+                "inputs": {
+                  "rst": 1,
+                  "noisy": 1
+                },
+                "outputs": {
+                  "clean": 1,
+                  "changed": 1
+                },
+                "spec": "A debouncer for one input, noisy, with one rising-edge clock clk. clean and changed are registered outputs that change only at rising edges.\nrst is a synchronous active-high reset: at a rising edge with rst high, clean becomes 0, changed becomes 0, and any count in progress is discarded.\nnoisy is sampled at each rising edge. clean changes to the value of noisy at the STABLE-th consecutive edge without reset at which noisy differs from clean. An edge at which noisy equals clean restarts the count, so clean only changes after noisy has held the other value at STABLE consecutive edges.\nchanged is high for exactly the cycle after each edge at which clean changes, and low otherwise.",
+                "split": "heldout"
+              },
+              "properties_hash": "sha256:3a107d05fb1ae8353de9667578b62b652690ba067535ed3b35d32faa47a75e6c",
+              "checker_hash": "sha256:923269c6d9d4fbd60802d607ced4dedf93d984f2947b854cc004c89fa680f2fb",
+              "golden_hash": "sha256:a3b1c3f73250c521e002e0cf71aef9a8f907bee340c030664802e21fdd3e0fb7",
+              "harness": {
+                "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+                "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+                "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+              },
+              "verifier_digest": "26a51c6bce5dcf38",
+              "trusted_code": {
+                "bundle.py": "sha256:a29824fd095cbf67c8ab8d2e81522101ceebf67285448a06ff93b950a75092ae",
+                "design.py": "sha256:b31699ceca4534bd7a0033017fd5cef83810a3faf9a9719f667abc957fe86395",
+                "__init__.py": "sha256:b8f3265344eb7ae70d0c1b8687be2390283a0a4d948334c0236f726312f13912",
+                "compile.py": "sha256:ff04ee4c2e1d29afae9fdc04271e231345ebf7a450eefc6825dbaa401b379c67",
+                "gate.py": "sha256:db27e1c32cde7d14d8b82fcb290aabc743a691cfb6f3d084b8da1ee2ea217ae3",
+                "agent.py": "sha256:0cc8c7e7cf6f08acb0b3b9e7f5fa6fcaff6345961e3e5a1a84b436dbc6403c16",
+                "modules.py": "sha256:d0bbeabf053a00261fbd1409ec26abe633320bad3b601bada6e714684c6d6538"
+              },
+              "limits": {
+                "solver_s": 120,
+                "bmc_depth": 20,
+                "cover_depth": 20
+              },
+              "mutants": {
+                "count": 40,
+                "seed": 1
+              },
+              "promotion_threshold": 0.9
+            }
+          }
+        ],
+        "promoted_round": 1
+      }
+    },
+    {
+      "module": "sat_counter",
+      "repeat": 1,
+      "run_id": "20261009-153248-che-0ab3c2",
+      "started_at": "2026-10-09T19:32:48Z",
+      "finished_at": "2026-10-09T19:33:21Z",
+      "outcome": "promoted",
+      "state": "complete",
+      "error": null,
+      "checks": {
+        "status": "promoted",
+        "rounds": [
+          {
+            "index": 0,
+            "calls": [
+              {
+                "task": "write_checks",
+                "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+                "at": "2026-10-09T19:32:48Z",
+                "attempts": 1,
+                "thinking": true,
+                "request_id": "ead0ed5eb782b8d43ef9a7f247e66eb5",
+                "latency_ms": 13258,
+                "prompt_tokens": 724,
+                "completion_tokens": 4985,
+                "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "status": "ok",
+                "finish_reason": "stop",
+                "schema_error": "defs 'at_max_shadow' needs a width from 1 to 64: an integer or a parameter name such as WIDTH"
+              },
+              {
+                "task": "write_checks",
+                "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+                "at": "2026-10-09T19:33:02Z",
+                "attempts": 1,
+                "thinking": true,
+                "request_id": "51c545610cebfcfcd8ea3ae185f27404",
+                "latency_ms": 9482,
+                "prompt_tokens": 776,
+                "completion_tokens": 3464,
+                "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "status": "ok",
+                "finish_reason": "stop"
+              }
+            ],
+            "model_status": "ok",
+            "properties": {
+              "state": [
+                {
+                  "name": "count_reg",
+                  "width": "WIDTH",
+                  "next": "next_count"
+                }
+              ],
+              "defs": [
+                {
+                  "name": "max_val",
+                  "width": "WIDTH",
+                  "expr": "{WIDTH{1'b1}}"
+                },
+                {
+                  "name": "min_val",
+                  "width": "WIDTH",
+                  "expr": "{WIDTH{1'b0}}"
+                },
+                {
+                  "name": "at_max_shadow",
+                  "width": 1,
+                  "expr": "count_reg == max_val"
+                },
+                {
+                  "name": "at_min_shadow",
+                  "width": 1,
+                  "expr": "count_reg == min_val"
+                },
+                {
+                  "name": "next_count",
+                  "width": "WIDTH",
+                  "expr": "rst ? min_val : (load ? load_value : (inc && !dec ? (at_max_shadow ? count_reg : count_reg + 1) : (dec && !inc ? (at_min_shadow ? count_reg : count_reg - 1) : count_reg)))"
+                }
+              ],
+              "memories": [],
+              "writes": [],
+              "properties": [
+                {
+                  "id": "at_max_correct",
+                  "when": "1",
+                  "then": "at_max == at_max_shadow",
+                  "why": "at_max should be high exactly when count is at maximum"
+                },
+                {
+                  "id": "at_min_correct",
+                  "when": "1",
+                  "then": "at_min == at_min_shadow",
+                  "why": "at_min should be high exactly when count is at minimum"
+                },
+                {
+                  "id": "count_updates_correctly",
+                  "when": "1",
+                  "then": "count_reg == $past(next_count)",
+                  "why": "count register should update according to specification at each rising edge"
+                }
+              ]
+            },
+            "gate": {
+              "stage": "mutants",
+              "passed": true,
+              "total": 38,
+              "killed": 35,
+              "equivalent": 3,
+              "invalid": 0,
+              "unresolved": 0,
+              "nonequivalent": 35,
+              "kill_rate": 1.0,
+              "survived": []
+            },
+            "feedback": null,
+            "frozen": {
+              "schema": "countertrace-promoted-checks-v1",
+              "module": {
+                "id": "sat_counter",
+                "title": "Saturating up/down counter",
+                "top": "sat_counter",
+                "clock": "clk",
+                "reset": "rst",
+                "params": [
+                  {
+                    "WIDTH": 4
+                  },
+                  {
+                    "WIDTH": 3
+                  }
+                ],
+                "inputs": {
+                  "rst": 1,
+                  "inc": 1,
+                  "dec": 1,
+                  "load": 1,
+                  "load_value": "WIDTH"
+                },
+                "outputs": {
+                  "count": "WIDTH",
+                  "at_max": 1,
+                  "at_min": 1
+                },
+                "spec": "A WIDTH-bit unsigned up/down counter with load, with one rising-edge clock clk. count is a registered output.\nrst is a synchronous active-high reset: at a rising edge with rst high, count becomes 0.\nAt each rising edge without reset: if load is high, count becomes load_value, whatever inc and dec are. Otherwise, if inc is high and dec is low, count increases by one unless it is already at its maximum value (all ones), where it stays. If dec is high and inc is low, count decreases by one unless it is already 0, where it stays. If inc and dec are both high or both low, count does not change.\nat_max is high exactly when count is at its maximum value; at_min is high exactly when count is 0. Both follow count within the same cycle.",
+                "split": "heldout"
+              },
+              "properties_hash": "sha256:094564a29103cd3ef4958c4568b9f9d0c89b25bbc967c76cf17221a63f6b9ed1",
+              "checker_hash": "sha256:3df500438e105b5e743266b1d37fc8bf97072d75ffbb0bcbfd44dd64e3fa8204",
+              "golden_hash": "sha256:d63be612ad4f3958bad3cac872b03c70eb6470221298535f13ad2868e0bb2ab9",
+              "harness": {
+                "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+                "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+                "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+              },
+              "verifier_digest": "26a51c6bce5dcf38",
+              "trusted_code": {
+                "bundle.py": "sha256:a29824fd095cbf67c8ab8d2e81522101ceebf67285448a06ff93b950a75092ae",
+                "design.py": "sha256:b31699ceca4534bd7a0033017fd5cef83810a3faf9a9719f667abc957fe86395",
+                "__init__.py": "sha256:b8f3265344eb7ae70d0c1b8687be2390283a0a4d948334c0236f726312f13912",
+                "compile.py": "sha256:ff04ee4c2e1d29afae9fdc04271e231345ebf7a450eefc6825dbaa401b379c67",
+                "gate.py": "sha256:db27e1c32cde7d14d8b82fcb290aabc743a691cfb6f3d084b8da1ee2ea217ae3",
+                "agent.py": "sha256:0cc8c7e7cf6f08acb0b3b9e7f5fa6fcaff6345961e3e5a1a84b436dbc6403c16",
+                "modules.py": "sha256:d0bbeabf053a00261fbd1409ec26abe633320bad3b601bada6e714684c6d6538"
+              },
+              "limits": {
+                "solver_s": 120,
+                "bmc_depth": 20,
+                "cover_depth": 20
+              },
+              "mutants": {
+                "count": 40,
+                "seed": 1
+              },
+              "promotion_threshold": 0.9
+            }
+          }
+        ],
+        "promoted_round": 0
+      }
+    },
+    {
+      "module": "seq_detector",
+      "repeat": 1,
+      "run_id": "20261009-153321-che-fc43eb",
+      "started_at": "2026-10-09T19:33:21Z",
+      "finished_at": "2026-10-09T19:33:58Z",
+      "outcome": "promoted",
+      "state": "complete",
+      "error": null,
+      "checks": {
+        "status": "promoted",
+        "rounds": [
+          {
+            "index": 0,
+            "calls": [
+              {
+                "task": "write_checks",
+                "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+                "at": "2026-10-09T19:33:21Z",
+                "attempts": 1,
+                "thinking": true,
+                "request_id": "39cf9000be808b5e6c10b38803ce0113",
+                "latency_ms": 28915,
+                "prompt_tokens": 668,
+                "completion_tokens": 9488,
+                "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "status": "ok",
+                "finish_reason": "stop"
+              }
+            ],
+            "model_status": "ok",
+            "properties": {
+              "state": [
+                {
+                  "name": "shadow_shift",
+                  "width": 4,
+                  "next": "rst ? 4'd0 : {shadow_shift[2:0], bit_in}"
+                },
+                {
+                  "name": "shadow_count",
+                  "width": 3,
+                  "next": "rst ? 3'd0 : (shadow_count == 3'd4 ? 3'd4 : shadow_count + 1)"
+                },
+                {
+                  "name": "shadow_match",
+                  "width": 1,
+                  "next": "rst ? 1'b0 : pattern_matched"
+                },
+                {
+                  "name": "has_reset",
+                  "width": 1,
+                  "next": "has_reset | rst"
+                }
+              ],
+              "defs": [
+                {
+                  "name": "four_bits_ready",
+                  "width": 1,
+                  "expr": "shadow_count >= 3'd3"
+                },
+                {
+                  "name": "current_pattern",
+                  "width": 4,
+                  "expr": "{shadow_shift[2:0], bit_in}"
+                },
+                {
+                  "name": "pattern_matched",
+                  "width": 1,
+                  "expr": "four_bits_ready && (current_pattern == PATTERN)"
+                }
+              ],
+              "memories": [],
+              "writes": [],
+              "properties": [
+                {
+                  "id": "match_correct_after_reset",
+                  "when": "has_reset",
+                  "then": "match == shadow_match",
+                  "why": "after a reset has occurred, the match output must follow the specification for all input sequences"
+                }
+              ]
+            },
+            "gate": {
+              "stage": "mutants",
+              "passed": true,
+              "total": 40,
+              "killed": 23,
+              "equivalent": 17,
+              "invalid": 0,
+              "unresolved": 0,
+              "nonequivalent": 23,
+              "kill_rate": 1.0,
+              "survived": []
+            },
+            "feedback": null,
+            "frozen": {
+              "schema": "countertrace-promoted-checks-v1",
+              "module": {
+                "id": "seq_detector",
+                "title": "Pattern detector",
+                "top": "seq_detector",
+                "clock": "clk",
+                "reset": "rst",
+                "params": [
+                  {
+                    "PATTERN": 11
+                  },
+                  {
+                    "PATTERN": 9
+                  }
+                ],
+                "inputs": {
+                  "rst": 1,
+                  "bit_in": 1
+                },
+                "outputs": {
+                  "match": 1
+                },
+                "spec": "A detector for a 4-bit pattern in a serial bit stream, with one rising-edge clock clk. PATTERN is a 4-bit value (for example 11 is binary 1011); its most significant bit is the oldest of the four bits. match is a registered output that changes only at rising edges.\nrst is a synchronous active-high reset: at a rising edge with rst high, match becomes 0 and all previously sampled bits are forgotten.\nbit_in is sampled at each rising edge without reset. match is high for the cycle after an edge exactly when the four most recently sampled bits since reset, oldest first and including the one sampled at that edge, equal PATTERN. Occurrences may overlap, and no match is possible until four bits have been sampled since reset.",
+                "split": "heldout"
+              },
+              "properties_hash": "sha256:668f9d3e6db29bc391346ea73a5a6c8c1350fae52a94c67ecc9649dec6ede972",
+              "checker_hash": "sha256:d1512e5d4b285ea5e994a5861592e6403cef87673ac1cc7a13c52ab30f4feabd",
+              "golden_hash": "sha256:7f4c41d4bdf3fd1651a481b815effa6ed5488702aaf1a9205546b2bd72d93122",
+              "harness": {
+                "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+                "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+                "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+              },
+              "verifier_digest": "26a51c6bce5dcf38",
+              "trusted_code": {
+                "bundle.py": "sha256:a29824fd095cbf67c8ab8d2e81522101ceebf67285448a06ff93b950a75092ae",
+                "design.py": "sha256:b31699ceca4534bd7a0033017fd5cef83810a3faf9a9719f667abc957fe86395",
+                "__init__.py": "sha256:b8f3265344eb7ae70d0c1b8687be2390283a0a4d948334c0236f726312f13912",
+                "compile.py": "sha256:ff04ee4c2e1d29afae9fdc04271e231345ebf7a450eefc6825dbaa401b379c67",
+                "gate.py": "sha256:db27e1c32cde7d14d8b82fcb290aabc743a691cfb6f3d084b8da1ee2ea217ae3",
+                "agent.py": "sha256:0cc8c7e7cf6f08acb0b3b9e7f5fa6fcaff6345961e3e5a1a84b436dbc6403c16",
+                "modules.py": "sha256:d0bbeabf053a00261fbd1409ec26abe633320bad3b601bada6e714684c6d6538"
+              },
+              "limits": {
+                "solver_s": 120,
+                "bmc_depth": 20,
+                "cover_depth": 20
+              },
+              "mutants": {
+                "count": 40,
+                "seed": 1
+              },
+              "promotion_threshold": 0.9
+            }
+          }
+        ],
+        "promoted_round": 0
+      }
+    },
+    {
+      "module": "uart_tx",
+      "repeat": 1,
+      "run_id": "20261009-153358-che-8306f2",
+      "started_at": "2026-10-09T19:33:58Z",
+      "finished_at": "2026-10-09T19:34:47Z",
+      "outcome": "promoted",
+      "state": "complete",
+      "error": null,
+      "checks": {
+        "status": "promoted",
+        "rounds": [
+          {
+            "index": 0,
+            "calls": [
+              {
+                "task": "write_checks",
+                "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+                "at": "2026-10-09T19:33:58Z",
+                "attempts": 1,
+                "thinking": true,
+                "request_id": "d693b6e1abaf2e37de0beaad988800ff",
+                "latency_ms": 36592,
+                "prompt_tokens": 789,
+                "completion_tokens": 12058,
+                "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "status": "ok",
+                "finish_reason": "stop"
+              }
+            ],
+            "model_status": "ok",
+            "properties": {
+              "state": [
+                {
+                  "name": "pending_start",
+                  "width": 1,
+                  "next": "next_pending_start"
+                },
+                {
+                  "name": "in_frame",
+                  "width": 1,
+                  "next": "next_in_frame"
+                },
+                {
+                  "name": "cycle_cnt",
+                  "width": 5,
+                  "next": "next_cycle_cnt"
+                },
+                {
+                  "name": "data_reg",
+                  "width": 8,
+                  "next": "next_data_reg"
+                },
+                {
+                  "name": "model_tx",
+                  "width": 1,
+                  "next": "next_in_frame ? (next_cycle_cnt < CLKS_PER_BIT ? 1'b0 : (next_cycle_cnt < 9*CLKS_PER_BIT ? next_data_reg[(next_cycle_cnt - CLKS_PER_BIT) / CLKS_PER_BIT] : 1'b1)) : 1'b1"
+                },
+                {
+                  "name": "model_busy",
+                  "width": 1,
+                  "next": "next_in_frame"
+                }
+              ],
+              "defs": [
+                {
+                  "name": "next_pending_start",
+                  "width": 1,
+                  "expr": "rst ? 1'b0 : (pending_start ? 1'b0 : (start && !in_frame && !rst ? 1'b1 : 1'b0))"
+                },
+                {
+                  "name": "next_in_frame",
+                  "width": 1,
+                  "expr": "rst ? 1'b0 : (next_pending_start ? 1'b1 : (in_frame ? (cycle_cnt == 10*CLKS_PER_BIT-1 ? 1'b0 : 1'b1) : 1'b0))"
+                },
+                {
+                  "name": "next_cycle_cnt",
+                  "width": 5,
+                  "expr": "rst ? 5'd0 : (next_pending_start ? 5'd0 : (in_frame ? (cycle_cnt == 10*CLKS_PER_BIT-1 ? 5'd0 : cycle_cnt + 1) : 5'd0))"
+                },
+                {
+                  "name": "next_data_reg",
+                  "width": 8,
+                  "expr": "rst ? 8'd0 : (start && !in_frame && !pending_start && !rst ? data : data_reg)"
+                }
+              ],
+              "memories": [],
+              "writes": [],
+              "properties": [
+                {
+                  "id": "tx_matches_model",
+                  "when": "1'b1",
+                  "then": "tx == model_tx",
+                  "why": "tx output must match the specification model"
+                },
+                {
+                  "id": "busy_matches_model",
+                  "when": "1'b1",
+                  "then": "busy == model_busy",
+                  "why": "busy output must match the specification model"
+                }
+              ]
+            },
+            "gate": {
+              "stage": "mutants",
+              "passed": true,
+              "total": 40,
+              "killed": 26,
+              "equivalent": 14,
+              "invalid": 0,
+              "unresolved": 0,
+              "nonequivalent": 26,
+              "kill_rate": 1.0,
+              "survived": []
+            },
+            "feedback": null,
+            "frozen": {
+              "schema": "countertrace-promoted-checks-v1",
+              "module": {
+                "id": "uart_tx",
+                "title": "UART transmitter (8N1)",
+                "top": "uart_tx",
+                "clock": "clk",
+                "reset": "rst",
+                "params": [
+                  {
+                    "CLKS_PER_BIT": 2
+                  },
+                  {
+                    "CLKS_PER_BIT": 1
+                  }
+                ],
+                "inputs": {
+                  "rst": 1,
+                  "start": 1,
+                  "data": 8
+                },
+                "outputs": {
+                  "tx": 1,
+                  "busy": 1
+                },
+                "spec": "A UART transmitter that sends 8-bit words as frames of one start bit, eight data bits, and one stop bit, with one rising-edge clock clk. Each bit lasts CLKS_PER_BIT clock cycles; a cycle is the interval between two consecutive rising edges. tx and busy are registered outputs that change only at rising edges.\nrst is a synchronous active-high reset: at a rising edge with rst high, the transmitter becomes idle: tx becomes 1 and busy becomes 0.\nWhile idle, tx is 1 and busy is 0. At a rising edge without reset where busy is low and start is high, the transmitter accepts data (sampled at that edge) and starts a frame. start is ignored at edges where busy is high.\nDuring a frame, starting right after the accepting edge: tx is 0 for CLKS_PER_BIT cycles (the start bit), then data bit 0, data bit 1, and so on up to data bit 7 for CLKS_PER_BIT cycles each (least significant bit first), then 1 for CLKS_PER_BIT cycles (the stop bit). busy is high for the whole frame, 10 times CLKS_PER_BIT cycles, and goes low together with the end of the stop bit, when the transmitter is idle again.",
+                "split": "heldout"
+              },
+              "properties_hash": "sha256:a0e32b870a8eece86c3af570575a6935e04489859635686a0ff7bc64fb6a822d",
+              "checker_hash": "sha256:1681a978967d4b8cb8669f3d8a597baba9222d459052892d05ac6c66723c8e60",
+              "golden_hash": "sha256:1014d9156239cc72a514fec97087bb60a1df7ffdda8c4296dbacc2a112c18ec1",
+              "harness": {
+                "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+                "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+                "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+              },
+              "verifier_digest": "26a51c6bce5dcf38",
+              "trusted_code": {
+                "bundle.py": "sha256:a29824fd095cbf67c8ab8d2e81522101ceebf67285448a06ff93b950a75092ae",
+                "design.py": "sha256:b31699ceca4534bd7a0033017fd5cef83810a3faf9a9719f667abc957fe86395",
+                "__init__.py": "sha256:b8f3265344eb7ae70d0c1b8687be2390283a0a4d948334c0236f726312f13912",
+                "compile.py": "sha256:ff04ee4c2e1d29afae9fdc04271e231345ebf7a450eefc6825dbaa401b379c67",
+                "gate.py": "sha256:db27e1c32cde7d14d8b82fcb290aabc743a691cfb6f3d084b8da1ee2ea217ae3",
+                "agent.py": "sha256:0cc8c7e7cf6f08acb0b3b9e7f5fa6fcaff6345961e3e5a1a84b436dbc6403c16",
+                "modules.py": "sha256:d0bbeabf053a00261fbd1409ec26abe633320bad3b601bada6e714684c6d6538"
+              },
+              "limits": {
+                "solver_s": 120,
+                "bmc_depth": 32,
+                "cover_depth": 32
+              },
+              "mutants": {
+                "count": 40,
+                "seed": 1
+              },
+              "promotion_threshold": 0.9
+            }
+          }
+        ],
+        "promoted_round": 0
+      }
+    },
+    {
+      "module": "debouncer",
+      "repeat": 2,
+      "run_id": "20261009-153447-che-97b7a9",
+      "started_at": "2026-10-09T19:34:47Z",
+      "finished_at": "2026-10-09T19:35:19Z",
+      "outcome": "promoted",
+      "state": "complete",
+      "error": null,
+      "checks": {
+        "status": "promoted",
+        "rounds": [
+          {
+            "index": 0,
+            "calls": [
+              {
+                "task": "write_checks",
+                "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+                "at": "2026-10-09T19:34:47Z",
+                "attempts": 1,
+                "thinking": true,
+                "request_id": "5b361165526651e509ae48a036b35ba7",
+                "latency_ms": 24516,
+                "prompt_tokens": 658,
+                "completion_tokens": 8284,
+                "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "status": "ok",
+                "finish_reason": "stop"
+              }
+            ],
+            "model_status": "ok",
+            "properties": {
+              "state": [
+                {
+                  "name": "clean_s",
+                  "width": 1,
+                  "next": "rst ? 1'b0 : clean_s_next"
+                },
+                {
+                  "name": "changed_s",
+                  "width": 1,
+                  "next": "rst ? 1'b0 : changed_s_next"
+                },
+                {
+                  "name": "count_s",
+                  "width": 2,
+                  "next": "rst ? 2'b0 : count_s_next"
+                }
+              ],
+              "defs": [
+                {
+                  "name": "reached_stable",
+                  "width": 1,
+                  "expr": "(count_s == STABLE-1) && (noisy ^ clean_s)"
+                },
+                {
+                  "name": "clean_s_next",
+                  "width": 1,
+                  "expr": "reached_stable ? noisy : clean_s"
+                },
+                {
+                  "name": "count_s_next",
+                  "width": 2,
+                  "expr": "reached_stable ? 2'b0 : ((noisy ^ clean_s) ? count_s + 1 : 2'b0)"
+                },
+                {
+                  "name": "changed_s_next",
+                  "width": 1,
+                  "expr": "reached_stable"
+                }
+              ],
+              "memories": [],
+              "writes": [],
+              "properties": [
+                {
+                  "id": "clean_matches",
+                  "when": "1",
+                  "then": "clean == clean_s",
+                  "why": "clean output matches shadow model"
+                },
+                {
+                  "id": "changed_matches",
+                  "when": "1",
+                  "then": "changed == changed_s",
+                  "why": "changed output matches shadow model"
+                }
+              ]
+            },
+            "gate": {
+              "stage": "mutants",
+              "passed": true,
+              "total": 40,
+              "killed": 27,
+              "equivalent": 13,
+              "invalid": 0,
+              "unresolved": 0,
+              "nonequivalent": 27,
+              "kill_rate": 1.0,
+              "survived": []
+            },
+            "feedback": null,
+            "frozen": {
+              "schema": "countertrace-promoted-checks-v1",
+              "module": {
+                "id": "debouncer",
+                "title": "Debouncer",
+                "top": "debouncer",
+                "clock": "clk",
+                "reset": "rst",
+                "params": [
+                  {
+                    "STABLE": 3
+                  },
+                  {
+                    "STABLE": 2
+                  }
+                ],
+                "inputs": {
+                  "rst": 1,
+                  "noisy": 1
+                },
+                "outputs": {
+                  "clean": 1,
+                  "changed": 1
+                },
+                "spec": "A debouncer for one input, noisy, with one rising-edge clock clk. clean and changed are registered outputs that change only at rising edges.\nrst is a synchronous active-high reset: at a rising edge with rst high, clean becomes 0, changed becomes 0, and any count in progress is discarded.\nnoisy is sampled at each rising edge. clean changes to the value of noisy at the STABLE-th consecutive edge without reset at which noisy differs from clean. An edge at which noisy equals clean restarts the count, so clean only changes after noisy has held the other value at STABLE consecutive edges.\nchanged is high for exactly the cycle after each edge at which clean changes, and low otherwise.",
+                "split": "heldout"
+              },
+              "properties_hash": "sha256:40a99b8ad64c870099594e3fb7770da35f1e423c89b09d04b0ee17dcbf47d09d",
+              "checker_hash": "sha256:4c87bf500aa67de46a1607cbd08e9e43ac3fbd2740d506a4867a9d523206b3ed",
+              "golden_hash": "sha256:a3b1c3f73250c521e002e0cf71aef9a8f907bee340c030664802e21fdd3e0fb7",
+              "harness": {
+                "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+                "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+                "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+              },
+              "verifier_digest": "26a51c6bce5dcf38",
+              "trusted_code": {
+                "bundle.py": "sha256:a29824fd095cbf67c8ab8d2e81522101ceebf67285448a06ff93b950a75092ae",
+                "design.py": "sha256:b31699ceca4534bd7a0033017fd5cef83810a3faf9a9719f667abc957fe86395",
+                "__init__.py": "sha256:b8f3265344eb7ae70d0c1b8687be2390283a0a4d948334c0236f726312f13912",
+                "compile.py": "sha256:ff04ee4c2e1d29afae9fdc04271e231345ebf7a450eefc6825dbaa401b379c67",
+                "gate.py": "sha256:db27e1c32cde7d14d8b82fcb290aabc743a691cfb6f3d084b8da1ee2ea217ae3",
+                "agent.py": "sha256:0cc8c7e7cf6f08acb0b3b9e7f5fa6fcaff6345961e3e5a1a84b436dbc6403c16",
+                "modules.py": "sha256:d0bbeabf053a00261fbd1409ec26abe633320bad3b601bada6e714684c6d6538"
+              },
+              "limits": {
+                "solver_s": 120,
+                "bmc_depth": 20,
+                "cover_depth": 20
+              },
+              "mutants": {
+                "count": 40,
+                "seed": 1
+              },
+              "promotion_threshold": 0.9
+            }
+          }
+        ],
+        "promoted_round": 0
+      }
+    },
+    {
+      "module": "sat_counter",
+      "repeat": 2,
+      "run_id": "20261009-153519-che-ff1856",
+      "started_at": "2026-10-09T19:35:19Z",
+      "finished_at": "2026-10-09T19:35:47Z",
+      "outcome": "promoted",
+      "state": "complete",
+      "error": null,
+      "checks": {
+        "status": "promoted",
+        "rounds": [
+          {
+            "index": 0,
+            "calls": [
+              {
+                "task": "write_checks",
+                "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+                "at": "2026-10-09T19:35:19Z",
+                "attempts": 1,
+                "thinking": true,
+                "request_id": "acb638fe3172b9b1553741c3cf26f1ac",
+                "latency_ms": 19147,
+                "prompt_tokens": 724,
+                "completion_tokens": 6974,
+                "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "status": "ok",
+                "finish_reason": "stop"
+              }
+            ],
+            "model_status": "ok",
+            "properties": {
+              "state": [],
+              "defs": [
+                {
+                  "name": "max_value",
+                  "width": "WIDTH",
+                  "expr": "(1 << WIDTH) - 1"
+                }
+              ],
+              "memories": [],
+              "writes": [],
+              "properties": [
+                {
+                  "id": "count_transition",
+                  "when": "1",
+                  "then": "count == ( $past(rst) ? 0 : ( $past(load) ? $past(load_value) : ( $past(inc) && !$past(dec) ? ( $past(count) == max_value ? $past(count) : $past(count) + 1 ) : ( $past(dec) && !$past(inc) ? ( $past(count) == 0 ? $past(count) : $past(count) - 1 ) : $past(count) ) ) ) )",
+                  "why": "count must update according to specification at each rising edge"
+                },
+                {
+                  "id": "at_max_correct",
+                  "when": "1",
+                  "then": "at_max == (count == max_value)",
+                  "why": "at_max must be high exactly when count is at maximum"
+                },
+                {
+                  "id": "at_min_correct",
+                  "when": "1",
+                  "then": "at_min == (count == 0)",
+                  "why": "at_min must be high exactly when count is at minimum"
+                }
+              ]
+            },
+            "gate": {
+              "stage": "mutants",
+              "passed": true,
+              "total": 38,
+              "killed": 35,
+              "equivalent": 3,
+              "invalid": 0,
+              "unresolved": 0,
+              "nonequivalent": 35,
+              "kill_rate": 1.0,
+              "survived": []
+            },
+            "feedback": null,
+            "frozen": {
+              "schema": "countertrace-promoted-checks-v1",
+              "module": {
+                "id": "sat_counter",
+                "title": "Saturating up/down counter",
+                "top": "sat_counter",
+                "clock": "clk",
+                "reset": "rst",
+                "params": [
+                  {
+                    "WIDTH": 4
+                  },
+                  {
+                    "WIDTH": 3
+                  }
+                ],
+                "inputs": {
+                  "rst": 1,
+                  "inc": 1,
+                  "dec": 1,
+                  "load": 1,
+                  "load_value": "WIDTH"
+                },
+                "outputs": {
+                  "count": "WIDTH",
+                  "at_max": 1,
+                  "at_min": 1
+                },
+                "spec": "A WIDTH-bit unsigned up/down counter with load, with one rising-edge clock clk. count is a registered output.\nrst is a synchronous active-high reset: at a rising edge with rst high, count becomes 0.\nAt each rising edge without reset: if load is high, count becomes load_value, whatever inc and dec are. Otherwise, if inc is high and dec is low, count increases by one unless it is already at its maximum value (all ones), where it stays. If dec is high and inc is low, count decreases by one unless it is already 0, where it stays. If inc and dec are both high or both low, count does not change.\nat_max is high exactly when count is at its maximum value; at_min is high exactly when count is 0. Both follow count within the same cycle.",
+                "split": "heldout"
+              },
+              "properties_hash": "sha256:79d5a8f754527628d536f87c653b42b0557b67512fdc0dc07db47461b8802f68",
+              "checker_hash": "sha256:cdd8f4eea9955750b46a49903e72bbddf43f68e0324803767ec3dd8864910498",
+              "golden_hash": "sha256:d63be612ad4f3958bad3cac872b03c70eb6470221298535f13ad2868e0bb2ab9",
+              "harness": {
+                "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+                "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+                "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+              },
+              "verifier_digest": "26a51c6bce5dcf38",
+              "trusted_code": {
+                "bundle.py": "sha256:a29824fd095cbf67c8ab8d2e81522101ceebf67285448a06ff93b950a75092ae",
+                "design.py": "sha256:b31699ceca4534bd7a0033017fd5cef83810a3faf9a9719f667abc957fe86395",
+                "__init__.py": "sha256:b8f3265344eb7ae70d0c1b8687be2390283a0a4d948334c0236f726312f13912",
+                "compile.py": "sha256:ff04ee4c2e1d29afae9fdc04271e231345ebf7a450eefc6825dbaa401b379c67",
+                "gate.py": "sha256:db27e1c32cde7d14d8b82fcb290aabc743a691cfb6f3d084b8da1ee2ea217ae3",
+                "agent.py": "sha256:0cc8c7e7cf6f08acb0b3b9e7f5fa6fcaff6345961e3e5a1a84b436dbc6403c16",
+                "modules.py": "sha256:d0bbeabf053a00261fbd1409ec26abe633320bad3b601bada6e714684c6d6538"
+              },
+              "limits": {
+                "solver_s": 120,
+                "bmc_depth": 20,
+                "cover_depth": 20
+              },
+              "mutants": {
+                "count": 40,
+                "seed": 1
+              },
+              "promotion_threshold": 0.9
+            }
+          }
+        ],
+        "promoted_round": 0
+      }
+    },
+    {
+      "module": "seq_detector",
+      "repeat": 2,
+      "run_id": "20261009-153547-che-2b438d",
+      "started_at": "2026-10-09T19:35:47Z",
+      "finished_at": "2026-10-09T19:36:19Z",
+      "outcome": "promoted",
+      "state": "complete",
+      "error": null,
+      "checks": {
+        "status": "promoted",
+        "rounds": [
+          {
+            "index": 0,
+            "calls": [
+              {
+                "task": "write_checks",
+                "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+                "at": "2026-10-09T19:35:47Z",
+                "attempts": 1,
+                "thinking": true,
+                "request_id": "d0ee00a9e55ce3adf79e76491fa7f43f",
+                "latency_ms": 23217,
+                "prompt_tokens": 668,
+                "completion_tokens": 7390,
+                "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "status": "ok",
+                "finish_reason": "stop"
+              }
+            ],
+            "model_status": "ok",
+            "properties": {
+              "state": [
+                {
+                  "name": "shift_reg",
+                  "width": 4,
+                  "next": "rst ? 4'b0 : {shift_reg[2:0], bit_in}"
+                },
+                {
+                  "name": "count",
+                  "width": 3,
+                  "next": "rst ? 3'b0 : (count < 4 ? count + 1 : 4)"
+                },
+                {
+                  "name": "match_shadow",
+                  "width": 1,
+                  "next": "rst ? 1'b0 : ( ( (count < 4 ? count + 1 : 4) == 4 ) && ( {shift_reg[2:0], bit_in} == PATTERN ) )"
+                }
+              ],
+              "defs": [
+                {
+                  "name": "match_shadow_def",
+                  "width": 1,
+                  "expr": "match_shadow"
+                }
+              ],
+              "memories": [],
+              "writes": [],
+              "properties": [
+                {
+                  "id": "match_correct",
+                  "when": "1",
+                  "then": "match == match_shadow_def",
+                  "why": "match output should equal the expected match from the shadow model"
+                }
+              ]
+            },
+            "gate": {
+              "stage": "mutants",
+              "passed": true,
+              "total": 40,
+              "killed": 23,
+              "equivalent": 17,
+              "invalid": 0,
+              "unresolved": 0,
+              "nonequivalent": 23,
+              "kill_rate": 1.0,
+              "survived": []
+            },
+            "feedback": null,
+            "frozen": {
+              "schema": "countertrace-promoted-checks-v1",
+              "module": {
+                "id": "seq_detector",
+                "title": "Pattern detector",
+                "top": "seq_detector",
+                "clock": "clk",
+                "reset": "rst",
+                "params": [
+                  {
+                    "PATTERN": 11
+                  },
+                  {
+                    "PATTERN": 9
+                  }
+                ],
+                "inputs": {
+                  "rst": 1,
+                  "bit_in": 1
+                },
+                "outputs": {
+                  "match": 1
+                },
+                "spec": "A detector for a 4-bit pattern in a serial bit stream, with one rising-edge clock clk. PATTERN is a 4-bit value (for example 11 is binary 1011); its most significant bit is the oldest of the four bits. match is a registered output that changes only at rising edges.\nrst is a synchronous active-high reset: at a rising edge with rst high, match becomes 0 and all previously sampled bits are forgotten.\nbit_in is sampled at each rising edge without reset. match is high for the cycle after an edge exactly when the four most recently sampled bits since reset, oldest first and including the one sampled at that edge, equal PATTERN. Occurrences may overlap, and no match is possible until four bits have been sampled since reset.",
+                "split": "heldout"
+              },
+              "properties_hash": "sha256:3076c559454a70f905be2de9be5104007ae71011eb6abe05129fa522bbe78d91",
+              "checker_hash": "sha256:f1d8b16edcda52bec6d5be40998dd08d9bc8bd611ee9985947bf763a566d6fb7",
+              "golden_hash": "sha256:7f4c41d4bdf3fd1651a481b815effa6ed5488702aaf1a9205546b2bd72d93122",
+              "harness": {
+                "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+                "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+                "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+              },
+              "verifier_digest": "26a51c6bce5dcf38",
+              "trusted_code": {
+                "bundle.py": "sha256:a29824fd095cbf67c8ab8d2e81522101ceebf67285448a06ff93b950a75092ae",
+                "design.py": "sha256:b31699ceca4534bd7a0033017fd5cef83810a3faf9a9719f667abc957fe86395",
+                "__init__.py": "sha256:b8f3265344eb7ae70d0c1b8687be2390283a0a4d948334c0236f726312f13912",
+                "compile.py": "sha256:ff04ee4c2e1d29afae9fdc04271e231345ebf7a450eefc6825dbaa401b379c67",
+                "gate.py": "sha256:db27e1c32cde7d14d8b82fcb290aabc743a691cfb6f3d084b8da1ee2ea217ae3",
+                "agent.py": "sha256:0cc8c7e7cf6f08acb0b3b9e7f5fa6fcaff6345961e3e5a1a84b436dbc6403c16",
+                "modules.py": "sha256:d0bbeabf053a00261fbd1409ec26abe633320bad3b601bada6e714684c6d6538"
+              },
+              "limits": {
+                "solver_s": 120,
+                "bmc_depth": 20,
+                "cover_depth": 20
+              },
+              "mutants": {
+                "count": 40,
+                "seed": 1
+              },
+              "promotion_threshold": 0.9
+            }
+          }
+        ],
+        "promoted_round": 0
+      }
+    },
+    {
+      "module": "uart_tx",
+      "repeat": 2,
+      "run_id": "20261009-153619-che-5886a8",
+      "started_at": "2026-10-09T19:36:19Z",
+      "finished_at": "2026-10-09T19:37:08Z",
+      "outcome": "promoted",
+      "state": "complete",
+      "error": null,
+      "checks": {
+        "status": "promoted",
+        "rounds": [
+          {
+            "index": 0,
+            "calls": [
+              {
+                "task": "write_checks",
+                "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+                "at": "2026-10-09T19:36:19Z",
+                "attempts": 1,
+                "thinking": true,
+                "request_id": "b7ffde61886e3b36ea68f0fba778163a",
+                "latency_ms": 37724,
+                "prompt_tokens": 789,
+                "completion_tokens": 10376,
+                "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "status": "ok",
+                "finish_reason": "stop"
+              }
+            ],
+            "model_status": "ok",
+            "properties": {
+              "state": [
+                {
+                  "name": "busy_reg",
+                  "width": 1,
+                  "next": "rst ? 1'b0 : (busy_reg ? (frame_done ? 1'b0 : 1'b1) : (start ? 1'b1 : 1'b0))"
+                },
+                {
+                  "name": "bit_index_reg",
+                  "width": 4,
+                  "next": "rst ? 4'd0 : (busy_reg ? (last_cycle ? (last_bit ? 4'd0 : bit_index_reg + 1) : bit_index_reg) : 4'd0)"
+                },
+                {
+                  "name": "bit_cycle_cnt_reg",
+                  "width": 1,
+                  "next": "rst ? 1'b0 : (busy_reg ? (last_cycle ? 1'b0 : bit_cycle_cnt_reg + 1) : 1'b0)"
+                },
+                {
+                  "name": "data_reg",
+                  "width": 8,
+                  "next": "rst ? 8'd0 : (busy_reg ? data_reg : (start ? data : data_reg))"
+                }
+              ],
+              "defs": [
+                {
+                  "name": "last_cycle",
+                  "width": 1,
+                  "expr": "bit_cycle_cnt_reg == (CLKS_PER_BIT - 1)"
+                },
+                {
+                  "name": "last_bit",
+                  "width": 1,
+                  "expr": "bit_index_reg == 4'd9"
+                },
+                {
+                  "name": "frame_done",
+                  "width": 1,
+                  "expr": "busy_reg && last_cycle && last_bit"
+                },
+                {
+                  "name": "expected_tx",
+                  "width": 1,
+                  "expr": "busy_reg ? (bit_index_reg == 4'd0 ? 1'b0 : (bit_index_reg == 4'd9 ? 1'b1 : data_reg[bit_index_reg - 1])) : 1'b1"
+                }
+              ],
+              "memories": [],
+              "writes": [],
+              "properties": [
+                {
+                  "id": "tx_matches_model",
+                  "when": "1",
+                  "then": "tx == expected_tx",
+                  "why": "tx must follow the specified frame format with start bit, data bits LSB first, and stop bit"
+                },
+                {
+                  "id": "busy_matches_model",
+                  "when": "1",
+                  "then": "busy == busy_reg",
+                  "why": "busy must be high for the entire frame duration and low when idle"
+                }
+              ]
+            },
+            "gate": {
+              "stage": "mutants",
+              "passed": true,
+              "total": 40,
+              "killed": 26,
+              "equivalent": 14,
+              "invalid": 0,
+              "unresolved": 0,
+              "nonequivalent": 26,
+              "kill_rate": 1.0,
+              "survived": []
+            },
+            "feedback": null,
+            "frozen": {
+              "schema": "countertrace-promoted-checks-v1",
+              "module": {
+                "id": "uart_tx",
+                "title": "UART transmitter (8N1)",
+                "top": "uart_tx",
+                "clock": "clk",
+                "reset": "rst",
+                "params": [
+                  {
+                    "CLKS_PER_BIT": 2
+                  },
+                  {
+                    "CLKS_PER_BIT": 1
+                  }
+                ],
+                "inputs": {
+                  "rst": 1,
+                  "start": 1,
+                  "data": 8
+                },
+                "outputs": {
+                  "tx": 1,
+                  "busy": 1
+                },
+                "spec": "A UART transmitter that sends 8-bit words as frames of one start bit, eight data bits, and one stop bit, with one rising-edge clock clk. Each bit lasts CLKS_PER_BIT clock cycles; a cycle is the interval between two consecutive rising edges. tx and busy are registered outputs that change only at rising edges.\nrst is a synchronous active-high reset: at a rising edge with rst high, the transmitter becomes idle: tx becomes 1 and busy becomes 0.\nWhile idle, tx is 1 and busy is 0. At a rising edge without reset where busy is low and start is high, the transmitter accepts data (sampled at that edge) and starts a frame. start is ignored at edges where busy is high.\nDuring a frame, starting right after the accepting edge: tx is 0 for CLKS_PER_BIT cycles (the start bit), then data bit 0, data bit 1, and so on up to data bit 7 for CLKS_PER_BIT cycles each (least significant bit first), then 1 for CLKS_PER_BIT cycles (the stop bit). busy is high for the whole frame, 10 times CLKS_PER_BIT cycles, and goes low together with the end of the stop bit, when the transmitter is idle again.",
+                "split": "heldout"
+              },
+              "properties_hash": "sha256:d384278623abbc5137d9c48f831a483d2d9618e51d2e9dd2c2f6f535ff8d8307",
+              "checker_hash": "sha256:d7a310c5173fbb7bfbb3df1ed4273dc97e2a1f8f989589989ba38b7aa22f2b12",
+              "golden_hash": "sha256:1014d9156239cc72a514fec97087bb60a1df7ffdda8c4296dbacc2a112c18ec1",
+              "harness": {
+                "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+                "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+                "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+              },
+              "verifier_digest": "26a51c6bce5dcf38",
+              "trusted_code": {
+                "bundle.py": "sha256:a29824fd095cbf67c8ab8d2e81522101ceebf67285448a06ff93b950a75092ae",
+                "design.py": "sha256:b31699ceca4534bd7a0033017fd5cef83810a3faf9a9719f667abc957fe86395",
+                "__init__.py": "sha256:b8f3265344eb7ae70d0c1b8687be2390283a0a4d948334c0236f726312f13912",
+                "compile.py": "sha256:ff04ee4c2e1d29afae9fdc04271e231345ebf7a450eefc6825dbaa401b379c67",
+                "gate.py": "sha256:db27e1c32cde7d14d8b82fcb290aabc743a691cfb6f3d084b8da1ee2ea217ae3",
+                "agent.py": "sha256:0cc8c7e7cf6f08acb0b3b9e7f5fa6fcaff6345961e3e5a1a84b436dbc6403c16",
+                "modules.py": "sha256:d0bbeabf053a00261fbd1409ec26abe633320bad3b601bada6e714684c6d6538"
+              },
+              "limits": {
+                "solver_s": 120,
+                "bmc_depth": 32,
+                "cover_depth": 32
+              },
+              "mutants": {
+                "count": 40,
+                "seed": 1
+              },
+              "promotion_threshold": 0.9
+            }
+          }
+        ],
+        "promoted_round": 0
+      }
+    },
+    {
+      "module": "debouncer",
+      "repeat": 3,
+      "run_id": "20261009-153708-che-a5c55a",
+      "started_at": "2026-10-09T19:37:08Z",
+      "finished_at": "2026-10-09T19:37:40Z",
+      "outcome": "promoted",
+      "state": "complete",
+      "error": null,
+      "checks": {
+        "status": "promoted",
+        "rounds": [
+          {
+            "index": 0,
+            "calls": [
+              {
+                "task": "write_checks",
+                "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+                "at": "2026-10-09T19:37:08Z",
+                "attempts": 1,
+                "thinking": true,
+                "request_id": "05be365a39de9d7494cbff1cc9a42a35",
+                "latency_ms": 23104,
+                "prompt_tokens": 658,
+                "completion_tokens": 5610,
+                "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "status": "ok",
+                "finish_reason": "stop"
+              }
+            ],
+            "model_status": "ok",
+            "properties": {
+              "state": [
+                {
+                  "name": "clean_state",
+                  "width": 1,
+                  "next": "rst ? 0 : (noisy == clean_state ? clean_state : (count_state + 1 == STABLE ? noisy : clean_state))"
+                },
+                {
+                  "name": "changed_state",
+                  "width": 1,
+                  "next": "rst ? 0 : (noisy == clean_state ? 0 : (count_state + 1 == STABLE ? 1 : 0))"
+                },
+                {
+                  "name": "count_state",
+                  "width": 2,
+                  "next": "rst ? 0 : (noisy == clean_state ? 0 : (count_state + 1 == STABLE ? 0 : count_state + 1))"
+                }
+              ],
+              "defs": [],
+              "memories": [],
+              "writes": [],
+              "properties": [
+                {
+                  "id": "clean_matches",
+                  "when": "1",
+                  "then": "clean == clean_state",
+                  "why": "clean output must match specification shadow model"
+                },
+                {
+                  "id": "changed_matches",
+                  "when": "1",
+                  "then": "changed == changed_state",
+                  "why": "changed output must match specification shadow model"
+                }
+              ]
+            },
+            "gate": {
+              "stage": "mutants",
+              "passed": true,
+              "total": 40,
+              "killed": 27,
+              "equivalent": 13,
+              "invalid": 0,
+              "unresolved": 0,
+              "nonequivalent": 27,
+              "kill_rate": 1.0,
+              "survived": []
+            },
+            "feedback": null,
+            "frozen": {
+              "schema": "countertrace-promoted-checks-v1",
+              "module": {
+                "id": "debouncer",
+                "title": "Debouncer",
+                "top": "debouncer",
+                "clock": "clk",
+                "reset": "rst",
+                "params": [
+                  {
+                    "STABLE": 3
+                  },
+                  {
+                    "STABLE": 2
+                  }
+                ],
+                "inputs": {
+                  "rst": 1,
+                  "noisy": 1
+                },
+                "outputs": {
+                  "clean": 1,
+                  "changed": 1
+                },
+                "spec": "A debouncer for one input, noisy, with one rising-edge clock clk. clean and changed are registered outputs that change only at rising edges.\nrst is a synchronous active-high reset: at a rising edge with rst high, clean becomes 0, changed becomes 0, and any count in progress is discarded.\nnoisy is sampled at each rising edge. clean changes to the value of noisy at the STABLE-th consecutive edge without reset at which noisy differs from clean. An edge at which noisy equals clean restarts the count, so clean only changes after noisy has held the other value at STABLE consecutive edges.\nchanged is high for exactly the cycle after each edge at which clean changes, and low otherwise.",
+                "split": "heldout"
+              },
+              "properties_hash": "sha256:ce7366dcc8b61538dd2ee03422acb2edb918554aa549864fbddfbebbaf600818",
+              "checker_hash": "sha256:3de488340a6e282b735271561322aee6d3cffa671d62425ce5bfc72b3afcf262",
+              "golden_hash": "sha256:a3b1c3f73250c521e002e0cf71aef9a8f907bee340c030664802e21fdd3e0fb7",
+              "harness": {
+                "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+                "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+                "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+              },
+              "verifier_digest": "26a51c6bce5dcf38",
+              "trusted_code": {
+                "bundle.py": "sha256:a29824fd095cbf67c8ab8d2e81522101ceebf67285448a06ff93b950a75092ae",
+                "design.py": "sha256:b31699ceca4534bd7a0033017fd5cef83810a3faf9a9719f667abc957fe86395",
+                "__init__.py": "sha256:b8f3265344eb7ae70d0c1b8687be2390283a0a4d948334c0236f726312f13912",
+                "compile.py": "sha256:ff04ee4c2e1d29afae9fdc04271e231345ebf7a450eefc6825dbaa401b379c67",
+                "gate.py": "sha256:db27e1c32cde7d14d8b82fcb290aabc743a691cfb6f3d084b8da1ee2ea217ae3",
+                "agent.py": "sha256:0cc8c7e7cf6f08acb0b3b9e7f5fa6fcaff6345961e3e5a1a84b436dbc6403c16",
+                "modules.py": "sha256:d0bbeabf053a00261fbd1409ec26abe633320bad3b601bada6e714684c6d6538"
+              },
+              "limits": {
+                "solver_s": 120,
+                "bmc_depth": 20,
+                "cover_depth": 20
+              },
+              "mutants": {
+                "count": 40,
+                "seed": 1
+              },
+              "promotion_threshold": 0.9
+            }
+          }
+        ],
+        "promoted_round": 0
+      }
+    },
+    {
+      "module": "sat_counter",
+      "repeat": 3,
+      "run_id": "20261009-153740-che-f45986",
+      "started_at": "2026-10-09T19:37:40Z",
+      "finished_at": "2026-10-09T19:39:27Z",
+      "outcome": "promoted",
+      "state": "complete",
+      "error": null,
+      "checks": {
+        "status": "promoted",
+        "rounds": [
+          {
+            "index": 0,
+            "calls": [
+              {
+                "task": "write_checks",
+                "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+                "at": "2026-10-09T19:37:40Z",
+                "attempts": 1,
+                "thinking": true,
+                "request_id": "abf76b24dd66a0757c1c41f331425593",
+                "latency_ms": 57187,
+                "prompt_tokens": 724,
+                "completion_tokens": 15082,
+                "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "status": "ok",
+                "finish_reason": "stop",
+                "schema_error": "state name 'count' collides with a port, parameter, or another helper"
+              },
+              {
+                "task": "write_checks",
+                "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+                "at": "2026-10-09T19:38:37Z",
+                "attempts": 1,
+                "thinking": true,
+                "request_id": "b13fc3ffaa656bd14bec4990046e36de",
+                "latency_ms": 39609,
+                "prompt_tokens": 763,
+                "completion_tokens": 12414,
+                "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "status": "ok",
+                "finish_reason": "stop"
+              }
+            ],
+            "model_status": "ok",
+            "properties": {
+              "state": [
+                {
+                  "name": "cnt",
+                  "width": "WIDTH",
+                  "next": "rst ? 0 : (load ? load_value : (inc & ~dec ? (cnt == max_val ? cnt : cnt + 1) : (~inc & dec ? (cnt == 0 ? cnt : cnt - 1) : cnt)))"
+                }
+              ],
+              "defs": [
+                {
+                  "name": "max_val",
+                  "width": "WIDTH",
+                  "expr": "(1 << WIDTH) - 1"
+                }
+              ],
+              "memories": [],
+              "writes": [],
+              "properties": [
+                {
+                  "id": "count_matches_model",
+                  "when": "1",
+                  "then": "count == cnt",
+                  "why": "output count matches shadow counter"
+                },
+                {
+                  "id": "at_max_correct",
+                  "when": "1",
+                  "then": "at_max == (cnt == max_val)",
+                  "why": "at_max high when counter at max"
+                },
+                {
+                  "id": "at_min_correct",
+                  "when": "1",
+                  "then": "at_min == (cnt == 0)",
+                  "why": "at_min high when counter at min"
+                }
+              ]
+            },
+            "gate": {
+              "stage": "mutants",
+              "passed": true,
+              "total": 38,
+              "killed": 35,
+              "equivalent": 3,
+              "invalid": 0,
+              "unresolved": 0,
+              "nonequivalent": 35,
+              "kill_rate": 1.0,
+              "survived": []
+            },
+            "feedback": null,
+            "frozen": {
+              "schema": "countertrace-promoted-checks-v1",
+              "module": {
+                "id": "sat_counter",
+                "title": "Saturating up/down counter",
+                "top": "sat_counter",
+                "clock": "clk",
+                "reset": "rst",
+                "params": [
+                  {
+                    "WIDTH": 4
+                  },
+                  {
+                    "WIDTH": 3
+                  }
+                ],
+                "inputs": {
+                  "rst": 1,
+                  "inc": 1,
+                  "dec": 1,
+                  "load": 1,
+                  "load_value": "WIDTH"
+                },
+                "outputs": {
+                  "count": "WIDTH",
+                  "at_max": 1,
+                  "at_min": 1
+                },
+                "spec": "A WIDTH-bit unsigned up/down counter with load, with one rising-edge clock clk. count is a registered output.\nrst is a synchronous active-high reset: at a rising edge with rst high, count becomes 0.\nAt each rising edge without reset: if load is high, count becomes load_value, whatever inc and dec are. Otherwise, if inc is high and dec is low, count increases by one unless it is already at its maximum value (all ones), where it stays. If dec is high and inc is low, count decreases by one unless it is already 0, where it stays. If inc and dec are both high or both low, count does not change.\nat_max is high exactly when count is at its maximum value; at_min is high exactly when count is 0. Both follow count within the same cycle.",
+                "split": "heldout"
+              },
+              "properties_hash": "sha256:b751f43a22943a2c1b611d67d3e3383727514af14c9cb237c6d9f2efa8a7c36e",
+              "checker_hash": "sha256:1d207227db0f6e1eb77f6f9c608154ade7d65e2294ca9154edda67e173a384f1",
+              "golden_hash": "sha256:d63be612ad4f3958bad3cac872b03c70eb6470221298535f13ad2868e0bb2ab9",
+              "harness": {
+                "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+                "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+                "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+              },
+              "verifier_digest": "26a51c6bce5dcf38",
+              "trusted_code": {
+                "bundle.py": "sha256:a29824fd095cbf67c8ab8d2e81522101ceebf67285448a06ff93b950a75092ae",
+                "design.py": "sha256:b31699ceca4534bd7a0033017fd5cef83810a3faf9a9719f667abc957fe86395",
+                "__init__.py": "sha256:b8f3265344eb7ae70d0c1b8687be2390283a0a4d948334c0236f726312f13912",
+                "compile.py": "sha256:ff04ee4c2e1d29afae9fdc04271e231345ebf7a450eefc6825dbaa401b379c67",
+                "gate.py": "sha256:db27e1c32cde7d14d8b82fcb290aabc743a691cfb6f3d084b8da1ee2ea217ae3",
+                "agent.py": "sha256:0cc8c7e7cf6f08acb0b3b9e7f5fa6fcaff6345961e3e5a1a84b436dbc6403c16",
+                "modules.py": "sha256:d0bbeabf053a00261fbd1409ec26abe633320bad3b601bada6e714684c6d6538"
+              },
+              "limits": {
+                "solver_s": 120,
+                "bmc_depth": 20,
+                "cover_depth": 20
+              },
+              "mutants": {
+                "count": 40,
+                "seed": 1
+              },
+              "promotion_threshold": 0.9
+            }
+          }
+        ],
+        "promoted_round": 0
+      }
+    },
+    {
+      "module": "seq_detector",
+      "repeat": 3,
+      "run_id": "20261009-153927-che-f60716",
+      "started_at": "2026-10-09T19:39:27Z",
+      "finished_at": "2026-10-09T19:40:29Z",
+      "outcome": "promoted",
+      "state": "complete",
+      "error": null,
+      "checks": {
+        "status": "promoted",
+        "rounds": [
+          {
+            "index": 0,
+            "calls": [
+              {
+                "task": "write_checks",
+                "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+                "at": "2026-10-09T19:39:27Z",
+                "attempts": 1,
+                "thinking": true,
+                "request_id": "8a536be15eeee565fd89f1d1c9a342b2",
+                "latency_ms": 53834,
+                "prompt_tokens": 668,
+                "completion_tokens": 16139,
+                "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "status": "ok",
+                "finish_reason": "stop"
+              }
+            ],
+            "model_status": "ok",
+            "properties": {
+              "state": [
+                {
+                  "name": "shift_reg",
+                  "width": 4,
+                  "next": "rst ? 4'b0 : {shift_reg[2:0], bit_in}"
+                },
+                {
+                  "name": "count",
+                  "width": 3,
+                  "next": "rst ? 3'b0 : (count < 4 ? count + 1 : 4)"
+                },
+                {
+                  "name": "match_reg",
+                  "width": 1,
+                  "next": "rst ? 1'b0 : ((count >= 3) && ({shift_reg[2:0], bit_in} == PATTERN))"
+                }
+              ],
+              "defs": [],
+              "memories": [],
+              "writes": [],
+              "properties": [
+                {
+                  "id": "match_correct",
+                  "when": "1",
+                  "then": "match == match_reg",
+                  "why": "match output must follow the specification: high exactly when the last 4 bits since reset equal PATTERN"
+                }
+              ]
+            },
+            "gate": {
+              "stage": "mutants",
+              "passed": true,
+              "total": 40,
+              "killed": 23,
+              "equivalent": 17,
+              "invalid": 0,
+              "unresolved": 0,
+              "nonequivalent": 23,
+              "kill_rate": 1.0,
+              "survived": []
+            },
+            "feedback": null,
+            "frozen": {
+              "schema": "countertrace-promoted-checks-v1",
+              "module": {
+                "id": "seq_detector",
+                "title": "Pattern detector",
+                "top": "seq_detector",
+                "clock": "clk",
+                "reset": "rst",
+                "params": [
+                  {
+                    "PATTERN": 11
+                  },
+                  {
+                    "PATTERN": 9
+                  }
+                ],
+                "inputs": {
+                  "rst": 1,
+                  "bit_in": 1
+                },
+                "outputs": {
+                  "match": 1
+                },
+                "spec": "A detector for a 4-bit pattern in a serial bit stream, with one rising-edge clock clk. PATTERN is a 4-bit value (for example 11 is binary 1011); its most significant bit is the oldest of the four bits. match is a registered output that changes only at rising edges.\nrst is a synchronous active-high reset: at a rising edge with rst high, match becomes 0 and all previously sampled bits are forgotten.\nbit_in is sampled at each rising edge without reset. match is high for the cycle after an edge exactly when the four most recently sampled bits since reset, oldest first and including the one sampled at that edge, equal PATTERN. Occurrences may overlap, and no match is possible until four bits have been sampled since reset.",
+                "split": "heldout"
+              },
+              "properties_hash": "sha256:73d8c7e9d83d87e947a6523f8dcd21239501bf2ed96cc2d362faf167faaa3c47",
+              "checker_hash": "sha256:96a31309beccfff8622d019d9bfff995dd6e011bc3de64c8b8aa5e2e4d41a1fb",
+              "golden_hash": "sha256:7f4c41d4bdf3fd1651a481b815effa6ed5488702aaf1a9205546b2bd72d93122",
+              "harness": {
+                "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+                "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+                "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+              },
+              "verifier_digest": "26a51c6bce5dcf38",
+              "trusted_code": {
+                "bundle.py": "sha256:a29824fd095cbf67c8ab8d2e81522101ceebf67285448a06ff93b950a75092ae",
+                "design.py": "sha256:b31699ceca4534bd7a0033017fd5cef83810a3faf9a9719f667abc957fe86395",
+                "__init__.py": "sha256:b8f3265344eb7ae70d0c1b8687be2390283a0a4d948334c0236f726312f13912",
+                "compile.py": "sha256:ff04ee4c2e1d29afae9fdc04271e231345ebf7a450eefc6825dbaa401b379c67",
+                "gate.py": "sha256:db27e1c32cde7d14d8b82fcb290aabc743a691cfb6f3d084b8da1ee2ea217ae3",
+                "agent.py": "sha256:0cc8c7e7cf6f08acb0b3b9e7f5fa6fcaff6345961e3e5a1a84b436dbc6403c16",
+                "modules.py": "sha256:d0bbeabf053a00261fbd1409ec26abe633320bad3b601bada6e714684c6d6538"
+              },
+              "limits": {
+                "solver_s": 120,
+                "bmc_depth": 20,
+                "cover_depth": 20
+              },
+              "mutants": {
+                "count": 40,
+                "seed": 1
+              },
+              "promotion_threshold": 0.9
+            }
+          }
+        ],
+        "promoted_round": 0
+      }
+    },
+    {
+      "module": "uart_tx",
+      "repeat": 3,
+      "run_id": "20261009-154029-che-771474",
+      "started_at": "2026-10-09T19:40:29Z",
+      "finished_at": "2026-10-09T19:42:05Z",
+      "outcome": "promoted",
+      "state": "complete",
+      "error": null,
+      "checks": {
+        "status": "promoted",
+        "rounds": [
+          {
+            "index": 0,
+            "calls": [
+              {
+                "task": "write_checks",
+                "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+                "at": "2026-10-09T19:40:29Z",
+                "attempts": 1,
+                "thinking": true,
+                "request_id": "61facf338fb2c5e9963c7492f7dd21dc",
+                "latency_ms": 65473,
+                "prompt_tokens": 789,
+                "completion_tokens": 15945,
+                "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "status": "ok",
+                "finish_reason": "stop"
+              }
+            ],
+            "model_status": "ok",
+            "properties": {
+              "state": [
+                {
+                  "name": "s_pending",
+                  "width": 1,
+                  "next": "rst ? 1'b0 : (accept ? 1'b1 : (s_pending ? 1'b0 : 1'b0))"
+                },
+                {
+                  "name": "s_busy",
+                  "width": 1,
+                  "next": "rst ? 1'b0 : (s_busy ? (frame_end ? 1'b0 : 1'b1) : (s_pending ? 1'b1 : 1'b0))"
+                },
+                {
+                  "name": "s_cycle",
+                  "width": 6,
+                  "next": "rst ? 6'd0 : (s_busy ? (frame_end ? 6'd0 : s_cycle + 1) : (s_pending ? 6'd0 : 6'd0))"
+                },
+                {
+                  "name": "s_data",
+                  "width": 8,
+                  "next": "rst ? 8'd0 : (accept ? data : s_data)"
+                }
+              ],
+              "defs": [
+                {
+                  "name": "accept",
+                  "width": 1,
+                  "expr": "~rst & ~s_busy & ~s_pending & start"
+                },
+                {
+                  "name": "frame_end",
+                  "width": 1,
+                  "expr": "s_busy & (s_cycle == 10*CLKS_PER_BIT - 1)"
+                },
+                {
+                  "name": "exp_tx",
+                  "width": 1,
+                  "expr": "s_busy ? ( (s_cycle < CLKS_PER_BIT) ? 1'b0 : (s_cycle < 9*CLKS_PER_BIT ? s_data[(s_cycle - CLKS_PER_BIT) / CLKS_PER_BIT] : 1'b1 ) ) : 1'b1"
+                },
+                {
+                  "name": "exp_busy",
+                  "width": 1,
+                  "expr": "s_busy"
+                }
+              ],
+              "memories": [],
+              "writes": [],
+              "properties": [
+                {
+                  "id": "tx_correct",
+                  "when": "1",
+                  "then": "tx == exp_tx",
+                  "why": "tx matches expected frame bits including start, data, stop"
+                },
+                {
+                  "id": "busy_correct",
+                  "when": "1",
+                  "then": "busy == exp_busy",
+                  "why": "busy high during frame, low otherwise"
+                }
+              ]
+            },
+            "gate": {
+              "stage": "golden",
+              "passed": false,
+              "status": "FAIL",
+              "failed": [
+                "busy_correct",
+                "tx_correct"
+              ],
+              "config": {
+                "id": "p0",
+                "params": {
+                  "CLKS_PER_BIT": 2
+                }
+              }
+            },
+            "feedback": "A reference implementation that meets the specification violates busy_correct, tx_correct at CLKS_PER_BIT = 2. Those properties are wrong, not the design. Counterexample (values just before each edge):\nedge | rst | start | data | tx | busy\n0 | 1 | 0 | 0 | 0 | 0\n1 | 0 | 1 | 0 | 1 | 0\n2 | 0 | 0 | 0 | 0 | 1\n3 | 0 | 0 | 0 | 0 | 1\n4 | 0 | 0 | 0 | 0 | 1\nCorrect or remove them and resubmit the whole set.",
+            "frozen": {
+              "schema": "countertrace-promoted-checks-v1",
+              "module": {
+                "id": "uart_tx",
+                "title": "UART transmitter (8N1)",
+                "top": "uart_tx",
+                "clock": "clk",
+                "reset": "rst",
+                "params": [
+                  {
+                    "CLKS_PER_BIT": 2
+                  },
+                  {
+                    "CLKS_PER_BIT": 1
+                  }
+                ],
+                "inputs": {
+                  "rst": 1,
+                  "start": 1,
+                  "data": 8
+                },
+                "outputs": {
+                  "tx": 1,
+                  "busy": 1
+                },
+                "spec": "A UART transmitter that sends 8-bit words as frames of one start bit, eight data bits, and one stop bit, with one rising-edge clock clk. Each bit lasts CLKS_PER_BIT clock cycles; a cycle is the interval between two consecutive rising edges. tx and busy are registered outputs that change only at rising edges.\nrst is a synchronous active-high reset: at a rising edge with rst high, the transmitter becomes idle: tx becomes 1 and busy becomes 0.\nWhile idle, tx is 1 and busy is 0. At a rising edge without reset where busy is low and start is high, the transmitter accepts data (sampled at that edge) and starts a frame. start is ignored at edges where busy is high.\nDuring a frame, starting right after the accepting edge: tx is 0 for CLKS_PER_BIT cycles (the start bit), then data bit 0, data bit 1, and so on up to data bit 7 for CLKS_PER_BIT cycles each (least significant bit first), then 1 for CLKS_PER_BIT cycles (the stop bit). busy is high for the whole frame, 10 times CLKS_PER_BIT cycles, and goes low together with the end of the stop bit, when the transmitter is idle again.",
+                "split": "heldout"
+              },
+              "properties_hash": "sha256:929000372ca259531a4101aab4d0b3a71777a4ffc56cac6e45b40d31ef5f471d",
+              "checker_hash": "sha256:12f57b082968639fef8c4e38f3435cc6b302cd87228b0f404167bdf4e7f3740a",
+              "golden_hash": "sha256:1014d9156239cc72a514fec97087bb60a1df7ffdda8c4296dbacc2a112c18ec1",
+              "harness": {
+                "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+                "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+                "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+              },
+              "verifier_digest": "26a51c6bce5dcf38",
+              "trusted_code": {
+                "bundle.py": "sha256:a29824fd095cbf67c8ab8d2e81522101ceebf67285448a06ff93b950a75092ae",
+                "design.py": "sha256:b31699ceca4534bd7a0033017fd5cef83810a3faf9a9719f667abc957fe86395",
+                "__init__.py": "sha256:b8f3265344eb7ae70d0c1b8687be2390283a0a4d948334c0236f726312f13912",
+                "compile.py": "sha256:ff04ee4c2e1d29afae9fdc04271e231345ebf7a450eefc6825dbaa401b379c67",
+                "gate.py": "sha256:db27e1c32cde7d14d8b82fcb290aabc743a691cfb6f3d084b8da1ee2ea217ae3",
+                "agent.py": "sha256:0cc8c7e7cf6f08acb0b3b9e7f5fa6fcaff6345961e3e5a1a84b436dbc6403c16",
+                "modules.py": "sha256:d0bbeabf053a00261fbd1409ec26abe633320bad3b601bada6e714684c6d6538"
+              },
+              "limits": {
+                "solver_s": 120,
+                "bmc_depth": 32,
+                "cover_depth": 32
+              },
+              "mutants": {
+                "count": 40,
+                "seed": 1
+              },
+              "promotion_threshold": 0.9
+            }
+          },
+          {
+            "index": 1,
+            "calls": [
+              {
+                "task": "write_checks",
+                "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+                "at": "2026-10-09T19:41:36Z",
+                "attempts": 1,
+                "thinking": true,
+                "request_id": "f365d74ecf30016dcc17fc9d9e96e151",
+                "latency_ms": 17165,
+                "prompt_tokens": 1448,
+                "completion_tokens": 6338,
+                "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+                "status": "ok",
+                "finish_reason": "stop"
+              }
+            ],
+            "model_status": "ok",
+            "properties": {
+              "state": [
+                {
+                  "name": "s_busy",
+                  "width": 1,
+                  "next": "rst ? 1'b0 : (accept ? 1'b1 : (frame_end ? 1'b0 : s_busy))"
+                },
+                {
+                  "name": "s_cycle",
+                  "width": 6,
+                  "next": "rst ? 6'd0 : (accept ? 6'd0 : (s_busy ? (frame_end ? 6'd0 : s_cycle + 1) : 6'd0))"
+                },
+                {
+                  "name": "s_data",
+                  "width": 8,
+                  "next": "rst ? 8'd0 : (accept ? data : s_data)"
+                }
+              ],
+              "defs": [
+                {
+                  "name": "accept",
+                  "width": 1,
+                  "expr": "~rst & ~s_busy & start"
+                },
+                {
+                  "name": "frame_end",
+                  "width": 1,
+                  "expr": "s_busy & (s_cycle == 10*CLKS_PER_BIT - 1)"
+                },
+                {
+                  "name": "exp_tx",
+                  "width": 1,
+                  "expr": "s_busy ? ( (s_cycle < CLKS_PER_BIT) ? 1'b0 : (s_cycle < 9*CLKS_PER_BIT ? s_data[(s_cycle - CLKS_PER_BIT) / CLKS_PER_BIT] : 1'b1 ) ) : 1'b1"
+                },
+                {
+                  "name": "exp_busy",
+                  "width": 1,
+                  "expr": "s_busy"
+                }
+              ],
+              "memories": [],
+              "writes": [],
+              "properties": [
+                {
+                  "id": "tx_correct",
+                  "when": "1",
+                  "then": "tx == exp_tx",
+                  "why": "tx matches expected frame bits including start, data, stop"
+                },
+                {
+                  "id": "busy_correct",
+                  "when": "1",
+                  "then": "busy == exp_busy",
+                  "why": "busy high during frame, low otherwise"
+                }
+              ]
+            },
+            "gate": {
+              "stage": "mutants",
+              "passed": true,
+              "total": 40,
+              "killed": 26,
+              "equivalent": 14,
+              "invalid": 0,
+              "unresolved": 0,
+              "nonequivalent": 26,
+              "kill_rate": 1.0,
+              "survived": []
+            },
+            "feedback": null,
+            "frozen": {
+              "schema": "countertrace-promoted-checks-v1",
+              "module": {
+                "id": "uart_tx",
+                "title": "UART transmitter (8N1)",
+                "top": "uart_tx",
+                "clock": "clk",
+                "reset": "rst",
+                "params": [
+                  {
+                    "CLKS_PER_BIT": 2
+                  },
+                  {
+                    "CLKS_PER_BIT": 1
+                  }
+                ],
+                "inputs": {
+                  "rst": 1,
+                  "start": 1,
+                  "data": 8
+                },
+                "outputs": {
+                  "tx": 1,
+                  "busy": 1
+                },
+                "spec": "A UART transmitter that sends 8-bit words as frames of one start bit, eight data bits, and one stop bit, with one rising-edge clock clk. Each bit lasts CLKS_PER_BIT clock cycles; a cycle is the interval between two consecutive rising edges. tx and busy are registered outputs that change only at rising edges.\nrst is a synchronous active-high reset: at a rising edge with rst high, the transmitter becomes idle: tx becomes 1 and busy becomes 0.\nWhile idle, tx is 1 and busy is 0. At a rising edge without reset where busy is low and start is high, the transmitter accepts data (sampled at that edge) and starts a frame. start is ignored at edges where busy is high.\nDuring a frame, starting right after the accepting edge: tx is 0 for CLKS_PER_BIT cycles (the start bit), then data bit 0, data bit 1, and so on up to data bit 7 for CLKS_PER_BIT cycles each (least significant bit first), then 1 for CLKS_PER_BIT cycles (the stop bit). busy is high for the whole frame, 10 times CLKS_PER_BIT cycles, and goes low together with the end of the stop bit, when the transmitter is idle again.",
+                "split": "heldout"
+              },
+              "properties_hash": "sha256:916110d23a450d69e32f05fde64c2dcde41398fecc8c733415e89df193b85641",
+              "checker_hash": "sha256:23695d7b4e8c6b7dda12ed023cd15282ef37f83276fcabd5951b7861b031b574",
+              "golden_hash": "sha256:1014d9156239cc72a514fec97087bb60a1df7ffdda8c4296dbacc2a112c18ec1",
+              "harness": {
+                "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+                "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+                "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+              },
+              "verifier_digest": "26a51c6bce5dcf38",
+              "trusted_code": {
+                "bundle.py": "sha256:a29824fd095cbf67c8ab8d2e81522101ceebf67285448a06ff93b950a75092ae",
+                "design.py": "sha256:b31699ceca4534bd7a0033017fd5cef83810a3faf9a9719f667abc957fe86395",
+                "__init__.py": "sha256:b8f3265344eb7ae70d0c1b8687be2390283a0a4d948334c0236f726312f13912",
+                "compile.py": "sha256:ff04ee4c2e1d29afae9fdc04271e231345ebf7a450eefc6825dbaa401b379c67",
+                "gate.py": "sha256:db27e1c32cde7d14d8b82fcb290aabc743a691cfb6f3d084b8da1ee2ea217ae3",
+                "agent.py": "sha256:0cc8c7e7cf6f08acb0b3b9e7f5fa6fcaff6345961e3e5a1a84b436dbc6403c16",
+                "modules.py": "sha256:d0bbeabf053a00261fbd1409ec26abe633320bad3b601bada6e714684c6d6538"
+              },
+              "limits": {
+                "solver_s": 120,
+                "bmc_depth": 32,
+                "cover_depth": 32
+              },
+              "mutants": {
+                "count": 40,
+                "seed": 1
+              },
+              "promotion_threshold": 0.9
+            }
+          }
+        ],
+        "promoted_round": 1
+      }
+    }
+  ],
+  "completed_at": "2026-10-09T19:42:05Z"
+}

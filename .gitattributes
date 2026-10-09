@@ -1,2 +1,4 @@
 # Curated tool artifacts preserve their original bytes, including log whitespace.
 recorded/**/batches/** -text -whitespace
+recorded/**/round-*/** -text -whitespace
+recorded/**/secondary-depth2/** -text -whitespace

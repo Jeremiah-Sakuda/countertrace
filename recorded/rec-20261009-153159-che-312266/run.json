@@ -1,0 +1,296 @@
+{
+ "id": "rec-20261009-153159-che-312266",
+ "kind": "checks",
+ "title": "Model-written checks: Debouncer",
+ "module_id": "debouncer",
+ "module": {
+  "id": "debouncer",
+  "title": "Debouncer",
+  "top": "debouncer",
+  "clock": "clk",
+  "reset": "rst",
+  "params": [
+   {
+    "STABLE": 3
+   },
+   {
+    "STABLE": 2
+   }
+  ],
+  "inputs": {
+   "rst": 1,
+   "noisy": 1
+  },
+  "outputs": {
+   "clean": 1,
+   "changed": 1
+  },
+  "spec": "A debouncer for one input, noisy, with one rising-edge clock clk. clean and changed are registered outputs that change only at rising edges.\nrst is a synchronous active-high reset: at a rising edge with rst high, clean becomes 0, changed becomes 0, and any count in progress is discarded.\nnoisy is sampled at each rising edge. clean changes to the value of noisy at the STABLE-th consecutive edge without reset at which noisy differs from clean. An edge at which noisy equals clean restarts the count, so clean only changes after noisy has held the other value at STABLE consecutive edges.\nchanged is high for exactly the cycle after each edge at which clean changes, and low otherwise.",
+  "split": "heldout"
+ },
+ "max_rounds": 4,
+ "state": "complete",
+ "created_at": "2026-10-09T19:31:59Z",
+ "recorded": true,
+ "checks": {
+  "status": "promoted",
+  "rounds": [
+   {
+    "index": 0,
+    "calls": [
+     {
+      "task": "write_checks",
+      "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+      "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+      "at": "2026-10-09T19:31:59Z",
+      "attempts": 1,
+      "thinking": true,
+      "request_id": "7e6ec8152816cce94315e52a842b13fb",
+      "latency_ms": 17544,
+      "prompt_tokens": 658,
+      "completion_tokens": 5880,
+      "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+      "status": "ok",
+      "finish_reason": "stop"
+     }
+    ],
+    "model_status": "ok",
+    "properties": {
+     "state": [
+      {
+       "name": "model_clean",
+       "width": 1,
+       "next": "rst ? 1'b0 : ((model_count == STABLE-1 && noisy != model_clean) ? noisy : model_clean)"
+      },
+      {
+       "name": "model_changed",
+       "width": 1,
+       "next": "rst ? 1'b0 : ((model_count == STABLE-1 && noisy != model_clean) ? 1'b1 : 1'b0)"
+      },
+      {
+       "name": "model_count",
+       "width": 2,
+       "next": "rst ? 2'b0 : ((noisy == model_clean) ? 2'b0 : model_count + 1)"
+      }
+     ],
+     "defs": [],
+     "memories": [],
+     "writes": [],
+     "properties": [
+      {
+       "id": "outputs_match",
+       "when": "1'b1",
+       "then": "clean == model_clean && changed == model_changed",
+       "why": "both outputs should follow the debouncing specification"
+      }
+     ]
+    },
+    "gate": {
+     "stage": "golden",
+     "passed": false,
+     "status": "FAIL",
+     "failed": [
+      "outputs_match"
+     ],
+     "config": {
+      "id": "p0",
+      "params": {
+       "STABLE": 3
+      }
+     }
+    },
+    "feedback": "A reference implementation that meets the specification violates outputs_match at STABLE = 3. Those properties are wrong, not the design. Counterexample (values just before each edge):\nedge | rst | noisy | clean | changed\n0 | 1 | 1 | 0 | 0\n1 | 0 | 1 | 0 | 0\n2 | 0 | 1 | 0 | 0\n3 | 0 | 1 | 0 | 0\n4 | 0 | 0 | 1 | 1\n5 | 0 | 0 | 1 | 0\n6 | 0 | 0 | 1 | 0\n7 | 0 | 0 | 0 | 1\n8 | 1 | 0 | 0 | 0\n9 | 1 | 0 | 0 | 0\nCorrect or remove them and resubmit the whole set.",
+    "frozen": {
+     "schema": "countertrace-promoted-checks-v1",
+     "module": {
+      "id": "debouncer",
+      "title": "Debouncer",
+      "top": "debouncer",
+      "clock": "clk",
+      "reset": "rst",
+      "params": [
+       {
+        "STABLE": 3
+       },
+       {
+        "STABLE": 2
+       }
+      ],
+      "inputs": {
+       "rst": 1,
+       "noisy": 1
+      },
+      "outputs": {
+       "clean": 1,
+       "changed": 1
+      },
+      "spec": "A debouncer for one input, noisy, with one rising-edge clock clk. clean and changed are registered outputs that change only at rising edges.\nrst is a synchronous active-high reset: at a rising edge with rst high, clean becomes 0, changed becomes 0, and any count in progress is discarded.\nnoisy is sampled at each rising edge. clean changes to the value of noisy at the STABLE-th consecutive edge without reset at which noisy differs from clean. An edge at which noisy equals clean restarts the count, so clean only changes after noisy has held the other value at STABLE consecutive edges.\nchanged is high for exactly the cycle after each edge at which clean changes, and low otherwise.",
+      "split": "heldout"
+     },
+     "properties_hash": "sha256:0fc6c21f020feaaadd4fdf1af0e9b7f311cac2edb4e75905e97c498f4fa5ae31",
+     "checker_hash": "sha256:e548dfbca902f667e566cfbde511d5083a94542edb5c89a72286d8d498ca5d32",
+     "golden_hash": "sha256:a3b1c3f73250c521e002e0cf71aef9a8f907bee340c030664802e21fdd3e0fb7",
+     "harness": {
+      "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+      "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+      "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+     },
+     "verifier_digest": "26a51c6bce5dcf38",
+     "trusted_code": {
+      "bundle.py": "sha256:a29824fd095cbf67c8ab8d2e81522101ceebf67285448a06ff93b950a75092ae",
+      "design.py": "sha256:b31699ceca4534bd7a0033017fd5cef83810a3faf9a9719f667abc957fe86395",
+      "__init__.py": "sha256:b8f3265344eb7ae70d0c1b8687be2390283a0a4d948334c0236f726312f13912",
+      "compile.py": "sha256:ff04ee4c2e1d29afae9fdc04271e231345ebf7a450eefc6825dbaa401b379c67",
+      "gate.py": "sha256:db27e1c32cde7d14d8b82fcb290aabc743a691cfb6f3d084b8da1ee2ea217ae3",
+      "agent.py": "sha256:0cc8c7e7cf6f08acb0b3b9e7f5fa6fcaff6345961e3e5a1a84b436dbc6403c16",
+      "modules.py": "sha256:d0bbeabf053a00261fbd1409ec26abe633320bad3b601bada6e714684c6d6538"
+     },
+     "limits": {
+      "solver_s": 120,
+      "bmc_depth": 20,
+      "cover_depth": 20
+     },
+     "mutants": {
+      "count": 40,
+      "seed": 1
+     },
+     "promotion_threshold": 0.9
+    }
+   },
+   {
+    "index": 1,
+    "calls": [
+     {
+      "task": "write_checks",
+      "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+      "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+      "at": "2026-10-09T19:32:21Z",
+      "attempts": 1,
+      "thinking": true,
+      "request_id": "cb47891e7fb360cbd79bdb3bceba758b",
+      "latency_ms": 19117,
+      "prompt_tokens": 1079,
+      "completion_tokens": 6926,
+      "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+      "status": "ok",
+      "finish_reason": "stop"
+     }
+    ],
+    "model_status": "ok",
+    "properties": {
+     "state": [
+      {
+       "name": "model_clean",
+       "width": 1,
+       "next": "rst ? 1'b0 : ((noisy != model_clean && model_count + 1 == STABLE) ? noisy : model_clean)"
+      },
+      {
+       "name": "model_changed",
+       "width": 1,
+       "next": "rst ? 1'b0 : (noisy != model_clean && model_count + 1 == STABLE)"
+      },
+      {
+       "name": "model_count",
+       "width": 2,
+       "next": "rst ? 2'b0 : (noisy == model_clean ? 2'b0 : (model_count + 1 == STABLE ? 2'b0 : model_count + 1))"
+      }
+     ],
+     "defs": [],
+     "memories": [],
+     "writes": [],
+     "properties": [
+      {
+       "id": "outputs_match",
+       "when": "1'b1",
+       "then": "clean == model_clean && changed == model_changed",
+       "why": "both outputs should follow the debouncing specification"
+      }
+     ]
+    },
+    "gate": {
+     "stage": "mutants",
+     "passed": true,
+     "total": 40,
+     "killed": 27,
+     "equivalent": 13,
+     "invalid": 0,
+     "unresolved": 0,
+     "nonequivalent": 27,
+     "kill_rate": 1.0,
+     "survived": []
+    },
+    "feedback": null,
+    "frozen": {
+     "schema": "countertrace-promoted-checks-v1",
+     "module": {
+      "id": "debouncer",
+      "title": "Debouncer",
+      "top": "debouncer",
+      "clock": "clk",
+      "reset": "rst",
+      "params": [
+       {
+        "STABLE": 3
+       },
+       {
+        "STABLE": 2
+       }
+      ],
+      "inputs": {
+       "rst": 1,
+       "noisy": 1
+      },
+      "outputs": {
+       "clean": 1,
+       "changed": 1
+      },
+      "spec": "A debouncer for one input, noisy, with one rising-edge clock clk. clean and changed are registered outputs that change only at rising edges.\nrst is a synchronous active-high reset: at a rising edge with rst high, clean becomes 0, changed becomes 0, and any count in progress is discarded.\nnoisy is sampled at each rising edge. clean changes to the value of noisy at the STABLE-th consecutive edge without reset at which noisy differs from clean. An edge at which noisy equals clean restarts the count, so clean only changes after noisy has held the other value at STABLE consecutive edges.\nchanged is high for exactly the cycle after each edge at which clean changes, and low otherwise.",
+      "split": "heldout"
+     },
+     "properties_hash": "sha256:3a107d05fb1ae8353de9667578b62b652690ba067535ed3b35d32faa47a75e6c",
+     "checker_hash": "sha256:923269c6d9d4fbd60802d607ced4dedf93d984f2947b854cc004c89fa680f2fb",
+     "golden_hash": "sha256:a3b1c3f73250c521e002e0cf71aef9a8f907bee340c030664802e21fdd3e0fb7",
+     "harness": {
+      "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+      "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+      "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+     },
+     "verifier_digest": "26a51c6bce5dcf38",
+     "trusted_code": {
+      "bundle.py": "sha256:a29824fd095cbf67c8ab8d2e81522101ceebf67285448a06ff93b950a75092ae",
+      "design.py": "sha256:b31699ceca4534bd7a0033017fd5cef83810a3faf9a9719f667abc957fe86395",
+      "__init__.py": "sha256:b8f3265344eb7ae70d0c1b8687be2390283a0a4d948334c0236f726312f13912",
+      "compile.py": "sha256:ff04ee4c2e1d29afae9fdc04271e231345ebf7a450eefc6825dbaa401b379c67",
+      "gate.py": "sha256:db27e1c32cde7d14d8b82fcb290aabc743a691cfb6f3d084b8da1ee2ea217ae3",
+      "agent.py": "sha256:0cc8c7e7cf6f08acb0b3b9e7f5fa6fcaff6345961e3e5a1a84b436dbc6403c16",
+      "modules.py": "sha256:d0bbeabf053a00261fbd1409ec26abe633320bad3b601bada6e714684c6d6538"
+     },
+     "limits": {
+      "solver_s": 120,
+      "bmc_depth": 20,
+      "cover_depth": 20
+     },
+     "mutants": {
+      "count": 40,
+      "seed": 1
+     },
+     "promotion_threshold": 0.9
+    }
+   }
+  ],
+  "promoted_round": 1
+ },
+ "started_at": "2026-10-09T19:31:59Z",
+ "image": {
+  "tag": "countertrace-verifier:26a51c6bce5dcf38",
+  "image_id": "sha256:62dbb264be6153e08c5014540a0a134482d1e29ccfbdd1602385100defa72ce5",
+  "verifier_digest": "26a51c6bce5dcf38"
+ },
+ "finished_at": "2026-10-09T19:32:48Z",
+ "replay_commit": "db13724c788535125b0cd1c0e293abd4998bad99",
+ "replay_note": "Frozen checks-v1 source; original outcomes and feedback are unchanged.",
+ "recorded_from": "20261009-153159-che-312266",
+ "recorded_at": "2026-10-09T19:42:25Z",
+ "recorded_note": "First checks-v1 debouncer attempt, selected chronologically to illustrate a real rejected property and corrected second round. All twelve attempts are in evaluation/results/checks-v1; this recording does not stand in for their denominator.",
+ "recorded_versions": null
+}

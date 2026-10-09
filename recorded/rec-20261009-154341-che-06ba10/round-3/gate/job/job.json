@@ -1,0 +1,29 @@
+{
+  "schema": "countertrace-checks-job/1",
+  "job_id": "f02de7294538",
+  "batch_limit_s": 1200,
+  "stage": "gate",
+  "top": "fifo",
+  "clock": "clk",
+  "configs": [
+    {
+      "id": "p0",
+      "params": {
+        "DEPTH": 4,
+        "WIDTH": 8
+      }
+    },
+    {
+      "id": "p1",
+      "params": {
+        "DEPTH": 2,
+        "WIDTH": 8
+      }
+    }
+  ],
+  "limits": {
+    "solver_s": 120,
+    "bmc_depth": 20,
+    "cover_depth": 20
+  }
+}

@@ -1,0 +1,148 @@
+{
+  "schema": "countertrace-checks-evaluation/1",
+  "frozen_at": "2026-10-09T19:31:38Z",
+  "source_commit": "80208c027677e16c8f0f60fdc067e2d798c1e927",
+  "configuration": {
+    "files": {
+      "fixtures/modules/debouncer/golden.v": "129196446edf3bf06b91fe5206e36eaf8239529fc10bf621a03b3e2594929e25",
+      "fixtures/modules/debouncer/module.json": "79a31d21fccabf86378441b451eb9c557923d2cf21b6a02f27103851a77d64f5",
+      "fixtures/modules/debouncer/reference_properties.json": "919e189e14abeb4953d1a6143ff56d889df33c98ea0f7091f92f862f862b6061",
+      "fixtures/modules/rr_arbiter/golden.v": "91334b7f26c4253c662260c88209b973e445ac9d0d9e19b604f93737d6b8fc85",
+      "fixtures/modules/rr_arbiter/module.json": "c1c323fd6d933ba76561aeb294812f657ad5fc18ed5fe627501b6c18f387aba1",
+      "fixtures/modules/rr_arbiter/reference_properties.json": "1575c85891e99df2ff874aa8b9f8a31e74383841bcbdf2e7b4ac4fdb31a6a796",
+      "fixtures/modules/sat_counter/golden.v": "89c7f854620b95a160004863af5008f495ea7422f4b0545e0dc7a99aa670ab26",
+      "fixtures/modules/sat_counter/module.json": "5c9b45dc6091780848823ac7bf441bc16caeb6bec21967859122efd53391aeac",
+      "fixtures/modules/sat_counter/reference_properties.json": "dd921044f3f143be63d3371b89f39622bad47a91b763056aa5c0487ebb32dd5f",
+      "fixtures/modules/seq_detector/golden.v": "4f036d98aa8264579d19f576afdd9e93e636f8beb9f606b8e659815a172ea511",
+      "fixtures/modules/seq_detector/module.json": "a08d69fde1cfb39931294fb078470416b85ceff3968535028da492e9996d6655",
+      "fixtures/modules/seq_detector/reference_properties.json": "e136047420f1a4d67e0b5e3e6332b5d48233408dd8e9867803b2481d546af701",
+      "fixtures/modules/skid_buffer/golden.v": "804ac6be3319424b069052c8837254800022521a8c402207c357a0924d2c0e1f",
+      "fixtures/modules/skid_buffer/module.json": "859ee23d5d72bb119c1c418349c6761c7fabb185f7de0d160a9f5d5c824464e6",
+      "fixtures/modules/skid_buffer/reference_properties.json": "deec5f2655294449d80df2c8e9207e2fb4ce9b40b72722386264a8b507c4b9ff",
+      "fixtures/modules/sync_fifo/module.json": "eac4472f783b1df0e25ff2288559d0745b4ccdd784dd25162410dbc0462f106f",
+      "fixtures/modules/sync_fifo/reference_properties.json": "219d949830f3979b81114ca8da91396a5020812595d1e4c1cab3b292e59780a7",
+      "fixtures/modules/uart_tx/golden.v": "bc58dd3c346ada2c39966892b3024bd7a2682d0659c4a33528372b672e75437f",
+      "fixtures/modules/uart_tx/module.json": "2befe625662509d947109e94d2f3885eae6240d0389854c8e9e095a01a99f838",
+      "fixtures/modules/uart_tx/reference_properties.json": "e51d001c21e3ea22405f4d941a154f6df0a32644eb9fd38e51c5994dde3c820f",
+      "scripts/evaluate_checks.py": "b24d87bab11d81d21ec1291a84d0f7d991b99ded9e59f5a946964b796c840061",
+      "src/countertrace/__init__.py": "17a4f8b532d42d4bb03cf8327b84354b53ee42a13ab06548e97e869b7f1d4f8c",
+      "src/countertrace/__main__.py": "61d85a6a1662f2b1c270a53a952102af8e8601334783d6aaa5d7ff6b9d4121b7",
+      "src/countertrace/admission.py": "254f2c38c92f8f471d7511cd43f398465b2826b0802a539bddd62bba1a81d747",
+      "src/countertrace/audit.py": "f6bfc60ac1f79eaec4f5809b118bc6672eb64cc1f9ccc665969f97a767901a94",
+      "src/countertrace/bundle.py": "b3d107cbebd0bd9bcb6c6803301cfd51644e219b3e0214b6da1a3edaf0b72f90",
+      "src/countertrace/catalog.py": "efba4b9218ff7e44ad3e7e7ce8b6abfe0a140c36e24ecc1633d88861910cb24f",
+      "src/countertrace/checks/__init__.py": "0b14494265c6666bcbf417594591cd8924f5821654012593fa03b5848aaf7b9f",
+      "src/countertrace/checks/agent.py": "0fea692b5d7a0e114547d1e36f28d4753019d5f7ad690da7baa73441131699d6",
+      "src/countertrace/checks/bundle.py": "412f29865cec5ca66e06c56bdc5f086ebfc863e5584708324b80acf702520cda",
+      "src/countertrace/checks/compile.py": "7af76e9f23f0797650e559d64acdd0cc401ce8a0b7aeaebbaa990bc5ca0eeb04",
+      "src/countertrace/checks/design.py": "8c47edbaa5342d630d29dbbba410911821caf9e5d7d2e877f67732a5cc1491dd",
+      "src/countertrace/checks/gate.py": "a020c24cb584b55f7c5de841c5ee4bfbdccea99a720e87940ac514a3a1ae7ed9",
+      "src/countertrace/checks/modules.py": "cb303cf8faff03e1a8af21ce615dd3edf8e4c6e15e5010fe3016d921789db00c",
+      "src/countertrace/cli.py": "ecb444d2c36d262c3707901ecd6a5611e59df9756f04a7aeba3b875e07ac941d",
+      "src/countertrace/contract.py": "2075e95b7deb3b56a70daa0fb3ff2b92c84a5b4164c5be79c0a10c4849d58a33",
+      "src/countertrace/evaluation.py": "68781ecc428969818d12082b355504a09498b6688ea70bba41330977c5530f1e",
+      "src/countertrace/formal.py": "a552741218a449e39e6f82811edb8d3eabca8939b718d744e9e11de80f36819e",
+      "src/countertrace/interface_map.py": "66c6450fcf021d4279a7686fed59156edba8a54959c60c327b7836154976d1d5",
+      "src/countertrace/learning.py": "7781daa9875852254f156e565a435787ac85ed916ccfff53c5277563f67064d1",
+      "src/countertrace/model.py": "468bdcb9c5a4c1f595b60f1794423f07053c094ba0d184ee19fd63a38bf4798a",
+      "src/countertrace/repair.py": "838256e080da528bbf859ebd225ab553612e414fbdaf229a8e034013bf5dece9",
+      "src/countertrace/runner.py": "56c57f146eeaf7ed254fac16cf751e57808f2478849c2ac1f37f26e50fffe138",
+      "src/countertrace/runs.py": "c77096d153cd6c4e890ba59bbd27a73a88f3e73e09b34ed0ebf2efe91a66c074",
+      "src/countertrace/scoreboard.py": "8b200118b0ce58f559a1f621807644fb9083421c2c967d3fe4e30927719fea78",
+      "src/countertrace/server.py": "559a9c0b9eae3c7dfdbaac2405305e17a29aaee0489706b5adcb9f925d32f163",
+      "src/countertrace/stimulus.py": "d1b9b42912a9e4cadd3387766ec2af97a0c5a4c9b8770b0e70ddbc3afcf1d22b",
+      "src/countertrace/verify.py": "4520e720bb65397fe20e2ce4c776cb42bab626d9e8037103df2cd6d19323ec7e",
+      "verifier/Dockerfile": "31d3c14ad07cf79dcee7579c9146e5842c9891b32f55d3c1fb5b93be4e29967f",
+      "verifier/README.md": "267fc4e692427a81b88f96f28cd92931f27fc0f9a9594639a85ef36847a380c0",
+      "verifier/harness/ct.sby.in": "31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+      "verifier/harness/ct_formal_top.sv": "6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+      "verifier/harness/ct_sim_top.sv": "918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534",
+      "verifier/worker.py": "614e81b4046aa7168718a1a3b6e60f54c46e721dc321a2249dc8e3ca0b25c9d4",
+      "fixtures/rtl/fifo_count.v": "ee0ad26c0c3b0ae036122fcf7907ace4b22311b04018ce586792f42e442855cd"
+    },
+    "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "endpoint": "https://api.tokenfactory.us-central1.nebius.com/v1",
+    "input_limit": 16384,
+    "checks_output_limit": 16384,
+    "model_timeout_s": 120,
+    "system_prefix": "",
+    "thinking_off_tasks": "",
+    "mutants": {
+      "count": 40,
+      "seed": 1
+    },
+    "limits": {
+      "solver_s": 120,
+      "bmc_depth": 20,
+      "cover_depth": 20
+    },
+    "max_rounds": 4,
+    "threshold": 0.9,
+    "verifier_digest": "26a51c6bce5dcf38"
+  },
+  "modules": [
+    "debouncer",
+    "sat_counter",
+    "seq_detector",
+    "uart_tx"
+  ],
+  "repeats": 3,
+  "order": [
+    {
+      "module": "debouncer",
+      "repeat": 1
+    },
+    {
+      "module": "sat_counter",
+      "repeat": 1
+    },
+    {
+      "module": "seq_detector",
+      "repeat": 1
+    },
+    {
+      "module": "uart_tx",
+      "repeat": 1
+    },
+    {
+      "module": "debouncer",
+      "repeat": 2
+    },
+    {
+      "module": "sat_counter",
+      "repeat": 2
+    },
+    {
+      "module": "seq_detector",
+      "repeat": 2
+    },
+    {
+      "module": "uart_tx",
+      "repeat": 2
+    },
+    {
+      "module": "debouncer",
+      "repeat": 3
+    },
+    {
+      "module": "sat_counter",
+      "repeat": 3
+    },
+    {
+      "module": "seq_detector",
+      "repeat": 3
+    },
+    {
+      "module": "uart_tx",
+      "repeat": 3
+    }
+  ],
+  "scoring": {
+    "primary": "Promoted within four rounds; show all 12 attempts.",
+    "target": "At least three of four modules promote; separately show modules promoting in all three repeats.",
+    "mutation_scope": "Primary parameter setting only; golden proof and trigger reachability use both settings.",
+    "feedback": "Normal shipped feedback only; no prompt or fixture edits between attempts.",
+    "limits": "No causal feedback-benefit claim without a matched control. No general accuracy claim.",
+    "provenance": "Assistant-authored catalog goldens/specifications; held out of model/prompt development, not independently authored or externally reviewed."
+  }
+}

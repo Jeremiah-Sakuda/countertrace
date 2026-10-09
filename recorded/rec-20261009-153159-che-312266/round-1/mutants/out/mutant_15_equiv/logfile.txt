@@ -1,0 +1,49 @@
+SBY 19:32:44 [mutant_15_equiv] Removing directory '/tmp/work/checks/mutant_15_equiv'.
+SBY 19:32:44 [mutant_15_equiv] Copy '/tmp/work/checks/golden.v' to '/tmp/work/checks/mutant_15_equiv/src/golden.v'.
+SBY 19:32:44 [mutant_15_equiv] Copy '/tmp/work/checks/all_mut.v' to '/tmp/work/checks/mutant_15_equiv/src/all_mut.v'.
+SBY 19:32:44 [mutant_15_equiv] Copy '/tmp/work/checks/mutant.sv' to '/tmp/work/checks/mutant_15_equiv/src/mutant.sv'.
+SBY 19:32:44 [mutant_15_equiv] Copy '/tmp/work/checks/miter.sv' to '/tmp/work/checks/mutant_15_equiv/src/miter.sv'.
+SBY 19:32:44 [mutant_15_equiv] engine_0: abc pdr
+SBY 19:32:44 [mutant_15_equiv] base: starting process "cd mutant_15_equiv/src; yosys -ql ../model/design.log ../model/design.ys"
+SBY 19:32:44 [mutant_15_equiv] base: finished (returncode=0)
+SBY 19:32:44 [mutant_15_equiv] prep: starting process "cd mutant_15_equiv/model; yosys -ql design_prep.log design_prep.ys"
+SBY 19:32:44 [mutant_15_equiv] prep: finished (returncode=0)
+SBY 19:32:44 [mutant_15_equiv] aig: starting process "cd mutant_15_equiv/model; yosys -ql design_aiger.log design_aiger.ys"
+SBY 19:32:44 [mutant_15_equiv] aig: Warning: Treating undriven bit ct_miter.\clk like $anyseq.
+SBY 19:32:44 [mutant_15_equiv] aig: Warning: Treating undriven bit ct_miter.\rst like $anyseq.
+SBY 19:32:44 [mutant_15_equiv] aig: Warning: Treating undriven bit ct_miter.\noisy like $anyseq.
+SBY 19:32:44 [mutant_15_equiv] aig: Warning: Treating a total of 3 undriven bits in ct_miter like $anyseq.
+SBY 19:32:44 [mutant_15_equiv] aig: finished (returncode=0)
+SBY 19:32:44 [mutant_15_equiv] engine_0: starting process "cd mutant_15_equiv; yosys-abc -c 'read_aiger model/design_aiger.aig; fold; strash; pdr -v -l; write_cex -a engine_0/trace.aiw'"
+SBY 19:32:44 [mutant_15_equiv] engine_0: ======== ABC command line "read_aiger model/design_aiger.aig; fold; strash; pdr -v -l; write_cex -a engine_0/trace.aiw"
+SBY 19:32:44 [mutant_15_equiv] engine_0: Warning: The last 2 outputs are interpreted as constraints.
+SBY 19:32:44 [mutant_15_equiv] engine_0: VarMax = 300. FrameMax = 10000. QueMax = 0. TimeMax = 139. MonoCNF = no. SkipGen = no. SolveAll = no.
+SBY 19:32:44 [mutant_15_equiv] engine_0: Frame Clauses                                                     Max Queue Flops Time
+SBY 19:32:44 [mutant_15_equiv] engine_0: 1 : 0 1                                                                 1     1      0.00 sec  T/O =  0  PRV =  0
+SBY 19:32:44 [mutant_15_equiv] engine_0: 2 : 0 7 10                                                              5    14      0.01 sec  T/O =  0  PRV =  0
+SBY 19:32:44 [mutant_15_equiv] engine_0: 3 : 0 3 5 5 ~1                                                           0    14      0.01 sec  T/O =  0  PRV =  0
+SBY 19:32:44 [mutant_15_equiv] engine_0: 4 : 0 4 6 11 12 ~1                                                       7    18      0.01 sec  T/O =  0  PRV =  0
+SBY 19:32:44 [mutant_15_equiv] engine_0: 5 : 0 4 3 6 13 15 ~1                                                     8    22      0.01 sec  T/O =  0  PRV =  0
+SBY 19:32:44 [mutant_15_equiv] engine_0: 6 : 0 3 2 4 2 0 20 ~1                                                    0    22      0.02 sec  T/O =  0  PRV =  0
+SBY 19:32:44 [mutant_15_equiv] engine_0: Proved output 0 in frame -2 (converged).
+SBY 19:32:44 [mutant_15_equiv] engine_0: Proved output 1 in frame -2 (converged).
+SBY 19:32:44 [mutant_15_equiv] engine_0: Block =    7  Oblig =   113  Clause =    55  Call =   415 (sat=54.7%)  Cex =   0  Start =   0
+SBY 19:32:44 [mutant_15_equiv] engine_0: SAT solving =     0.00 sec ( 16.72 %)
+SBY 19:32:44 [mutant_15_equiv] engine_0: unsat     =     0.00 sec (  1.81 %)
+SBY 19:32:44 [mutant_15_equiv] engine_0: sat       =     0.00 sec ( 14.91 %)
+SBY 19:32:44 [mutant_15_equiv] engine_0: Generalize  =     0.00 sec ( 11.95 %)
+SBY 19:32:44 [mutant_15_equiv] engine_0: Push clause =     0.00 sec (  4.68 %)
+SBY 19:32:44 [mutant_15_equiv] engine_0: Ternary sim =     0.00 sec (  1.12 %)
+SBY 19:32:44 [mutant_15_equiv] engine_0: Containment =     0.00 sec (  0.07 %)
+SBY 19:32:44 [mutant_15_equiv] engine_0: CNF compute =     0.00 sec (  1.50 %)
+SBY 19:32:44 [mutant_15_equiv] engine_0: Refinement  =     0.00 sec (  0.00 %)
+SBY 19:32:44 [mutant_15_equiv] engine_0: TOTAL       =     0.02 sec (100.00 %)
+SBY 19:32:44 [mutant_15_equiv] engine_0: Property proved.  Time =     0.02 sec
+SBY 19:32:44 [mutant_15_equiv] engine_0: Counter-example is not available.
+SBY 19:32:44 [mutant_15_equiv] engine_0: finished (returncode=0)
+SBY 19:32:44 [mutant_15_equiv] engine_0: Status returned by engine: PASS
+SBY 19:32:44 [mutant_15_equiv] summary: Elapsed clock time [H:MM:SS (secs)]: 0:00:00 (0)
+SBY 19:32:44 [mutant_15_equiv] summary: Elapsed process time [H:MM:SS (secs)]: 0:00:00 (0)
+SBY 19:32:44 [mutant_15_equiv] summary: engine_0 (abc pdr) returned PASS
+SBY 19:32:44 [mutant_15_equiv] summary: engine_0 did not produce any traces
+SBY 19:32:44 [mutant_15_equiv] DONE (PASS, rc=0)

@@ -1,0 +1,114 @@
+SBY 19:48:06 [mutant_38_equiv] Removing directory '/tmp/work/checks/mutant_38_equiv'.
+SBY 19:48:06 [mutant_38_equiv] Copy '/tmp/work/checks/golden.v' to '/tmp/work/checks/mutant_38_equiv/src/golden.v'.
+SBY 19:48:06 [mutant_38_equiv] Copy '/tmp/work/checks/all_mut.v' to '/tmp/work/checks/mutant_38_equiv/src/all_mut.v'.
+SBY 19:48:06 [mutant_38_equiv] Copy '/tmp/work/checks/mutant.sv' to '/tmp/work/checks/mutant_38_equiv/src/mutant.sv'.
+SBY 19:48:06 [mutant_38_equiv] Copy '/tmp/work/checks/miter.sv' to '/tmp/work/checks/mutant_38_equiv/src/miter.sv'.
+SBY 19:48:06 [mutant_38_equiv] engine_0: abc pdr
+SBY 19:48:06 [mutant_38_equiv] base: starting process "cd mutant_38_equiv/src; yosys -ql ../model/design.log ../model/design.ys"
+SBY 19:48:06 [mutant_38_equiv] base: Warning: Encountered `parallel_case' comment! Such legacy hot comments are supported by Yosys, but are not part of any formal language specification. Using the Verilog `parallel_case' attribute or the SystemVerilog `unique' or `priority' keywords is recommended!
+SBY 19:48:06 [mutant_38_equiv] base: finished (returncode=0)
+SBY 19:48:06 [mutant_38_equiv] prep: starting process "cd mutant_38_equiv/model; yosys -ql design_prep.log design_prep.ys"
+SBY 19:48:06 [mutant_38_equiv] prep: finished (returncode=0)
+SBY 19:48:06 [mutant_38_equiv] aig: starting process "cd mutant_38_equiv/model; yosys -ql design_aiger.log design_aiger.ys"
+SBY 19:48:06 [mutant_38_equiv] aig: Warning: Treating undriven bit ct_miter.\clk like $anyseq.
+SBY 19:48:06 [mutant_38_equiv] aig: Warning: Treating undriven bit ct_miter.\wr_en like $anyseq.
+SBY 19:48:06 [mutant_38_equiv] aig: Warning: Treating undriven bit ct_miter.\rst like $anyseq.
+SBY 19:48:06 [mutant_38_equiv] aig: Warning: Treating undriven bit ct_miter.\rd_en like $anyseq.
+SBY 19:48:06 [mutant_38_equiv] aig: Warning: Treating undriven bit ct_miter.\din [0] like $anyseq.
+SBY 19:48:06 [mutant_38_equiv] aig: Warning: Treating undriven bit ct_miter.\din [1] like $anyseq.
+SBY 19:48:06 [mutant_38_equiv] aig: Warning: Treating undriven bit ct_miter.\din [2] like $anyseq.
+SBY 19:48:06 [mutant_38_equiv] aig: Warning: Treating undriven bit ct_miter.\din [3] like $anyseq.
+SBY 19:48:06 [mutant_38_equiv] aig: Warning: Treating undriven bit ct_miter.\din [4] like $anyseq.
+SBY 19:48:06 [mutant_38_equiv] aig: Warning: Treating undriven bit ct_miter.\din [5] like $anyseq.
+SBY 19:48:06 [mutant_38_equiv] aig: Warning: Treating undriven bit ct_miter.\din [6] like $anyseq.
+SBY 19:48:06 [mutant_38_equiv] aig: Warning: Treating undriven bit ct_miter.\din [7] like $anyseq.
+SBY 19:48:06 [mutant_38_equiv] aig: Warning: Treating a total of 12 undriven bits in ct_miter like $anyseq.
+SBY 19:48:06 [mutant_38_equiv] aig: finished (returncode=0)
+SBY 19:48:06 [mutant_38_equiv] engine_0: starting process "cd mutant_38_equiv; yosys-abc -c 'read_aiger model/design_aiger.aig; fold; strash; pdr -v -l; write_cex -a engine_0/trace.aiw'"
+SBY 19:48:06 [mutant_38_equiv] engine_0: ======== ABC command line "read_aiger model/design_aiger.aig; fold; strash; pdr -v -l; write_cex -a engine_0/trace.aiw"
+SBY 19:48:06 [mutant_38_equiv] engine_0: Warning: The last 2 outputs are interpreted as constraints.
+SBY 19:48:06 [mutant_38_equiv] engine_0: VarMax = 300. FrameMax = 10000. QueMax = 0. TimeMax = 159. MonoCNF = no. SkipGen = no. SolveAll = no.
+SBY 19:48:06 [mutant_38_equiv] engine_0: Frame Clauses                                                     Max Queue Flops Time
+SBY 19:48:06 [mutant_38_equiv] engine_0: 1 : 0 2                                                                 1     2      0.00 sec  T/O =  0  PRV =  0
+SBY 19:48:06 [mutant_38_equiv] engine_0: 2 : 0 8 12                                                              5    15      0.01 sec  T/O =  0  PRV =  0
+SBY 19:48:06 [mutant_38_equiv] engine_0: 3 : 0 5 7 7 ~1                                                           2    15      0.01 sec  T/O =  0  PRV =  0
+SBY 19:48:06 [mutant_38_equiv] engine_0: 4 : 0 7 13 31 24 ~1                                                     15    28      0.02 sec  T/O =  0  PRV =  0
+SBY 19:48:06 [mutant_38_equiv] engine_0: 4 : 0 7 13 57 61 ~1                                                      5    62      0.03 sec  T/O =  0  PRV =  0
+SBY 19:48:06 [mutant_38_equiv] engine_0: 4 : 0 7 13 79 100 ~1                                                     5    70      0.05 sec  T/O =  0  PRV =  0
+SBY 19:48:06 [mutant_38_equiv] engine_0: 4 : 0 7 13 82 108 ~1                                                     5    71      0.05 sec  T/O =  0  PRV =  0
+SBY 19:48:06 [mutant_38_equiv] engine_0: 5 : 0 6 9 37 106 13 ~1                                                   0    71      0.06 sec  T/O =  0  PRV =  0
+SBY 19:48:06 [mutant_38_equiv] engine_0: 6 : 0 6 9 37 115 44 21 ~1                                               20    73      0.08 sec  T/O =  0  PRV =  0
+SBY 19:48:06 [mutant_38_equiv] engine_0: 6 : 0 6 9 37 118 66 60 ~1                                               19    81      0.10 sec  T/O =  0  PRV =  0
+SBY 19:48:06 [mutant_38_equiv] engine_0: 6 : 0 6 9 37 123 94 93 ~1                                                9    83      0.12 sec  T/O =  0  PRV =  0
+SBY 19:48:06 [mutant_38_equiv] engine_0: 6 : 0 6 9 37 127 121 126 ~1                                              9    87      0.13 sec  T/O =  0  PRV =  0
+SBY 19:48:06 [mutant_38_equiv] engine_0: 6 : 0 6 9 37 131 146 160 ~1                                              9    91      0.15 sec  T/O =  0  PRV =  0
+SBY 19:48:06 [mutant_38_equiv] engine_0: 6 : 0 6 9 37 135 175 192 ~1                                              9    99      0.17 sec  T/O =  0  PRV =  0
+SBY 19:48:06 [mutant_38_equiv] engine_0: 6 : 0 6 9 37 139 203 226 ~1                                              9   103      0.19 sec  T/O =  0  PRV =  0
+SBY 19:48:06 [mutant_38_equiv] engine_0: 6 : 0 6 9 37 143 231 257 ~1                                              9   103      0.21 sec  T/O =  0  PRV =  0
+SBY 19:48:06 [mutant_38_equiv] engine_0: 6 : 0 6 9 37 145 244 284 ~1                                              9   103      0.22 sec  T/O =  0  PRV =  0
+SBY 19:48:06 [mutant_38_equiv] engine_0: 7 : 0 6 9 29 73 111 215 110 ~1                                           0   103      0.25 sec  T/O =  0  PRV =  0
+SBY 19:48:06 [mutant_38_equiv] engine_0: 8 : 0 6 9 29 73 111 216 59 59 ~1                                         6   103      0.27 sec  T/O =  0  PRV =  0
+SBY 19:48:06 [mutant_38_equiv] engine_0: Timing out on output 0 in frame 8 (retrying in next anytime pass).
+SBY 19:48:06 [mutant_38_equiv] engine_0: 8 : 0 6 9 29 73 111 216 59 59 ~1                                         0   103      0.27 sec  T/O =  1  PRV =  0
+SBY 19:48:06 [mutant_38_equiv] engine_0: Proved output 1 in frame 8.
+SBY 19:48:06 [mutant_38_equiv] engine_0: Proved output 2 in frame 8.
+SBY 19:48:06 [mutant_38_equiv] engine_0: 9 : 0 6 9 29 73 109 207 56 6 7 ~54                                       0   103      0.29 sec  T/O =  1  PRV =  2
+SBY 19:48:06 [mutant_38_equiv] engine_0: 10 : 0 6 9 29 73 109 207 56 6 5 2 ~54                                     0   103      0.31 sec  T/O =  1  PRV =  2
+SBY 19:48:06 [mutant_38_equiv] engine_0: All outputs solved or timed out in frame 10.
+SBY 19:48:06 [mutant_38_equiv] engine_0: Starting new anytime pass, reusing clauses.
+SBY 19:48:06 [mutant_38_equiv] engine_0: Frame Clauses                                                     Max Queue Flops Time
+SBY 19:48:06 [mutant_38_equiv] engine_0: 1 : 0 502 ~43                                                            0     0      0.04 sec  T/O =  0  PRV =  2
+SBY 19:48:06 [mutant_38_equiv] engine_0: 2 : 0 6 496 ~43                                                          0     0      0.04 sec  T/O =  0  PRV =  2
+SBY 19:48:06 [mutant_38_equiv] engine_0: 3 : 0 6 9 487 ~43                                                        0     0      0.04 sec  T/O =  0  PRV =  2
+SBY 19:48:06 [mutant_38_equiv] engine_0: 4 : 0 6 9 29 458 ~43                                                     0     0      0.04 sec  T/O =  0  PRV =  2
+SBY 19:48:06 [mutant_38_equiv] engine_0: 5 : 0 6 9 29 73 385 ~43                                                  0     0      0.05 sec  T/O =  0  PRV =  2
+SBY 19:48:06 [mutant_38_equiv] engine_0: 6 : 0 6 9 29 73 109 276 ~43                                              0     0      0.05 sec  T/O =  0  PRV =  2
+SBY 19:48:06 [mutant_38_equiv] engine_0: 7 : 0 6 9 29 73 109 207 69 ~43                                           0     0      0.07 sec  T/O =  0  PRV =  2
+SBY 19:48:07 [mutant_38_equiv] engine_0: 8 : 0 6 9 29 73 110 215 77 39 ~43                                        9    22      0.13 sec  T/O =  0  PRV =  2
+SBY 19:48:07 [mutant_38_equiv] engine_0: 8 : 0 6 9 29 73 110 224 103 60 ~43                                       9    40      0.17 sec  T/O =  0  PRV =  2
+SBY 19:48:07 [mutant_38_equiv] engine_0: 8 : 0 6 9 29 73 110 227 125 98 ~43                                       9    57      0.20 sec  T/O =  0  PRV =  2
+SBY 19:48:07 [mutant_38_equiv] engine_0: 8 : 0 6 9 29 73 110 236 149 129 ~43                                      8    75      0.24 sec  T/O =  0  PRV =  2
+SBY 19:48:07 [mutant_38_equiv] engine_0: 8 : 0 6 9 29 73 110 243 175 162 ~43                                      7    94      0.29 sec  T/O =  0  PRV =  2
+SBY 19:48:07 [mutant_38_equiv] engine_0: 8 : 0 6 9 29 73 110 243 176 166 ~43                                      6    96      0.29 sec  T/O =  0  PRV =  2
+SBY 19:48:07 [mutant_38_equiv] engine_0: Timing out on output 0 in frame 8 (retrying in next anytime pass).
+SBY 19:48:07 [mutant_38_equiv] engine_0: 8 : 0 6 9 29 73 110 243 176 166 ~43                                      0    96      0.29 sec  T/O =  1  PRV =  2
+SBY 19:48:07 [mutant_38_equiv] engine_0: 9 : 0 6 9 20 61 58 69 56 154 165 ~65                                     0    96      0.35 sec  T/O =  1  PRV =  2
+SBY 19:48:07 [mutant_38_equiv] engine_0: All outputs solved or timed out in frame 9.
+SBY 19:48:07 [mutant_38_equiv] engine_0: Starting new anytime pass, reusing clauses.
+SBY 19:48:07 [mutant_38_equiv] engine_0: Frame Clauses                                                     Max Queue Flops Time
+SBY 19:48:07 [mutant_38_equiv] engine_0: 1 : 0 368 ~81                                                            0     0      0.06 sec  T/O =  0  PRV =  2
+SBY 19:48:07 [mutant_38_equiv] engine_0: 2 : 0 3 365 ~81                                                          0     0      0.06 sec  T/O =  0  PRV =  2
+SBY 19:48:07 [mutant_38_equiv] engine_0: 3 : 0 3 3 362 ~81                                                        0     0      0.06 sec  T/O =  0  PRV =  2
+SBY 19:48:07 [mutant_38_equiv] engine_0: 4 : 0 3 3 12 350 ~81                                                     0     0      0.06 sec  T/O =  0  PRV =  2
+SBY 19:48:07 [mutant_38_equiv] engine_0: 5 : 0 3 3 12 25 325 ~81                                                  0     0      0.06 sec  T/O =  0  PRV =  2
+SBY 19:48:07 [mutant_38_equiv] engine_0: 6 : 0 3 3 12 25 31 294 ~81                                               0     0      0.06 sec  T/O =  0  PRV =  2
+SBY 19:48:07 [mutant_38_equiv] engine_0: 7 : 0 3 3 12 25 31 46 248 ~81                                            0     0      0.07 sec  T/O =  0  PRV =  2
+SBY 19:48:07 [mutant_38_equiv] engine_0: 8 : 0 3 3 12 25 31 46 42 206 ~81                                         0     0      0.07 sec  T/O =  0  PRV =  2
+SBY 19:48:07 [mutant_38_equiv] engine_0: 9 : 0 3 3 12 25 31 49 59 127 119 ~81                                    12    26      0.11 sec  T/O =  0  PRV =  2
+SBY 19:48:07 [mutant_38_equiv] engine_0: 9 : 0 3 3 12 25 31 52 68 153 148 ~81                                    14    46      0.13 sec  T/O =  0  PRV =  2
+SBY 19:48:07 [mutant_38_equiv] engine_0: 9 : 0 3 3 12 25 31 54 77 173 175 ~81                                    13    62      0.15 sec  T/O =  0  PRV =  2
+SBY 19:48:07 [mutant_38_equiv] engine_0: 10 : 0 3 3 10 22 25 17 22 24 18 319 ~76                                   8    70      0.19 sec  T/O =  0  PRV =  2
+SBY 19:48:07 [mutant_38_equiv] engine_0: 11 : 0 3 3 10 22 25 17 18 12 13 8 17 ~392                                 6    70      0.23 sec  T/O =  0  PRV =  2
+SBY 19:48:07 [mutant_38_equiv] engine_0: 12 : 0 3 3 10 22 25 17 12 3 6 5 5 17 ~338                                 5    70      0.25 sec  T/O =  0  PRV =  2
+SBY 19:48:07 [mutant_38_equiv] engine_0: 13 : 0 3 3 10 22 24 16 11 0 0 0 0 0 0 ~353                                0    70      0.26 sec  T/O =  0  PRV =  2
+SBY 19:48:07 [mutant_38_equiv] engine_0: Proved output 0 in frame -2 (converged).
+SBY 19:48:07 [mutant_38_equiv] engine_0: Block =   17  Oblig =  2154  Clause =  1344  Call = 20331 (sat=65.6%)  Cex =   0  Start =  56
+SBY 19:48:07 [mutant_38_equiv] engine_0: SAT solving =     0.60 sec ( 64.21 %)
+SBY 19:48:07 [mutant_38_equiv] engine_0: unsat     =     0.11 sec ( 11.68 %)
+SBY 19:48:07 [mutant_38_equiv] engine_0: sat       =     0.49 sec ( 52.53 %)
+SBY 19:48:07 [mutant_38_equiv] engine_0: Generalize  =     0.38 sec ( 40.79 %)
+SBY 19:48:07 [mutant_38_equiv] engine_0: Push clause =     0.23 sec ( 24.91 %)
+SBY 19:48:07 [mutant_38_equiv] engine_0: Ternary sim =     0.01 sec (  1.37 %)
+SBY 19:48:07 [mutant_38_equiv] engine_0: Containment =     0.00 sec (  0.17 %)
+SBY 19:48:07 [mutant_38_equiv] engine_0: CNF compute =     0.03 sec (  3.12 %)
+SBY 19:48:07 [mutant_38_equiv] engine_0: Refinement  =     0.00 sec (  0.00 %)
+SBY 19:48:07 [mutant_38_equiv] engine_0: TOTAL       =     0.94 sec (100.00 %)
+SBY 19:48:07 [mutant_38_equiv] engine_0: Property proved.  Time =     0.94 sec
+SBY 19:48:07 [mutant_38_equiv] engine_0: Counter-example is not available.
+SBY 19:48:07 [mutant_38_equiv] engine_0: finished (returncode=0)
+SBY 19:48:07 [mutant_38_equiv] engine_0: Status returned by engine: PASS
+SBY 19:48:07 [mutant_38_equiv] summary: Elapsed clock time [H:MM:SS (secs)]: 0:00:01 (1)
+SBY 19:48:07 [mutant_38_equiv] summary: Elapsed process time [H:MM:SS (secs)]: 0:00:00 (0)
+SBY 19:48:07 [mutant_38_equiv] summary: engine_0 (abc pdr) returned PASS
+SBY 19:48:07 [mutant_38_equiv] summary: engine_0 did not produce any traces
+SBY 19:48:07 [mutant_38_equiv] DONE (PASS, rc=0)

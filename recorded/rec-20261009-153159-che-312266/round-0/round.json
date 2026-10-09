@@ -1,0 +1,275 @@
+{
+ "index": 0,
+ "calls": [
+  {
+   "task": "write_checks",
+   "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+   "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+   "at": "2026-10-09T19:31:59Z",
+   "attempts": 1,
+   "thinking": true,
+   "request_id": "7e6ec8152816cce94315e52a842b13fb",
+   "latency_ms": 17544,
+   "prompt_tokens": 658,
+   "completion_tokens": 5880,
+   "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+   "status": "ok",
+   "finish_reason": "stop"
+  }
+ ],
+ "model_status": "ok",
+ "properties": {
+  "state": [
+   {
+    "name": "model_clean",
+    "width": 1,
+    "next": "rst ? 1'b0 : ((model_count == STABLE-1 && noisy != model_clean) ? noisy : model_clean)"
+   },
+   {
+    "name": "model_changed",
+    "width": 1,
+    "next": "rst ? 1'b0 : ((model_count == STABLE-1 && noisy != model_clean) ? 1'b1 : 1'b0)"
+   },
+   {
+    "name": "model_count",
+    "width": 2,
+    "next": "rst ? 2'b0 : ((noisy == model_clean) ? 2'b0 : model_count + 1)"
+   }
+  ],
+  "defs": [],
+  "memories": [],
+  "writes": [],
+  "properties": [
+   {
+    "id": "outputs_match",
+    "when": "1'b1",
+    "then": "clean == model_clean && changed == model_changed",
+    "why": "both outputs should follow the debouncing specification"
+   }
+  ]
+ },
+ "gate": {
+  "stage": "golden",
+  "passed": false,
+  "status": "FAIL",
+  "failed": [
+   "outputs_match"
+  ],
+  "config": {
+   "id": "p0",
+   "params": {
+    "STABLE": 3
+   }
+  }
+ },
+ "feedback": "A reference implementation that meets the specification violates outputs_match at STABLE = 3. Those properties are wrong, not the design. Counterexample (values just before each edge):\nedge | rst | noisy | clean | changed\n0 | 1 | 1 | 0 | 0\n1 | 0 | 1 | 0 | 0\n2 | 0 | 1 | 0 | 0\n3 | 0 | 1 | 0 | 0\n4 | 0 | 0 | 1 | 1\n5 | 0 | 0 | 1 | 0\n6 | 0 | 0 | 1 | 0\n7 | 0 | 0 | 0 | 1\n8 | 1 | 0 | 0 | 0\n9 | 1 | 0 | 0 | 0\nCorrect or remove them and resubmit the whole set.",
+ "frozen": {
+  "schema": "countertrace-promoted-checks-v1",
+  "module": {
+   "id": "debouncer",
+   "title": "Debouncer",
+   "top": "debouncer",
+   "clock": "clk",
+   "reset": "rst",
+   "params": [
+    {
+     "STABLE": 3
+    },
+    {
+     "STABLE": 2
+    }
+   ],
+   "inputs": {
+    "rst": 1,
+    "noisy": 1
+   },
+   "outputs": {
+    "clean": 1,
+    "changed": 1
+   },
+   "spec": "A debouncer for one input, noisy, with one rising-edge clock clk. clean and changed are registered outputs that change only at rising edges.\nrst is a synchronous active-high reset: at a rising edge with rst high, clean becomes 0, changed becomes 0, and any count in progress is discarded.\nnoisy is sampled at each rising edge. clean changes to the value of noisy at the STABLE-th consecutive edge without reset at which noisy differs from clean. An edge at which noisy equals clean restarts the count, so clean only changes after noisy has held the other value at STABLE consecutive edges.\nchanged is high for exactly the cycle after each edge at which clean changes, and low otherwise.",
+   "split": "heldout"
+  },
+  "properties_hash": "sha256:0fc6c21f020feaaadd4fdf1af0e9b7f311cac2edb4e75905e97c498f4fa5ae31",
+  "checker_hash": "sha256:e548dfbca902f667e566cfbde511d5083a94542edb5c89a72286d8d498ca5d32",
+  "golden_hash": "sha256:a3b1c3f73250c521e002e0cf71aef9a8f907bee340c030664802e21fdd3e0fb7",
+  "harness": {
+   "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+   "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+   "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+  },
+  "verifier_digest": "26a51c6bce5dcf38",
+  "trusted_code": {
+   "bundle.py": "sha256:a29824fd095cbf67c8ab8d2e81522101ceebf67285448a06ff93b950a75092ae",
+   "design.py": "sha256:b31699ceca4534bd7a0033017fd5cef83810a3faf9a9719f667abc957fe86395",
+   "__init__.py": "sha256:b8f3265344eb7ae70d0c1b8687be2390283a0a4d948334c0236f726312f13912",
+   "compile.py": "sha256:ff04ee4c2e1d29afae9fdc04271e231345ebf7a450eefc6825dbaa401b379c67",
+   "gate.py": "sha256:db27e1c32cde7d14d8b82fcb290aabc743a691cfb6f3d084b8da1ee2ea217ae3",
+   "agent.py": "sha256:0cc8c7e7cf6f08acb0b3b9e7f5fa6fcaff6345961e3e5a1a84b436dbc6403c16",
+   "modules.py": "sha256:d0bbeabf053a00261fbd1409ec26abe633320bad3b601bada6e714684c6d6538"
+  },
+  "limits": {
+   "solver_s": 120,
+   "bmc_depth": 20,
+   "cover_depth": 20
+  },
+  "mutants": {
+   "count": 40,
+   "seed": 1
+  },
+  "promotion_threshold": 0.9
+ },
+ "gate_full": {
+  "stage": "golden",
+  "passed": false,
+  "configs": [
+   {
+    "id": "p0",
+    "params": {
+     "STABLE": 3
+    }
+   },
+   {
+    "id": "p1",
+    "params": {
+     "STABLE": 2
+    }
+   }
+  ],
+  "limits": {
+   "solver_s": 120,
+   "bmc_depth": 20,
+   "cover_depth": 20
+  },
+  "gate_run": {
+   "wall_s": 4.317,
+   "image": {
+    "tag": "countertrace-verifier:26a51c6bce5dcf38",
+    "image_id": "sha256:62dbb264be6153e08c5014540a0a134482d1e29ccfbdd1602385100defa72ce5",
+    "verifier_digest": "26a51c6bce5dcf38"
+   }
+  },
+  "status": "FAIL",
+  "config": {
+   "id": "p0",
+   "params": {
+    "STABLE": 3
+   }
+  },
+  "failed": [
+   "outputs_match"
+  ],
+  "trace": [
+   {
+    "step": 0,
+    "inputs": {
+     "rst": 1,
+     "noisy": 1
+    },
+    "outputs": {
+     "clean": 0,
+     "changed": 0
+    }
+   },
+   {
+    "step": 1,
+    "inputs": {
+     "rst": 0,
+     "noisy": 1
+    },
+    "outputs": {
+     "clean": 0,
+     "changed": 0
+    }
+   },
+   {
+    "step": 2,
+    "inputs": {
+     "rst": 0,
+     "noisy": 1
+    },
+    "outputs": {
+     "clean": 0,
+     "changed": 0
+    }
+   },
+   {
+    "step": 3,
+    "inputs": {
+     "rst": 0,
+     "noisy": 1
+    },
+    "outputs": {
+     "clean": 0,
+     "changed": 0
+    }
+   },
+   {
+    "step": 4,
+    "inputs": {
+     "rst": 0,
+     "noisy": 0
+    },
+    "outputs": {
+     "clean": 1,
+     "changed": 1
+    }
+   },
+   {
+    "step": 5,
+    "inputs": {
+     "rst": 0,
+     "noisy": 0
+    },
+    "outputs": {
+     "clean": 1,
+     "changed": 0
+    }
+   },
+   {
+    "step": 6,
+    "inputs": {
+     "rst": 0,
+     "noisy": 0
+    },
+    "outputs": {
+     "clean": 1,
+     "changed": 0
+    }
+   },
+   {
+    "step": 7,
+    "inputs": {
+     "rst": 0,
+     "noisy": 0
+    },
+    "outputs": {
+     "clean": 0,
+     "changed": 1
+    }
+   },
+   {
+    "step": 8,
+    "inputs": {
+     "rst": 1,
+     "noisy": 0
+    },
+    "outputs": {
+     "clean": 0,
+     "changed": 0
+    }
+   },
+   {
+    "step": 9,
+    "inputs": {
+     "rst": 1,
+     "noisy": 0
+    },
+    "outputs": {
+     "clean": 0,
+     "changed": 0
+    }
+   }
+  ]
+ }
+}

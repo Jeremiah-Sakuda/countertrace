@@ -77,3 +77,20 @@ test('held-out modules remain reserved with the exploratory start disabled even 
     assert.equal(calls,1);
   } finally {await vite.close();}
 });
+
+test('featured journey requires a complete promoted FIFO with both recorded downstream links',async()=>{
+  const vite=await createServer({server:{middlewareMode:true,hmr:false,ws:false,watch:null}});
+  try {
+    const {createElement}=await import('react');
+    const {renderToStaticMarkup}=await import('react-dom/server');
+    const {FeaturedJourney}=await vite.ssrLoadModule('/src/views/ChecksView.tsx');
+    const run={id:'checks',state:'complete',module_id:'sync_fifo',checks:{status:'promoted',promoted_round:0,rounds:[{index:0,properties:{properties:[{id:'flags'}]},gate:{stage:'mutants',passed:true,total:40,killed:39,nonequivalent:39,equivalent:1,invalid:0,unresolved:0,survived:[]}}],demonstration:{hunt_run_id:'hunt',repair_run_id:'repair'}}};
+    const render=x=>renderToStaticMarkup(createElement(FeaturedJourney,{run:x}));
+    const html=render(run);
+    assert.match(html,/39 \/ 39 faulty variants caught/);
+    for(const id of ['checks','hunt','repair'])assert.match(html,new RegExp(`href="#/runs/${id}"`));
+    for(const alter of [r=>r.state='failed',r=>r.module_id='debouncer',r=>delete r.checks.demonstration.repair_run_id,r=>r.checks.rounds[0].gate.unresolved=1]) {
+      const invalid=structuredClone(run);alter(invalid);assert.equal(render(invalid),'');
+    }
+  } finally {await vite.close();}
+});

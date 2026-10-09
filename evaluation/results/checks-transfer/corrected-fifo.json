@@ -1,0 +1,226 @@
+{
+  "source_commit": "28ee40cbd5ca7892f90a00a7dab2ecbf12237e71",
+  "checks_run": "20261009-154341-che-06ba10",
+  "checks_status": "promoted",
+  "secondary": {
+    "params": [
+      {
+        "DEPTH": 2,
+        "WIDTH": 8
+      }
+    ],
+    "frozen": {
+      "schema": "countertrace-promoted-checks-v1",
+      "module": {
+        "id": "sync_fifo",
+        "title": "Synchronous FIFO",
+        "top": "fifo",
+        "clock": "clk",
+        "reset": "rst",
+        "params": [
+          {
+            "DEPTH": 2,
+            "WIDTH": 8
+          }
+        ],
+        "inputs": {
+          "rst": 1,
+          "wr_en": 1,
+          "rd_en": 1,
+          "din": "WIDTH"
+        },
+        "outputs": {
+          "dout": "WIDTH",
+          "full": 1,
+          "empty": 1
+        },
+        "spec": "A synchronous first-in first-out queue holding up to DEPTH words of WIDTH bits, with one rising-edge clock clk.\nrst is a synchronous active-high reset: at a rising edge with rst high the queue becomes empty, and read and write requests at that edge are ignored.\nAt each rising edge without reset: a write (wr_en high) stores din at the tail unless the queue is full; a read (rd_en high) removes the head word unless the queue is empty. Full and empty are judged from the occupancy before the edge, so a read and a write at the same edge are each accepted or ignored on that basis.\nAfter an accepted read, dout contains the removed word after that edge. Its value is unconstrained at other times, including reset, idle cycles and ignored reads. Do not require it to remain stable between accepted reads.\nempty is high exactly when the queue holds no words; full is high exactly when it holds DEPTH words. Words come out in the order they were accepted.",
+        "split": "development"
+      },
+      "properties_hash": "sha256:2b36b1b33128b3d893940e7eaddf3d3a0cbf529f2fd0691e3b58bd4837f207d2",
+      "checker_hash": "sha256:98c1ef408754d32b5191ef6193e025e19c94d388fdccd8dfffc2794775369a42",
+      "golden_hash": "sha256:da0e5a92be992d813f92bbf4383fadf92883b24b4c91df621d9261b5565079d6",
+      "harness": {
+        "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+        "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+        "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+      },
+      "verifier_digest": "26a51c6bce5dcf38",
+      "trusted_code": {
+        "bundle.py": "sha256:a29824fd095cbf67c8ab8d2e81522101ceebf67285448a06ff93b950a75092ae",
+        "design.py": "sha256:b31699ceca4534bd7a0033017fd5cef83810a3faf9a9719f667abc957fe86395",
+        "__init__.py": "sha256:b8f3265344eb7ae70d0c1b8687be2390283a0a4d948334c0236f726312f13912",
+        "compile.py": "sha256:ff04ee4c2e1d29afae9fdc04271e231345ebf7a450eefc6825dbaa401b379c67",
+        "gate.py": "sha256:db27e1c32cde7d14d8b82fcb290aabc743a691cfb6f3d084b8da1ee2ea217ae3",
+        "agent.py": "sha256:0cc8c7e7cf6f08acb0b3b9e7f5fa6fcaff6345961e3e5a1a84b436dbc6403c16",
+        "modules.py": "sha256:d0bbeabf053a00261fbd1409ec26abe633320bad3b601bada6e714684c6d6538"
+      },
+      "limits": {
+        "solver_s": 120,
+        "bmc_depth": 20,
+        "cover_depth": 20
+      },
+      "mutants": {
+        "count": 40,
+        "seed": 1
+      },
+      "promotion_threshold": 0.9
+    },
+    "gate": {
+      "stage": "mutants",
+      "passed": true,
+      "total": 40,
+      "killed": 37,
+      "equivalent": 3,
+      "invalid": 0,
+      "unresolved": 0,
+      "nonequivalent": 37,
+      "kill_rate": 1.0,
+      "survived": []
+    }
+  },
+  "hunt_run": "20261009-154734-ver-dfae43",
+  "confirmation": "confirmed",
+  "repair": {
+    "max_attempts": 3,
+    "parent_frozen": {
+      "contract": "sha256:d8c9a8e739585556ac4f0931dbbbcc14b75d4f197cd000be00d91a1af4a58ce3",
+      "harness": {
+        "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+        "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+        "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+      },
+      "verifier_digest": "26a51c6bce5dcf38",
+      "stimulus_version": "stimulus-v1",
+      "stimulus": {
+        "learner_basic": "sha256:1251c52b29ed1844b0b10990abd1342a374a0bfdd3e5c59a01e434e77946d3f1",
+        "fill_drain": "sha256:08fb777f2a55280f4c87a08ededda1c44620983e78d24fff64064ac5dacd67fe",
+        "write_when_full": "sha256:04c6acd082206ba9a4c07800794d26098aa2b520e823e594f2e594b2829d65bf",
+        "simultaneous": "sha256:dc481895d0ed348e42982fc3a211b4b38178c5c196280238bcdacf8cfbf6ea50",
+        "wraparound": "sha256:545e9e9e1ca64f16b0cc986b453eb8bf8bbf560508a13d7b79dddf51e534643a",
+        "recurrent_reset": "sha256:b22685a91bb333e82d9c092150e3686d8ce5356c3c11b89a7f813358c7440291",
+        "random_s1": "sha256:8bd6ee1b4943fb0e7b773e2e1603d5db1b2fa925b2f8ed5006d931ddffae9dd2",
+        "random_s2": "sha256:4cf2ffe52bdf16b7ffa58ea0d1b2c946ce0ada219ced02edc40981537c564b4d",
+        "random_s3": "sha256:68f7c3a78971c7657450cba5f0b6292d211e1146682d09386ab017b6a6bf8165",
+        "random_s4": "sha256:7293c9d0ea3bfc69d0e9c784eb9e7fb338c243f78df2681b23a1b097979b8b9e",
+        "random_s5": "sha256:c69b2aa263a5185382f67c7d2d0eb543c8931cd4f1f3455a49d6169a878ffa82",
+        "random_s6": "sha256:9663d197ffedbfb6f7949601f1c1e15dc991b74c8e115bbfecbbf96bddee6b36",
+        "random_s7": "sha256:728636019d543950a64a569f69cb58f7c6a62b31eb454ead3d7e0cd12a815cf9",
+        "random_s8": "sha256:213b0afca2a40ffb3358aea6361f79d99472f1261ace1b388d8df920b7f9efd6"
+      },
+      "limits": {
+        "compile_s": 60,
+        "sim_s": 30,
+        "solver_s": 120,
+        "bmc_depth": 24,
+        "cover_depth": 24
+      },
+      "formal_tasks": [
+        "bmc",
+        "prove",
+        "cover"
+      ],
+      "expected_properties": {
+        "assert": 3,
+        "assume": 1,
+        "cover": 12
+      },
+      "promoted_checks": {
+        "schema": "countertrace-promoted-checks-v1",
+        "module": {
+          "id": "sync_fifo",
+          "title": "Synchronous FIFO",
+          "top": "fifo",
+          "clock": "clk",
+          "reset": "rst",
+          "params": [
+            {
+              "DEPTH": 4,
+              "WIDTH": 8
+            },
+            {
+              "DEPTH": 2,
+              "WIDTH": 8
+            }
+          ],
+          "inputs": {
+            "rst": 1,
+            "wr_en": 1,
+            "rd_en": 1,
+            "din": "WIDTH"
+          },
+          "outputs": {
+            "dout": "WIDTH",
+            "full": 1,
+            "empty": 1
+          },
+          "spec": "A synchronous first-in first-out queue holding up to DEPTH words of WIDTH bits, with one rising-edge clock clk.\nrst is a synchronous active-high reset: at a rising edge with rst high the queue becomes empty, and read and write requests at that edge are ignored.\nAt each rising edge without reset: a write (wr_en high) stores din at the tail unless the queue is full; a read (rd_en high) removes the head word unless the queue is empty. Full and empty are judged from the occupancy before the edge, so a read and a write at the same edge are each accepted or ignored on that basis.\nAfter an accepted read, dout contains the removed word after that edge. Its value is unconstrained at other times, including reset, idle cycles and ignored reads. Do not require it to remain stable between accepted reads.\nempty is high exactly when the queue holds no words; full is high exactly when it holds DEPTH words. Words come out in the order they were accepted.",
+          "split": "development"
+        },
+        "properties_hash": "sha256:2b36b1b33128b3d893940e7eaddf3d3a0cbf529f2fd0691e3b58bd4837f207d2",
+        "checker_hash": "sha256:b5a60a813645b72c8b5cbb77ea37bb8b16c90b174bc1866915fe58b7ddec0e46",
+        "golden_hash": "sha256:da0e5a92be992d813f92bbf4383fadf92883b24b4c91df621d9261b5565079d6",
+        "harness": {
+          "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+          "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+          "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+        },
+        "verifier_digest": "26a51c6bce5dcf38",
+        "trusted_code": {
+          "bundle.py": "sha256:a29824fd095cbf67c8ab8d2e81522101ceebf67285448a06ff93b950a75092ae",
+          "design.py": "sha256:b31699ceca4534bd7a0033017fd5cef83810a3faf9a9719f667abc957fe86395",
+          "__init__.py": "sha256:b8f3265344eb7ae70d0c1b8687be2390283a0a4d948334c0236f726312f13912",
+          "compile.py": "sha256:ff04ee4c2e1d29afae9fdc04271e231345ebf7a450eefc6825dbaa401b379c67",
+          "gate.py": "sha256:db27e1c32cde7d14d8b82fcb290aabc743a691cfb6f3d084b8da1ee2ea217ae3",
+          "agent.py": "sha256:0cc8c7e7cf6f08acb0b3b9e7f5fa6fcaff6345961e3e5a1a84b436dbc6403c16",
+          "modules.py": "sha256:d0bbeabf053a00261fbd1409ec26abe633320bad3b601bada6e714684c6d6538"
+        },
+        "limits": {
+          "solver_s": 120,
+          "bmc_depth": 20,
+          "cover_depth": 20
+        },
+        "mutants": {
+          "count": 40,
+          "seed": 1
+        },
+        "promotion_threshold": 0.9
+      }
+    },
+    "started_at": "2026-10-09T19:48:23Z",
+    "attempts": [
+      {
+        "index": 1,
+        "origin": "model",
+        "status": "passed_unchanged_checks",
+        "started_at": "2026-10-09T19:48:23Z",
+        "calls": [
+          {
+            "task": "repair",
+            "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+            "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+            "at": "2026-10-09T19:48:23Z",
+            "attempts": 1,
+            "thinking": true,
+            "request_id": "cbeae468b7341eb1809f9235f2b3d969",
+            "latency_ms": 9620,
+            "prompt_tokens": 1561,
+            "completion_tokens": 3199,
+            "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+            "status": "ok",
+            "finish_reason": "stop"
+          }
+        ],
+        "rationale": "The FIFO incorrectly accepts writes when full because `do_write` is not gated by the full condition. This causes the write pointer to advance and overwrite the oldest data, leading to wrong read data. The fix adds a check for `count != DEPTH` (i.e., not full) to `do_write`, ensuring writes are ignored when full as required by the contract.",
+        "diff": "--- a/dut.v\n+++ b/dut.v\n@@ -22,7 +22,7 @@\n     reg [AW:0]      count;\n \n     wire do_read  = rd_en && (count != 0);\n-    wire do_write = wr_en;\n+    wire do_write = wr_en && (count != DEPTH);\n \n     assign empty = (count == 0);\n     assign full  = (count == DEPTH);\n",
+        "candidate_run_id": "20261009-154833-ver-5bb770",
+        "summary": "All 11 obligations resolved under the unchanged checks (4 proved, no counterexample).",
+        "frozen_match": true,
+        "finished_at": "2026-10-09T19:49:04Z"
+      }
+    ],
+    "status": "passed",
+    "finished_at": "2026-10-09T19:49:04Z"
+  },
+  "repair_run": "20261009-154833-ver-5bb770"
+}
