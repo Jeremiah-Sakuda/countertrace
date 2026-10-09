@@ -126,11 +126,62 @@ def _run(batch: ChecksBatch, image: dict, cancel: threading.Event | None) -> dic
         raise GateToolError("the verifier batch did not complete")
     if worker.get("harness_hashes") != runner.harness_hashes():
         raise GateToolError("verifier harness hashes differ from the trusted copy")
+    if worker.get("job_id") != batch.job_id:
+        raise GateToolError("verifier result belongs to a different job")
+    validate_steps(batch, worker.get("steps"))
     return record
 
 
 class GateToolError(RuntimeError):
     pass
+
+
+def validate_steps(batch: ChecksBatch, steps: list | None) -> None:
+    """Status files are authoritative only with complete, consistent process records."""
+    if not isinstance(steps, list) or any(not isinstance(s, dict) for s in steps):
+        raise GateToolError("missing worker step records")
+    by_id = {s.get("id"): s for s in steps}
+    if len(by_id) != len(steps):
+        raise GateToolError("duplicate worker steps")
+    expected = set()
+
+    def process(name: str, codes: tuple[int, ...]) -> None:
+        expected.add(name)
+        step = by_id.get(name)
+        if not step or step.get("timed_out") is not False or step.get("start_error") or type(step.get("returncode")) is not int or step["returncode"] not in codes:
+            raise GateToolError(f"incomplete or unsuccessful process: {name}")
+
+    def formal(name: str) -> None:
+        sid = f"checks:{name}"
+        # The worker has exactly one permitted fallback, for combinational BMC.
+        if sid + ":smtbmc" in by_id:
+            log = batch.out_dir / "logs" / f"{name}.log"
+            if not name.endswith("_props") or not log.is_file() or "Does not work for combinational networks" not in log.read_text(errors="replace"):
+                raise GateToolError("unexplained formal fallback")
+            process(sid, (16, 1))
+            sid += ":smtbmc"
+        status = _status(batch.out_dir, name)
+        if status not in ("PASS", "FAIL", "UNKNOWN", "TIMEOUT"):
+            raise GateToolError(f"missing or invalid formal status: {name}")
+        process(sid, (0,) if status == "PASS" else (2,) if status == "FAIL" else (4, 8))
+
+    if batch.job["stage"] in ("gate", "design"):
+        for cfg in batch.job["configs"]:
+            cid = cfg["id"]
+            process(f"checks:inventory:{cid}", (0,))
+            for mode in (("prove", "cover") if batch.job["stage"] == "gate" else ("prove",)):
+                formal(f"golden_{mode}_{cid}")
+    else:
+        process("checks:mutate-list", (0,))
+        process("checks:mutate-build", (0,))
+        manifest = batch.out_dir / "mutants" / "mutations.ys"
+        if not manifest.is_file() or not manifest.read_text().strip():
+            raise GateToolError("missing mutation manifest")
+        for i, _ in enumerate(manifest.read_text().splitlines(), 1):
+            formal(f"mutant_{i}_props")
+            formal(f"mutant_{i}_equiv")
+    if set(by_id) != expected:
+        raise GateToolError("unexpected or unaccounted worker steps")
 
 
 def run_gate(module: Module, props: dict, workdir: Path, image: dict, cancel: threading.Event | None = None,
@@ -203,11 +254,12 @@ def classify_mutants(out: Path, module: Module) -> dict:
     killed, equivalent, invalid, unresolved, survived = [], [], [], [], []
     for i in range(1, len(lines) + 1):
         props_status, equiv_status = _status(out, f"mutant_{i}_props"), _status(out, f"mutant_{i}_equiv")
-        if equiv_status in (None, "ERROR"):
-            invalid.append(i)  # the tools cannot analyze this mutant; reported, never scored
-        elif props_status in (None, "ERROR"):
-            return {"stage": "tool", "passed": False, "error": f"the property check on mutant {i} ended in a tool error"}
-        elif props_status == "FAIL":
+        if equiv_status in (None, "ERROR") or props_status in (None, "ERROR"):
+            # No evidence of execution is not evidence of an invalid mutation.
+            unresolved.append(i)
+        elif equiv_status == "PASS" and props_status == "FAIL":
+            return {"stage": "integrity", "passed": False, "error": f"mutant {i} is equivalent but violates properties proved on the golden"}
+        elif props_status == "FAIL" and equiv_status == "FAIL":
             killed.append(i)
         elif equiv_status == "PASS" and props_status == "PASS":
             equivalent.append(i)

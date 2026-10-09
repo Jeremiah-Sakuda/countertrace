@@ -1,0 +1,60 @@
+SBY 17:12:49 [golden_prove_p1] Removing directory '/tmp/work/checks/golden_prove_p1'.
+SBY 17:12:49 [golden_prove_p1] Copy '/tmp/work/checks/golden.v' to '/tmp/work/checks/golden_prove_p1/src/golden.v'.
+SBY 17:12:49 [golden_prove_p1] Copy '/tmp/work/checks/props.sv' to '/tmp/work/checks/golden_prove_p1/src/props.sv'.
+SBY 17:12:49 [golden_prove_p1] engine_0: abc pdr
+SBY 17:12:49 [golden_prove_p1] base: starting process "cd golden_prove_p1/src; yosys -ql ../model/design.log ../model/design.ys"
+SBY 17:12:49 [golden_prove_p1] base: finished (returncode=0)
+SBY 17:12:49 [golden_prove_p1] prep: starting process "cd golden_prove_p1/model; yosys -ql design_prep.log design_prep.ys"
+SBY 17:12:49 [golden_prove_p1] prep: finished (returncode=0)
+SBY 17:12:49 [golden_prove_p1] aig: starting process "cd golden_prove_p1/model; yosys -ql design_aiger.log design_aiger.ys"
+SBY 17:12:49 [golden_prove_p1] aig: Warning: Treating undriven bit ct_props_top.\clk like $anyseq.
+SBY 17:12:49 [golden_prove_p1] aig: Warning: Treating undriven bit ct_props_top.\wr_en like $anyseq.
+SBY 17:12:49 [golden_prove_p1] aig: Warning: Treating undriven bit ct_props_top.\rst like $anyseq.
+SBY 17:12:49 [golden_prove_p1] aig: Warning: Treating undriven bit ct_props_top.\rd_en like $anyseq.
+SBY 17:12:49 [golden_prove_p1] aig: Warning: Treating undriven bit ct_props_top.\din [0] like $anyseq.
+SBY 17:12:49 [golden_prove_p1] aig: Warning: Treating undriven bit ct_props_top.\din [1] like $anyseq.
+SBY 17:12:49 [golden_prove_p1] aig: Warning: Treating undriven bit ct_props_top.\din [2] like $anyseq.
+SBY 17:12:49 [golden_prove_p1] aig: Warning: Treating undriven bit ct_props_top.\din [3] like $anyseq.
+SBY 17:12:49 [golden_prove_p1] aig: Warning: Treating undriven bit ct_props_top.\din [4] like $anyseq.
+SBY 17:12:49 [golden_prove_p1] aig: Warning: Treating undriven bit ct_props_top.\din [5] like $anyseq.
+SBY 17:12:49 [golden_prove_p1] aig: Warning: Treating undriven bit ct_props_top.\din [6] like $anyseq.
+SBY 17:12:49 [golden_prove_p1] aig: Warning: Treating undriven bit ct_props_top.\din [7] like $anyseq.
+SBY 17:12:49 [golden_prove_p1] aig: Warning: Treating a total of 12 undriven bits in ct_props_top like $anyseq.
+SBY 17:12:49 [golden_prove_p1] aig: finished (returncode=0)
+SBY 17:12:49 [golden_prove_p1] engine_0: starting process "cd golden_prove_p1; yosys-abc -c 'read_aiger model/design_aiger.aig; fold; strash; pdr -v -l; write_cex -a engine_0/trace.aiw'"
+SBY 17:12:49 [golden_prove_p1] engine_0: ======== ABC command line "read_aiger model/design_aiger.aig; fold; strash; pdr -v -l; write_cex -a engine_0/trace.aiw"
+SBY 17:12:49 [golden_prove_p1] engine_0: Warning: The last 2 outputs are interpreted as constraints.
+SBY 17:12:49 [golden_prove_p1] engine_0: VarMax = 300. FrameMax = 10000. QueMax = 0. TimeMax = 159. MonoCNF = no. SkipGen = no. SolveAll = no.
+SBY 17:12:49 [golden_prove_p1] engine_0: Frame Clauses                                                     Max Queue Flops Time
+SBY 17:12:49 [golden_prove_p1] engine_0: 1 : 0 2                                                                 1     2      0.00 sec  T/O =  0  PRV =  0
+SBY 17:12:49 [golden_prove_p1] engine_0: 2 : 0 7 10                                                              5    14      0.01 sec  T/O =  0  PRV =  0
+SBY 17:12:49 [golden_prove_p1] engine_0: 3 : 0 4 6 5 ~2                                                           2    14      0.01 sec  T/O =  0  PRV =  0
+SBY 17:12:49 [golden_prove_p1] engine_0: 4 : 0 6 10 30 28 ~2                                                     12    31      0.02 sec  T/O =  0  PRV =  0
+SBY 17:12:49 [golden_prove_p1] engine_0: 4 : 0 6 10 54 66 ~2                                                      5    67      0.03 sec  T/O =  0  PRV =  0
+SBY 17:12:49 [golden_prove_p1] engine_0: 4 : 0 6 10 70 97 ~2                                                      5    68      0.04 sec  T/O =  0  PRV =  0
+SBY 17:12:49 [golden_prove_p1] engine_0: 5 : 0 6 8 22 3 97 ~4                                                     0    68      0.04 sec  T/O =  0  PRV =  0
+SBY 17:12:49 [golden_prove_p1] engine_0: 6 : 0 6 8 22 4 2 100 ~4                                                  4    68      0.05 sec  T/O =  0  PRV =  0
+SBY 17:12:49 [golden_prove_p1] engine_0: Proved output 0 in frame 6.
+SBY 17:12:49 [golden_prove_p1] engine_0: Proved output 1 in frame 6.
+SBY 17:12:49 [golden_prove_p1] engine_0: Proved output 2 in frame 6.
+SBY 17:12:49 [golden_prove_p1] engine_0: 7 : 0 6 8 21 1 0 0 -3 ~104                                       0    68      0.05 sec  T/O =  0  PRV =  3
+SBY 17:12:49 [golden_prove_p1] engine_0: Block =   10  Oblig =   310  Clause =   195  Call =  1806 (sat=59.7%)  Cex =   0  Start =   3
+SBY 17:12:49 [golden_prove_p1] engine_0: SAT solving =     0.03 sec ( 57.49 %)
+SBY 17:12:49 [golden_prove_p1] engine_0: unsat     =     0.00 sec (  8.43 %)
+SBY 17:12:49 [golden_prove_p1] engine_0: sat       =     0.03 sec ( 49.07 %)
+SBY 17:12:49 [golden_prove_p1] engine_0: Generalize  =     0.03 sec ( 46.10 %)
+SBY 17:12:49 [golden_prove_p1] engine_0: Push clause =     0.01 sec ( 10.67 %)
+SBY 17:12:49 [golden_prove_p1] engine_0: Ternary sim =     0.00 sec (  2.07 %)
+SBY 17:12:49 [golden_prove_p1] engine_0: Containment =     0.00 sec (  0.13 %)
+SBY 17:12:49 [golden_prove_p1] engine_0: CNF compute =     0.00 sec (  2.23 %)
+SBY 17:12:49 [golden_prove_p1] engine_0: Refinement  =     0.00 sec (  0.00 %)
+SBY 17:12:49 [golden_prove_p1] engine_0: TOTAL       =     0.06 sec (100.00 %)
+SBY 17:12:49 [golden_prove_p1] engine_0: Property proved.  Time =     0.06 sec
+SBY 17:12:49 [golden_prove_p1] engine_0: Counter-example is not available.
+SBY 17:12:49 [golden_prove_p1] engine_0: finished (returncode=0)
+SBY 17:12:49 [golden_prove_p1] engine_0: Status returned by engine: PASS
+SBY 17:12:49 [golden_prove_p1] summary: Elapsed clock time [H:MM:SS (secs)]: 0:00:00 (0)
+SBY 17:12:49 [golden_prove_p1] summary: Elapsed process time [H:MM:SS (secs)]: 0:00:00 (0)
+SBY 17:12:49 [golden_prove_p1] summary: engine_0 (abc pdr) returned PASS
+SBY 17:12:49 [golden_prove_p1] summary: engine_0 did not produce any traces
+SBY 17:12:49 [golden_prove_p1] DONE (PASS, rc=0)

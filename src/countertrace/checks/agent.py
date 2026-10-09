@@ -80,8 +80,8 @@ def feedback(result: dict, module: Module) -> str:
                 "Those properties are wrong, not the design. Counterexample (values just before each edge):\n"
                 f"{trace}\nCorrect or remove them and resubmit the whole set.")
     if stage == "vacuity":
-        return (f"The conditions of {', '.join(result['unreached'])} can never occur{where}, so those checks are vacuous. "
-                "Fix their when conditions and resubmit the whole set.")
+        return (f"The conditions of {', '.join(result['unreached'])} were not reached within the configured cover horizon{where}. "
+                "This does not prove impossibility. Review their when conditions and resubmit the whole set.")
     if stage == "mutants":
         parts = [f"Your properties hold on the reference at every setting and caught {result['killed']} of {result['nonequivalent']} "
                  "faulty variants. These faulty variants passed every property; on each input sequence the reference and the faulty "
@@ -138,6 +138,8 @@ def run_loop(module: Module, workdir: Path, image: dict, cancel: threading.Event
         round_dir = workdir / f"round-{index}"
         result = gate.run_gate(module, props, round_dir, image, cancel)
         record.update(properties=props, gate=summary(result), feedback=None)
+        from countertrace.checks.design import frozen
+        record['frozen'] = frozen(module, props)
         if not (result.get("passed") and not result.get("survived")):
             record["feedback"] = feedback(result, module)
         (round_dir / "round.json").parent.mkdir(parents=True, exist_ok=True)

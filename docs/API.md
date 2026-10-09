@@ -94,3 +94,14 @@ The mutation result scores the named supplemental check set only. It is never a 
 ## Learning coaching
 
 `POST /api/learn/hint` (local live service): `{lesson: "overflow"|"exchange"|"control", path: string of 1–6 w/r/b/x actions, reflection: nonempty string up to 2000 characters}`. Loads server-owned recorded observations; client-supplied evidence is ignored. Uses configured Ultra, token/spend limits, and a two-request visitor reservation for the bounded retry. Returns structured advisory `hint` and validated edge references plus sanitized call metadata. It never changes a verdict or answer key. Hosted Vercel rejects this write route with 405. Authored hints need no API.
+
+## Model-written checks
+
+- `GET /api/modules` and `GET /api/modules/:id`: public specifications, ports, parameters, and development/held-out split. Golden source is not included.
+- `POST /api/check-runs` with `{"module_id":"sync_fifo"}`: bounded Nemotron property generation. Requires configured model access and the isolated verifier.
+- `GET /api/runs/:id`: `kind: "checks"`, `module_id`, and `checks` containing every round, exact properties, gate summary, feedback, calls, frozen identity, and promoted round.
+- `POST /api/runs/:id/hunt` with `{"example_id":"showcase-overwrite-when-full"}`: use a completed promoted FIFO set on a bundled FIFO. Creates a verification run with an extra `promoted_checks` result; the source round is re-gated before use. Other modules are currently unsupported downstream.
+- Existing repair endpoints retain the promoted properties, golden, compiler, gate, and configuration in the frozen comparison. A candidate needs all core obligations and the additional property obligation to pass.
+- `GET /api/runs/:id/bundle` supports completed checks runs with schema `countertrace-checks-evidence/1`. Replay reruns deterministic gate rounds without inference and rejects mismatched trusted code or configuration.
+
+A confirmed property failure contains `promoted_checks.confirmation.status: "confirmed"` and the same replay inputs plus golden/candidate evidence. Any failed or incomplete replay stays unresolved. Public Vercel API writes remain unavailable; static module data and curated recordings are readable without authentication.

@@ -11,6 +11,7 @@ import { RunView } from "./views/run/RunView";
 import { LearnHome, LearnView, TeachView } from "./views/LearnView";
 import { RepairLabView } from "./views/RepairLabView";
 import { TestbenchLabView } from "./views/TestbenchLabView";
+import { ChecksHome } from "./views/ChecksView";
 import { SetupView } from "./views/SetupView";
 
 function NotFound({ hash }: { hash: string }) {
@@ -34,7 +35,7 @@ export function App() {
   const first = useRef(true);
 
   // Move focus to the main region on navigation so keyboard and screen-reader users land on the new view.
-  const routeKey = route.name === "run" || route.name === "learn" ? `${route.name}:${route.id}` : route.name;
+  const routeKey = route.name === "run" || route.name === "learn" ? `${route.name}:${route.id}` : route.name === "checks" ? `checks:${route.moduleId}` : route.name;
 
   useEffect(() => {
     if (first.current) {
@@ -52,8 +53,9 @@ export function App() {
       </a>
       <Header status={status} route={route} run={route.name === "run" ? runContext : null} />
       <main id="main" ref={mainRef} tabIndex={-1} className="main">
-        {route.name !== "home" && route.name !== "repair" && route.name !== "learn" && route.name !== "teach" && route.name !== "testbench" && <DeploymentNotice status={status} />}
-        {(route.name === "home" || route.name === "repair") && <RepairLabView home={route.name === "home"} caseId={route.name === "repair" ? route.caseId : null} />}
+        {route.name !== "home" && route.name !== "checks" && route.name !== "repair" && route.name !== "learn" && route.name !== "teach" && route.name !== "testbench" && <DeploymentNotice status={status} />}
+        {(route.name === "home" || route.name === "checks") && <ChecksHome key={route.name === "checks" ? route.moduleId : "home"} moduleId={route.name === "checks" ? route.moduleId : null} status={status} />}
+        {route.name === "repair" && <RepairLabView home={false} caseId={route.caseId} />}
         {route.name === "learn" && (route.id ? <LearnView key={route.id} id={route.id} status={status} /> : <LearnHome />)}
         {route.name === "teach" && <TeachView />}
         {route.name === "testbench" && <TestbenchLabView />}

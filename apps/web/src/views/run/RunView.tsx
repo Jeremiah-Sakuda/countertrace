@@ -17,6 +17,7 @@ import { ExplanationPanel } from "./ExplanationPanel";
 import { FindingPanel, FormalFindingPanel } from "./FindingPanel";
 import { ObligationsPanel } from "./ObligationsPanel";
 import { RepairPanel } from "./RepairPanel";
+import { ChecksRunBody, PromotedChecksPanel } from "../ChecksView";
 import { StagesPanel } from "./StagesPanel";
 
 export function isActive(run: Run): boolean {
@@ -110,7 +111,7 @@ function RunHeader({ run, now, onCancel, cancelling, cancelError }: { run: Run; 
     <div className="run-header">
       <div className="case-masthead">
         <a href={href.runs()} className="inline-link"><ArrowLeft size={14} aria-hidden="true" /> Evidence library</a>
-        <span>{run.kind === "audit" ? "Check-quality audit" : "Verification notebook"}</span>
+        <span>{run.kind === "checks" ? "Model-written checks" : run.kind === "audit" ? "Check-quality audit" : "Verification notebook"}</span>
       </div>
       <div className="case-hero">
         <div className="case-title">
@@ -157,7 +158,7 @@ function RunHeader({ run, now, onCancel, cancelling, cancelError }: { run: Run; 
       <UnresolvedNote run={run} />
       {!!run.evidence_corrections?.length && <p className="callout-inline">Simulation summaries were corrected from the preserved traces. Original execution timings and model responses are retained; details are in run provenance.</p>}
       <div className="case-facts">
-        <span><small>Configuration</small><strong>{run.depth ? `Depth ${run.depth} · 8-bit` : "Supplemental-check audit"}</strong></span>
+        <span><small>Configuration</small><strong>{run.kind === "checks" ? run.module?.title ?? run.module_id ?? "Catalog module" : run.depth ? `Depth ${run.depth} · 8-bit` : "Supplemental-check audit"}</strong></span>
         <span><small>{run.recorded ? "Recorded" : "Created"}</small><strong>{formatDateTime(run.created_at)}</strong></span>
         {active ? (
           <span><small>Elapsed</small><strong aria-live="off">{total === null ? "—" : formatDuration(total)}</strong></span>
@@ -284,6 +285,7 @@ function VerificationBody({
         </Section>
       )}
 
+      {run.promoted_checks && <PromotedChecksPanel run={run} />}
       {run.parent_id && <CandidatePanel run={run} />}
 
       {primary ? (
@@ -386,7 +388,7 @@ export function RunView({
       </p>
       {error ? <ErrorNotice error={error} title="Lost contact while polling; showing the last received state" onRetry={refresh} /> : null}
       <RunHeader run={run} now={now} onCancel={cancel} cancelling={cancelling} cancelError={cancelError} />
-      {run.kind === "audit" ? (
+      {run.kind === "checks" ? <ChecksRunBody run={run} status={status} /> : run.kind === "audit" ? (
         <AuditResult run={run} profile={profile} now={now} />
       ) : (
         <VerificationBody run={run} profile={profile} status={status} now={now} refresh={refresh} />

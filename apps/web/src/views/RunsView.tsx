@@ -11,6 +11,7 @@ import { useAsync, useDocumentTitle, type AsyncState } from "../lib/hooks";
 import { href } from "../lib/route";
 
 function Outcome({ kind, state, verdict }: { kind: string; state: string; verdict: Verdict | null | undefined }) {
+  if (kind === "checks") return <Badge tone="neutral" icon={ClipboardCheck}>Model-written checks · {state}</Badge>;
   if (kind === "audit")
     return (
       <Badge tone="neutral" icon={ClipboardCheck}>
@@ -29,6 +30,7 @@ function Outcome({ kind, state, verdict }: { kind: string; state: string; verdic
 }
 
 function caseDescription(run: RecordedRunSummary, detail: Run | null): string {
+  if (run.kind === "checks") return "Follow model-written properties through the golden proof, reachable triggers, and mutation challenge, with exact feedback between rounds.";
   if (run.kind === "audit") return "See which seeded faults a supplemental check set misses. The mandatory core checks stay independent.";
   if (detail?.parent_id) return "A model-proposed repair, re-run against the parent's frozen contract and checks. Compare its results with the failing run.";
   if (run.verdict?.headline === "counterexample") return "Follow the failing sequence from its first mismatch to the evidence behind it.";
@@ -90,7 +92,7 @@ function RecordedList({ items }: { items: RecordedRunSummary[] }) {
           <article key={r.id} className={`gallery-card${r.id === firstFailure?.id ? " gallery-card-featured" : ""}`} aria-labelledby={`case-${r.id}`}>
             <div className="gallery-card-top">
               <span className="gallery-card-number">{String(index + 1).padStart(2, "0")}</span>
-              <span className="gallery-card-type">{r.kind === "audit" ? "Check-quality audit" : detail?.parent_id ? "Repair candidate" : "Verification case"}</span>
+              <span className="gallery-card-type">{r.kind === "checks" ? "Model-written checks" : r.kind === "audit" ? "Check-quality audit" : detail?.parent_id ? "Repair candidate" : "Verification case"}</span>
               <Badge tone="neutral" icon={History}>Recorded</Badge>
             </div>
             <h3 id={`case-${r.id}`} className="gallery-title"><a href={href.run(r.id)}>{r.title}</a></h3>

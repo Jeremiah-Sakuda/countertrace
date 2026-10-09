@@ -8,7 +8,7 @@ import { isRecordedDemo } from "./DeploymentNotice";
 
 export interface RunContextInfo {
   id: string;
-  kind: "verification" | "audit";
+  kind: "verification" | "audit" | "checks";
   recorded: boolean;
   unresolved: number | null;
   state: string;
@@ -58,7 +58,7 @@ function ModelPill({ status }: { status: AsyncState<Status> }) {
     if (existing) existing.role = `${existing.role}, ${role}`;
     else roles.push({ id, role });
   };
-  add(m.model_id, "explanation, learning coaching");
+  add(m.model_id, "check writing, explanation, learning coaching");
   add(m.repair_model_id ?? m.model_id, "repair");
   add(m.fast_model_id, "brief interpretation, check-set proposals");
   return (
@@ -82,16 +82,18 @@ function ModelPill({ status }: { status: AsyncState<Status> }) {
 }
 
 const NAV: { label: string; to: string; match: (r: Route) => boolean }[] = [
-  { label: "Repair lab", to: "#/repair", match: r => r.name === "home" || r.name === "repair" },
+  { label: "Write checks", to: "#/", match: r => r.name === "home" || r.name === "checks" },
+  { label: "Repair lab", to: "#/repair", match: r => r.name === "repair" },
   { label: "Practice bench", to: "#/learn", match: r => r.name === "learn" || r.name === "testbench" },
   { label: "Teach", to: "#/teach", match: r => r.name === "teach" },
   { label: "Workbench", to: href.setup(), match: r => ["setup","runs","run","audit"].includes(r.name) },
 ];
 export function Header({status,route,run}: {status:AsyncState<Status>;route:Route;run:RunContextInfo|null}) {
-  const workbench=["setup","runs","run","audit"].includes(route.name);
+  const checkRun=route.name==="run"&&run?.kind==="checks";
+  const workbench=["setup","runs","run","audit"].includes(route.name)&&!checkRun;
   return <header className="studio-header"><div className="studio-header-row">
-    <a className="studio-brand" href="#/" aria-label="Countertrace home"><svg viewBox="0 0 40 40" width="32" height="32" aria-hidden="true"><path d="M5 10h19v8H13v12h22M5 24h6M29 10h6v14" fill="none" stroke="currentColor" strokeWidth="3"/><circle cx="35" cy="30" r="3" fill="currentColor"/></svg><span>Countertrace<small>THE HARDWARE DEBUGGING LAB</small></span></a>
-    <nav className="studio-nav" aria-label="Primary">{NAV.map(n=><a key={n.to} href={n.to} aria-current={n.match(route)?"page":undefined}>{n.label}</a>)}</nav>
+    <a className="studio-brand" href="#/" aria-label="Countertrace home"><svg viewBox="0 0 40 40" width="32" height="32" aria-hidden="true"><path d="M5 10h19v8H13v12h22M5 24h6M29 10h6v14" fill="none" stroke="currentColor" strokeWidth="3"/><circle cx="35" cy="30" r="3" fill="currentColor"/></svg><span>Countertrace<small>WHO CHECKS THE CHECKS?</small></span></a>
+    <nav className="studio-nav" aria-label="Primary">{NAV.map(n=><a key={n.to} href={n.to} aria-current={(checkRun?n.label==="Write checks":n.match(route))?"page":undefined}>{n.label}</a>)}</nav>
     <details className="studio-runtime"><summary>{isRecordedDemo(status)?"Recorded edition":"Runtime & model"}</summary><div className="header-status"><VerifierPill status={status}/><ModelPill status={status}/></div></details>
   </div>{workbench&&<nav className="workbench-nav" aria-label="Workbench"><a href={href.setup()}>Contract setup</a><a href={href.runs()}>Evidence runs</a><a href={href.audit()}>Check-quality audit</a>{run&&<span><Badge tone="neutral" icon={run.recorded?History:Radio}>{run.recorded?"Recorded run":"Run on this server"}</Badge></span>}</nav>}</header>;
 }

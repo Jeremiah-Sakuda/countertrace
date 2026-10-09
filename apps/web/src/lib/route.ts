@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 export type Route =
   | { name: "home" }
+  | { name: "checks"; moduleId: string | null }
   | { name: "repair"; caseId: string | null }
   | { name: "learn"; id: string | null }
   | { name: "teach" }
@@ -16,6 +17,7 @@ export function parseHash(hash: string): Route {
   const path = hash.replace(/^#/, "") || "/";
   const parts = path.split("/").filter(Boolean).map(decodeURIComponent);
   if (parts.length === 0) return { name: "home" };
+  if (parts[0] === "checks" && parts.length <= 2) return { name: "checks", moduleId: parts[1] ?? null };
   if (parts[0] === "repair" && parts.length <= 2) return { name: "repair", caseId: parts[1] ?? null };
   if (parts[0] === "learn" && parts.length <= 2) return { name: "learn", id: parts[1] ?? null };
   if (parts[0] === "teach" && parts.length === 1) return { name: "teach" };
@@ -28,6 +30,7 @@ export function parseHash(hash: string): Route {
 }
 
 export const href = {
+  checks: (moduleId?: string | null) => moduleId ? `#/checks/${encodeURIComponent(moduleId)}` : "#/checks",
   repair: (caseId?: string | null) => (caseId ? `#/repair/${encodeURIComponent(caseId)}` : "#/repair"),
   setup: (exampleId?: string | null) => (exampleId ? `#/examples/${encodeURIComponent(exampleId)}` : "#/examples"),
   runs: () => "#/runs",

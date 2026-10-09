@@ -68,6 +68,10 @@ def build(output: Path | None = None) -> dict:
     app = server.App.__new__(server.App)
     write("status", recorded_status())
     write("profile", app.profile())
+    from countertrace.checks import modules
+    write("modules", [m.public() for m in modules.catalog()])
+    for module in modules.catalog():
+        write(f"modules/{module.id}", module.public())
     examples = app.examples()
     public_recordings = tracked_files(ROOT, "recorded")
     write("examples", examples)
@@ -104,10 +108,10 @@ def build(output: Path | None = None) -> dict:
                 raise ValueError(f"Only completed explicitly recorded runs can be published: {run_id}")
             write(f"runs/{run_id}", state)
             recordings.append({k: state.get(k) for k in (
-                "id", "kind", "title", "example_id", "created_at", "finished_at", "recorded", "verdict", "recorded_note")})
+                "id", "kind", "title", "example_id", "created_at", "finished_at", "recorded", "verdict", "recorded_note", "module_id", "checks")})
             public_run = data / "runs" / run_id
             shutil.copytree(run_file.parent, public_run / "files")
-            if state.get("kind") == "verification":
+            if state.get("kind") in ("verification", "checks"):
                 archive = bundle.export(store, run_id, verifier_root=snapshot / "verifier", output_dir=public_run)
                 archive.rename(public_run / "bundle.zip")
     write("recorded", recordings)

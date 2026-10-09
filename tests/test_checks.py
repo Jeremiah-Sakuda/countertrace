@@ -185,3 +185,79 @@ class AgentLoopTest(unittest.TestCase):
         result, _ = self.run_loop([{"status": "unavailable", "detail": "no key", "calls": []}], [])
         self.assertEqual(result["status"], "not_promoted")
         self.assertEqual(len(result["rounds"]), 1)
+
+
+class GateEvidenceTest(unittest.TestCase):
+    def classify(self, statuses):
+        import tempfile
+        from pathlib import Path
+        from countertrace.checks.gate import classify_mutants
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / 'mutants').mkdir()
+            (root / 'mutants/mutations.ys').write_text('mutation1\nmutation2\n')
+            for name, value in statuses.items():
+                (root / name).mkdir()
+                (root / name / 'status').write_text(value)
+            return classify_mutants(root, ARB)
+
+    def test_missing_errors_and_unknowns_never_reduce_the_promotion_denominator(self):
+        good = {'mutant_1_props': 'FAIL', 'mutant_1_equiv': 'FAIL'}
+        for status in (None, 'ERROR', 'UNKNOWN', 'TIMEOUT'):
+            with self.subTest(status=status):
+                other = {} if status is None else {'mutant_2_props': 'FAIL', 'mutant_2_equiv': status}
+                result = self.classify({**good, **other})
+                self.assertFalse(result['passed'])
+                self.assertEqual(result['unresolved'], 1)
+                self.assertEqual(result['invalid'], 0)
+
+    def test_equivalent_mutant_cannot_count_as_a_kill(self):
+        r = self.classify({'mutant_1_props': 'FAIL', 'mutant_1_equiv': 'PASS'})
+        self.assertFalse(r['passed'])
+        self.assertEqual(r['stage'], 'integrity')
+
+    def test_pass_artifacts_require_complete_successful_process_records(self):
+        import tempfile
+        from pathlib import Path
+        from countertrace.checks.gate import ChecksBatch, GateToolError, validate_steps
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for mode in ('prove', 'cover'):
+                (root / f'golden_{mode}_p0').mkdir()
+                (root / f'golden_{mode}_p0/status').write_text('PASS')
+            batch = ChecksBatch(root, root, 'job', {'stage': 'gate', 'configs': [{'id': 'p0'}]})
+            ids = ['checks:inventory:p0', 'checks:golden_prove_p0', 'checks:golden_cover_p0']
+            clean = [{'id': i, 'returncode': 0, 'timed_out': False} for i in ids]
+            validate_steps(batch, clean)
+            for bad in (clean[:-1], clean + [clean[0]], [*clean[:2], {**clean[2], 'returncode': 2}],
+                        [*clean[:2], {**clean[2], 'timed_out': True}], [*clean[:2], {**clean[2], 'start_error': 'failed'}]):
+                with self.subTest(bad=bad), self.assertRaises(GateToolError):
+                    validate_steps(batch, bad)
+
+
+class PromotedSelectionTest(unittest.TestCase):
+    def test_only_completed_promoted_fifo_sets_can_start_a_hunt(self):
+        from countertrace.checks.design import selected
+        import copy
+        state = {'id': 'test', 'kind': 'checks', 'state': 'complete', 'module_id': 'sync_fifo',
+                 'checks': {'status': 'promoted', 'promoted_round': 0,
+                            'rounds': [{'index': 0, 'properties': props(("1'b1", '!full || !empty')), 'gate': {'passed': True}}]}}
+        self.assertEqual(selected(state)['source_run'], 'test')
+        for change in ({'state': 'running'}, {'kind': 'verification'}, {'module_id': 'rr_arbiter'},
+                       {'checks': {'status': 'not_promoted'}}, {'checks': {'status': 'promoted', 'rounds': []}}):
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                selected({**copy.deepcopy(state), **change})
+
+    def test_check_bundle_replay_rejects_different_frozen_inputs_without_execution(self):
+        import io, json, zipfile
+        from unittest.mock import patch
+        from countertrace.bundle import sha256
+        from countertrace.checks.bundle import replay, SCHEMA
+        data = json.dumps({'module_id': 'sync_fifo', 'checks': {'rounds': [{'index': 0, 'properties': props(("1'b1", 'empty || full')), 'frozen': {}}]}}).encode()
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, 'w') as z:
+            z.writestr('checks.json', data)
+            z.writestr('manifest.json', json.dumps({'schema': SCHEMA, 'files': {'checks.json': sha256(data)}}))
+        with zipfile.ZipFile(buf) as z, patch('countertrace.runner.ensure_image') as docker:
+            self.assertFalse(replay(z)['matches'])
+            docker.assert_not_called()

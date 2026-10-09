@@ -41,13 +41,13 @@ Impact priority selected October 4: help instructors and FPGA club mentors reuse
 ## October 8 to 28 — model-written checks (lead direction, PRD 1.4)
 
 - [x] Feasibility spike: structured properties compiled by trusted code, golden proof, trigger reachability, and mutants classified by formal equivalence, in the pinned verifier. Nemotron 3 Ultra promoted on the FIFO in one round and on a round-robin arbiter in two. (October 8, development data; see STATUS.md.)
-- [ ] Productize the gate with negative controls and a worker job type (October 9 to 11).
-- [ ] Agent loop as a recorded run type (October 11 to 14).
-- [ ] Catalog of four to six modules with golden references, specifications, and seeded bugs (October 13 to 17).
-- [ ] Golden-confirmed bug hunt and repair under promoted checks (October 16 to 19).
-- [ ] Interface, recorded and live (October 18 to 22).
+- [x] Productize the gate with negative controls and a worker job type, including fail-closed per-step and mutation evidence checks (October 9).
+- [x] Agent loop as a recorded run type with replayable property evidence (October 9).
+- [x] Seven-module gate catalog with golden references, specifications, and hand-written reference properties (October 9). This is not a seven-module model benchmark.
+- [ ] Extend golden-confirmed bug hunt and frozen repair beyond the implemented FIFO adapter (October 16 to 19).
+- [x] Check-writing interface in recorded mode and configured local live mode (October 9); funded public live runtime remains pending.
 - [ ] Frozen held-out evaluation, three runs per module (October 21 to 24).
-- [ ] Documentation, Devpost, and demo script (October 24 to 25).
+- [x] Align README, PRD, Devpost draft, and demo script with model-written checks (October 9). Final submission review remains pending.
 
 ## October 9 to 14 — trustworthy release scope
 

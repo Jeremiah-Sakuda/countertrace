@@ -73,7 +73,8 @@ def verify_candidate(store, parent: dict, source: str, attempt: dict, origin: st
     child = store.create_verification(source_text=source, depth=parent["depth"], parent_id=run_id,
                                       origin=origin, title=f"{parent.get('title', 'Run')} — candidate {attempt['index']}",
                                       formal_tasks=tuple(parent.get("formal_tasks", ("bmc", "prove", "cover"))),
-                                      interface_map=parent.get("interface_map"))
+                                      interface_map=parent.get("interface_map"),
+                                      extra={"promoted_checks": {k: parent["promoted_checks"][k] for k in ("source_run", "module_id", "properties")}} if parent.get("promoted_checks") else None)
     attempt.update(status="verifying", candidate_run_id=child["id"])
     update(store, run_id, lambda s: s["repair"]["attempts"].__setitem__(attempt["index"] - 1, dict(attempt)))
     store.execute(child["id"])

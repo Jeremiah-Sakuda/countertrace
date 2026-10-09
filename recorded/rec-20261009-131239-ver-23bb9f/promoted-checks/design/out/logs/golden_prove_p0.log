@@ -1,0 +1,112 @@
+SBY 17:13:20 [golden_prove_p0] Removing directory '/tmp/work/checks/golden_prove_p0'.
+SBY 17:13:20 [golden_prove_p0] Copy '/tmp/work/checks/golden.v' to '/tmp/work/checks/golden_prove_p0/src/golden.v'.
+SBY 17:13:20 [golden_prove_p0] Copy '/tmp/work/checks/props.sv' to '/tmp/work/checks/golden_prove_p0/src/props.sv'.
+SBY 17:13:20 [golden_prove_p0] engine_0: abc pdr
+SBY 17:13:20 [golden_prove_p0] base: starting process "cd golden_prove_p0/src; yosys -ql ../model/design.log ../model/design.ys"
+SBY 17:13:20 [golden_prove_p0] base: finished (returncode=0)
+SBY 17:13:20 [golden_prove_p0] prep: starting process "cd golden_prove_p0/model; yosys -ql design_prep.log design_prep.ys"
+SBY 17:13:20 [golden_prove_p0] prep: finished (returncode=0)
+SBY 17:13:20 [golden_prove_p0] aig: starting process "cd golden_prove_p0/model; yosys -ql design_aiger.log design_aiger.ys"
+SBY 17:13:20 [golden_prove_p0] aig: Warning: Treating undriven bit ct_props_top.\clk like $anyseq.
+SBY 17:13:20 [golden_prove_p0] aig: Warning: Treating undriven bit ct_props_top.\wr_en like $anyseq.
+SBY 17:13:20 [golden_prove_p0] aig: Warning: Treating undriven bit ct_props_top.\rst like $anyseq.
+SBY 17:13:20 [golden_prove_p0] aig: Warning: Treating undriven bit ct_props_top.\rd_en like $anyseq.
+SBY 17:13:20 [golden_prove_p0] aig: Warning: Treating undriven bit ct_props_top.\din [0] like $anyseq.
+SBY 17:13:20 [golden_prove_p0] aig: Warning: Treating undriven bit ct_props_top.\din [1] like $anyseq.
+SBY 17:13:20 [golden_prove_p0] aig: Warning: Treating undriven bit ct_props_top.\din [2] like $anyseq.
+SBY 17:13:20 [golden_prove_p0] aig: Warning: Treating undriven bit ct_props_top.\din [3] like $anyseq.
+SBY 17:13:20 [golden_prove_p0] aig: Warning: Treating undriven bit ct_props_top.\din [4] like $anyseq.
+SBY 17:13:20 [golden_prove_p0] aig: Warning: Treating undriven bit ct_props_top.\din [5] like $anyseq.
+SBY 17:13:20 [golden_prove_p0] aig: Warning: Treating undriven bit ct_props_top.\din [6] like $anyseq.
+SBY 17:13:20 [golden_prove_p0] aig: Warning: Treating undriven bit ct_props_top.\din [7] like $anyseq.
+SBY 17:13:20 [golden_prove_p0] aig: Warning: Treating a total of 12 undriven bits in ct_props_top like $anyseq.
+SBY 17:13:20 [golden_prove_p0] aig: finished (returncode=0)
+SBY 17:13:20 [golden_prove_p0] engine_0: starting process "cd golden_prove_p0; yosys-abc -c 'read_aiger model/design_aiger.aig; fold; strash; pdr -v -l; write_cex -a engine_0/trace.aiw'"
+SBY 17:13:20 [golden_prove_p0] engine_0: ======== ABC command line "read_aiger model/design_aiger.aig; fold; strash; pdr -v -l; write_cex -a engine_0/trace.aiw"
+SBY 17:13:20 [golden_prove_p0] engine_0: Warning: The last 2 outputs are interpreted as constraints.
+SBY 17:13:20 [golden_prove_p0] engine_0: VarMax = 300. FrameMax = 10000. QueMax = 0. TimeMax = 159. MonoCNF = no. SkipGen = no. SolveAll = no.
+SBY 17:13:20 [golden_prove_p0] engine_0: Frame Clauses                                                     Max Queue Flops Time
+SBY 17:13:20 [golden_prove_p0] engine_0: 1 : 0 2                                                                 1     2      0.00 sec  T/O =  0  PRV =  0
+SBY 17:13:20 [golden_prove_p0] engine_0: 2 : 0 9 10                                                              6    16      0.00 sec  T/O =  0  PRV =  0
+SBY 17:13:20 [golden_prove_p0] engine_0: 3 : 0 4 7 7 ~1                                                           2    16      0.00 sec  T/O =  0  PRV =  0
+SBY 17:13:20 [golden_prove_p0] engine_0: 4 : 0 7 13 31 24 ~1                                                     11    34      0.01 sec  T/O =  0  PRV =  0
+SBY 17:13:20 [golden_prove_p0] engine_0: 4 : 0 7 13 53 65 ~1                                                      5    58      0.03 sec  T/O =  0  PRV =  0
+SBY 17:13:20 [golden_prove_p0] engine_0: 4 : 0 7 13 74 103 ~1                                                     5    71      0.04 sec  T/O =  0  PRV =  0
+SBY 17:13:20 [golden_prove_p0] engine_0: 5 : 0 6 10 28 91 15 ~1                                                   0    71      0.05 sec  T/O =  0  PRV =  0
+SBY 17:13:20 [golden_prove_p0] engine_0: 6 : 0 6 10 29 100 48 19 ~1                                              18    75      0.06 sec  T/O =  0  PRV =  0
+SBY 17:13:20 [golden_prove_p0] engine_0: 6 : 0 6 10 29 103 69 61 ~1                                              16    79      0.08 sec  T/O =  0  PRV =  0
+SBY 17:13:20 [golden_prove_p0] engine_0: 6 : 0 6 10 29 107 94 94 ~1                                               9    83      0.10 sec  T/O =  0  PRV =  0
+SBY 17:13:20 [golden_prove_p0] engine_0: 6 : 0 6 10 29 111 119 129 ~1                                             9    89      0.11 sec  T/O =  0  PRV =  0
+SBY 17:13:20 [golden_prove_p0] engine_0: 6 : 0 6 10 29 115 145 162 ~1                                             9    91      0.13 sec  T/O =  0  PRV =  0
+SBY 17:13:20 [golden_prove_p0] engine_0: 6 : 0 6 10 29 119 170 198 ~1                                             9    93      0.14 sec  T/O =  0  PRV =  0
+SBY 17:13:20 [golden_prove_p0] engine_0: 6 : 0 6 10 29 123 194 233 ~1                                             9    97      0.16 sec  T/O =  0  PRV =  0
+SBY 17:13:20 [golden_prove_p0] engine_0: 6 : 0 6 10 29 127 220 266 ~1                                             9   103      0.17 sec  T/O =  0  PRV =  0
+SBY 17:13:20 [golden_prove_p0] engine_0: 6 : 0 6 10 29 131 246 300 ~1                                             9   103      0.19 sec  T/O =  0  PRV =  0
+SBY 17:13:20 [golden_prove_p0] engine_0: 6 : 0 6 10 29 131 253 320 ~1                                             9   103      0.20 sec  T/O =  0  PRV =  0
+SBY 17:13:20 [golden_prove_p0] engine_0: 7 : 0 6 10 23 68 75 187 162 ~3                                           0   103      0.23 sec  T/O =  0  PRV =  0
+SBY 17:13:20 [golden_prove_p0] engine_0: 8 : 0 6 10 23 68 74 183 71 125 ~3                                        8   103      0.27 sec  T/O =  0  PRV =  0
+SBY 17:13:20 [golden_prove_p0] engine_0: Timing out on output 0 in frame 8 (retrying in next anytime pass).
+SBY 17:13:20 [golden_prove_p0] engine_0: 8 : 0 6 10 23 68 74 183 71 125 ~3                                        0   103      0.27 sec  T/O =  1  PRV =  0
+SBY 17:13:20 [golden_prove_p0] engine_0: Proved output 1 in frame 8.
+SBY 17:13:20 [golden_prove_p0] engine_0: Proved output 2 in frame 8.
+SBY 17:13:20 [golden_prove_p0] engine_0: 9 : 0 6 10 22 67 71 171 57 18 15 ~104                                    0   103      0.29 sec  T/O =  1  PRV =  2
+SBY 17:13:20 [golden_prove_p0] engine_0: 10 : 0 6 10 22 67 71 171 57 18 0 14 ~104                                  0   103      0.31 sec  T/O =  1  PRV =  2
+SBY 17:13:20 [golden_prove_p0] engine_0: All outputs solved or timed out in frame 10.
+SBY 17:13:20 [golden_prove_p0] engine_0: Starting new anytime pass, reusing clauses.
+SBY 17:13:20 [golden_prove_p0] engine_0: Frame Clauses                                                     Max Queue Flops Time
+SBY 17:13:20 [golden_prove_p0] engine_0: 1 : 0 338 ~104                                                           0     0      0.03 sec  T/O =  0  PRV =  2
+SBY 17:13:20 [golden_prove_p0] engine_0: 2 : 0 3 335 ~104                                                         0     0      0.03 sec  T/O =  0  PRV =  2
+SBY 17:13:20 [golden_prove_p0] engine_0: 3 : 0 3 3 332 ~104                                                       0     0      0.03 sec  T/O =  0  PRV =  2
+SBY 17:13:20 [golden_prove_p0] engine_0: 4 : 0 3 3 17 315 ~104                                                    0     0      0.03 sec  T/O =  0  PRV =  2
+SBY 17:13:20 [golden_prove_p0] engine_0: 5 : 0 3 3 17 34 281 ~104                                                 0     0      0.03 sec  T/O =  0  PRV =  2
+SBY 17:13:20 [golden_prove_p0] engine_0: 6 : 0 3 3 17 34 44 237 ~104                                              0     0      0.04 sec  T/O =  0  PRV =  2
+SBY 17:13:20 [golden_prove_p0] engine_0: 7 : 0 3 3 17 34 44 167 70 ~104                                           0     0      0.04 sec  T/O =  0  PRV =  2
+SBY 17:13:20 [golden_prove_p0] engine_0: 8 : 0 3 3 17 34 45 172 78 43 ~104                                        8    31      0.08 sec  T/O =  0  PRV =  2
+SBY 17:13:20 [golden_prove_p0] engine_0: 8 : 0 3 3 17 34 45 176 98 75 ~104                                        8    43      0.11 sec  T/O =  0  PRV =  2
+SBY 17:13:20 [golden_prove_p0] engine_0: 8 : 0 3 3 17 34 45 182 121 106 ~104                                      8    54      0.13 sec  T/O =  0  PRV =  2
+SBY 17:13:20 [golden_prove_p0] engine_0: 8 : 0 3 3 17 34 45 189 140 137 ~104                                      8    56      0.15 sec  T/O =  0  PRV =  2
+SBY 17:13:20 [golden_prove_p0] engine_0: 8 : 0 3 3 17 34 45 189 142 147 ~104                                      7    58      0.15 sec  T/O =  0  PRV =  2
+SBY 17:13:20 [golden_prove_p0] engine_0: 9 : 0 3 3 13 26 26 60 84 74 140 ~165                                    14    62      0.21 sec  T/O =  0  PRV =  2
+SBY 17:13:20 [golden_prove_p0] engine_0: 9 : 0 3 3 13 26 26 63 98 91 160 ~165                                    17    68      0.23 sec  T/O =  0  PRV =  2
+SBY 17:13:20 [golden_prove_p0] engine_0: 9 : 0 3 3 13 26 26 66 109 115 183 ~165                                  15    76      0.25 sec  T/O =  0  PRV =  2
+SBY 17:13:20 [golden_prove_p0] engine_0: 9 : 0 3 3 13 26 26 67 118 136 219 ~165                                  15    82      0.27 sec  T/O =  0  PRV =  2
+SBY 17:13:20 [golden_prove_p0] engine_0: 9 : 0 3 3 13 26 26 67 120 146 234 ~165                                  11    86      0.28 sec  T/O =  0  PRV =  2
+SBY 17:13:20 [golden_prove_p0] engine_0: Timing out on output 0 in frame 9 (retrying in next anytime pass).
+SBY 17:13:20 [golden_prove_p0] engine_0: 9 : 0 3 3 13 26 26 67 120 146 234 ~165                                   0    86      0.28 sec  T/O =  1  PRV =  2
+SBY 17:13:20 [golden_prove_p0] engine_0: 10 : 0 3 3 9 19 21 18 25 28 73 139 ~280                                   0    86      0.32 sec  T/O =  1  PRV =  2
+SBY 17:13:20 [golden_prove_p0] engine_0: All outputs solved or timed out in frame 10.
+SBY 17:13:20 [golden_prove_p0] engine_0: Starting new anytime pass, reusing clauses.
+SBY 17:13:20 [golden_prove_p0] engine_0: Frame Clauses                                                     Max Queue Flops Time
+SBY 17:13:21 [golden_prove_p0] engine_0: 1 : 0 221 ~273                                                           0     0      0.04 sec  T/O =  0  PRV =  2
+SBY 17:13:21 [golden_prove_p0] engine_0: 2 : 0 3 218 ~273                                                         0     0      0.04 sec  T/O =  0  PRV =  2
+SBY 17:13:21 [golden_prove_p0] engine_0: 3 : 0 3 3 215 ~273                                                       0     0      0.04 sec  T/O =  0  PRV =  2
+SBY 17:13:21 [golden_prove_p0] engine_0: 4 : 0 3 3 9 206 ~273                                                     0     0      0.04 sec  T/O =  0  PRV =  2
+SBY 17:13:21 [golden_prove_p0] engine_0: 5 : 0 3 3 9 16 190 ~273                                                  0     0      0.05 sec  T/O =  0  PRV =  2
+SBY 17:13:21 [golden_prove_p0] engine_0: 6 : 0 3 3 9 16 19 171 ~273                                               0     0      0.05 sec  T/O =  0  PRV =  2
+SBY 17:13:21 [golden_prove_p0] engine_0: 7 : 0 3 3 9 16 19 11 160 ~273                                            0     0      0.05 sec  T/O =  0  PRV =  2
+SBY 17:13:21 [golden_prove_p0] engine_0: 8 : 0 3 3 9 16 19 11 19 141 ~273                                         0     0      0.05 sec  T/O =  0  PRV =  2
+SBY 17:13:21 [golden_prove_p0] engine_0: 9 : 0 3 3 9 16 19 13 25 30 130 ~273                                      9    19      0.06 sec  T/O =  0  PRV =  2
+SBY 17:13:21 [golden_prove_p0] engine_0: 10 : 0 3 3 8 14 18 8 15 25 73 97 ~260                                     9    36      0.09 sec  T/O =  0  PRV =  2
+SBY 17:13:21 [golden_prove_p0] engine_0: 11 : 0 3 3 8 11 15 8 8 10 64 88 -1 ~277                                     7    40      0.12 sec  T/O =  0  PRV =  2
+SBY 17:13:21 [golden_prove_p0] engine_0: 12 : 0 3 3 8 11 15 8 5 0 0 0 0 136 ~278                                   0    40      0.14 sec  T/O =  0  PRV =  2
+SBY 17:13:21 [golden_prove_p0] engine_0: Proved output 0 in frame -2 (converged).
+SBY 17:13:21 [golden_prove_p0] engine_0: Block =   17  Oblig =  2353  Clause =  1432  Call = 19738 (sat=63.9%)  Cex =   0  Start =  53
+SBY 17:13:21 [golden_prove_p0] engine_0: SAT solving =     0.51 sec ( 64.44 %)
+SBY 17:13:21 [golden_prove_p0] engine_0: unsat     =     0.10 sec ( 12.17 %)
+SBY 17:13:21 [golden_prove_p0] engine_0: sat       =     0.41 sec ( 52.26 %)
+SBY 17:13:21 [golden_prove_p0] engine_0: Generalize  =     0.33 sec ( 41.73 %)
+SBY 17:13:21 [golden_prove_p0] engine_0: Push clause =     0.18 sec ( 23.14 %)
+SBY 17:13:21 [golden_prove_p0] engine_0: Ternary sim =     0.01 sec (  1.59 %)
+SBY 17:13:21 [golden_prove_p0] engine_0: Containment =     0.00 sec (  0.30 %)
+SBY 17:13:21 [golden_prove_p0] engine_0: CNF compute =     0.02 sec (  2.63 %)
+SBY 17:13:21 [golden_prove_p0] engine_0: Refinement  =     0.00 sec (  0.00 %)
+SBY 17:13:21 [golden_prove_p0] engine_0: TOTAL       =     0.78 sec (100.00 %)
+SBY 17:13:21 [golden_prove_p0] engine_0: Property proved.  Time =     0.79 sec
+SBY 17:13:21 [golden_prove_p0] engine_0: Counter-example is not available.
+SBY 17:13:21 [golden_prove_p0] engine_0: finished (returncode=0)
+SBY 17:13:21 [golden_prove_p0] engine_0: Status returned by engine: PASS
+SBY 17:13:21 [golden_prove_p0] summary: Elapsed clock time [H:MM:SS (secs)]: 0:00:00 (0)
+SBY 17:13:21 [golden_prove_p0] summary: Elapsed process time [H:MM:SS (secs)]: 0:00:00 (0)
+SBY 17:13:21 [golden_prove_p0] summary: engine_0 (abc pdr) returned PASS
+SBY 17:13:21 [golden_prove_p0] summary: engine_0 did not produce any traces
+SBY 17:13:21 [golden_prove_p0] DONE (PASS, rc=0)

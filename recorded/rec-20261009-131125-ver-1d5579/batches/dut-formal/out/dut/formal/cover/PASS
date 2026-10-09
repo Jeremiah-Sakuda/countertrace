@@ -1,0 +1,37 @@
+Elapsed clock time [H:MM:SS (secs)]: 0:00:02 (2)
+Elapsed process time [H:MM:SS (secs)]: 0:00:01 (1)
+engine_0 (smtbmc yices) returned pass
+cover trace: engine_0/trace0.vcd
+cover trace: engine_0/trace0.yw
+  reached cover statement ct_formal_top.cov_reset_release at ct_formal_top.sv:85.13-85.45 step 1
+cover trace: engine_0/trace1.vcd
+cover trace: engine_0/trace1.yw
+  reached cover statement ct_formal_top.cov_write_accepted at ct_formal_top.sv:86.13-86.47 step 1
+cover trace: engine_0/trace10.vcd
+cover trace: engine_0/trace10.yw
+  reached cover statement ct_formal_top.cov_wrap_read at ct_formal_top.sv:95.13-95.70 step 6
+cover trace: engine_0/trace2.vcd
+cover trace: engine_0/trace2.yw
+  reached cover statement ct_formal_top.cov_both_empty at ct_formal_top.sv:91.13-91.68 step 1
+cover trace: engine_0/trace3.vcd
+cover trace: engine_0/trace3.yw
+  reached cover statement ct_formal_top.cov_read_empty at ct_formal_top.sv:90.13-90.69 step 1
+cover trace: engine_0/trace4.vcd
+cover trace: engine_0/trace4.yw
+  reached cover statement ct_formal_top.cov_both_mid at ct_formal_top.sv:92.13-92.82 step 2
+  reached cover statement ct_formal_top.cov_read_accepted at ct_formal_top.sv:87.13-87.47 step 2
+cover trace: engine_0/trace5.vcd
+cover trace: engine_0/trace5.yw
+  reached cover statement ct_formal_top.cov_recurrent_reset at ct_formal_top.sv:98.13-98.46 step 2
+cover trace: engine_0/trace6.vcd
+cover trace: engine_0/trace6.yw
+  reached cover statement ct_formal_top.cov_wrap_write at ct_formal_top.sv:94.13-94.71 step 5
+cover trace: engine_0/trace7.vcd
+cover trace: engine_0/trace7.yw
+  reached cover statement ct_formal_top.cov_full at ct_formal_top.sv:88.13-88.49 step 5
+cover trace: engine_0/trace8.vcd
+cover trace: engine_0/trace8.yw
+  reached cover statement ct_formal_top.cov_both_full at ct_formal_top.sv:93.13-93.67 step 5
+cover trace: engine_0/trace9.vcd
+cover trace: engine_0/trace9.yw
+  reached cover statement ct_formal_top.cov_write_full at ct_formal_top.sv:89.13-89.68 step 5

@@ -39,14 +39,19 @@ class RecordingTest(unittest.TestCase):
             store = runs.RunStore(root / "private")
             parent = store.create_verification(example_id="showcase-overwrite-when-full")
             child = store.create_verification(example_id="good-count-d4", parent_id=parent["id"])
+            checks = store.create_checks("sync_fifo")
+            checks.update(state="complete", checks={"demonstration": {"hunt_run_id": parent["id"], "repair_run_id": child["id"]}})
+            parent["promoted_checks"] = {"source_run": checks["id"]}
             parent.update(state="complete", explanation={"status": "ok", "result": {"summary": "Explanation"}},
                           repair={"status": "passed", "attempts": [{"candidate_run_id": child["id"]}]})
             child["state"] = "complete"
             store.save(parent)
             store.save(child)
+            store.save(checks)
             with mock.patch.object(runs, "ROOT", root), mock.patch.object(server, "RECORDED", root / "recorded"):
                 runs.record(store, parent["id"])
                 runs.record(store, child["id"])
+                runs.record(store, checks["id"])
                 with mock.patch.object(server, "RunStore", return_value=runs.RunStore(root / "fresh")):
                     app = server.App()
                 recorded_parent = app.load_run("rec-" + parent["id"])
@@ -55,6 +60,9 @@ class RecordingTest(unittest.TestCase):
                 self.assertEqual(candidate_id, "rec-" + child["id"])
                 self.assertEqual(recorded_child["parent_id"], recorded_parent["id"])
                 self.assertEqual(recorded_parent["explanation"], parent["explanation"])
+                recorded_checks = app.load_run(recorded_parent["promoted_checks"]["source_run"])
+                self.assertEqual(recorded_checks["checks"]["demonstration"],
+                                 {"hunt_run_id": recorded_parent["id"], "repair_run_id": recorded_child["id"]})
                 for recorded_id in (recorded_parent["id"], recorded_child["id"]):
                     with self.assertRaises(PermissionError):
                         app.require_live(recorded_id)

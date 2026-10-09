@@ -1,5 +1,22 @@
 # Implementation status
 
+
+## October 9 check-writing workflow and evidence hardening
+
+The primary UI now exposes the specification catalog, every model round, generated properties, exact feedback, per-call provenance, mutation denominators, and links into a confirmed FIFO defect and frozen repair. The teaching labs remain accessible. Held-out modules are labeled and their exploratory UI start action is disabled. README, Devpost draft, testing guide, and 2:45 demo script now lead with the implemented workflow. PRD 1.5 matches the Page at sequence 6; the read-back Markdown was compared exactly (Page layout not separately inspected).
+
+The gate now blocks missing/error mutation evidence, rejects a property failure paired with proved equivalence, and validates every expected worker step, return code, timeout flag, and job identity. A bounded trigger miss is described as unreached within the horizon, not impossible. These parser regressions do not imply historical zero-invalid runs were false proofs.
+
+Actual development demonstration, October 9 (not a frozen model benchmark):
+
+- [Property generation](../recorded/rec-20261009-130847-che-c5ecc4/run.json): Nemotron 3 Ultra wrote three FIFO properties in one round from specification and ports, without golden source. One real request, 740 prompt and 9,097 completion tokens, 25.912 seconds inference; complete run 43 seconds. Golden proof and trigger reachability passed at both catalog settings. At the first setting, 39/39 non-equivalent mutants were killed; 1 equivalent, 0 invalid, 0 unresolved, 0 survivors. Promotion threshold remains 90%, not a general completeness claim.
+- [Bug hunt](../recorded/rec-20261009-131125-ver-1d5579/run.json): the promoted properties failed on the bundled depth-4 overflow FIFO. The identical witness inputs passed the golden and failed the candidate against the independent Python reference queue in isolated Verilator simulation. The property set was freshly re-gated before the hunt; existing core obligations remained present. Total run 66 seconds with concurrent local integration work; not a hosted latency estimate.
+- [Repair](../recorded/rec-20261009-131239-ver-23bb9f/run.json): one actual Ultra proposal changed `wr_en` to `wr_en && !full`; 1,561 prompt and 2,750 completion tokens, 8.420 seconds inference. Candidate verification took 44 seconds and passed all 11 unchanged obligations (the original ten plus the promoted-property group). Frozen identity matched, including properties, golden, trusted compiler/gate code, configuration and verifier. All three records are linked; raw evidence adds approximately 10 MB before compression.
+
+The downstream adapter currently supports only the bundled 8-bit synchronous FIFO at depths 2 and 4. Other catalog modules are gate-only. Seven-module reference-property validation is hand-written harness testing, not seven model-generation successes. The new held-out model evaluation remains unexecuted. No new participant result, account funding, or live cloud backend is claimed.
+
+Check-writing bundles now preserve properties, every round, raw artifacts and frozen identities; replay reruns deterministic gate rounds with no model calls. Verification bundles preserve the promoted-check inputs and raw downstream evidence. Validation passed: 126 Python tests, nine web tests, TypeScript and production build, and all 17 Docker integration tests in 399.714 seconds. Each of the three new bundles replayed successfully without inference; compressed sizes were approximately 0.45, 0.73 and 0.66 MB. Browser review completed the linked check run → golden-confirmed hunt → accepted repair journey; the new mobile navigation/diff wrapping removed the observed page overflow. Publication is pending the final prebuilt export.
+
 ## October 9 module catalog
 
 The catalog now has seven modules, each with a reviewed specification, two parameter settings, a hand-written golden, and hand-written reference properties derived from the specification (never sent to the model). Development modules: synchronous FIFO, round-robin arbiter, skid buffer. Held-out modules, frozen for the evaluation and not run through the agent before it: saturating up/down counter, UART transmitter (8N1, 32-cycle check depth so a full frame fits), debouncer, and 4-bit pattern detector.

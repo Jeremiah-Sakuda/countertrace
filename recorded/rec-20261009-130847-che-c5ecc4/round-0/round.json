@@ -1,0 +1,245 @@
+{
+ "index": 0,
+ "calls": [
+  {
+   "task": "write_checks",
+   "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+   "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+   "at": "2026-10-09T17:08:47Z",
+   "attempts": 1,
+   "thinking": true,
+   "request_id": "71db9fcbc7cade2cb164d83c98a8df44",
+   "latency_ms": 25912,
+   "prompt_tokens": 740,
+   "completion_tokens": 9097,
+   "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+   "status": "ok",
+   "finish_reason": "stop"
+  }
+ ],
+ "model_status": "ok",
+ "properties": {
+  "state": [
+   {
+    "name": "count",
+    "width": 3,
+    "next": "rst ? 0 : (do_write & do_read ? count : (do_write ? count + 1 : (do_read ? count - 1 : count)))"
+   },
+   {
+    "name": "head",
+    "width": 2,
+    "next": "rst ? 0 : (do_read ? next_head : head)"
+   },
+   {
+    "name": "tail",
+    "width": 2,
+    "next": "rst ? 0 : (do_write ? next_tail : tail)"
+   },
+   {
+    "name": "has_read",
+    "width": 1,
+    "next": "rst ? 0 : (do_read ? 1 : has_read)"
+   },
+   {
+    "name": "dout_shadow",
+    "width": 8,
+    "next": "rst ? 0 : (do_read ? read_data : dout_shadow)"
+   }
+  ],
+  "defs": [
+   {
+    "name": "is_full",
+    "width": 1,
+    "expr": "count == DEPTH"
+   },
+   {
+    "name": "is_empty",
+    "width": 1,
+    "expr": "count == 0"
+   },
+   {
+    "name": "do_write",
+    "width": 1,
+    "expr": "wr_en & ~is_full & ~rst"
+   },
+   {
+    "name": "do_read",
+    "width": 1,
+    "expr": "rd_en & ~is_empty & ~rst"
+   },
+   {
+    "name": "next_head",
+    "width": 2,
+    "expr": "(head + 1) % DEPTH"
+   },
+   {
+    "name": "next_tail",
+    "width": 2,
+    "expr": "(tail + 1) % DEPTH"
+   },
+   {
+    "name": "read_data",
+    "width": 8,
+    "expr": "data_mem[head]"
+   }
+  ],
+  "memories": [
+   {
+    "name": "data_mem",
+    "width": 8,
+    "depth": 4
+   }
+  ],
+  "writes": [
+   {
+    "memory": "data_mem",
+    "when": "do_write",
+    "index": "tail",
+    "value": "din"
+   }
+  ],
+  "properties": [
+   {
+    "id": "empty_flag",
+    "when": "1",
+    "then": "empty == is_empty",
+    "why": "empty high exactly when queue holds no words"
+   },
+   {
+    "id": "full_flag",
+    "when": "1",
+    "then": "full == is_full",
+    "why": "full high exactly when queue holds DEPTH words"
+   },
+   {
+    "id": "dout_after_read",
+    "when": "has_read",
+    "then": "dout == dout_shadow",
+    "why": "after first accepted read, dout holds the last read word until next accepted read"
+   }
+  ]
+ },
+ "gate": {
+  "stage": "mutants",
+  "passed": true,
+  "total": 40,
+  "killed": 39,
+  "equivalent": 1,
+  "invalid": 0,
+  "unresolved": 0,
+  "nonequivalent": 39,
+  "kill_rate": 1.0,
+  "survived": []
+ },
+ "feedback": null,
+ "frozen": {
+  "schema": "countertrace-promoted-checks-v1",
+  "module": {
+   "id": "sync_fifo",
+   "title": "Synchronous FIFO",
+   "top": "fifo",
+   "clock": "clk",
+   "reset": "rst",
+   "params": [
+    {
+     "DEPTH": 4,
+     "WIDTH": 8
+    },
+    {
+     "DEPTH": 2,
+     "WIDTH": 8
+    }
+   ],
+   "inputs": {
+    "rst": 1,
+    "wr_en": 1,
+    "rd_en": 1,
+    "din": "WIDTH"
+   },
+   "outputs": {
+    "dout": "WIDTH",
+    "full": 1,
+    "empty": 1
+   },
+   "spec": "A synchronous first-in first-out queue holding up to DEPTH words of WIDTH bits, with one rising-edge clock clk.\nrst is a synchronous active-high reset: at a rising edge with rst high the queue becomes empty, and read and write requests at that edge are ignored.\nAt each rising edge without reset: a write (wr_en high) stores din at the tail unless the queue is full; a read (rd_en high) removes the head word unless the queue is empty. Full and empty are judged from the occupancy before the edge, so a read and a write at the same edge are each accepted or ignored on that basis.\nAfter an accepted read, dout holds the removed word until the next accepted read; dout is only meaningful after an accepted read.\nempty is high exactly when the queue holds no words; full is high exactly when it holds DEPTH words. Words come out in the order they were accepted.",
+   "split": "development"
+  },
+  "properties_hash": "sha256:2fd9521663950621f0ae56f471faf20f11bb82d584d2d3b0be450224b491f233",
+  "checker_hash": "sha256:d84ceabced29743c5740cf16ef3ae6a63431f20a659fe7b797221a7500708bd7",
+  "golden_hash": "sha256:da0e5a92be992d813f92bbf4383fadf92883b24b4c91df621d9261b5565079d6",
+  "harness": {
+   "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+   "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+   "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+  },
+  "verifier_digest": "26a51c6bce5dcf38",
+  "trusted_code": {
+   "bundle.py": "sha256:2ab751fde22c007dc9904449d1f01c570f60c5953caacddd49665426b790f901",
+   "design.py": "sha256:d78d5977482cc7a651e587b285d9ef1d2309873e7f551edf3c58b10553ab19cb",
+   "__init__.py": "sha256:b8f3265344eb7ae70d0c1b8687be2390283a0a4d948334c0236f726312f13912",
+   "compile.py": "sha256:ff04ee4c2e1d29afae9fdc04271e231345ebf7a450eefc6825dbaa401b379c67",
+   "gate.py": "sha256:db27e1c32cde7d14d8b82fcb290aabc743a691cfb6f3d084b8da1ee2ea217ae3",
+   "agent.py": "sha256:0cc8c7e7cf6f08acb0b3b9e7f5fa6fcaff6345961e3e5a1a84b436dbc6403c16",
+   "modules.py": "sha256:d0bbeabf053a00261fbd1409ec26abe633320bad3b601bada6e714684c6d6538"
+  },
+  "limits": {
+   "solver_s": 120,
+   "bmc_depth": 20,
+   "cover_depth": 20
+  },
+  "mutants": {
+   "count": 40,
+   "seed": 1
+  },
+  "promotion_threshold": 0.9
+ },
+ "gate_full": {
+  "stage": "mutants",
+  "passed": true,
+  "configs": [
+   {
+    "id": "p0",
+    "params": {
+     "DEPTH": 4,
+     "WIDTH": 8
+    }
+   },
+   {
+    "id": "p1",
+    "params": {
+     "DEPTH": 2,
+     "WIDTH": 8
+    }
+   }
+  ],
+  "limits": {
+   "solver_s": 120,
+   "bmc_depth": 20,
+   "cover_depth": 20
+  },
+  "gate_run": {
+   "wall_s": 3.547,
+   "image": {
+    "tag": "countertrace-verifier:26a51c6bce5dcf38",
+    "image_id": "sha256:62dbb264be6153e08c5014540a0a134482d1e29ccfbdd1602385100defa72ce5",
+    "verifier_digest": "26a51c6bce5dcf38"
+   }
+  },
+  "mutant_run": {
+   "wall_s": 13.952,
+   "image": {
+    "tag": "countertrace-verifier:26a51c6bce5dcf38",
+    "image_id": "sha256:62dbb264be6153e08c5014540a0a134482d1e29ccfbdd1602385100defa72ce5",
+    "verifier_digest": "26a51c6bce5dcf38"
+   }
+  },
+  "total": 40,
+  "killed": 39,
+  "equivalent": 1,
+  "invalid": 0,
+  "unresolved": 0,
+  "survived": [],
+  "nonequivalent": 39,
+  "kill_rate": 1.0
+ }
+}

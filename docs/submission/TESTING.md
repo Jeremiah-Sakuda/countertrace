@@ -4,9 +4,19 @@ Open https://countertrace.vercel.app without signing in. The public site provide
 
 ---
 
-## Start with the repair lab
+## Start with model-written checks
 
-1. Open **Enter the repair lab**. Case 01 is selected; the other three cases are in the row above it. Inspect the depth-4 contract and the actual Nemotron diff.
+1. Open **Checks**. Read the catalog and choose the synchronous FIFO specification.
+2. Open its actual recorded run. Inspect every model round, properties, exact gate feedback, parameter settings, mutation denominators, and model-call provenance.
+3. Follow its linked FIFO bug-hunt evidence when present. A confirmed defect requires the golden replay to pass and the candidate to violate the independent reference on the same input sequence.
+4. Follow the repair link and inspect every attempted diff and unchanged-check comparison. Missing or unresolved evidence cannot appear as acceptance.
+5. Download the checks or verification bundle and replay it from the matching checkout. The new checks bundle reruns deterministic gates, not inference.
+
+Live start buttons are disabled on Vercel. In the configured local build, choose **Write checks**, then start a FIFO hunt from a promoted run. Other catalog modules currently support the gate only. Do not use held-out modules for exploratory prompt development before freezing the evaluation protocol.
+
+## Optional repair learning lab
+
+1. Open **Labs** and choose the repair lab. Case 01 is selected; the other three cases are in the row above it. Inspect the depth-4 contract and the actual Nemotron diff.
 2. Choose a prediction and write a reason. Open **Test it yourself first**, add Write four times, and see the candidate report empty at edge 4 while the reference queue is full. Then reveal the recorded checks, which show the same kind of counterexample.
 3. Investigate the revised proposal and commit another prediction. Its ten obligations pass under unchanged comparison inputs: three simulation obligations, three bounded checks, three proved properties, and one cover group containing twelve covers.
 4. Follow **Inspect this run’s trace & methods** for raw evidence and scope. Return to the lab, explain your decision, answer the depth-8 transfer question, and download Markdown notes.
@@ -20,7 +30,7 @@ This is recorded playback, not a new model response or solver run. Test answers 
 
 Open https://countertrace.vercel.app. All browser experiments replay actual recorded RTL execution. No API key or login is needed.
 
-1. **Start the first lab → The disappearing word.** Commit a prediction. Add Write → Read, choose “No mismatch,” and run. Clear the sequence, add Write → Write → Write → Read, predict a mismatch, and run. Edge 4 should show expected 0x11 versus observed 0x33. The expected reference queue ignores the third write while full.
+1. **Labs → Practice bench → The disappearing word.** Commit a prediction. Add Write → Read, choose “No mismatch,” and run. Clear the sequence, add Write → Write → Write → Read, predict a mismatch, and run. Edge 4 should show expected 0x11 versus observed 0x33. The expected reference queue ignores the third write while full.
 2. **Explain and transfer.** Write an explanation. Open an authored hint or the explicitly recorded Nemotron example if desired; assistance is counted. The recorded response answers its displayed example text, not your newly typed text. Answer the depth-4 simultaneous-operation question and download notes or session JSON. Free text is ungraded.
 3. **Facilitator desk.** Open lesson notes/answer keys. Optionally import the JSON you just exported; it stays in the browser. Counts describe practice records, not unique participants or learning gains.
 4. **Other labs.** The simultaneous-operation candidate fails Write → Write → Read + write at edge 3. The correct-control lesson permits no-mismatch conclusions; Write → Read repeated three times returns no mismatch under this finite test.
@@ -50,6 +60,7 @@ For developers, live Nemotron actions require a Token Factory API key in the loc
 
 ```sh
 source .venv/bin/activate
+countertrace write-checks --module sync_fifo --rounds 4
 countertrace verify --example showcase-overwrite-when-full
 countertrace audit --check-set weak-learner-v1
 countertrace bundle rec-20261004-003607-ver-4cc749

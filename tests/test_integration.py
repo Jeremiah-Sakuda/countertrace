@@ -267,3 +267,19 @@ class CatalogGoldenTest(unittest.TestCase):
                 self.assertEqual(result["stage"], "mutants", result.get("error") or result)
                 self.assertTrue(result["passed"])
                 self.assertEqual((result["invalid"], result["unresolved"], len(result["survived"])), (0, 0, 0))
+
+
+class PromotedDesignTest(unittest.TestCase):
+    def test_properties_hunt_replays_against_golden_and_good_design_proves(self):
+        from countertrace.checks import design
+        image = image_or_skip()
+        selection = {'source_run': 'test-properties', 'module_id': 'sync_fifo', 'properties': ChecksGateTest.FIFO_PROPS}
+        with tempfile.TemporaryDirectory(dir=Path.home()) as tmp:
+            base = Path(tmp)
+            bad = design.check(catalog.fault_source('count-overwrite-when-full'), 4, selection, base / 'bad', image, threading.Event())
+            self.assertEqual(bad['status'], 'counterexample', bad)
+            self.assertEqual(bad['confirmation']['status'], 'confirmed')
+            self.assertFalse(bad['confirmation']['runs']['golden']['findings'])
+            good = design.check(catalog.base_source('fifo_count.v'), 4, selection, base / 'good', image, threading.Event())
+            self.assertEqual(good['status'], 'proved', good)
+            self.assertEqual(bad['frozen'], good['frozen'])

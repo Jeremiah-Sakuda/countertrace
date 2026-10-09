@@ -60,7 +60,7 @@ class RunStore:
                 continue
             items.append({k: state.get(k) for k in (
                 "id", "kind", "example_id", "title", "state", "created_at", "parent_id", "recorded", "verdict",
-                "origin", "depth")})
+                "origin", "depth", "module_id", "checks")})
         return items
 
     def new_id(self, kind: str) -> str:
@@ -215,6 +215,14 @@ class RunStore:
                                     formal_tasks=tuple(state.get("formal_tasks", FORMAL_TASKS)),
                                     interface_map=state.get("interface_map"))
         verification.run()
+        if state.get("promoted_checks"):
+            from countertrace.checks import design
+
+            result = design.check(source, state["depth"], state["promoted_checks"], run_dir / "promoted-checks", image, cancel)
+            state["promoted_checks"] = result
+            verification.state["frozen"]["promoted_checks"] = result["frozen"]
+            verification.obligation(id="promoted:properties", check="model_written_properties", method="prove",
+                                    status=result["status"], detail=result["detail"])
         emit()
 
 
@@ -294,6 +302,12 @@ def record(store: RunStore, run_id: str, note: str = "") -> Path:
     # Related runs are recorded separately, never published implicitly here.
     if state.get("parent_id") and not state["parent_id"].startswith("rec-"):
         state["parent_id"] = f"rec-{state['parent_id']}"
+    links = state.get("promoted_checks") or {}
+    if links.get("source_run") and not links["source_run"].startswith("rec-"):
+        links["source_run"] = f"rec-{links['source_run']}"
+    for key, value in ((state.get("checks") or {}).get("demonstration") or {}).items():
+        if key.endswith("_run_id") and value and not value.startswith("rec-"):
+            state["checks"]["demonstration"][key] = f"rec-{value}"
     for attempt in (state.get("repair") or {}).get("attempts", []):
         candidate_id = attempt.get("candidate_run_id")
         if candidate_id and not candidate_id.startswith("rec-"):

@@ -1,4 +1,5 @@
 import type {
+  CatalogModule,
   CheckSet,
   CheckSetProposal,
   Example,
@@ -60,6 +61,10 @@ const post = <T>(path: string, body?: unknown) =>
   request<T>(path, { method: "POST", body: body === undefined ? "{}" : JSON.stringify(body) });
 
 export const api = {
+  modules: () => request<CatalogModule[]>("/api/modules"),
+  module: (id: string) => request<CatalogModule>(`/api/modules/${encodeURIComponent(id)}`),
+  hunt: (id: string, exampleId: string) => post<RunSummary>(`/api/runs/${encodeURIComponent(id)}/hunt`, { example_id: exampleId }),
+  createChecks: (moduleId: string) => post<RunSummary>("/api/check-runs", { module_id: moduleId }),
   status: () => request<Status>("/api/status"),
   profile: () => request<Profile>("/api/profile"),
   examples: () => request<Example[]>("/api/examples"),

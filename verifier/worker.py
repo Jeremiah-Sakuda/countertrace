@@ -217,7 +217,7 @@ MUTATE_LINE = re.compile(
 
 
 def validate_checks(job: dict) -> None:
-    if job.get("stage") not in ("gate", "mutants"):
+    if job.get("stage") not in ("gate", "mutants", "design"):
         fail("invalid checks stage")
     if not IDENT.match(str(job.get("top", ""))):
         fail("invalid top module name")
@@ -293,7 +293,7 @@ def run_checks(job: dict, steps: list, deadline: float) -> None:
         if JOB.joinpath(name).is_file():
             shutil.copy(JOB / name, work / name)
     dut = f"-D CT_DUT={top}"
-    if job["stage"] == "gate":
+    if job["stage"] in ("gate", "design"):
         for cfg in configs:
             cid, params = cfg["id"], cfg["params"]
             (OUT / "inventory").mkdir(exist_ok=True)
@@ -302,7 +302,7 @@ def run_checks(job: dict, steps: list, deadline: float) -> None:
                 f"prep -top ct_props_top; write_json {OUT}/inventory/{cid}.json"],
                 work, limits["solver_s"], OUT / "logs" / f"inventory_{cid}.log", steps)
             script = [f"read -formal {dut} golden.v", f"read -formal {dut} props.sv", chparams(params, "ct_props_top"), "prep -top ct_props_top", UNDEF]
-            for mode in ("prove", "cover"):
+            for mode in (("prove", "cover") if job["stage"] == "gate" else ("prove",)):
                 if time.monotonic() < deadline:
                     run_sby(f"golden_{mode}_{cid}", work, mode, limits, ["golden.v", "props.sv"], script, steps, traces=True)
         return

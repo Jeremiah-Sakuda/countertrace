@@ -1,20 +1,22 @@
 # Countertrace
 
-Countertrace is a hardware debugging lab where learners challenge real NVIDIA Nemotron repairs. Inspect the patch, commit a prediction, reveal independent checks, and explain whether the evidence supports the fix. Instructors and FPGA club mentors get reusable activities and learner-owned notes.
+**Nemotron writes hardware checks. Countertrace checks the checks.** From a plain-English specification and ports, NVIDIA Nemotron generates formal properties without seeing the golden implementation. Countertrace tests those properties before letting them judge a design.
 
-[Open the learning lab](https://countertrace.vercel.app) · [Facilitator desk](https://countertrace.vercel.app/#/teach) · [Teaching guide](docs/TEACHING.md)
+[Open Countertrace](https://countertrace.vercel.app) · [Local build](#quick-start) · [Current evidence](docs/STATUS.md)
 
-The repair lab is a casebook of four actual Nemotron repairs at depth 4, with one to three candidates each: rejected patches fail with recorded counterexamples, and the final candidate passes the frozen checks. Before each reveal, learners can probe a candidate with their own input sequences, replayed from runs of every six-action sequence in the isolated verifier. Patch diffs, model provenance, recorded counterexamples, method-specific results, a depth-transfer question, and Markdown field notes form the activity. No model judgment authorizes a verification result.
+1. Pick a catalog module and inspect its specification and parameter settings.
+2. Follow each model round through compilation, golden-reference proof, bounded trigger reachability, and mutation testing. Failures and surviving-mutant traces go back to the model.
+3. Inspect the promoted properties, exact denominators, feedback, and model usage. Promotion requires at least 90% of analyzable non-equivalent mutants killed and no unresolved or invalid evidence. Mutation testing currently uses the first parameter setting.
+4. For the supported FIFO, run those properties on a bundled design. A property failure becomes a confirmed defect only after the same input sequence passes the golden and fails the candidate against the independent reference.
+5. Ask Nemotron for a repair. The properties and core checks stay frozen; every candidate gets a new isolated verification run. Download and replay the evidence without inference.
 
-Three practice labs cover overflow, simultaneous operations, and the limits of passing tests, and a testbench lab scores a learner's choice of tests and checked signals against six seeded bugs using the raw traces of a recorded audit. The browser replays actual isolated Verilator simulations for 4,096 six-edge paths per candidate; shorter sequences are checked prefixes of those executions, two slots, four actions, fixed 8-bit data. This finite simulation library is not an unbounded proof. Candidates are authored fixtures, not claimed AI outputs. No account or API key is needed for the hosted labs.
+**Scope:** seven catalog modules; the complete bug-hunt/repair path currently supports the 8-bit synchronous FIFO at depths 2 and 4. The seven-module catalog validation used hand-written reference properties; it is not a seven-module model benchmark. Check-writing model results are development observations, with frozen held-out evaluation still pending. See [STATUS](docs/STATUS.md) for individual runs, failures, and timings. The older [FIFO evaluation](evaluation/results/eval-v2/REPORT.md) measures diagnosis and repair under hand-written checks, not the new property-writing agent.
 
-Nemotron coaching runs in the configured local build using the learner's explanation and server-selected evidence. Authored hints work on the hosted site and are explicitly labeled. The underlying verification workbench retains actual model explanations, rejected and accepted repairs, independent checks, and reproducible exports.
+**Deployment:** Vercel serves actual recorded evidence without a login or key. Live model calls and Docker verification run in the configured local build. Project-funded live judge access through December 15 remains pending. The hosted site does not impersonate live inference.
 
-**Status: public recorded demo and working local build, with two frozen evaluations.** On October 4, a pre-registered suite of 4 controls and 8 seeded faults (half derived from an independently authored FIFO held out of prompt development) gave: diagnosis 8/8 across four defect classes with 0/4 false alarms, Nemotron repairs passing unchanged checks in 7/8 cases, and conflict detection 4/4 with 4/4 compatible briefs accepted ([report](evaluation/results/eval-v1/REPORT.md)). A second pre-registered run on fresh, harder cases (multi-line and two-bug defects, a new assistant-authored FIFO held out of prompt development) with the current repair agent gave diagnosis 8/8, 0/4 false alarms, repairs 8/8 including three cases that needed a second or third candidate (in an exploratory run with reduced feedback, the two-bug case was the only failure), conflicts 3/4 with 4/4 compatible, and 6/8 explanations with only valid citations (assistant review found one partly wrong and one incomplete root cause) ([report](evaluation/results/eval-v2/REPORT.md)). Cases and labels were prepared with the developer's coding assistant, and learning outcomes have not been measured yet. The hosted lab replays recorded evidence; live verification and model calls run in the local build. See [implementation status](docs/STATUS.md) for exactly what ran.
+The [repair casebook](https://countertrace.vercel.app/#/repair), three practice labs, testbench exercise, and [facilitator desk](https://countertrace.vercel.app/#/teach) remain an educational use case for instructors and FPGA club mentors. They use recorded execution and learner-owned notes; no learning gains or adoption are claimed.
 
-Built for the [Nebius x NVIDIA Global AI Hackathon](https://nebiusglobalaihackathon.devpost.com/), targeting Coding and Agentic Engineering. Submission: October 30, 2026, 1:00 p.m. EDT. Judge access must remain available through December 15.
-
-[Open the learning lab](https://countertrace.vercel.app) · [Run the local build](#quick-start) · [Deployment details](docs/DEPLOYMENT.md)
+Built for the [Nebius x NVIDIA Global AI Hackathon](https://nebiusglobalaihackathon.devpost.com/), Coding and Agentic Engineering. Submission deadline: October 30, 2026, 1:00 p.m. EDT.
 
 ## The verification workbench
 
@@ -35,6 +37,7 @@ Every model call is a runtime call from the control service to the Nebius Token 
 
 | Task | Model | Role and safeguards |
 | --- | --- | --- |
+| Property generation | `nvidia/Nemotron-3-Ultra-550b-a55b` | Writes structured formal properties from the specification and ports, without golden source. The isolated golden gate and bounded feedback loop decide promotion. |
 | Learning coaching | Configured Ultra | Responds to learner reasoning using server-selected recorded observations. Advisory only; validates cited edges. Hosted labs use authored hints. |
 | Brief interpretation | `nvidia/nemotron-3-super-120b-a12b` | Flags conflicts between a plain-English brief and the fixed contract (cannot change it). Reasoning off by default for these tasks: 1.7 to 3.7 s per brief across development and eval-v2 briefs (7.1 to 11.4 s with reasoning on in eval-v1). |
 | Failure explanation | `nvidia/Nemotron-3-Ultra-550b-a55b` | Explains the recorded failing cycles for a learner; every cited cycle, signal, and RTL line is checked against the trace and source. Never changes the verdict. |
@@ -46,12 +49,7 @@ Responses are schema-validated with one bounded retry; input/output token caps a
 
 LLM-assisted hardware design and repair is an active area. RTLFixer uses LLM agents with compiler feedback to fix Verilog errors; AutoChip iterates LLM-generated Verilog with compiler and simulation feedback; NVIDIA's VerilogEval and ChipNeMo benchmark and adapt LLMs for hardware design, and FVEval evaluates LLMs on formal-verification tasks; Veri-Sure and recent open-source LLM-driven formal verification studies combine generation or repair with formal checks. Mutation testing of checks (for example YosysHQ MCY) is also established.
 
-Countertrace does not claim a new repair algorithm. Its contribution is the combination aimed at learners:
-
-1. **The checks cannot move.** A repair counts only if a separate run with hash-identical contract, harness, stimulus, limits, and formal tasks resolves every obligation, including unbounded proofs. The model never grades its own fix, and the loop feeds each failed candidate's own counterexample back to the model.
-2. **Cycle-level evidence a learner can follow.** Two independent references (a Python reference queue and a SystemVerilog formal monitor) agree on one sampling convention; the first mismatch is shown with deterministic "related events", and model explanations are checked citation by citation against that trace.
-3. **Intent before verification.** A plain-English brief is compared with the fixed contract and conflicts are surfaced instead of silently changing the rules.
-4. **Auditing the learner's checks, not the design.** Seeded faults score a named check set; the independent core decides which faults are real, and each miss points to the requirement the set never drives.
+Countertrace combines specification-only property generation with an inspectable quality gate: multi-parameter golden proofs, bounded trigger reachability, and equivalence-classified mutation testing. It then keeps the promoted properties frozen during FIFO bug hunting and repair, alongside independent hand-written checks. The golden reference remains a trusted dependency. This is an engineering workflow, not a first-of-kind research claim.
 
 ## Quick start
 
@@ -69,6 +67,7 @@ make serve        # http://127.0.0.1:8765
 Command line (after `source .venv/bin/activate`, or prefix commands with `.venv/bin/`):
 
 ```sh
+countertrace write-checks --module sync_fifo --rounds 4
 countertrace verify --example showcase-overwrite-when-full
 countertrace audit --check-set weak-learner-v1
 countertrace survey                      # every bundled example, raw outcomes
@@ -78,14 +77,14 @@ countertrace model-check --run-id <run-id> # explain a local failure and preserv
 countertrace doctor
 ```
 
-To enable Nemotron, fill `NEBIUS_API_KEY`, `NEBIUS_BASE_URL`, `NEBIUS_MODEL_ID` (and optionally `NEBIUS_FAST_MODEL_ID`), and the two token limits in `.env`. Calls are refused until the limits are set. When you request interpretation, explanation, or repair, the RTL, contract, and relevant diagnostics are sent to Nebius Token Factory; do not use confidential designs.
+To enable Nemotron, fill `NEBIUS_API_KEY`, `NEBIUS_BASE_URL`, `NEBIUS_MODEL_ID` (and optionally `NEBIUS_FAST_MODEL_ID`), and the two token limits in `.env`. Calls are refused until the limits are set. Set `COUNTERTRACE_CHECKS_OUTPUT_TOKEN_LIMIT` for property generation. When you request interpretation, explanation, or repair, the RTL, contract, and relevant diagnostics are sent to Nebius Token Factory; do not use confidential designs.
 
 ## Trust boundaries
 
 - The model proposes interpretation, explanation, or patches; it never authorizes a result.
 - RTL executes only in a container with no network, a read-only root, dropped capabilities, bounded CPU, memory, and processes, and no environment from the host. Model credentials stay in the control service.
 - Admission rejects DUT-authored assertions or assumptions, file and process system tasks, directives, `initial` blocks, attributes, extra or renamed ports without a validated interface mapping, asynchronous reset, and other constructs that could bypass the harness or make the engines disagree. The same gate applies to model patches.
-- The host parses authoritative artifacts: trace files that must match the driven stimulus, SBY status files, and the elaborated property inventory (exactly 3 assertions, 1 assumption, 12 covers, all in the trusted monitor). The elaborated DUT must leave every input a free net: an input bit tied to a constant, aliased to another input, or driven inside the design fails integrity, so it cannot constrain its own stimulus. Harness hashes are compared on every batch. Timeouts, errors, cancellation, and missing evidence never become a pass.
+- The host parses authoritative artifacts: trace files that must match the driven stimulus, SBY status files, and the elaborated property inventory (for the core FIFO monitor: exactly 3 assertions, 1 assumption, 12 covers; for generated checks: the exact compiled property inventory). The elaborated DUT must leave every input a free net: an input bit tied to a constant, aliased to another input, or driven inside the design fails integrity, so it cannot constrain its own stimulus. Harness hashes are compared on every batch. Timeouts, errors, cancellation, and missing evidence never become a pass.
 - Public custom uploads are disabled. The public experience uses bundled examples; `COUNTERTRACE_PUBLIC_UPLOADS_ENABLED=true` is for the owner's local test build.
 
 ## Repository layout

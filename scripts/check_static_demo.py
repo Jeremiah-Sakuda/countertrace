@@ -38,6 +38,11 @@ def check(base: str) -> dict:
     recordings = get_json("/api/recorded")
     examples = get_json("/api/examples")
     assert recordings and examples
+    modules = get_json("/api/modules")
+    assert modules
+    for module in modules:
+        detail = get_json(f"/api/modules/{module['id']}")
+        assert detail["id"] == module["id"] and detail["spec"]
     for example in examples:
         detail = get_json(f"/api/examples/{example['id']}")
         assert detail["id"] == example["id"] and detail["source"] and detail["contract_hash"]
@@ -45,7 +50,7 @@ def check(base: str) -> dict:
     for item in recordings:
         state = get_json(f"/api/runs/{item['id']}")
         assert state["recorded"] and state["state"] == "complete"
-        if state["kind"] != "verification":
+        if state["kind"] not in ("verification", "checks"):
             continue
         code, headers, data = fetch(f"/api/runs/{item['id']}/bundle")
         assert code == 200 and "application/zip" in headers.get("Content-Type", "")

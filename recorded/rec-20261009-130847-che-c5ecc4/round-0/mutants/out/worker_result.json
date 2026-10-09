@@ -1,0 +1,1169 @@
+{
+  "schema": "countertrace-worker-result/1",
+  "job_id": "d124fac72b62",
+  "tool_versions": {
+    "verilator": "Verilator 5.053 devel rev v5.052-258-ga419e9157 (mod)",
+    "yosys": "Yosys 0.69+158 (git sha1 a1a0ad7d4-dirty, Release, GNU /usr/bin/aarch64-linux-gnu-g++ 15.2.0)",
+    "python": "Python 3.11.2",
+    "oss_cad_suite": "2026-09-30"
+  },
+  "harness_hashes": {
+    "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+    "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+    "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+  },
+  "steps": [
+    {
+      "id": "checks:mutate-list",
+      "argv": [
+        "yosys",
+        "-q",
+        "-p",
+        "read_verilog -sv golden.v; hierarchy -top fifo -chparam DEPTH 4 -chparam WIDTH 8; proc; opt_clean; mutate -list 40 -seed 1 -o mutations.ys -s mutation_sources.txt"
+      ],
+      "timeout_s": 120,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.025,
+      "log": "logs/mutate_list.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutate-build",
+      "argv": [
+        "yosys",
+        "-q",
+        "-s",
+        "all_mut.ys"
+      ],
+      "timeout_s": 120,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.012,
+      "log": "logs/mutate_build.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_3_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_3_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.615,
+      "log": "logs/mutant_3_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_1_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_1_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.626,
+      "log": "logs/mutant_1_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_4_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_4_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.66,
+      "log": "logs/mutant_4_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_2_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_2_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.676,
+      "log": "logs/mutant_2_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_3_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_3_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.516,
+      "log": "logs/mutant_3_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_1_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_1_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.554,
+      "log": "logs/mutant_1_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_4_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_4_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.632,
+      "log": "logs/mutant_4_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_2_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_2_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.663,
+      "log": "logs/mutant_2_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_5_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_5_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.545,
+      "log": "logs/mutant_5_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_6_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_6_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.531,
+      "log": "logs/mutant_6_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_7_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_7_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.605,
+      "log": "logs/mutant_7_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_8_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_8_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.627,
+      "log": "logs/mutant_8_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_5_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_5_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.672,
+      "log": "logs/mutant_5_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_6_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_6_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.661,
+      "log": "logs/mutant_6_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_7_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_7_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.598,
+      "log": "logs/mutant_7_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_8_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_8_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.735,
+      "log": "logs/mutant_8_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_9_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_9_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.496,
+      "log": "logs/mutant_9_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_10_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_10_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.482,
+      "log": "logs/mutant_10_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_11_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_11_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.519,
+      "log": "logs/mutant_11_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_12_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_12_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.591,
+      "log": "logs/mutant_12_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_10_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_10_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.724,
+      "log": "logs/mutant_10_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_9_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_9_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.735,
+      "log": "logs/mutant_9_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_11_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_11_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.723,
+      "log": "logs/mutant_11_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_12_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_12_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.84,
+      "log": "logs/mutant_12_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_14_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_14_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.922,
+      "log": "logs/mutant_14_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_13_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_13_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.959,
+      "log": "logs/mutant_13_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_15_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_15_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 1.021,
+      "log": "logs/mutant_15_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_16_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_16_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.949,
+      "log": "logs/mutant_16_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_14_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_14_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.62,
+      "log": "logs/mutant_14_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_13_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_13_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.679,
+      "log": "logs/mutant_13_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_15_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_15_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.6,
+      "log": "logs/mutant_15_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_16_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_16_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.515,
+      "log": "logs/mutant_16_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_17_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_17_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.515,
+      "log": "logs/mutant_17_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_18_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_18_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.524,
+      "log": "logs/mutant_18_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_19_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_19_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.511,
+      "log": "logs/mutant_19_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_20_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_20_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.492,
+      "log": "logs/mutant_20_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_17_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_17_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.49,
+      "log": "logs/mutant_17_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_18_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_18_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.527,
+      "log": "logs/mutant_18_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_19_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_19_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.692,
+      "log": "logs/mutant_19_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_21_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_21_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.627,
+      "log": "logs/mutant_21_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_20_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_20_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.674,
+      "log": "logs/mutant_20_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_22_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_22_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.6,
+      "log": "logs/mutant_22_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_23_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_23_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.502,
+      "log": "logs/mutant_23_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_24_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_24_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.487,
+      "log": "logs/mutant_24_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_21_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_21_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.52,
+      "log": "logs/mutant_21_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_22_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_22_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.509,
+      "log": "logs/mutant_22_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_23_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_23_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.583,
+      "log": "logs/mutant_23_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_24_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_24_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.588,
+      "log": "logs/mutant_24_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_25_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_25_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.564,
+      "log": "logs/mutant_25_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_26_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_26_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.536,
+      "log": "logs/mutant_26_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_27_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_27_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.437,
+      "log": "logs/mutant_27_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_28_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_28_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.415,
+      "log": "logs/mutant_28_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_25_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_25_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.433,
+      "log": "logs/mutant_25_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_26_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_26_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.398,
+      "log": "logs/mutant_26_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_27_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_27_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.434,
+      "log": "logs/mutant_27_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_29_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_29_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.434,
+      "log": "logs/mutant_29_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_28_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_28_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.504,
+      "log": "logs/mutant_28_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_30_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_30_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.471,
+      "log": "logs/mutant_30_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_31_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_31_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.428,
+      "log": "logs/mutant_31_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_29_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_29_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.435,
+      "log": "logs/mutant_29_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_32_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_32_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.407,
+      "log": "logs/mutant_32_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_31_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_31_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.405,
+      "log": "logs/mutant_31_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_30_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_30_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.614,
+      "log": "logs/mutant_30_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_33_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_33_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.402,
+      "log": "logs/mutant_33_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_32_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_32_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.41,
+      "log": "logs/mutant_32_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_34_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_34_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.444,
+      "log": "logs/mutant_34_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_35_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_35_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.429,
+      "log": "logs/mutant_35_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_33_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_33_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.437,
+      "log": "logs/mutant_33_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_36_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_36_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.404,
+      "log": "logs/mutant_36_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_34_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_34_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.405,
+      "log": "logs/mutant_34_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_35_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_35_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.432,
+      "log": "logs/mutant_35_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_36_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_36_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.464,
+      "log": "logs/mutant_36_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_37_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_37_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.47,
+      "log": "logs/mutant_37_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_39_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_39_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.482,
+      "log": "logs/mutant_39_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_40_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_40_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.449,
+      "log": "logs/mutant_40_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_37_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_37_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.538,
+      "log": "logs/mutant_37_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_39_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_39_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.445,
+      "log": "logs/mutant_39_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_40_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_40_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.385,
+      "log": "logs/mutant_40_equiv.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_38_props",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_38_props.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 2.191,
+      "log": "logs/mutant_38_props.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:mutant_38_equiv",
+      "argv": [
+        "sby",
+        "-f",
+        "mutant_38_equiv.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.8,
+      "log": "logs/mutant_38_equiv.log",
+      "log_truncated": false
+    }
+  ],
+  "deadline_reached": false,
+  "duration_s": 13.477
+}

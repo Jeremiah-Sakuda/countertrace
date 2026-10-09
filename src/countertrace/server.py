@@ -148,7 +148,7 @@ class App:
         for path in sorted(RECORDED.glob("*/run.json")):
             state = json.loads(path.read_text())
             items.append({k: state.get(k) for k in ("id", "kind", "title", "example_id", "created_at", "finished_at",
-                                                     "recorded", "verdict", "recorded_note")})
+                                                     "recorded", "verdict", "recorded_note", "module_id", "checks")})
         return items
 
     def load_run(self, run_id: str) -> dict:
@@ -202,6 +202,24 @@ class App:
         self.claim_run_slot(visitor)
         try:
             state = self.store.create_checks(str(body.get("module_id", "")))
+            self.note_run(visitor, state["id"])
+            self.store.start(state["id"])
+            return state
+        finally:
+            self.release_run_slot(visitor)
+
+    def create_hunt(self, run_id: str, body: dict, visitor: str) -> dict:
+        from countertrace.checks.design import selected
+
+        selection = selected(self.load_run(run_id))
+        example_id = str(body.get("example_id", "showcase-overwrite-when-full"))
+        # Public arbitrary RTL is deliberately not part of this path.
+        item = catalog.example(example_id)
+        if item["depth"] not in (2, 4):
+            raise ValueError("This demonstration supports FIFO depths 2 and 4.")
+        self.claim_run_slot(visitor)
+        try:
+            state = self.store.create_verification(example_id=example_id, extra={"promoted_checks": selection})
             self.note_run(visitor, state["id"])
             self.store.start(state["id"])
             return state
@@ -385,6 +403,8 @@ class Handler(BaseHTTPRequestHandler):
 
             app.claim_model_call(visitor, units=agent.MAX_ROUNDS * 2)  # each round may retry once
             return self.send_json(app.create_checks(body, visitor), HTTPStatus.CREATED)
+        if m := re.fullmatch(r"/api/runs/([\w-]+)/hunt", path):
+            return self.send_json(app.create_hunt(m.group(1), body, visitor), HTTPStatus.CREATED)
         if path == "/api/check-sets/propose":
             from countertrace import audit
 

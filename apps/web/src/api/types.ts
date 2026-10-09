@@ -174,7 +174,7 @@ export interface RecordedRunSummary {
 }
 
 // ---- Runs ----------------------------------------------------------------------
-export type RunKind = "verification" | "audit";
+export type RunKind = "verification" | "audit" | "checks";
 export type RunState = "queued" | "running" | "complete" | "cancelled" | "failed";
 
 export interface RunSummary {
@@ -575,6 +575,11 @@ export interface Run {
   error?: string | null;
   image?: RunImage;
   verdict?: Verdict | null;
+  module_id?: string;
+  module?: CatalogModule;
+  max_rounds?: number;
+  checks?: ChecksResult;
+  promoted_checks?: PromotedChecks;
   verification?: Verification;
   audit?: Audit;
   explanation?: Explanation;
@@ -588,4 +593,39 @@ export interface CheckSetProposal extends ModelResult<unknown> {
 export interface RepairStartResponse {
   started: boolean;
   repair: Repair | null;
+}
+
+// The golden source is deliberately absent from the public catalog.
+export interface CatalogModule {
+  id: string; title: string; top: string; clock: string; reset: string;
+  params: Record<string, number>[]; inputs: Record<string, number | string>;
+  outputs: Record<string, number | string>; spec: string; split: "development" | "heldout";
+}
+export interface WrittenProperties {
+  state?: unknown[]; defs?: unknown[]; memories?: unknown[]; writes?: unknown[];
+  properties: { id: string; when: string; then: string; why: string }[];
+  notes?: string;
+}
+export interface CheckGate {
+  stage: string; passed: boolean; error?: string; status?: string;
+  failed?: string[]; unreached?: string[]; config?: { id: string; params: Record<string, number> };
+  total?: number; killed?: number; equivalent?: number; invalid?: number; unresolved?: number;
+  nonequivalent?: number; kill_rate?: number | null; survived?: number[];
+}
+export interface CheckRound {
+  index: number; calls: ModelCall[]; model_status: string; detail?: string;
+  properties?: WrittenProperties; gate?: CheckGate; feedback?: string | null;
+}
+export interface ChecksResult {
+  status: string; detail?: string; rounds: CheckRound[]; promoted_round?: number | null;
+  demonstration?: { hunt_run_id?: string; repair_run_id?: string };
+}
+
+export interface PromotedChecks {
+  source_run: string; module_id: string; properties: WrittenProperties;
+  frozen: Record<string, unknown>; promotion: CheckGate;
+  status: "proved" | "counterexample" | "unresolved";
+  detail?: string; tool_status?: string; failed?: string[];
+  trace?: { step?: number; inputs?: Record<string, number | null>; outputs?: Record<string, number | null> }[];
+  confirmation?: {status:"confirmed"|"unconfirmed";detail:string;inputs:unknown;runs:unknown};
 }

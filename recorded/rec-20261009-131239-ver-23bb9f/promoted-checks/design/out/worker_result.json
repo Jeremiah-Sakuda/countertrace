@@ -1,0 +1,48 @@
+{
+  "schema": "countertrace-worker-result/1",
+  "job_id": "431738f33b9a",
+  "tool_versions": {
+    "verilator": "Verilator 5.053 devel rev v5.052-258-ga419e9157 (mod)",
+    "yosys": "Yosys 0.69+158 (git sha1 a1a0ad7d4-dirty, Release, GNU /usr/bin/aarch64-linux-gnu-g++ 15.2.0)",
+    "python": "Python 3.11.2",
+    "oss_cad_suite": "2026-09-30"
+  },
+  "harness_hashes": {
+    "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+    "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+    "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+  },
+  "steps": [
+    {
+      "id": "checks:inventory:p0",
+      "argv": [
+        "yosys",
+        "-q",
+        "-p",
+        "read -formal -D CT_DUT=fifo golden.v; read -formal -D CT_DUT=fifo props.sv; chparam -set DEPTH 4 -set WIDTH 8 ct_props_top; prep -top ct_props_top; write_json /out/inventory/p0.json"
+      ],
+      "timeout_s": 120,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.064,
+      "log": "logs/inventory_p0.log",
+      "log_truncated": false
+    },
+    {
+      "id": "checks:golden_prove_p0",
+      "argv": [
+        "sby",
+        "-f",
+        "golden_prove_p0.sby"
+      ],
+      "timeout_s": 150,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 1.251,
+      "log": "logs/golden_prove_p0.log",
+      "log_truncated": false
+    }
+  ],
+  "deadline_reached": false,
+  "duration_s": 2.559
+}

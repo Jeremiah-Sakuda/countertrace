@@ -1,0 +1,93 @@
+{
+  "schema": "countertrace-worker-result/1",
+  "job_id": "11d2ae86a6ea",
+  "tool_versions": {
+    "verilator": "Verilator 5.053 devel rev v5.052-258-ga419e9157 (mod)",
+    "yosys": "Yosys 0.69+158 (git sha1 a1a0ad7d4-dirty, Release, GNU /usr/bin/aarch64-linux-gnu-g++ 15.2.0)",
+    "python": "Python 3.11.2",
+    "oss_cad_suite": "2026-09-30"
+  },
+  "harness_hashes": {
+    "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+    "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+    "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+  },
+  "steps": [
+    {
+      "id": "dut:ports",
+      "argv": [
+        "yosys",
+        "-q",
+        "-p",
+        "read_verilog -sv dut.v; hierarchy -top fifo -chparam DEPTH 4 -chparam WIDTH 8; proc; write_json /out/dut/ports.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.037,
+      "log": "dut/logs/ports.log",
+      "log_truncated": false
+    },
+    {
+      "id": "dut:properties",
+      "argv": [
+        "yosys",
+        "-p",
+        "read -formal -D CT_DUT=fifo dut.v; read -formal -D CT_DUT=fifo ct_formal_top.sv; chparam -set DEPTH 4 -set WIDTH 8 ct_formal_top; prep -top ct_formal_top; write_json /out/dut/properties.json"
+      ],
+      "timeout_s": 60,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 0.131,
+      "log": "dut/logs/properties.log",
+      "log_truncated": false
+    },
+    {
+      "id": "dut:formal:bmc",
+      "argv": [
+        "sby",
+        "-f",
+        "ct.sby",
+        "bmc"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 0.848,
+      "log": "dut/logs/sby_bmc.log",
+      "log_truncated": false
+    },
+    {
+      "id": "dut:formal:prove",
+      "argv": [
+        "sby",
+        "-f",
+        "ct.sby",
+        "prove"
+      ],
+      "timeout_s": 150,
+      "returncode": 2,
+      "timed_out": false,
+      "duration_s": 6.9,
+      "log": "dut/logs/sby_prove.log",
+      "log_truncated": false
+    },
+    {
+      "id": "dut:formal:cover",
+      "argv": [
+        "sby",
+        "-f",
+        "ct.sby",
+        "cover"
+      ],
+      "timeout_s": 150,
+      "returncode": 0,
+      "timed_out": false,
+      "duration_s": 2.778,
+      "log": "dut/logs/sby_cover.log",
+      "log_truncated": false
+    }
+  ],
+  "deadline_reached": false,
+  "duration_s": 11.141
+}

@@ -117,12 +117,17 @@ def report(state: dict, contract: Contract) -> str:
 
 def export(store, run_id: str, *, verifier_root: Path | None = None, output_dir: Path | None = None) -> Path:
     state = store.load(run_id)
+    if state.get("kind") == "checks":
+        from countertrace.checks.bundle import export as export_checks
+        return export_checks(store, run_id, output_dir)
     if state.get("kind") != "verification":
         raise ValueError("Bundles are exported for verification runs.")
     run_dir = store.run_dir(run_id)
     contract = Contract(depth=state["depth"])
     files: dict[str, bytes] = {}
     files["inputs/dut.v"] = (run_dir / "dut.v").read_bytes()
+    if state.get("promoted_checks"):
+        files["inputs/promoted_checks.json"] = json.dumps(state["promoted_checks"], indent=2).encode()
     if state.get("interface_map"):
         files["inputs/interface_map.json"] = json.dumps(state["interface_map"], indent=2).encode()
     files["inputs/contract.json"] = json.dumps(contract.document(), indent=2).encode()
@@ -139,7 +144,8 @@ def export(store, run_id: str, *, verifier_root: Path | None = None, output_dir:
             files[f"verifier/{path.relative_to(verifier_root)}"] = path.read_bytes()
     truncated = []
     budget = BUNDLE_LIMIT
-    for path in sorted((run_dir / "batches").rglob("*")):
+    evidence_paths = list((run_dir / "batches").rglob("*")) + list((run_dir / "promoted-checks").rglob("*"))
+    for path in sorted(evidence_paths):
         if not path.is_file() or "job/designs" in str(path):
             continue
         data = path.read_bytes()
@@ -207,6 +213,9 @@ def export(store, run_id: str, *, verifier_root: Path | None = None, output_dir:
 def replay(bundle_path: str) -> dict:
     with zipfile.ZipFile(bundle_path) as zf:
         manifest = json.loads(zf.read("manifest.json"))
+        if manifest.get("schema") == "countertrace-checks-evidence/1":
+            from countertrace.checks.bundle import replay as replay_checks
+            return replay_checks(zf)
         for name, digest in manifest["files"].items():
             if sha256(zf.read(name)) != digest:
                 return {"matches": False, "error": f"{name} does not match its manifest hash"}
@@ -214,6 +223,7 @@ def replay(bundle_path: str) -> dict:
         source = zf.read("inputs/dut.v").decode()
         contract_doc = json.loads(zf.read("inputs/contract.json"))
         mapping = json.loads(zf.read("inputs/interface_map.json")) if "inputs/interface_map.json" in manifest["files"] else None
+        promoted = json.loads(zf.read("inputs/promoted_checks.json")) if "inputs/promoted_checks.json" in manifest["files"] else None
     if bundled_harness != runner.harness_hashes():
         return {"matches": False, "error": "The bundled verifier harness differs from this checkout. Check out "
                                            f"commit {manifest.get('git_commit')} and replay again."}
@@ -231,6 +241,15 @@ def replay(bundle_path: str) -> dict:
                          limits=frozen.get("limits"), formal_tasks=tuple(frozen.get("formal_tasks", ("bmc", "prove", "cover"))),
                          interface_map=mapping)
         state = {"verification": v.run()}
+        if promoted:
+            from countertrace.checks import design, modules
+            if promoted.get('frozen') != design.frozen(modules.load('sync_fifo'), promoted['properties']):
+                return {'matches': False, 'error': 'Promoted check inputs differ from this checkout.'}
+            result = design.check(source, contract.depth, {k: promoted[k] for k in ('source_run', 'module_id', 'properties')},
+                                  Path(tmp) / 'promoted-checks', image, threading.Event())
+            v.state['frozen']['promoted_checks'] = result['frozen']
+            v.obligation(id='promoted:properties', check='model_written_properties', method='prove',
+                         status=result['status'], detail=result['detail'])
     now_outcome = outcome(state)
     recorded = manifest["outcome"]
     differences = []
