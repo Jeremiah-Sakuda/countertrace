@@ -20,3 +20,9 @@ Two engineering evaluations have been frozen and run: [eval-v1](results/eval-v1/
 In the diagnosis release, omit the repair comparison. One run per configuration is the required pilot; repeats are stretch work and do not increase the independent-design count. Three user sessions provide observations, not population estimates.
 
 Publish all outcomes, unresolved cases, tool errors, mutation categories, cost availability, first-finding time, total run time, and queue time. Report both all-case and attempted-repair denominators. After evaluation, release authorized fixtures, protocol, and raw outcomes with any holdout contamination disclosed.
+
+## Model-written checks: checks-v1
+
+The [checks-v1 commitment](checks-v1-commitment.json) commits to the privately retained protocol, which freezes the current implementation, model, prompts, catalog files and budgets before model evaluation. Four catalog modules reserved from prompt development receive three runs each, at most four rounds per run. The runner preserves every attempt, including model failures and interruptions, without replacement attempts. Golden proof and trigger reachability cover both settings; mutation adequacy is measured only at the primary setting. The modules were assistant-authored, not independently authored or externally validated.
+
+Run `PYTHONPATH=src .venv/bin/python scripts/evaluate_checks.py --run` from the committed frozen source with configured model access and the pinned verifier image. It refuses changed frozen files or settings. Raw artifacts remain in the ignored local run store; public results contain every proposal, gate summary and model-call metadata. Results do not establish a causal benefit from feedback without a matched control.

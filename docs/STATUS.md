@@ -1,5 +1,9 @@
 # Implementation status
 
+## October 9 held-out check-generation evaluation preparation
+
+The checks-v1 protocol and resumable runner freeze the existing implementation before testing four reserved catalog modules, three runs each and at most four rounds. Frozen hashes cover source, verifier, catalog specifications/goldens, prompt and model configuration. Interrupted attempts are retained rather than silently replaced. This entry records preparation only; it is not an executed model result.
+
 
 ## October 9 check-writing workflow and evidence hardening
 

@@ -1,0 +1,9 @@
+{
+  "schema": "countertrace-checks-evaluation/1",
+  "frozen_at": "2026-10-09T19:31:38Z",
+  "protocol_sha256": "b4e57bdb3faed223a9474921ec2c3860135a3322242afb00fd3290c60c6e32aa",
+  "module_count": 4,
+  "repeats": 3,
+  "max_rounds": 4,
+  "note": "Complete protocol and held-out identities retained privately until evaluation ends."
+}
