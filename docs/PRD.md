@@ -1,20 +1,20 @@
 # Countertrace PRD
 
-**Version:** 1.3 · **Date:** October 5, 2026 · **Status:** Education centers on investigating real Nemotron repairs. The verification engine and recorded model repairs have run; learning outcomes remain unmeasured. See repository STATUS.md for current execution evidence.
+**Version:** 1.4 · **Date:** October 9, 2026 · **Status:** Leads with model-written checks validated by a golden-reference gate (owner decision, October 8). The October 8 feasibility spike passed on two module types; productization is in progress. The verification engine, recorded model repairs, and education labs have run; learning outcomes remain unmeasured. See repository STATUS.md for current execution evidence. Not yet synchronized with the Countertrace PRD Page; see DEVELOPMENT.md.
 
-Countertrace is a hardware debugging lab where digital-design learners challenge real NVIDIA Nemotron repairs using counterexamples and unchanged independent checks. The primary activity asks learners to inspect a model-proposed RTL patch, commit a prediction and reason, reveal recorded verifier evidence, and explain whether the result transfers to another parameter. Instructors and FPGA club mentors can reuse this activity and three smaller sequence-building exercises. The verification workbench retains diagnosis, model-proposed repair, and reproducible export. Public arbitrary uploads and user testbench ingestion remain deferred. The project was built from scratch; historical AKILI code is not a dependency.
+Countertrace is a coding agent for hardware verification in which NVIDIA Nemotron writes the checks and Countertrace checks the checks. From a module's plain-English specification and port list, Nemotron writes formal properties, including any shadow state it needs. Countertrace compiles them through trusted code and promotes them only after a gate: they must hold on a hand-written golden reference at more than one parameter setting, every property's trigger must be reachable, and they must catch the golden's non-equivalent mutants, with equivalent, invalid, and unresolved mutants reported separately. Failures go back to the model as counterexample traces, never as golden source, for a bounded number of rounds. Promoted checks then hunt bugs in other designs, where every failure is confirmed by replay against the golden before it counts, and the existing repair agent fixes a design under those frozen checks. The FIFO verification workbench and the education labs (repair casebook, probe, testbench lab, practice bench, facilitator desk) remain as one use case. Public arbitrary uploads and user testbench ingestion remain deferred. The project was built from scratch; historical AKILI code is not a dependency.
 
 The recommended entry is in Coding and Agentic Engineering. The submission deadline is October 30, 2026 at 1:00 p.m. EDT. The working project must remain available for judging through December 15, 2026. These dates and the requirement to use an NVIDIA open model with Nebius come from the [official rules](https://nebiusglobalaihackathon.devpost.com/rules).
 
-Coding and Agentic Engineering remains the recommended track: learners investigate executable RTL and inspect NVIDIA Nemotron interpretations, explanations, and independently checked repairs. The education workflow adds advisory coaching through Nebius Token Factory in the configured local build. Hardware subject matter alone does not make this Physical AI. All four judging criteria are equally weighted. Educational positioning does not establish impact without observed learner usefulness.
+Coding and Agentic Engineering remains the recommended track: Nemotron writes and revises verification code, the isolated verifier runs it, and the gate tests it; Nemotron also proposes repairs that are judged by unchanged checks. The education workflow adds advisory coaching through Nebius Token Factory in the configured local build. Hardware subject matter alone does not make this Physical AI. All four judging criteria are equally weighted. Educational positioning does not establish impact without observed learner usefulness.
 
 ## Product decision
 
-Commit to one primary journey: read a fixed contract → inspect an actual Nemotron patch → commit a prediction and rationale → reveal independent recorded checks → investigate the next proposal → explain the evidence → answer a parameter-transfer question → download field notes. Keep the three sequence-building exercises as the practice bench. The instructor journey is share the repair-lab link → facilitate predictions and evidence discussion → review voluntarily shared notes → select a focused practice exercise.
+Commit to one primary journey: pick a catalog module → read its plain-English specification and ports → watch Nemotron write properties → see each gate round (compile, golden proof, reachability, mutant score) and the feedback sent back → inspect the promoted check set with its denominators → run the promoted checks on buggy or model-repaired designs, with each failure confirmed against the golden → let the repair agent fix a design under the frozen checks. The FIFO workbench and the education labs remain available as a use case for instructors and learners.
 
-The distinctive product hypothesis is that asking learners to challenge real AI repair attempts helps them reason about hardware behavior and the limits of evidence. Nemotron generates the investigated patches through Nebius; independent tools decide their verification outcomes. The education interface never substitutes a model judgment for a tool result. A passing sequence is not complete correctness, and completing an activity is not a learning gain. Agentic RTL repair, educational HDL exercises, formal verification, and mutation testing have precedents; make no first-of-kind research claim.
+The distinctive product hypothesis is that a model can write useful verification code when an independent gate decides whether that code is any good, and that the gate's feedback (counterexamples and surviving mutants) lets the model improve it. Model-written checks are never authoritative on their own. LLM-generated assertions, mutation testing, formal equivalence, and agentic RTL repair all have precedents; make no first-of-kind research claim.
 
-Keep the scope narrow: one fixed FIFO contract, one recorded two-attempt Nemotron repair investigation at depth 4, three depth-2 practice lessons, a finite recorded experiment library, and optional local advisory coaching. The local verification workbench retains eligible RTL input. Generic SystemVerilog support, arbitrary public uploads, course catalogs, accounts, grading automation, and LMS integrations are deferred.
+Keep the scope bounded: synchronous single-clock modules with a synchronous active-high reset, a structured property format compiled by trusted code, a catalog of four to six modules each with a hand-written golden reference, specification text, and seeded bugs, and the existing FIFO workbench and education labs. Generic SystemVerilog assertion ingestion, arbitrary public uploads, multiple clocks, accounts, grading automation, and LMS integrations are deferred.
 
 ## Audience and problem
 
@@ -43,6 +43,8 @@ Proposed launch targets are:
 | Model contribution | On four independently authored ambiguous or conflicting briefs, detect at least three material issues and silently accept no conflict. On four clear compatible briefs, let at least three proceed without a false blocking conflict. Trace explanations must cite actual signals/cycles. Score interpretation, explanation, and repair separately from deterministic bug detection. |
 | Audit usefulness | In the three-person pilot, at least two participants identify the missing requirement after seeing a supplemental-check audit and recognize the same omission in a different example. Report assistance and failures; do not infer population-level learning gains. |
 | First useful experience | Provisional targets: open a recorded evidence-backed example within 5 seconds and show a useful live finding within 120 seconds on the declared bundled configuration. Measure cold and warm runs separately before publishing a latency promise. Full repair completion is reported separately. |
+
+| Model-written checks | On a frozen set of held-out catalog modules, report for each module and run: rounds to promotion or failure, killed over non-equivalent mutants, and equivalent, invalid, and unresolved counts. Declared target: at least three of four held-out modules reach promotion within four rounds with a kill rate of at least 90 percent. On the FIFO, compare promoted model-written checks with the hand-written monitor on the reviewed fault library. Three runs per module. |
 
 These are release targets, not measured performance or guarantees. Failure to meet them triggers a smaller product or a narrower claim. Zero observed errors on a small suite does not establish a general error rate of zero.
 
@@ -97,8 +99,9 @@ The formal monitor may observe the preceding edge's outputs on its next clocked 
 | Must ship | Hosted runnable examples and a local test build for owner-controlled RTL; exact contract review; deterministic FIFO reference checks; Verilator simulation; one SBY formal flow; counterexample replay and explanation; honest result states; evidence export. Repair and rerun are required for the primary release. |
 | Must ship | A small verification-quality audit using independently reviewed seeded faults; visible handling of surviving, invalid, equivalent, and unresolved mutations. |
 | Must ship | Runtime NVIDIA Nemotron inference through Nebius Token Factory; measured model use; bounded retries; cancellation; recoverable run records. |
+| Must ship | Model-written checks: structured property format, trusted compiler and admission, the golden gate (multi-parameter proof, reachability, mutant classification), the bounded feedback loop, a catalog of four to six modules beyond the FIFO, the golden-confirmed bug hunt, and repair under promoted checks. |
 | Preferred | CPU verification batches on Nebius Serverless Jobs, subject to account access and measured integration. |
-| Stretch | Custom public file uploads after additional isolation testing; expanded/repeated evaluation; a second simple module family, depth 8, or another FIFO profile. Prioritize evaluation over breadth. |
+| Stretch | Custom public file uploads after additional isolation testing; user-supplied golden references; expanded/repeated evaluation; depth 8 or another FIFO profile. Prioritize evaluation over breadth. |
 | Deferred | Natural-language-to-arbitrary-RTL generation; user testbench ingestion; UVM; general SVA ingestion; multiple simulators; repository integrations; teams/accounts product; fine-tuning; cryptographic signing; custom agents that write their own tools. |
 | Excluded from claims | SoCs, multiple clocks and CDC, asynchronous reset, liveness or fairness guarantees, analog verification, timing and PPA optimization, industrial sign-off, and all-parameter proofs. |
 
@@ -127,6 +130,20 @@ The workbench retains its three existing surfaces:
 Use text and icons as well as color for every state. Requirements and trace cycles must be keyboard accessible. Display a persistent unresolved count. A recorded example is labeled as a recorded run and includes its actual date, versions, and timing; a live run has separate status.
 
 The judge journey offers an immediately inspectable recorded example with real evidence and a separate live rerun. The live route exposes the first useful finding while later obligations continue. The 45-minute safety deadline is not an interaction target. Record time to first finding and time to complete repair separately; the provisional 5-second recorded-example and 120-second live-finding targets must be measured on a named configuration.
+
+## Model-written checks and the golden gate
+
+**Module catalog.** Each catalog module has a reviewed plain-English specification, a port list with widths, parameter settings, observation qualifiers for outputs that are only meaningful after certain events, a hand-written golden reference, and seeded bugs for the bug hunt. The golden is trusted fixture code and is never sent to the model.
+
+**Property format.** The model returns structured data: auxiliary state registers, named combinational helpers, optional auxiliary memories with writes, and properties of the form "at each rising edge after the first, if *when* then *then*". Trusted code checks every name and expression against a whitelist (ports, parameters, declared helpers, literals, Verilog operators, $past, $stable, $rose, $fell), rejects collisions and reserved names, lowers $past into named delay registers, and compiles a checker with the environment assumption (reset at the first edge) owned by the template. The model cannot add assumptions, covers, hierarchical references, or tool directives. The elaborated property inventory must match the compiled set exactly.
+
+**Gate.** A property set is promoted only when all of the following hold in the isolated verifier: it compiles; every property is proved on the golden by an unbounded proof at each declared parameter setting; every property's trigger is reached by a bounded cover; and it is scored against Yosys-generated mutants of the golden. Each mutant is classified as killed (a property fails within the bounded check), equivalent (a formal miter against the golden proves no observable difference), surviving (not killed and observably different, with the distinguishing input trace), invalid (the tools cannot analyze it), or unresolved (timeout or unknown). Report every category with explicit denominators; the score is killed over non-equivalent analyzable mutants. A promotion threshold is declared before evaluation. Tool errors, timeouts, and missing artifacts never count toward promotion.
+
+**Feedback loop.** On failure, the model receives the failing stage: the compiler or tool error with the offending compiled line, the property names and counterexample trace for a golden failure, the unreachable triggers, or up to three surviving mutants as input sequences with reference and faulty output values. It never receives the golden source or mutation sites. The loop is bounded (default four rounds) and every round is recorded.
+
+**Bug hunt and repair.** Promoted checks run on other designs under the same compiled checker. A property failure is a candidate finding; it becomes a confirmed defect only when its input trace, replayed on the golden in the miter, shows an observable difference. A failure the golden does not reproduce is reported as a check problem, not a design defect. Repairs are judged by the frozen promoted check set plus the golden differential, with the same hash-frozen comparison rules as the FIFO workbench.
+
+**Claims.** Results name their basis: "proved against promoted model-written properties" or "differs from the golden reference on this trace", never "verified". Kill rates describe the named property set against the named mutant set; they are not a confidence score for arbitrary designs. The gate depends on the golden reference being correct; that dependency is stated wherever results appear.
 
 ## Result semantics and trust rules
 
@@ -244,8 +261,14 @@ Planning reference: one builder and a 100-hour effort envelope for a new impleme
 | October 1 to 4 | Start the new repository; confirm an actual Nemotron call; pin the verifier; distinguish one correct FIFO from one reviewed fault; replay the counterexample and get a useful model response. Prepare the cycle fixtures; begin reviewer and learner recruitment. Attempt a first small proof if time permits. |
 | October 5 to 8 | Establish one nontrivial proof or bounded-only scope, one unchanged-contract repair, and a CPU execution batch. Deliver a basic contract/findings interface. Measure the first-finding latency; observe an early user session and seek expert review. Make the initial diagnosis/repair profile decision. |
 | October 9 to 14 | Add constrained patching, complete regression reruns, mutation canaries, evidence export, cancellation, and all negative result states. Test worker isolation before custom public uploads. |
-| October 15 to 20 | Freeze the evaluation set, baseline, compatible/conflicting briefs, budgets, and comprehension rubric; run the declared comparisons and fix reliability issues. Add no new module family unless all core targets are already met. |
-| October 21 to 25 | Run the proposed three-person usability study, simplify confusing evidence, test clean-environment replays, and stabilize deployment. Expand the study only within capacity. |
+| October 8 | Feasibility gate for model-written checks: passed in a spike on the FIFO and a round-robin arbiter (see STATUS.md). Owner selected this as the lead direction. |
+| October 9 to 11 | Productize the gate: catalog format, property format and admission, trusted compiler, worker job type, multi-parameter proof, reachability, mutant classification, negative controls. |
+| October 11 to 14 | Agent loop as a recorded run type with bounded rounds, feedback, spend accounting, and evidence bundles. |
+| October 13 to 17 | Catalog of four to six modules with golden references, specifications, and seeded bugs. |
+| October 16 to 19 | Golden-confirmed bug hunt and repair under promoted checks. |
+| October 18 to 22 | Interface for the specification, gate rounds, promoted checks, and bug hunt; recorded on the hosted site, live in the local build. |
+| October 21 to 24 | Freeze held-out modules and the promotion threshold before running; three runs per module; FIFO comparison against the hand-written monitor. |
+| October 24 to 25 | Documentation, Devpost text, and demo script. |
 | October 26 to 28 | Record the demonstration, complete the public repository and README, document provenance of this new implementation and dependencies, prepare feedback and testing instructions. |
 | October 29 | Submission rehearsal and final deployment checks. Preserve a tested release and judging fixtures; test free access without the owner's credentials and confirm funded inference and compute through December 15. |
 | October 30 | Submit before 1:00 p.m. EDT. Keep time for upload and submission failures. |
@@ -261,13 +284,12 @@ Target a 2 minute 45 second public video, leaving room below the three-minute li
 
 | Time | What the judge sees |
 | --- | --- |
-| 0:00 to 0:20 | “A patch is a hypothesis”: introduce the learner audience and actual Nemotron repair at depth 4. |
-| 0:20 to 0:55 | Inspect the first patch, commit a prediction, and reveal its recorded counterexample. |
-| 0:55 to 1:25 | Inspect the revised patch and show the unchanged checks, distinguishing simulation, bounded checks, proofs, and covers. |
-| 1:25 to 1:45 | Explain the decision, answer the depth-8 transfer question, and export field notes. |
-| 1:45 to 2:10 | Build a short boundary experiment in the practice bench; label it as a checked prefix of recorded simulation. |
-| 2:10 to 2:30 | Show the teaching plan and voluntarily shareable practice notes. Demonstration inputs are not real learner results. |
-| 2:30 to 2:45 | State measured engineering scope, unmeasured learning outcomes, and actual NVIDIA/Nebius roles. |
+| 0:00 to 0:20 | "Nemotron writes the checks; Countertrace checks the checks." Pick a catalog module and show its specification. |
+| 0:20 to 1:05 | Nemotron's first property set; the gate disproves one property on the golden and sends back the trace; the next round passes the proof and reachability. |
+| 1:05 to 1:30 | The mutant score with its denominators and a surviving-mutant round, if one occurs. |
+| 1:30 to 2:05 | Promoted checks catch a seeded bug in another design, confirmed against the golden; the repair agent fixes it under the frozen checks. |
+| 2:05 to 2:30 | The education labs as a use case: the repair casebook and the testbench lab. |
+| 2:30 to 2:45 | Measured results with denominators, the golden dependency, and the NVIDIA and Nebius roles. |
 
 For the diagnosis release, replace the patch segment with a second held-out counterexample and evidence replay. For bounded-only delivery, replace the proof segment with the exact checked horizon and remaining uncertainty. The video follows the selected release profile.
 

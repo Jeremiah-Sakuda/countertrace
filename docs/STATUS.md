@@ -1,5 +1,16 @@
 # Implementation status
 
+## October 8 feasibility spike: model-written checks
+
+At the owner's direction, the lead direction changed to model-written checks with a golden-reference gate (PRD 1.4). A throwaway spike, kept out of the repository, tested the riskiest parts in the pinned verifier image with no network.
+
+- **Tooling.** Yosys `mutate` generated 40 mutants of the golden FIFO; following MCY, all mutations were compiled into one design behind a `mutsel` input to avoid Yosys's global cell numbering. A structured property set compiled to a checker proved on the golden with `abc pdr` and reached every trigger with a bounded cover. Each mutant ran a bounded property check and a formal miter against the golden: 40 mutants took 31 s. A hand-written stand-in set that checked only the flags killed 18, left 1 proved equivalent, and left 21 data-path mutants surviving.
+- **Nemotron, FIFO.** Given only the specification text and ports, Nemotron 3 Ultra wrote a shadow queue (count, head, tail, memory, last read word) and three properties. With a 16,000-token output budget its first set passed the gate: proved on the golden, every trigger reached, 39 of 39 non-equivalent mutants killed, 1 equivalent. It hard-coded depth 4 instead of using the DEPTH parameter, which a single-parameter gate does not catch. With a 4,096-token budget, every round ran out while reasoning and the reasoning-off retry repeated the same answer, so feedback had no effect.
+- **Nemotron, round-robin arbiter (hand-written golden).** Round 0 claimed the grant is a subset of the current requests, which is one cycle off; the gate disproved it on the golden and returned the trace. Round 1 passed: proved on the golden, every trigger reached, 26 of 26 non-equivalent mutants killed, 13 equivalent, 1 invalid. Model time was 40 to 65 s per round.
+- **Pipeline fixes the product must keep.** Open-source Yosys does not parse `$past(x)[i]`, which the model wrote repeatedly despite an instruction; trusted code now lowers `$past` into named delay registers. Helper names that collide with ports must be rejected (the model named a register `grant`). A mutant that the tools cannot analyze (undefined bits from a mutated modulo) is classified as invalid and reported, never scored. Compiler or tool errors go back to the model with the offending compiled line.
+
+These are development observations on two modules, one run each, not an evaluation.
+
 ## October 7 repair casebook, probe, and testbench lab
 
 The hosted repair lab is now a casebook of four recorded Nemotron 3 Ultra repairs at depth 4: eval-v2 F6 (two candidates), F2 (two), F1 (three), and the showcase overwrite-when-full fix (one). F1 and F2 were recorded from their preserved October 4 evaluation runs with `countertrace record`; `scripts/refresh_recorded_evidence.py` applied the same derived-summary correction as the earlier recordings, now stamped with its actual date. Every case still fails closed in `validateRepairCase` unless each rejected candidate has a counterexample and the accepted one passes all ten obligations under the parent's frozen checks.
