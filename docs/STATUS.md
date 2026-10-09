@@ -2,7 +2,9 @@
 
 ## October 9 held-out check-generation evaluation preparation
 
-The checks-v1 protocol and resumable runner freeze the existing implementation before testing four reserved catalog modules, three runs each and at most four rounds. Frozen hashes cover source, verifier, catalog specifications/goldens, prompt and model configuration. Interrupted attempts are retained rather than silently replaced. This entry records preparation only; it is not an executed model result.
+The checks-v1 protocol and resumable runner freeze the existing implementation before testing four reserved catalog modules, three runs each and at most four rounds. Frozen hashes cover source, verifier, catalog specifications/goldens, prompt and model configuration. Interrupted attempts are retained rather than silently replaced. Execution completed before any frozen source changed: 12/12 attempts promoted, 10/12 on the first proposal. The first debouncer and third UART runs each failed golden proof in round one and passed after a revision. Full results, original committed protocol hash and scope are in [checks-v1](../evaluation/results/checks-v1/REPORT.md). The protocol is now released and these fixtures are no longer fresh holdouts for future prompt tuning. Sixteen recorded model calls used 12,583 input and 147,353 output tokens; estimated inference cost $0.4546 at configured rates, not an invoice. No matched no-feedback control was run.
+
+A separate post-showcase depth-two mutation audit of the original FIFO properties was blocked: mutant 1 was equivalent within the specified output-observation window but violated the generated output-retention property. Inspection found the catalog text promised retention between accepted reads while the core contract and equivalence miter impose no requirement there. The FIFO specification now explicitly matches the existing contract; no monitor, property result or historical execution was rewritten. New generation and transfer checks are recorded separately below.
 
 
 ## October 9 check-writing workflow and evidence hardening
