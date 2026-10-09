@@ -50296,5 +50296,7 @@
     }
    ]
   }
- ]
+ ],
+ "replay_commit": "af3bca31c0aa79e381aadeedd1b0f42cae8f5fc9",
+ "replay_note": "Original executed verifier retained at this release. Replay pin added October 9; no execution or model outcome changed."
 }

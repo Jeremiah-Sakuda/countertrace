@@ -253,5 +253,7 @@
  "recorded_from": "20261009-130847-che-c5ecc4",
  "recorded_at": "2026-10-09T17:13:25Z",
  "recorded_note": "Actual October 9 development execution: specification-only Nemotron properties, golden gate, and linked FIFO demonstration. Not held-out evaluation.",
- "recorded_versions": null
+ "recorded_versions": null,
+ "replay_commit": "d121f1519dcb15999bc33e5e5d12bb17da75711b",
+ "replay_note": "Replay uses the original executed check compiler/gate identity. Added October 9 after a recovery-only source change; original model and tool outcomes are unchanged."
 }

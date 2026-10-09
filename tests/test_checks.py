@@ -261,3 +261,27 @@ class PromotedSelectionTest(unittest.TestCase):
         with zipfile.ZipFile(buf) as z, patch('countertrace.runner.ensure_image') as docker:
             self.assertFalse(replay(z)['matches'])
             docker.assert_not_called()
+
+class RejectedProposalRecordingTest(unittest.TestCase):
+    def test_lexical_rejection_is_recorded_and_feedback_reaches_next_attempt(self):
+        import json, tempfile
+        from pathlib import Path
+        from unittest import mock
+        from countertrace.checks import agent, gate
+        from countertrace.contract import sha256_json
+        for bad in (props(('1', '$display(1)')), props(('1', 'empty'), state=[{'name': 'count', 'width': 3}])):
+            with self.subTest(bad=bad):
+                calls, callbacks = [], []
+                def reply(task, system, prompt, validator, **kwargs):
+                    calls.append(prompt)
+                    return {'status': 'ok', 'result': bad, 'calls': []}
+                with tempfile.TemporaryDirectory() as tmp, mock.patch.object(agent, 'output_cap', return_value=1000), \
+                     mock.patch.object(agent.model, 'structured', reply), mock.patch.object(gate, '_run') as worker:
+                    result = agent.run_loop(FIFO, Path(tmp), {}, max_rounds=2, on_round=callbacks.append)
+                    self.assertEqual(result['status'], 'not_promoted')
+                    self.assertEqual(len(callbacks), 2)
+                    self.assertIn('could not be compiled', calls[1])
+                    self.assertEqual([r['gate']['stage'] for r in callbacks], ['compile', 'compile'])
+                    self.assertEqual(callbacks[0]['frozen']['checker_hash'], sha256_json(None))
+                    self.assertEqual(json.loads((Path(tmp)/'round-0/round.json').read_text())['properties'], bad)
+                    worker.assert_not_called()

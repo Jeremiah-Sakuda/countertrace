@@ -52024,5 +52024,7 @@
   "yosys": "Yosys 0.69+158 (git sha1 a1a0ad7d4-dirty, Release, GNU /usr/bin/aarch64-linux-gnu-g++ 15.2.0)",
   "python": "Python 3.11.2",
   "oss_cad_suite": "2026-09-30"
- }
+ },
+ "replay_commit": "d121f1519dcb15999bc33e5e5d12bb17da75711b",
+ "replay_note": "Replay uses the original executed check compiler/gate identity. Added October 9 after a recovery-only source change; original model and tool outcomes are unchanged."
 }

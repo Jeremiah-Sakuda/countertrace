@@ -51,31 +51,41 @@ jobs:
         run: make test-integration PYTHON=python
 
   clean-replay:
-    # Clean-environment reproducibility: each leg starts from a fresh runner,
-    # builds the pinned image from scratch, exports three recorded bundles, and
-    # replays their deterministic checks without any model call.
+    # Archived outcomes must use their matching trusted source, not a newer
+    # verifier. Current source is separately covered by unit and verifier jobs.
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
         replay: [1, 2]
+        fixture:
+          - name: fifo
+            ref: af3bca31c0aa79e381aadeedd1b0f42cae8f5fc9
+            ids: rec-20261004-003607-ver-4cc749 rec-20261001-193044-ver-f15d50 rec-20261004-003622-ver-d88ef8
+          - name: generated-checks
+            ref: d121f1519dcb15999bc33e5e5d12bb17da75711b
+            ids: rec-20261009-130847-che-c5ecc4 rec-20261009-131125-ver-1d5579 rec-20261009-131239-ver-23bb9f
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ matrix.fixture.ref }}
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.14"
-      - name: Build verifier image
+      - name: Build matching verifier image
         run: PYTHONPATH=src python -m countertrace build-image
       - name: Export and replay recorded bundles
         shell: bash
+        env:
+          REPLAY_IDS: ${{ matrix.fixture.ids }}
         run: |
           set -euo pipefail
-          for id in rec-20261004-003607-ver-4cc749 rec-20261001-193044-ver-f15d50 rec-20261004-003622-ver-d88ef8; do
+          for id in $REPLAY_IDS; do
             bundle=$(PYTHONPATH=src python -m countertrace bundle "$id")
             PYTHONPATH=src python -m countertrace replay "$bundle" | tee "replay-$id.json"
           done
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: clean-replay-${{ matrix.replay }}
+          name: clean-replay-${{ matrix.fixture.name }}-${{ matrix.replay }}
           path: replay-*.json

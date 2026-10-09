@@ -139,9 +139,19 @@ def export(store, run_id: str, *, verifier_root: Path | None = None, output_dir:
         for name, edges in suite(contract.depth).items():
             files[f"inputs/stimulus/{name}.txt"] = render(edges).encode()
     verifier_root = verifier_root or ROOT / "verifier"
-    for path in sorted(verifier_root.rglob("*")):
-        if path.is_file():
-            files[f"verifier/{path.relative_to(verifier_root)}"] = path.read_bytes()
+    pinned = state.get("replay_commit")
+    if pinned:
+        if len(pinned) != 40 or any(c not in "0123456789abcdef" for c in pinned):
+            raise ValueError("Recorded replay_commit must be a complete commit hash.")
+        names = subprocess.check_output(["git", "-C", str(ROOT), "ls-tree", "-r", "--name-only", pinned, "verifier/"]).decode().splitlines()
+        if not names:
+            raise ValueError("The recorded verifier revision is unavailable in this checkout.")
+        for name in names:
+            files[name] = subprocess.check_output(["git", "-C", str(ROOT), "show", f"{pinned}:{name}"])
+    else:
+        for path in sorted(verifier_root.rglob("*")):
+            if path.is_file():
+                files[f"verifier/{path.relative_to(verifier_root)}"] = path.read_bytes()
     truncated = []
     budget = BUNDLE_LIMIT
     evidence_paths = list((run_dir / "batches").rglob("*")) + list((run_dir / "promoted-checks").rglob("*"))
@@ -170,7 +180,7 @@ def export(store, run_id: str, *, verifier_root: Path | None = None, output_dir:
     manifest = {
         "schema": "countertrace-evidence/1",
         "countertrace_version": __version__,
-        "git_commit": git_commit(),
+        "git_commit": state.get("replay_commit") or git_commit(),
         "exported_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "run": {k: state.get(k) for k in ("id", "title", "kind", "example_id", "origin", "parent_id", "created_at",
                                           "started_at", "finished_at", "state", "recorded")},

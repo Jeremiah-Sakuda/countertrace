@@ -32,7 +32,7 @@ def export(store, run_id, output_dir=None):
             continue
         files[name] = data
         budget -= len(data)
-    manifest = {'schema': SCHEMA, 'run_id': run_id, 'git_commit': git_commit(), 'omitted': omitted,
+    manifest = {'schema': SCHEMA, 'run_id': run_id, 'git_commit': state.get('replay_commit') or git_commit(), 'omitted': omitted,
                 'files': {name: sha256(data) for name, data in files.items()}}
     files['manifest.json'] = json.dumps(manifest, indent=2).encode()
     out = (output_dir or data_dir() / 'bundles') / f'countertrace-{run_id}.zip'

@@ -11,7 +11,7 @@ from countertrace import runner
 from countertrace.admission import admit
 from countertrace.contract import Contract, Edge, sha256_json
 from countertrace.checks import gate, modules
-from countertrace.checks.compile import compile_checker, validate
+from countertrace.checks.compile import PropertyError, compile_checker, validate
 from countertrace.verify import Verification
 
 
@@ -30,7 +30,12 @@ def selected(state: dict) -> dict:
 
 
 def frozen(module, props):
-    checker = compile_checker(props, module)
+    # Rejected proposals also need a stable identity for recorded feedback and
+    # deterministic replay. No executable checker exists for those proposals.
+    try:
+        checker = compile_checker(props, module)
+    except (PropertyError, KeyError, TypeError):
+        checker = None
     return {'schema': 'countertrace-promoted-checks-v1', 'module': module.public(),
             'properties_hash': sha256_json(props), 'checker_hash': sha256_json(checker),
             'golden_hash': sha256_json(module.golden), 'harness': runner.harness_hashes(),
