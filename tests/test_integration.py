@@ -193,3 +193,62 @@ class AuditTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ChecksGateTest(unittest.TestCase):
+    """Model-written checks: promotion and negative controls through the real gate."""
+
+    FIFO_PROPS = {
+        "state": [
+            {"name": "count", "width": 4, "next": "rst ? 4'd0 : count + (wr_en && (count != DEPTH)) - (rd_en && (count != 0))"},
+            {"name": "head", "width": 3, "next": "rst ? 3'd0 : (rd_en && (count != 0)) ? ((head + 3'd1) % DEPTH) : head"},
+            {"name": "tail", "width": 3, "next": "rst ? 3'd0 : (wr_en && (count != DEPTH)) ? ((tail + 3'd1) % DEPTH) : tail"},
+            {"name": "dout_ref", "width": 8, "next": "rst ? 8'd0 : (rd_en && (count != 0)) ? mem[head] : dout_ref"},
+            {"name": "has_read", "width": 1, "next": "rst ? 1'd0 : has_read || (rd_en && (count != 0))"},
+        ],
+        "memories": [{"name": "mem", "width": 8, "depth": 4}],
+        "writes": [{"memory": "mem", "when": "wr_en && (count != DEPTH) && !rst", "index": "tail", "value": "din"}],
+        "properties": [
+            {"id": "full_flag", "when": "1'b1", "then": "full == (count == DEPTH)"},
+            {"id": "empty_flag", "when": "1'b1", "then": "empty == (count == 0)"},
+            {"id": "dout_matches", "when": "has_read", "then": "dout == dout_ref"},
+        ],
+    }
+
+    def gate(self, props):
+        from countertrace.checks import gate, modules
+
+        image = image_or_skip()
+        with tempfile.TemporaryDirectory(dir=Path.home()) as tmp:
+            return gate.run_gate(modules.load("sync_fifo"), props, Path(tmp), image)
+
+    def test_parameter_generic_shadow_model_is_promoted(self):
+        result = self.gate(self.FIFO_PROPS)
+        self.assertEqual(result["stage"], "mutants")
+        self.assertTrue(result["passed"])
+        self.assertEqual(result["unresolved"], 0)
+        self.assertEqual(result["killed"], result["nonequivalent"])
+        self.assertGreater(result["nonequivalent"], 20)
+
+    def test_wrong_property_is_disproved_on_the_golden_with_a_trace(self):
+        result = self.gate({"properties": [{"id": "never_full", "when": "1'b1", "then": "!full"}]})
+        self.assertEqual(result["stage"], "golden")
+        self.assertFalse(result["passed"])
+        self.assertEqual(result["failed"], ["never_full"])
+        self.assertTrue(result["trace"])
+
+    def test_hard_coded_parameter_fails_at_the_second_setting(self):
+        props = {**self.FIFO_PROPS, "properties": [{"id": "full_flag", "when": "1'b1", "then": "full == (count == 4)"}]}
+        result = self.gate(props)
+        self.assertEqual((result["stage"], result["config"]["id"]), ("golden", "p1"))
+
+    def test_unreachable_trigger_is_vacuous(self):
+        result = self.gate({"properties": [{"id": "never_happens", "when": "full && empty", "then": "1'b0"}]})
+        self.assertEqual(result["stage"], "vacuity")
+        self.assertEqual(result["unreached"], ["never_happens"])
+
+    def test_trivially_true_properties_are_never_promoted(self):
+        result = self.gate({"properties": [{"id": "tautology", "when": "1'b1", "then": "1'b1"}]})
+        self.assertEqual(result["stage"], "mutants")
+        self.assertEqual(result["killed"], 0)
+        self.assertFalse(result["passed"])

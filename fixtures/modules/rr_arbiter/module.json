@@ -1,0 +1,18 @@
+{
+  "id": "rr_arbiter",
+  "title": "Round-robin arbiter",
+  "top": "rr_arbiter",
+  "clock": "clk",
+  "reset": "rst",
+  "params": [{"N": 4}, {"N": 3}],
+  "inputs": {"rst": 1, "req": "N"},
+  "outputs": {"grant": "N"},
+  "observe": {},
+  "golden": "modules/rr_arbiter/golden.v",
+  "spec": [
+    "A round-robin arbiter for N requesters with one rising-edge clock clk. req is an N-bit vector of request lines; grant is an N-bit registered output.",
+    "rst is a synchronous active-high reset: at a rising edge with rst high, grant becomes all zeros and the arbiter forgets any previous grants, so requester 0 has the highest priority for the next grant.",
+    "At each rising edge without reset: if no request line is high, grant becomes all zeros. Otherwise grant becomes one-hot, selecting exactly one requester whose req bit is high at that edge. The choice is round robin: starting from the requester just after the most recently granted one (wrapping from N-1 to 0), the first requester with its req bit high is granted. A requester that keeps requesting is therefore granted within N edges that have any request.",
+    "grant only changes at rising edges and depends only on req, rst, and the arbiter's own history."
+  ]
+}

@@ -1,5 +1,18 @@
 # Implementation status
 
+## October 9 golden gate in the product
+
+`src/countertrace/checks/` now holds the module catalog (`fixtures/modules/`: the FIFO and a round-robin arbiter, each with two parameter settings), the trusted property compiler, and the two-stage gate. The worker gained a `countertrace-checks-job/1` type that renders every tool script itself and generates mutants from a count and seed; job data never supplies commands. The verifier harness is unchanged, so existing bundles still replay; the image digest is now `929586e183d87dab`.
+
+Observed in the Docker integration tests (`ChecksGateTest`, 31 s for all five):
+
+- A parameter-generic FIFO shadow model is promoted: proved on the golden at depth 4 and depth 2, every trigger reached, 39 of 39 non-equivalent mutants killed, 1 proved equivalent, 16 s end to end.
+- The October 8 Nemotron FIFO properties, which hard-coded depth 4, now fail at the second setting (depth 2) on `full_flag`; the one-setting spike had promoted them.
+- A false property (`full` is never high) is disproved on the golden with its name and a trace; an unreachable trigger is reported as vacuous; trivially true properties kill no mutants and are not promoted.
+- `abc bmc3` refuses a check with no state ("Does not work for combinational networks"); the worker reruns only that case with `smtbmc yices`. Using `smtbmc` for every mutant left the equivalent FIFO mutant unresolved at the 120 s limit and took 131 s instead of 16 s.
+
+`make check` passes 115 Python tests; `make test-integration` passes 15 of 15.
+
 ## October 8 feasibility spike: model-written checks
 
 At the owner's direction, the lead direction changed to model-written checks with a golden-reference gate (PRD 1.4). A throwaway spike, kept out of the repository, tested the riskiest parts in the pinned verifier image with no network.

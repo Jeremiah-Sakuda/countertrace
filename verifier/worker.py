@@ -202,12 +202,157 @@ def run_design(design: dict, limits: dict, steps: list, deadline: float) -> None
                             shutil.copy(vcd, dest / vcd.name)
 
 
+# -- model-written checks ---------------------------------------------------------
+# The control service compiles the checker, miter, and mutant wrapper from trusted
+# templates; this worker renders every tool script itself and generates mutants
+# from a count and seed. Job data never supplies commands.
+CHECKS_SCHEMA = "countertrace-checks-job/1"
+MUTATE_LINE = re.compile(
+    r"^mutate -mode (const0|const1|inv|cnot0|cnot1) -module [A-Za-z_][A-Za-z0-9_]* -cell [^\s;]+ -port [A-Za-z]+ -portbit \d+"
+    r"( -ctrlbit \d+)?( -wire [^\s;]+ -wirebit \d+)?( -src [^\s;]+)*$")
+
+
+def validate_checks(job: dict) -> None:
+    if job.get("stage") not in ("gate", "mutants"):
+        fail("invalid checks stage")
+    if not IDENT.match(str(job.get("top", ""))):
+        fail("invalid top module name")
+    limits = job.get("limits", {})
+    for key, bound in (("solver_s", 600), ("bmc_depth", 64), ("cover_depth", 64)):
+        if not isinstance(limits.get(key), int) or not 1 <= limits[key] <= bound:
+            fail(f"invalid limit {key}")
+    configs = job.get("configs")
+    if not isinstance(configs, list) or not 1 <= len(configs) <= 4:
+        fail("invalid parameter settings")
+    for cfg in configs:
+        params = cfg.get("params")
+        if not ID.match(str(cfg.get("id", ""))) or not isinstance(params, dict) or not params:
+            fail("invalid parameter setting")
+        if not all(IDENT.match(k) and isinstance(v, int) and 1 <= v <= 64 for k, v in params.items()):
+            fail("invalid parameter value")
+    needed = ["golden.v", "props.sv"]
+    if job["stage"] == "mutants":
+        mutation = job.get("mutation", {})
+        if not isinstance(mutation.get("count"), int) or not 1 <= mutation["count"] <= 64:
+            fail("invalid mutant count")
+        if not isinstance(mutation.get("seed"), int) or not 0 <= mutation["seed"] <= 1_000_000:
+            fail("invalid mutant seed")
+        needed += ["miter.sv", "mutant.sv"]
+    for name in needed:
+        if not JOB.joinpath(name).is_file():
+            fail(f"missing {name}")
+
+
+def write_sby(path: Path, mode: str, limits: dict, files: list[str], script: list[str]) -> None:
+    engine = {"prove": "abc pdr", "bmc": "abc bmc3", "bmc_smt": "smtbmc yices", "cover": "smtbmc yices"}[mode]
+    mode = "bmc" if mode == "bmc_smt" else mode
+    depth = limits["cover_depth"] if mode == "cover" else limits["bmc_depth"]
+    path.write_text("\n".join(["[options]", f"mode {mode}", f"depth {depth}", f"timeout {limits['solver_s']}",
+                               "[engines]", engine, "[script]", *script, "[files]", *files]) + "\n")
+
+
+def keep_sby_artifacts(task_dir: Path, dest: Path, traces: bool) -> None:
+    dest.mkdir(parents=True, exist_ok=True)
+    for name in ("status", "logfile.txt"):
+        if (task_dir / name).is_file():
+            shutil.copy(task_dir / name, dest / name)
+    if traces:
+        for vcd in sorted(task_dir.glob("engine_*/trace*.vcd"))[:2]:
+            if vcd.stat().st_size <= 4 * 1024 * 1024:
+                shutil.copy(vcd, dest / vcd.name)
+
+
+def chparams(params: dict, module: str) -> str:
+    return "chparam " + " ".join(f"-set {k} {v}" for k, v in params.items()) + f" {module}"
+
+
+def run_sby(name: str, work: Path, mode: str, limits: dict, files: list[str], script: list[str], steps: list, traces: bool) -> None:
+    write_sby(work / f"{name}.sby", mode, limits, files, script)
+    run(f"checks:{name}", ["sby", "-f", f"{name}.sby"], work, limits["solver_s"] + 30, OUT / "logs" / f"{name}.log", steps)
+    log = work / name / "logfile.txt"
+    # abc bmc3 refuses a check without state (for example constant properties); only then use smtbmc.
+    if mode == "bmc" and log.is_file() and "Does not work for combinational networks" in log.read_text(errors="replace"):
+        write_sby(work / f"{name}.sby", "bmc_smt", limits, files, script)
+        run(f"checks:{name}:smtbmc", ["sby", "-f", f"{name}.sby"], work, limits["solver_s"] + 30, OUT / "logs" / f"{name}_smtbmc.log", steps)
+    keep_sby_artifacts(work / name, OUT / name, traces)
+
+
+def run_checks(job: dict, steps: list, deadline: float) -> None:
+    from concurrent.futures import ThreadPoolExecutor
+
+    top, limits, configs = job["top"], job["limits"], job["configs"]
+    work = WORK / "checks"
+    work.mkdir(parents=True)
+    for name in ("golden.v", "props.sv", "miter.sv", "mutant.sv"):
+        if JOB.joinpath(name).is_file():
+            shutil.copy(JOB / name, work / name)
+    dut = f"-D CT_DUT={top}"
+    if job["stage"] == "gate":
+        for cfg in configs:
+            cid, params = cfg["id"], cfg["params"]
+            (OUT / "inventory").mkdir(exist_ok=True)
+            run(f"checks:inventory:{cid}", ["yosys", "-q", "-p",
+                f"read -formal {dut} golden.v; read -formal {dut} props.sv; {chparams(params, 'ct_props_top')}; "
+                f"prep -top ct_props_top; write_json {OUT}/inventory/{cid}.json"],
+                work, limits["solver_s"], OUT / "logs" / f"inventory_{cid}.log", steps)
+            script = [f"read -formal {dut} golden.v", f"read -formal {dut} props.sv", chparams(params, "ct_props_top"), "prep -top ct_props_top"]
+            for mode in ("prove", "cover"):
+                if time.monotonic() < deadline:
+                    run_sby(f"golden_{mode}_{cid}", work, mode, limits, ["golden.v", "props.sv"], script, steps, traces=True)
+        return
+    # Mutants: generated here from the golden at the first parameter setting.
+    params = configs[0]["params"]
+    elaborate = f"read_verilog -sv golden.v; hierarchy -top {top} " + " ".join(f"-chparam {k} {v}" for k, v in params.items()) + "; proc; opt_clean"
+    mutation = job["mutation"]
+    run("checks:mutate-list", ["yosys", "-q", "-p", f"{elaborate}; mutate -list {mutation['count']} -seed {mutation['seed']} -o mutations.ys -s mutation_sources.txt"],
+        work, limits["solver_s"], OUT / "logs" / "mutate_list.log", steps)
+    (OUT / "mutants").mkdir(exist_ok=True)
+    lines = [l for l in (work / "mutations.ys").read_text().splitlines() if l.strip()] if (work / "mutations.ys").is_file() else []
+    if not lines or any(not MUTATE_LINE.match(l) for l in lines):
+        OUT.joinpath("mutants", "mutations_rejected.txt").write_text("\n".join(lines) + "\n")
+        return
+    shutil.copy(work / "mutations.ys", OUT / "mutants" / "mutations.ys")
+    if (work / "mutation_sources.txt").is_file():
+        shutil.copy(work / "mutation_sources.txt", OUT / "mutants" / "mutation_sources.txt")
+    (work / "all_mut.ys").write_text("\n".join([*elaborate.split("; "), *[f"{l} -ctrl mutsel 8 {i + 1}" for i, l in enumerate(lines)],
+                                               "opt_clean", f"rename {top} {top}_all", "write_verilog -noattr all_mut.v"]) + "\n")
+    built = run("checks:mutate-build", ["yosys", "-q", "-s", "all_mut.ys"], work, limits["solver_s"], OUT / "logs" / "mutate_build.log", steps)
+    if built.get("returncode") != 0:
+        return
+    mut = f"-D CT_DUT={top}_mut"
+    def one(i: int) -> None:
+        if time.monotonic() >= deadline:
+            return
+        sel = f"-D CT_MUTSEL=8'd{i}"
+        files = ["all_mut.v", "mutant.sv", "props.sv"]
+        run_sby(f"mutant_{i}_props", work, "bmc", limits, files,
+                ["read -formal all_mut.v", f"read -formal {sel} mutant.sv", f"read -formal {mut} props.sv",
+                 chparams(params, "ct_props_top"), "prep -top ct_props_top"], steps, traces=False)
+        run_sby(f"mutant_{i}_equiv", work, "prove", limits, ["golden.v", *files[:2], "miter.sv"],
+                ["read -formal golden.v", "read -formal all_mut.v", f"read -formal {sel} mutant.sv",
+                 f"read -formal -D CT_OTHER={top}_mut miter.sv", chparams(params, "ct_miter"), "prep -top ct_miter"], steps, traces=True)
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        list(pool.map(one, range(1, len(lines) + 1)))
+
+
 def main() -> None:
     started = time.monotonic()
     try:
         job = json.loads(JOB.joinpath("job.json").read_text())
     except (OSError, ValueError) as exc:
         fail(f"unreadable job: {exc}")
+    if job.get("schema") == CHECKS_SCHEMA:
+        validate_checks(job)
+        steps: list = []
+        deadline = started + min(int(job.get("batch_limit_s", 900)), 1800)
+        WORK.mkdir(parents=True, exist_ok=True)
+        (OUT / "logs").mkdir(exist_ok=True)
+        run_checks(job, steps, deadline)
+        OUT.joinpath("worker_result.json").write_text(json.dumps({
+            "schema": "countertrace-worker-result/1", "job_id": job.get("job_id"), "tool_versions": tool_versions(),
+            "harness_hashes": harness_hashes(), "steps": steps, "deadline_reached": time.monotonic() >= deadline,
+            "duration_s": round(time.monotonic() - started, 3)}, indent=2))
+        return
     validate(job)
     steps: list = []
     deadline = started + job.get("batch_limit_s", 900)
