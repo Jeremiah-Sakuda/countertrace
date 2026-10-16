@@ -73,8 +73,8 @@ def execute():
         report['hunt_run_id']=state['id']; save(report)
         store.execute(state['id']); state=store.load(state['id'])
         report['hunt']={'state':state['state'],'verdict':state.get('verdict'),'promoted_checks_status':(state.get('promoted_checks') or {}).get('status'),
-                        'golden_replay':(state.get('promoted_checks') or {}).get('replay')}
-        save(report); print(json.dumps({'hunt':report['hunt']}),flush=True)
+                        'golden_replay':(state.get('promoted_checks') or {}).get('confirmation')}
+        save(report); print(json.dumps({'hunt':report['hunt']['promoted_checks_status']}),flush=True)
         if state['state']!='complete' or not model.primary_finding(state):
             raise SystemExit('No completed witnessed defect; repair not attempted.')
         explanation=model.explain_run(state,(store.run_dir(state['id'])/'dut.v').read_text())
