@@ -1,0 +1,2065 @@
+{
+  "started_at": "2026-10-16T19:48:58Z",
+  "execution_commit": "1dd61c3b1cdf27a6ae128db4e416844bc03e3bb9",
+  "source_checks": "20261016-154408-che-01f04d",
+  "selection": "first promoted FIFO detailed, then control, then historical fallback",
+  "historical_fallback": false,
+  "incremental_estimated_allowance_usd": 0.25,
+  "raw_calls": [
+    {
+      "task": "interpret",
+      "system": "You review a hardware designer's natural-language brief for a synchronous FIFO against a fixed contract profile.\nFor each topic, report what the brief says and whether it matches, conflicts with, leaves unspecified, or requests something the profile does not support.\nDo not resolve conflicts yourself and do not change the contract. Unsupported requests include fall-through (first-word) reads, accepting a write when full during a simultaneous read, asynchronous reset, multiple clocks, and parameters other than WIDTH=8 and DEPTH 2 or 4.\nReply with one JSON object only:\n{\"summary\": string, \"decisions\": [{\"topic\": string, \"brief_says\": string or null, \"status\": \"matches\"|\"conflict\"|\"unspecified\"|\"unsupported\", \"note\": string}]}\nInclude every topic exactly once.",
+      "user": "Contract profile sync-fifo-v1 v1.0.0, DEPTH=4, WIDTH=8.\nTopics and the contract's fixed behavior:\n- reset_kind: Reset is synchronous and active-high, sampled on the rising clock edge.\n- reset_priority: Reset wins over read and write. Occupancy becomes zero; empty is true and full is false after the edge.\n- reset_recurrence: Reset may be asserted again at any later edge and must restore the empty state.\n- write_when_full: Ignore the write.\n- read_when_empty: Ignore the read. Nothing is consumed and nothing is bypassed.\n- simultaneous_mid: Accept both. Occupancy stays constant; the old head is read and the new word joins the tail.\n- simultaneous_empty: Accept only the write. The new word is not bypassed to dout.\n- simultaneous_full: Accept only the read. The write is ignored even though the read frees a slot.\n- ordering: Accepted words leave exactly once and in arrival order, across pointer wraparound.\n- read_latency: dout is registered: it holds the removed word after the edge of an accepted read (no fall-through).\n- depth: DEPTH words of capacity, for the selected DEPTH.\n- flags: full is true exactly when DEPTH words are stored and empty exactly when none are; there are no early-warning or almost-full semantics on these outputs.\n- width: 8-bit data words.\n\nBrief:\n\"\"\"\nAn 8-bit synchronous FIFO of depth 4, with active-high synchronous reset. Reset clears occupancy. Ignore writes when full, even with a simultaneous read; ignore reads when empty, even with a simultaneous write. In the interior accept both operations. Return the oldest accepted word after an accepted read. full and empty exactly reflect occupancy; preserve order across wraparound.\n\"\"\"",
+      "content": "{\"summary\": \"The brief aligns closely with the contract but contains two deviations: it incorrectly states that writes are ignored when full even during a simultaneous read (which contradicts the contract\u2019s acceptance of the read in simultaneous_full), and it claims reset clears occupancy without specifying the resulting flag states (empty=true, full=false). All other topics match or are left unspecified where the contract has fixed behavior.\"}",
+      "meta": {
+        "task": "interpret",
+        "model_id": "nvidia/nemotron-3-super-120b-a12b",
+        "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+        "at": "2026-10-16T19:48:58Z",
+        "attempts": 1,
+        "thinking": false,
+        "request_id": "b2e526cf11fed32a913eb35e0f091ce2",
+        "latency_ms": 833,
+        "prompt_tokens": 570,
+        "completion_tokens": 83,
+        "model_reported": "nvidia/nemotron-3-super-120b-a12b",
+        "status": "ok",
+        "finish_reason": "stop",
+        "schema_error": "'decisions'"
+      }
+    },
+    {
+      "task": "interpret",
+      "system": "You review a hardware designer's natural-language brief for a synchronous FIFO against a fixed contract profile.\nFor each topic, report what the brief says and whether it matches, conflicts with, leaves unspecified, or requests something the profile does not support.\nDo not resolve conflicts yourself and do not change the contract. Unsupported requests include fall-through (first-word) reads, accepting a write when full during a simultaneous read, asynchronous reset, multiple clocks, and parameters other than WIDTH=8 and DEPTH 2 or 4.\nReply with one JSON object only:\n{\"summary\": string, \"decisions\": [{\"topic\": string, \"brief_says\": string or null, \"status\": \"matches\"|\"conflict\"|\"unspecified\"|\"unsupported\", \"note\": string}]}\nInclude every topic exactly once.",
+      "user": "Contract profile sync-fifo-v1 v1.0.0, DEPTH=4, WIDTH=8.\nTopics and the contract's fixed behavior:\n- reset_kind: Reset is synchronous and active-high, sampled on the rising clock edge.\n- reset_priority: Reset wins over read and write. Occupancy becomes zero; empty is true and full is false after the edge.\n- reset_recurrence: Reset may be asserted again at any later edge and must restore the empty state.\n- write_when_full: Ignore the write.\n- read_when_empty: Ignore the read. Nothing is consumed and nothing is bypassed.\n- simultaneous_mid: Accept both. Occupancy stays constant; the old head is read and the new word joins the tail.\n- simultaneous_empty: Accept only the write. The new word is not bypassed to dout.\n- simultaneous_full: Accept only the read. The write is ignored even though the read frees a slot.\n- ordering: Accepted words leave exactly once and in arrival order, across pointer wraparound.\n- read_latency: dout is registered: it holds the removed word after the edge of an accepted read (no fall-through).\n- depth: DEPTH words of capacity, for the selected DEPTH.\n- flags: full is true exactly when DEPTH words are stored and empty exactly when none are; there are no early-warning or almost-full semantics on these outputs.\n- width: 8-bit data words.\n\nBrief:\n\"\"\"\nAn 8-bit synchronous FIFO of depth 4, with active-high synchronous reset. Reset clears occupancy. Ignore writes when full, even with a simultaneous read; ignore reads when empty, even with a simultaneous write. In the interior accept both operations. Return the oldest accepted word after an accepted read. full and empty exactly reflect occupancy; preserve order across wraparound.\n\"\"\"\n\nYour previous reply was rejected by the schema validator: 'decisions'. Reply again with only the JSON object in the required schema.",
+      "content": "{\"summary\": \"The brief aligns with the contract on all specified topics except where it adds unsupported constraints or omits details already fixed by the profile.\", \"decisions\": [{\"topic\": \"reset_kind\", \"brief_says\": \"active-high synchronous reset\", \"status\": \"matches\", \"note\": \"\"}, {\"topic\": \"reset_priority\", \"brief_says\": \"Reset clears occupancy\", \"status\": \"matches\", \"note\": \"\"}, {\"topic\": \"reset_recurrence\", \"brief_says\": null, \"status\": \"unspecified\", \"note\": \"\"}, {\"topic\": \"write_when_full\", \"brief_says\": \"Ignore writes when full, even with a simultaneous read\", \"status\": \"conflict\", \"note\": \"Contract allows write to be ignored but read accepted in simultaneous_full; brief says ignore writes even with simultaneous read, which matches, but then says 'ignore writes when full, even with a simultaneous read' \u2014 this is correct per contract. However, re-evaluating: contract says for simultaneous_full: accept only the read, write ignored. Brief says: ignore writes when full, even with a simultaneous read \u2192 matches. No conflict.\"}, {\"topic\": \"read_when_empty\", \"brief_says\": \"ignore reads when empty, even with a simultaneous write\", \"status\": \"matches\", \"note\": \"\"}, {\"topic\": \"simultaneous_mid\", \"brief_says\": \"In the interior accept both operations\", \"status\": \"matches\", \"note\": \"\"}, {\"topic\": \"simultaneous_empty\", \"brief_says\": null, \"status\": \"unspecified\", \"note\": \"\"}, {\"topic\": \"simultaneous_full\", \"brief_says\": \"Ignore writes when full, even with a simultaneous read\", \"status\": \"matches\", \"note\": \"\"}, {\"topic\": \"ordering\", \"brief_says\": \"preserve order across wraparound\", \"status\": \"matches\", \"note\": \"\"}, {\"topic\": \"read_latency\", \"brief_says\": \"Return the oldest accepted word after an accepted read\", \"status\": \"matches\", \"note\": \"\"}, {\"topic\": \"depth\", \"brief_says\": \"depth 4\", \"status\": \"matches\", \"note\": \"\"}, {\"topic\": \"flags\", \"brief_says\": \"full and empty exactly reflect occupancy\", \"status\": \"matches\", \"note\": \"\"}, {\"topic\": \"width\", \"brief_says\": \"8-bit\", \"status\": \"matches\", \"note\": \"\"}]}",
+      "meta": {
+        "task": "interpret",
+        "model_id": "nvidia/nemotron-3-super-120b-a12b",
+        "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+        "at": "2026-10-16T19:48:58Z",
+        "attempts": 1,
+        "thinking": false,
+        "request_id": "3e38891ad6d3b4d1ce8683dffad3c61b",
+        "latency_ms": 2679,
+        "prompt_tokens": 597,
+        "completion_tokens": 538,
+        "model_reported": "nvidia/nemotron-3-super-120b-a12b",
+        "status": "ok",
+        "finish_reason": "stop"
+      }
+    },
+    {
+      "task": "explain",
+      "system": "You explain a recorded FIFO verification failure to a student who knows RTL basics.\nUse only the evidence provided. The deterministic checker already decided that the design failed; you explain why, you do not re-judge it.\nCite every claim with cycle numbers from the provided table and signal names that exist in the evidence or RTL. Cite RTL line numbers for the likely cause.\nThe normalized trace samples interface signals and reference-queue state, not internal registers or memory addresses. Explain the RTL logic, but do not assert numeric internal-register values or memory indices that are absent from the sampled trace.\nReply with one JSON object only:\n{\"summary\": string (two sentences max), \"steps\": [{\"text\": string, \"cycles\": [int], \"signals\": [string]}], \"likely_cause\": {\"text\": string, \"lines\": [int]}, \"next_action\": string, \"limits\": string}\n\"limits\" must state what this failure and any passing checks do and do not establish.\nA witnessed failure refutes the contract for the tested configuration. Passing simulation checks cover only their named tests; bounded checks cover their stated horizon; an unbounded proof applies only to its named property and assumptions. Reached cover scenarios establish reachability, not correctness. Unresolved obligations are not passes.\nUse the supplied run outcomes for these limits. Do not invent which input conditions passing checks covered or claim that all passing checks excluded full/empty conditions. Other outcomes can come from different traces; do not merge them into the trace being explained.\nIf naming another outcome, identify its exact method/check pair and status. Never group an unresolved formal check with witnessed counterexamples; a simulation failure does not imply that the formal checker found that same failure.",
+      "user": "Configuration under test: DEPTH=4, WIDTH=8. State this configuration exactly; results apply to no other configuration.\nContract row at the failing edge (read_not_empty): Remove the oldest word. dout holds that word after the edge.\nFailed check: read_data \u2014 dout equals the reference head removed by an accepted read\nFirst observed mismatch: cycle 6 in test fill_drain (simulation).\nExpected: {\"dout\": 33, \"empty\": false, \"full\": false}  Observed: {\"dout\": 101, \"empty\": false, \"full\": false}\nDeterministic related events:\n- The expected word 0x21 was accepted at cycle 1.\n- The observed word 0x65 was offered at cycle 5 (write requested while full); the contract ignored it.\n\nSampling convention: cycle k is a rising edge; queues are oldest first; dout is checked only after an accepted read.\nCycle table (hex data):\ncycle | rst wr_en rd_en din | contract row | accepted | pre-edge queue -> post-edge queue | expected dout/empty/full | observed dout/empty/full | mismatches\n0 | 1 0 0 10 | reset | reset | - -> [] | --/1/0 | d7(unchecked)/1/0 | -\n1 | 0 1 0 21 | write_not_full | write | [] -> [21] | --/0/0 | d7(unchecked)/0/0 | -\n2 | 0 1 0 32 | write_not_full | write | [21] -> [21, 32] | --/0/0 | d7(unchecked)/0/0 | -\n3 | 0 1 0 43 | write_not_full | write | [21, 32] -> [21, 32, 43] | --/0/0 | d7(unchecked)/0/0 | -\n4 | 0 1 0 54 | write_not_full | write | [21, 32, 43] -> [21, 32, 43, 54] | --/0/1 | d7(unchecked)/0/1 | -\n5 | 0 1 0 65 | write_full | none | [21, 32, 43, 54] -> [21, 32, 43, 54] | --/0/1 | d7(unchecked)/0/1 | -\n6 | 0 0 1 76 | read_not_empty | read | [21, 32, 43, 54] -> [32, 43, 54] | 21/0/0 | 65/0/0 | read_data\n7 | 0 0 1 87 | read_not_empty | read | [32, 43, 54] -> [43, 54] | 32/0/0 | 32/0/0 | -\n8 | 0 0 1 98 | read_not_empty | read | [43, 54] -> [54] | 43/0/0 | 43/0/0 | -\n\nRTL with line numbers:\n  1| // Countertrace fixture: known-good synchronous FIFO, pointer + occupancy-count style.\n  2| // Authored for Countertrace (MIT). Supported profile: sync-fifo-v1, WIDTH 8, DEPTH 2 or 4.\n  3| `default_nettype none\n  4| module fifo #(\n  5|     parameter integer DEPTH = 4,\n  6|     parameter integer WIDTH = 8\n  7| ) (\n  8|     input  wire             clk,\n  9|     input  wire             rst,\n 10|     input  wire             wr_en,\n 11|     input  wire             rd_en,\n 12|     input  wire [WIDTH-1:0] din,\n 13|     output reg  [WIDTH-1:0] dout,\n 14|     output wire             full,\n 15|     output wire             empty\n 16| );\n 17|     localparam integer AW = $clog2(DEPTH);\n 18| \n 19|     reg [WIDTH-1:0] mem [0:DEPTH-1];\n 20|     reg [AW-1:0]    wr_ptr;\n 21|     reg [AW-1:0]    rd_ptr;\n 22|     reg [AW:0]      count;\n 23| \n 24|     wire do_read  = rd_en && (count != 0);\n 25|     wire do_write = wr_en;\n 26| \n 27|     assign empty = (count == 0);\n 28|     assign full  = (count == DEPTH);\n 29| \n 30|     always @(posedge clk) begin\n 31|         if (rst) begin\n 32|             wr_ptr <= 0;\n 33|             rd_ptr <= 0;\n 34|             count  <= 0;\n 35|         end else begin\n 36|             if (do_write) begin\n 37|                 mem[wr_ptr] <= din;\n 38|                 wr_ptr      <= wr_ptr + 1'b1;\n 39|             end\n 40|             if (do_read) begin\n 41|                 dout   <= mem[rd_ptr];\n 42|                 rd_ptr <= rd_ptr + 1'b1;\n 43|             end\n 44|             case ({do_write, do_read})\n 45|                 2'b10:   count <= (count == DEPTH) ? count : count + 1'b1;\n 46|                 2'b01:   count <= count - 1'b1;\n 47|                 default: count <= count;\n 48|             endcase\n 49|         end\n 50|     end\n 51| endmodule\n 52| `default_nettype wire\n\nAssumptions: Reset is asserted at the first sampled edge; no pre-reset state is claimed. Later reset pulses are legal and are exercised. Inputs are driven while the clock is low and held stable through the rising edge. Two-state digital semantics; X-propagation, timing closure, and synthesized behavior are not checked. No requirement is imposed on dout unless the preceding edge accepted a read. Results apply only to the exact instantiated DEPTH and WIDTH.\n\nRun outcomes for result scope (may refer to other tests and traces):\n[{\"id\": \"bmc:empty_flag\", \"method\": \"bmc\", \"status\": \"unresolved\", \"detail\": \"Not established: the solver stopped at another property's counterexample.\"}, {\"id\": \"bmc:full_flag\", \"method\": \"bmc\", \"status\": \"counterexample\", \"detail\": \"Solver step 6 (application cycle 5); trace batches/dut-formal/out/dut/formal/bmc/trace.vcd\"}, {\"id\": \"bmc:read_data\", \"method\": \"bmc\", \"status\": \"unresolved\", \"detail\": \"Not established: the solver stopped at another property's counterexample.\"}, {\"id\": \"prove:empty_flag\", \"method\": \"prove\", \"status\": \"unresolved\", \"detail\": \"Not established: the solver stopped at another property's counterexample.\"}, {\"id\": \"prove:full_flag\", \"method\": \"prove\", \"status\": \"counterexample\", \"detail\": \"Solver step 6 (application cycle 5); trace batches/dut-formal/out/dut/formal/prove/trace.vcd\"}, {\"id\": \"prove:read_data\", \"method\": \"prove\", \"status\": \"unresolved\", \"detail\": \"Not established: the solver stopped at another property's counterexample.\"}, {\"id\": \"cover:reachability\", \"method\": \"cover\", \"status\": \"bounded_pass\", \"detail\": \"Environment reachability: the covers observe the inputs and the reference queue (not the DUT), showing the assumptions do not rule out any contract scenario. They reduce the risk of vacuous checks; they do not prove the specification complete.\", \"depth\": 24}, {\"id\": \"simulation:empty_flag\", \"method\": \"simulation\", \"status\": \"counterexample\", \"detail\": \"Failed in 9 of 14 tests: random_s2, random_s3, random_s4, random_s5 and 5 more.\", \"tests\": [\"learner_basic\", \"fill_drain\", \"write_when_full\", \"simultaneous\", \"wraparound\", \"recurrent_reset\", \"random_s1\", \"random_s2\", \"random_s3\", \"random_s4\", \"random_s5\", \"random_s6\", \"random_s7\", \"random_s8\"]}, {\"id\": \"simulation:full_flag\", \"method\": \"simulation\", \"status\": \"counterexample\", \"detail\": \"Failed in 10 of 14 tests: random_s1, random_s2, random_s3, random_s4 and 6 more.\", \"tests\": [\"learner_basic\", \"fill_drain\", \"write_when_full\", \"simultaneous\", \"wraparound\", \"recurrent_reset\", \"random_s1\", \"random_s2\", \"random_s3\", \"random_s4\", \"random_s5\", \"random_s6\", \"random_s7\", \"random_s8\"]}, {\"id\": \"simulation:read_data\", \"method\": \"simulation\", \"status\": \"counterexample\", \"detail\": \"Failed in 12 of 14 tests: fill_drain, random_s1, random_s2, random_s3 and 8 more.\", \"tests\": [\"learner_basic\", \"fill_drain\", \"write_when_full\", \"simultaneous\", \"wraparound\", \"recurrent_reset\", \"random_s1\", \"random_s2\", \"random_s3\", \"random_s4\", \"random_s5\", \"random_s6\", \"random_s7\", \"random_s8\"]}, {\"id\": \"promoted:properties\", \"method\": \"prove\", \"status\": \"counterexample\", \"detail\": \"The same input sequence passes on the golden and violates the independent reference on the candidate.\"}]",
+      "content": "{\n  \"summary\": \"At cycle 5 a write while full (wr_en=1, full=1) was incorrectly accepted by the DUT, overwriting the oldest entry (0x21) with 0x65. At cycle 6 the read returned the overwritten value 0x65 instead of the expected 0x21.\",\n  \"steps\": [\n    {\n      \"text\": \"Cycle 5: write requested while full (wr_en=1, full=1). The contract rejects it (write_full), but the DUT executes the write because do_write lacks a full check, storing 0x65 at the write pointer (index 0) and advancing wr_ptr.\",\n      \"cycles\": [5],\n      \"signals\": [\"wr_en\", \"full\", \"din\", \"wr_ptr\", \"mem[0]\"]\n    },\n    {\n      \"text\": \"Cycle 6: read accepted (rd_en=1, count!=0). The DUT reads from rd_ptr (still 0) which now holds 0x65, outputting 0x65 instead of the expected 0x21.\",\n      \"cycles\": [6],\n      \"signals\": [\"rd_en\", \"rd_ptr\", \"dout\", \"mem[0]\"]\n    }\n  ],\n  \"likely_cause\": {\n    \"text\": \"The write enable do_write is not gated by the full flag, so writes proceed even when the FIFO is full. This overwrites the oldest data before it can be read.\",\n    \"lines\": [25, 36, 37, 38, 45]\n  },\n  \"next_action\": \"Change do_write to `wr_en && !full` (or `wr_en && (count != DEPTH)`) and ensure the write block is only entered when do_write is true.\",\n  \"limits\": \"This failure refutes the read_data contract for DEPTH=4, WIDTH=8. The simulation read_data check fails in 12 of 14 tests; formal read_data checks are unresolved (stopped at another counterexample). The cover reachability check passes bounded but only shows environment assumptions do not rule out contract scenarios. Other simulation checks (empty_flag, full_flag) also have counterexamples. No passing check establishes correctness for any property.\"\n}",
+      "meta": {
+        "task": "explain",
+        "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+        "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+        "at": "2026-10-16T19:49:33Z",
+        "attempts": 1,
+        "thinking": true,
+        "request_id": "fd64c69db322d5824c6b7d98387d2f34",
+        "latency_ms": 5327,
+        "prompt_tokens": 2707,
+        "completion_tokens": 1791,
+        "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+        "status": "ok",
+        "finish_reason": "stop"
+      }
+    },
+    {
+      "task": "repair",
+      "system": "You repair a synchronous FIFO RTL module so it satisfies a fixed contract.\nChange only the module's internal logic. Keep the module name, parameters, port names, directions, and widths exactly the same.\nDo not add assertions, assumptions, initial blocks, system tasks, compiler directives, attributes, or extra modules.\nReturn a minimal patch as exact-match edits. Each \"find\" must be copied verbatim from the current RTL (including indentation) and must occur exactly once; \"replace\" is its new text. Keep comments and author headers unchanged. Use as few, short edits as possible.\nReply with one JSON object only:\n{\"rationale\": string, \"edits\": [{\"find\": string, \"replace\": string}]}",
+      "user": "Contract requirements:\n- Reset asserted at a rising edge: Reset wins over read and write. Occupancy becomes zero; empty is true and full is false after the edge.\n- Write requested while not full: Accept one input word.\n- Read requested while not empty: Remove the oldest word. dout holds that word after the edge.\n- Read requested while empty: Ignore the read. Nothing is consumed and nothing is bypassed.\n- Write requested while full: Ignore the write.\n- Read and write between empty and full: Accept both. Occupancy stays constant; the old head is read and the new word joins the tail.\n- Read and write while empty: Accept only the write. The new word is not bypassed to dout.\n- Read and write while full: Accept only the read. The write is ignored even though the read frees a slot.\n- No request: Occupancy and stored words are unchanged.\n- Wraparound: Preserve accepted-word ordering and capacity across pointer wraparound.\nChecks: {\"empty_flag\": \"empty equals (reference occupancy == 0) after every edge\", \"full_flag\": \"full equals (reference occupancy == DEPTH) after every edge\", \"read_data\": \"dout equals the reference head removed by an accepted read\"}\n\nThe current RTL below is what failed; the finding and trace are from verifying it.\nFailing clause (read_not_empty): Remove the oldest word. dout holds that word after the edge.\nFirst mismatch: cycle 6, check read_data; expected {\"dout\": 33, \"empty\": false, \"full\": false}, observed {\"dout\": 101, \"empty\": false, \"full\": false}.\nRelated events:\n- The expected word 0x21 was accepted at cycle 1.\n- The observed word 0x65 was offered at cycle 5 (write requested while full); the contract ignored it.\n\nReproducible trace window:\ncycle | rst wr_en rd_en din | contract row | accepted | pre-edge queue -> post-edge queue | expected dout/empty/full | observed dout/empty/full | mismatches\n0 | 1 0 0 10 | reset | reset | - -> [] | --/1/0 | d7(unchecked)/1/0 | -\n1 | 0 1 0 21 | write_not_full | write | [] -> [21] | --/0/0 | d7(unchecked)/0/0 | -\n2 | 0 1 0 32 | write_not_full | write | [21] -> [21, 32] | --/0/0 | d7(unchecked)/0/0 | -\n3 | 0 1 0 43 | write_not_full | write | [21, 32] -> [21, 32, 43] | --/0/0 | d7(unchecked)/0/0 | -\n4 | 0 1 0 54 | write_not_full | write | [21, 32, 43] -> [21, 32, 43, 54] | --/0/1 | d7(unchecked)/0/1 | -\n5 | 0 1 0 65 | write_full | none | [21, 32, 43, 54] -> [21, 32, 43, 54] | --/0/1 | d7(unchecked)/0/1 | -\n6 | 0 0 1 76 | read_not_empty | read | [21, 32, 43, 54] -> [32, 43, 54] | 21/0/0 | 65/0/0 | read_data\n7 | 0 0 1 87 | read_not_empty | read | [32, 43, 54] -> [43, 54] | 32/0/0 | 32/0/0 | -\n8 | 0 0 1 98 | read_not_empty | read | [43, 54] -> [54] | 43/0/0 | 43/0/0 | -\n\nPrevious attempts:\n- none\n\nCurrent RTL:\n// Countertrace fixture: known-good synchronous FIFO, pointer + occupancy-count style.\n// Authored for Countertrace (MIT). Supported profile: sync-fifo-v1, WIDTH 8, DEPTH 2 or 4.\n`default_nettype none\nmodule fifo #(\n    parameter integer DEPTH = 4,\n    parameter integer WIDTH = 8\n) (\n    input  wire             clk,\n    input  wire             rst,\n    input  wire             wr_en,\n    input  wire             rd_en,\n    input  wire [WIDTH-1:0] din,\n    output reg  [WIDTH-1:0] dout,\n    output wire             full,\n    output wire             empty\n);\n    localparam integer AW = $clog2(DEPTH);\n\n    reg [WIDTH-1:0] mem [0:DEPTH-1];\n    reg [AW-1:0]    wr_ptr;\n    reg [AW-1:0]    rd_ptr;\n    reg [AW:0]      count;\n\n    wire do_read  = rd_en && (count != 0);\n    wire do_write = wr_en;\n\n    assign empty = (count == 0);\n    assign full  = (count == DEPTH);\n\n    always @(posedge clk) begin\n        if (rst) begin\n            wr_ptr <= 0;\n            rd_ptr <= 0;\n            count  <= 0;\n        end else begin\n            if (do_write) begin\n                mem[wr_ptr] <= din;\n                wr_ptr      <= wr_ptr + 1'b1;\n            end\n            if (do_read) begin\n                dout   <= mem[rd_ptr];\n                rd_ptr <= rd_ptr + 1'b1;\n            end\n            case ({do_write, do_read})\n                2'b10:   count <= (count == DEPTH) ? count : count + 1'b1;\n                2'b01:   count <= count - 1'b1;\n                default: count <= count;\n            endcase\n        end\n    end\nendmodule\n`default_nettype wire\n",
+      "content": "{\"rationale\": \"The write enable signal must be gated by the full flag to prevent writes when the FIFO is full. Currently, do_write = wr_en allows writes even when full, which corrupts memory (overwrites the oldest entry) and leads to incorrect read data. The contract requires writes to be ignored when full.\", \"edits\": [{\"find\": \"    wire do_write = wr_en;\", \"replace\": \"    wire do_write = wr_en && !full;\"}]}",
+      "meta": {
+        "task": "repair",
+        "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+        "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+        "at": "2026-10-16T19:49:39Z",
+        "attempts": 1,
+        "thinking": true,
+        "request_id": "c74697dc3b81d251f3f7425aee53495e",
+        "latency_ms": 6782,
+        "prompt_tokens": 1561,
+        "completion_tokens": 2393,
+        "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+        "status": "ok",
+        "finish_reason": "stop"
+      }
+    }
+  ],
+  "scope": "Synthetic FIFO, WIDTH=8 DEPTH=4. Local isolated Docker. Model proposals never approve a verdict. No public deployment or learner result.",
+  "interpretation": {
+    "status": "ok",
+    "result": {
+      "summary": "The brief aligns with the contract on all specified topics except where it adds unsupported constraints or omits details already fixed by the profile.",
+      "decisions": [
+        {
+          "topic": "reset_kind",
+          "contract": "Reset is synchronous and active-high, sampled on the rising clock edge.",
+          "brief_says": "active-high synchronous reset",
+          "status": "matches",
+          "note": ""
+        },
+        {
+          "topic": "reset_priority",
+          "contract": "Reset wins over read and write. Occupancy becomes zero; empty is true and full is false after the edge.",
+          "brief_says": "Reset clears occupancy",
+          "status": "matches",
+          "note": ""
+        },
+        {
+          "topic": "reset_recurrence",
+          "contract": "Reset may be asserted again at any later edge and must restore the empty state.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": ""
+        },
+        {
+          "topic": "write_when_full",
+          "contract": "Ignore the write.",
+          "brief_says": "Ignore writes when full, even with a simultaneous read",
+          "status": "conflict",
+          "note": "Contract allows write to be ignored but read accepted in simultaneous_full; brief says ignore writes even with simultaneous read, which matches, but then says 'ignore writes when full, even with a simultaneous read' \u2014 this is correct per contract. However, re-evaluating: contract says for simultaneous_full: accept only the read, write ignored. Brief says: ignore writes when full, even with a simul"
+        },
+        {
+          "topic": "read_when_empty",
+          "contract": "Ignore the read. Nothing is consumed and nothing is bypassed.",
+          "brief_says": "ignore reads when empty, even with a simultaneous write",
+          "status": "matches",
+          "note": ""
+        },
+        {
+          "topic": "simultaneous_mid",
+          "contract": "Accept both. Occupancy stays constant; the old head is read and the new word joins the tail.",
+          "brief_says": "In the interior accept both operations",
+          "status": "matches",
+          "note": ""
+        },
+        {
+          "topic": "simultaneous_empty",
+          "contract": "Accept only the write. The new word is not bypassed to dout.",
+          "brief_says": null,
+          "status": "unspecified",
+          "note": ""
+        },
+        {
+          "topic": "simultaneous_full",
+          "contract": "Accept only the read. The write is ignored even though the read frees a slot.",
+          "brief_says": "Ignore writes when full, even with a simultaneous read",
+          "status": "matches",
+          "note": ""
+        },
+        {
+          "topic": "ordering",
+          "contract": "Accepted words leave exactly once and in arrival order, across pointer wraparound.",
+          "brief_says": "preserve order across wraparound",
+          "status": "matches",
+          "note": ""
+        },
+        {
+          "topic": "read_latency",
+          "contract": "dout is registered: it holds the removed word after the edge of an accepted read (no fall-through).",
+          "brief_says": "Return the oldest accepted word after an accepted read",
+          "status": "matches",
+          "note": ""
+        },
+        {
+          "topic": "depth",
+          "contract": "DEPTH words of capacity, for the selected DEPTH.",
+          "brief_says": "depth 4",
+          "status": "matches",
+          "note": ""
+        },
+        {
+          "topic": "flags",
+          "contract": "full is true exactly when DEPTH words are stored and empty exactly when none are; there are no early-warning or almost-full semantics on these outputs.",
+          "brief_says": "full and empty exactly reflect occupancy",
+          "status": "matches",
+          "note": ""
+        },
+        {
+          "topic": "width",
+          "contract": "8-bit data words.",
+          "brief_says": "8-bit",
+          "status": "matches",
+          "note": ""
+        }
+      ],
+      "backend_filled": []
+    },
+    "calls": [
+      {
+        "task": "interpret",
+        "model_id": "nvidia/nemotron-3-super-120b-a12b",
+        "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+        "at": "2026-10-16T19:48:58Z",
+        "attempts": 1,
+        "thinking": false,
+        "request_id": "b2e526cf11fed32a913eb35e0f091ce2",
+        "latency_ms": 833,
+        "prompt_tokens": 570,
+        "completion_tokens": 83,
+        "model_reported": "nvidia/nemotron-3-super-120b-a12b",
+        "status": "ok",
+        "finish_reason": "stop",
+        "schema_error": "'decisions'"
+      },
+      {
+        "task": "interpret",
+        "model_id": "nvidia/nemotron-3-super-120b-a12b",
+        "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+        "at": "2026-10-16T19:48:58Z",
+        "attempts": 1,
+        "thinking": false,
+        "request_id": "3e38891ad6d3b4d1ce8683dffad3c61b",
+        "latency_ms": 2679,
+        "prompt_tokens": 597,
+        "completion_tokens": 538,
+        "model_reported": "nvidia/nemotron-3-super-120b-a12b",
+        "status": "ok",
+        "finish_reason": "stop"
+      }
+    ],
+    "blocking": [
+      "write_when_full"
+    ],
+    "needs_decision": [
+      "reset_recurrence",
+      "simultaneous_empty"
+    ]
+  },
+  "hunt_run_id": "20261016-154901-ver-9fa633",
+  "hunt": {
+    "state": "complete",
+    "verdict": {
+      "headline": "counterexample",
+      "counts": {
+        "simulation_passed": 0,
+        "bounded_pass": 1,
+        "proved": 0,
+        "counterexample": 6,
+        "unresolved": 4,
+        "tool_error": 0,
+        "not_checked": 0,
+        "unsupported": 0
+      },
+      "unresolved": 4
+    },
+    "promoted_checks_status": "counterexample",
+    "golden_replay": {
+      "status": "confirmed",
+      "detail": "The same input sequence passes on the golden and violates the independent reference on the candidate.",
+      "inputs": [
+        {
+          "rst": 1,
+          "wr_en": 0,
+          "rd_en": 0,
+          "din": 0
+        },
+        {
+          "rst": 0,
+          "wr_en": 1,
+          "rd_en": 0,
+          "din": 32
+        },
+        {
+          "rst": 0,
+          "wr_en": 1,
+          "rd_en": 0,
+          "din": 0
+        },
+        {
+          "rst": 0,
+          "wr_en": 1,
+          "rd_en": 0,
+          "din": 0
+        },
+        {
+          "rst": 0,
+          "wr_en": 1,
+          "rd_en": 0,
+          "din": 32
+        },
+        {
+          "rst": 0,
+          "wr_en": 1,
+          "rd_en": 0,
+          "din": 0
+        },
+        {
+          "rst": 0,
+          "wr_en": 0,
+          "rd_en": 1,
+          "din": 0
+        },
+        {
+          "rst": 0,
+          "wr_en": 0,
+          "rd_en": 0,
+          "din": 0
+        },
+        {
+          "rst": 1,
+          "wr_en": 0,
+          "rd_en": 0,
+          "din": 0
+        }
+      ],
+      "runs": {
+        "golden": {
+          "design_id": "golden",
+          "source_hash": "sha256:da0e5a92be992d813f92bbf4383fadf92883b24b4c91df621d9261b5565079d6",
+          "interface_map": null,
+          "interface_map_hash": null,
+          "contract_hash": "sha256:d8c9a8e739585556ac4f0931dbbbcc14b75d4f197cd000be00d91a1af4a58ce3",
+          "frozen": {
+            "contract": "sha256:d8c9a8e739585556ac4f0931dbbbcc14b75d4f197cd000be00d91a1af4a58ce3",
+            "harness": {
+              "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+              "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+              "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+            },
+            "verifier_digest": "26a51c6bce5dcf38",
+            "stimulus_version": "stimulus-v1",
+            "stimulus": {
+              "learner_basic": "sha256:1251c52b29ed1844b0b10990abd1342a374a0bfdd3e5c59a01e434e77946d3f1",
+              "fill_drain": "sha256:08fb777f2a55280f4c87a08ededda1c44620983e78d24fff64064ac5dacd67fe",
+              "write_when_full": "sha256:04c6acd082206ba9a4c07800794d26098aa2b520e823e594f2e594b2829d65bf",
+              "simultaneous": "sha256:dc481895d0ed348e42982fc3a211b4b38178c5c196280238bcdacf8cfbf6ea50",
+              "wraparound": "sha256:545e9e9e1ca64f16b0cc986b453eb8bf8bbf560508a13d7b79dddf51e534643a",
+              "recurrent_reset": "sha256:b22685a91bb333e82d9c092150e3686d8ce5356c3c11b89a7f813358c7440291",
+              "random_s1": "sha256:8bd6ee1b4943fb0e7b773e2e1603d5db1b2fa925b2f8ed5006d931ddffae9dd2",
+              "random_s2": "sha256:4cf2ffe52bdf16b7ffa58ea0d1b2c946ce0ada219ced02edc40981537c564b4d",
+              "random_s3": "sha256:68f7c3a78971c7657450cba5f0b6292d211e1146682d09386ab017b6a6bf8165",
+              "random_s4": "sha256:7293c9d0ea3bfc69d0e9c784eb9e7fb338c243f78df2681b23a1b097979b8b9e",
+              "random_s5": "sha256:c69b2aa263a5185382f67c7d2d0eb543c8931cd4f1f3455a49d6169a878ffa82",
+              "random_s6": "sha256:9663d197ffedbfb6f7949601f1c1e15dc991b74c8e115bbfecbbf96bddee6b36",
+              "random_s7": "sha256:728636019d543950a64a569f69cb58f7c6a62b31eb454ead3d7e0cd12a815cf9",
+              "random_s8": "sha256:213b0afca2a40ffb3358aea6361f79d99472f1261ace1b388d8df920b7f9efd6"
+            },
+            "limits": {
+              "compile_s": 60,
+              "sim_s": 30,
+              "solver_s": 120,
+              "bmc_depth": 24,
+              "cover_depth": 24
+            },
+            "formal_tasks": [],
+            "expected_properties": {
+              "assert": 3,
+              "assume": 1,
+              "cover": 12
+            }
+          },
+          "stages": [
+            {
+              "id": "validating",
+              "status": "pending"
+            },
+            {
+              "id": "simulating",
+              "status": "done",
+              "started_at": "2026-10-16T19:49:25Z",
+              "finished_at": "2026-10-16T19:49:29Z",
+              "detail": "1 tests, 9 cycles; rows not exercised: both_empty, both_full, both_mid, read_empty, wrap_read, wrap_write"
+            },
+            {
+              "id": "checking_properties",
+              "status": "pending"
+            },
+            {
+              "id": "replaying",
+              "status": "pending"
+            }
+          ],
+          "admission": {
+            "accepted": true,
+            "module": "fifo",
+            "parameters": [
+              "DEPTH",
+              "WIDTH"
+            ],
+            "ports": {
+              "clk": {
+                "direction": "input",
+                "range": null
+              },
+              "rst": {
+                "direction": "input",
+                "range": null
+              },
+              "wr_en": {
+                "direction": "input",
+                "range": null
+              },
+              "rd_en": {
+                "direction": "input",
+                "range": null
+              },
+              "din": {
+                "direction": "input",
+                "range": "[WIDTH-1:0]"
+              },
+              "dout": {
+                "direction": "output",
+                "range": "[WIDTH-1:0]"
+              },
+              "full": {
+                "direction": "output",
+                "range": null
+              },
+              "empty": {
+                "direction": "output",
+                "range": null
+              }
+            },
+            "diagnostics": []
+          },
+          "obligations": [
+            {
+              "id": "simulation:empty_flag",
+              "check": "empty_flag",
+              "method": "simulation",
+              "status": "simulation_passed",
+              "detail": "1 named tests (9 cycles, seeds ).",
+              "tests": [
+                "property_witness"
+              ],
+              "cycles": 9,
+              "label": "Simulation passed for these runs"
+            },
+            {
+              "id": "simulation:full_flag",
+              "check": "full_flag",
+              "method": "simulation",
+              "status": "simulation_passed",
+              "detail": "1 named tests (9 cycles, seeds ).",
+              "tests": [
+                "property_witness"
+              ],
+              "cycles": 9,
+              "label": "Simulation passed for these runs"
+            },
+            {
+              "id": "simulation:read_data",
+              "check": "read_data",
+              "method": "simulation",
+              "status": "simulation_passed",
+              "detail": "1 named tests (9 cycles, seeds ).",
+              "tests": [
+                "property_witness"
+              ],
+              "cycles": 9,
+              "label": "Simulation passed for these runs"
+            }
+          ],
+          "findings": [],
+          "coverage": {
+            "reset": 2,
+            "write_not_full": 4,
+            "read_not_empty": 1,
+            "read_empty": 0,
+            "write_full": 1,
+            "both_mid": 0,
+            "both_empty": 0,
+            "both_full": 0,
+            "idle": 1,
+            "wrap_write": 0,
+            "wrap_read": 0,
+            "recurrent_reset": 1
+          },
+          "formal_covers": {},
+          "traces": {
+            "sim:property_witness": [
+              {
+                "cycle": 0,
+                "rst": 1,
+                "wr_en": 0,
+                "rd_en": 0,
+                "din": 0,
+                "row": "reset",
+                "pre_queue": null,
+                "post_queue": [],
+                "accepted": {
+                  "reset": true,
+                  "read": false,
+                  "write": false
+                },
+                "expected": {
+                  "dout": null,
+                  "empty": true,
+                  "full": false
+                },
+                "observed": {
+                  "dout": 215,
+                  "empty": true,
+                  "full": false
+                },
+                "dout_checked": false,
+                "mismatches": [],
+                "wraps": []
+              },
+              {
+                "cycle": 1,
+                "rst": 0,
+                "wr_en": 1,
+                "rd_en": 0,
+                "din": 32,
+                "row": "write_not_full",
+                "pre_queue": [],
+                "post_queue": [
+                  32
+                ],
+                "accepted": {
+                  "reset": false,
+                  "read": false,
+                  "write": true
+                },
+                "expected": {
+                  "dout": null,
+                  "empty": false,
+                  "full": false
+                },
+                "observed": {
+                  "dout": 215,
+                  "empty": false,
+                  "full": false
+                },
+                "dout_checked": false,
+                "mismatches": [],
+                "wraps": []
+              },
+              {
+                "cycle": 2,
+                "rst": 0,
+                "wr_en": 1,
+                "rd_en": 0,
+                "din": 0,
+                "row": "write_not_full",
+                "pre_queue": [
+                  32
+                ],
+                "post_queue": [
+                  32,
+                  0
+                ],
+                "accepted": {
+                  "reset": false,
+                  "read": false,
+                  "write": true
+                },
+                "expected": {
+                  "dout": null,
+                  "empty": false,
+                  "full": false
+                },
+                "observed": {
+                  "dout": 215,
+                  "empty": false,
+                  "full": false
+                },
+                "dout_checked": false,
+                "mismatches": [],
+                "wraps": []
+              },
+              {
+                "cycle": 3,
+                "rst": 0,
+                "wr_en": 1,
+                "rd_en": 0,
+                "din": 0,
+                "row": "write_not_full",
+                "pre_queue": [
+                  32,
+                  0
+                ],
+                "post_queue": [
+                  32,
+                  0,
+                  0
+                ],
+                "accepted": {
+                  "reset": false,
+                  "read": false,
+                  "write": true
+                },
+                "expected": {
+                  "dout": null,
+                  "empty": false,
+                  "full": false
+                },
+                "observed": {
+                  "dout": 215,
+                  "empty": false,
+                  "full": false
+                },
+                "dout_checked": false,
+                "mismatches": [],
+                "wraps": []
+              },
+              {
+                "cycle": 4,
+                "rst": 0,
+                "wr_en": 1,
+                "rd_en": 0,
+                "din": 32,
+                "row": "write_not_full",
+                "pre_queue": [
+                  32,
+                  0,
+                  0
+                ],
+                "post_queue": [
+                  32,
+                  0,
+                  0,
+                  32
+                ],
+                "accepted": {
+                  "reset": false,
+                  "read": false,
+                  "write": true
+                },
+                "expected": {
+                  "dout": null,
+                  "empty": false,
+                  "full": true
+                },
+                "observed": {
+                  "dout": 215,
+                  "empty": false,
+                  "full": true
+                },
+                "dout_checked": false,
+                "mismatches": [],
+                "wraps": []
+              },
+              {
+                "cycle": 5,
+                "rst": 0,
+                "wr_en": 1,
+                "rd_en": 0,
+                "din": 0,
+                "row": "write_full",
+                "pre_queue": [
+                  32,
+                  0,
+                  0,
+                  32
+                ],
+                "post_queue": [
+                  32,
+                  0,
+                  0,
+                  32
+                ],
+                "accepted": {
+                  "reset": false,
+                  "read": false,
+                  "write": false
+                },
+                "expected": {
+                  "dout": null,
+                  "empty": false,
+                  "full": true
+                },
+                "observed": {
+                  "dout": 215,
+                  "empty": false,
+                  "full": true
+                },
+                "dout_checked": false,
+                "mismatches": [],
+                "wraps": []
+              },
+              {
+                "cycle": 6,
+                "rst": 0,
+                "wr_en": 0,
+                "rd_en": 1,
+                "din": 0,
+                "row": "read_not_empty",
+                "pre_queue": [
+                  32,
+                  0,
+                  0,
+                  32
+                ],
+                "post_queue": [
+                  0,
+                  0,
+                  32
+                ],
+                "accepted": {
+                  "reset": false,
+                  "read": true,
+                  "write": false
+                },
+                "expected": {
+                  "dout": 32,
+                  "empty": false,
+                  "full": false
+                },
+                "observed": {
+                  "dout": 32,
+                  "empty": false,
+                  "full": false
+                },
+                "dout_checked": true,
+                "mismatches": [],
+                "wraps": []
+              },
+              {
+                "cycle": 7,
+                "rst": 0,
+                "wr_en": 0,
+                "rd_en": 0,
+                "din": 0,
+                "row": "idle",
+                "pre_queue": [
+                  0,
+                  0,
+                  32
+                ],
+                "post_queue": [
+                  0,
+                  0,
+                  32
+                ],
+                "accepted": {
+                  "reset": false,
+                  "read": false,
+                  "write": false
+                },
+                "expected": {
+                  "dout": null,
+                  "empty": false,
+                  "full": false
+                },
+                "observed": {
+                  "dout": 32,
+                  "empty": false,
+                  "full": false
+                },
+                "dout_checked": false,
+                "mismatches": [],
+                "wraps": []
+              },
+              {
+                "cycle": 8,
+                "rst": 1,
+                "wr_en": 0,
+                "rd_en": 0,
+                "din": 0,
+                "row": "reset",
+                "pre_queue": [
+                  0,
+                  0,
+                  32
+                ],
+                "post_queue": [],
+                "accepted": {
+                  "reset": true,
+                  "read": false,
+                  "write": false
+                },
+                "expected": {
+                  "dout": null,
+                  "empty": true,
+                  "full": false
+                },
+                "observed": {
+                  "dout": 32,
+                  "empty": true,
+                  "full": false
+                },
+                "dout_checked": false,
+                "mismatches": [],
+                "wraps": []
+              }
+            ]
+          },
+          "batches": {
+            "sim": {
+              "argv": [
+                "docker",
+                "run",
+                "--rm",
+                "--name",
+                "ct-7c00f1139195",
+                "--user",
+                "501:20",
+                "--network",
+                "none",
+                "--read-only",
+                "--tmpfs",
+                "/tmp:rw,exec,nosuid,size=1g",
+                "--cap-drop",
+                "ALL",
+                "--security-opt",
+                "no-new-privileges",
+                "--pids-limit",
+                "256",
+                "--memory",
+                "4g",
+                "--cpus",
+                "4",
+                "-v",
+                "/Users/jerem/Desktop/Projects/NVIDIA Hackathon/Countertrace/.countertrace/runs/20261016-154901-ver-9fa633/promoted-checks/replay/golden/batches/golden-sim/job:/job:ro",
+                "-v",
+                "/Users/jerem/Desktop/Projects/NVIDIA Hackathon/Countertrace/.countertrace/runs/20261016-154901-ver-9fa633/promoted-checks/replay/golden/batches/golden-sim/out:/out:rw",
+                "countertrace-verifier:26a51c6bce5dcf38"
+              ],
+              "container_returncode": 0,
+              "wall_s": 4.359,
+              "cancelled": false,
+              "timed_out": false,
+              "image": {
+                "tag": "countertrace-verifier:26a51c6bce5dcf38",
+                "image_id": "sha256:62dbb264be6153e08c5014540a0a134482d1e29ccfbdd1602385100defa72ce5",
+                "verifier_digest": "26a51c6bce5dcf38"
+              },
+              "resources": {
+                "cpus": "4",
+                "memory": "4g",
+                "pids": "256",
+                "tmpfs": "1g"
+              },
+              "network": "none",
+              "out_dir": "batches/golden-sim/out",
+              "tool_versions": {
+                "verilator": "Verilator 5.053 devel rev v5.052-258-ga419e9157 (mod)",
+                "yosys": "Yosys 0.69+158 (git sha1 a1a0ad7d4-dirty, Release, GNU /usr/bin/aarch64-linux-gnu-g++ 15.2.0)",
+                "python": "Python 3.11.2",
+                "oss_cad_suite": "2026-09-30"
+              },
+              "steps": [
+                {
+                  "id": "golden:ports",
+                  "argv": [
+                    "yosys",
+                    "-q",
+                    "-p",
+                    "read_verilog -sv dut.v; hierarchy -top fifo -chparam DEPTH 4 -chparam WIDTH 8; proc; write_json /out/golden/ports.json"
+                  ],
+                  "timeout_s": 60,
+                  "returncode": 0,
+                  "timed_out": false,
+                  "duration_s": 0.012,
+                  "log": "golden/logs/ports.log",
+                  "log_truncated": false
+                },
+                {
+                  "id": "golden:properties",
+                  "argv": [
+                    "yosys",
+                    "-p",
+                    "read -formal -D CT_DUT=fifo dut.v; read -formal -D CT_DUT=fifo ct_formal_top.sv; chparam -set DEPTH 4 -set WIDTH 8 ct_formal_top; prep -top ct_formal_top; write_json /out/golden/properties.json"
+                  ],
+                  "timeout_s": 60,
+                  "returncode": 0,
+                  "timed_out": false,
+                  "duration_s": 0.02,
+                  "log": "golden/logs/properties.log",
+                  "log_truncated": false
+                },
+                {
+                  "id": "golden:compile",
+                  "argv": [
+                    "verilator",
+                    "--binary",
+                    "--timing",
+                    "--trace",
+                    "-Wno-fatal",
+                    "-Wno-lint",
+                    "-Wno-style",
+                    "--x-assign",
+                    "unique",
+                    "--x-initial",
+                    "unique",
+                    "-DCT_DUT=fifo",
+                    "-GDEPTH=4",
+                    "-GWIDTH=8",
+                    "--top-module",
+                    "ct_sim_top",
+                    "--Mdir",
+                    "/tmp/work/golden/obj",
+                    "-j",
+                    "2",
+                    "ct_sim_top.sv",
+                    "dut.v"
+                  ],
+                  "timeout_s": 60,
+                  "returncode": 0,
+                  "timed_out": false,
+                  "duration_s": 3.887,
+                  "log": "golden/logs/compile.log",
+                  "log_truncated": false
+                },
+                {
+                  "id": "golden:sim:property_witness",
+                  "argv": [
+                    "/tmp/work/golden/obj/Vct_sim_top",
+                    "+stim=/job/stimulus/property_witness.txt",
+                    "+trace=/out/golden/sim/property_witness.trace",
+                    "+vcd=/out/golden/sim/property_witness.vcd",
+                    "+verilator+rand+reset+2",
+                    "+verilator+seed+1"
+                  ],
+                  "timeout_s": 30,
+                  "returncode": 0,
+                  "timed_out": false,
+                  "duration_s": 0.003,
+                  "log": "golden/logs/sim_property_witness.log",
+                  "log_truncated": false
+                }
+              ]
+            }
+          },
+          "timings": {},
+          "integrity": [],
+          "integrity_checked": [
+            "sim"
+          ]
+        },
+        "candidate": {
+          "design_id": "candidate",
+          "source_hash": "sha256:89f548c825cdca7f6c66953bd7258372ca72449876b553c5010957ac12b51efe",
+          "interface_map": null,
+          "interface_map_hash": null,
+          "contract_hash": "sha256:d8c9a8e739585556ac4f0931dbbbcc14b75d4f197cd000be00d91a1af4a58ce3",
+          "frozen": {
+            "contract": "sha256:d8c9a8e739585556ac4f0931dbbbcc14b75d4f197cd000be00d91a1af4a58ce3",
+            "harness": {
+              "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+              "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+              "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+            },
+            "verifier_digest": "26a51c6bce5dcf38",
+            "stimulus_version": "stimulus-v1",
+            "stimulus": {
+              "learner_basic": "sha256:1251c52b29ed1844b0b10990abd1342a374a0bfdd3e5c59a01e434e77946d3f1",
+              "fill_drain": "sha256:08fb777f2a55280f4c87a08ededda1c44620983e78d24fff64064ac5dacd67fe",
+              "write_when_full": "sha256:04c6acd082206ba9a4c07800794d26098aa2b520e823e594f2e594b2829d65bf",
+              "simultaneous": "sha256:dc481895d0ed348e42982fc3a211b4b38178c5c196280238bcdacf8cfbf6ea50",
+              "wraparound": "sha256:545e9e9e1ca64f16b0cc986b453eb8bf8bbf560508a13d7b79dddf51e534643a",
+              "recurrent_reset": "sha256:b22685a91bb333e82d9c092150e3686d8ce5356c3c11b89a7f813358c7440291",
+              "random_s1": "sha256:8bd6ee1b4943fb0e7b773e2e1603d5db1b2fa925b2f8ed5006d931ddffae9dd2",
+              "random_s2": "sha256:4cf2ffe52bdf16b7ffa58ea0d1b2c946ce0ada219ced02edc40981537c564b4d",
+              "random_s3": "sha256:68f7c3a78971c7657450cba5f0b6292d211e1146682d09386ab017b6a6bf8165",
+              "random_s4": "sha256:7293c9d0ea3bfc69d0e9c784eb9e7fb338c243f78df2681b23a1b097979b8b9e",
+              "random_s5": "sha256:c69b2aa263a5185382f67c7d2d0eb543c8931cd4f1f3455a49d6169a878ffa82",
+              "random_s6": "sha256:9663d197ffedbfb6f7949601f1c1e15dc991b74c8e115bbfecbbf96bddee6b36",
+              "random_s7": "sha256:728636019d543950a64a569f69cb58f7c6a62b31eb454ead3d7e0cd12a815cf9",
+              "random_s8": "sha256:213b0afca2a40ffb3358aea6361f79d99472f1261ace1b388d8df920b7f9efd6"
+            },
+            "limits": {
+              "compile_s": 60,
+              "sim_s": 30,
+              "solver_s": 120,
+              "bmc_depth": 24,
+              "cover_depth": 24
+            },
+            "formal_tasks": [],
+            "expected_properties": {
+              "assert": 3,
+              "assume": 1,
+              "cover": 12
+            }
+          },
+          "stages": [
+            {
+              "id": "validating",
+              "status": "pending"
+            },
+            {
+              "id": "simulating",
+              "status": "done",
+              "started_at": "2026-10-16T19:49:29Z",
+              "finished_at": "2026-10-16T19:49:33Z",
+              "detail": "1 tests, 9 cycles; rows not exercised: both_empty, both_full, both_mid, read_empty, wrap_read, wrap_write"
+            },
+            {
+              "id": "checking_properties",
+              "status": "pending"
+            },
+            {
+              "id": "replaying",
+              "status": "pending"
+            }
+          ],
+          "admission": {
+            "accepted": true,
+            "module": "fifo",
+            "parameters": [
+              "DEPTH",
+              "WIDTH"
+            ],
+            "ports": {
+              "clk": {
+                "direction": "input",
+                "range": null
+              },
+              "rst": {
+                "direction": "input",
+                "range": null
+              },
+              "wr_en": {
+                "direction": "input",
+                "range": null
+              },
+              "rd_en": {
+                "direction": "input",
+                "range": null
+              },
+              "din": {
+                "direction": "input",
+                "range": "[WIDTH-1:0]"
+              },
+              "dout": {
+                "direction": "output",
+                "range": "[WIDTH-1:0]"
+              },
+              "full": {
+                "direction": "output",
+                "range": null
+              },
+              "empty": {
+                "direction": "output",
+                "range": null
+              }
+            },
+            "diagnostics": []
+          },
+          "obligations": [
+            {
+              "id": "simulation:empty_flag",
+              "check": "empty_flag",
+              "method": "simulation",
+              "status": "simulation_passed",
+              "detail": "1 named tests (9 cycles, seeds ).",
+              "tests": [
+                "property_witness"
+              ],
+              "cycles": 9,
+              "label": "Simulation passed for these runs"
+            },
+            {
+              "id": "simulation:full_flag",
+              "check": "full_flag",
+              "method": "simulation",
+              "status": "simulation_passed",
+              "detail": "1 named tests (9 cycles, seeds ).",
+              "tests": [
+                "property_witness"
+              ],
+              "cycles": 9,
+              "label": "Simulation passed for these runs"
+            },
+            {
+              "id": "simulation:read_data",
+              "check": "read_data",
+              "method": "simulation",
+              "status": "counterexample",
+              "detail": "Failed in 1 of 1 tests: property_witness.",
+              "tests": [
+                "property_witness"
+              ],
+              "cycles": 9,
+              "label": "Counterexample found"
+            }
+          ],
+          "findings": [
+            {
+              "test": "property_witness",
+              "source": "simulation",
+              "cycle": 6,
+              "check": "read_data",
+              "checks_failed": [
+                "read_data"
+              ],
+              "check_text": "dout equals the reference head removed by an accepted read",
+              "requirement_id": "read_not_empty",
+              "requirement_title": "Read requested while not empty",
+              "requirement_text": "Remove the oldest word. dout holds that word after the edge.",
+              "expected": {
+                "dout": 32,
+                "empty": false,
+                "full": false
+              },
+              "observed": {
+                "dout": 0,
+                "empty": false,
+                "full": false
+              },
+              "related_events": [
+                {
+                  "cycle": 1,
+                  "kind": "expected_word_accepted",
+                  "text": "The expected word 0x20 was accepted at cycle 1."
+                },
+                {
+                  "cycle": 2,
+                  "kind": "observed_word_offered",
+                  "row": "write_not_full",
+                  "text": "The observed word 0x00 was offered at cycle 2 (write requested while not full); the contract accepted it."
+                },
+                {
+                  "cycle": 3,
+                  "kind": "observed_word_offered",
+                  "row": "write_not_full",
+                  "text": "The observed word 0x00 was offered at cycle 3 (write requested while not full); the contract accepted it."
+                },
+                {
+                  "cycle": 4,
+                  "kind": "expected_word_accepted",
+                  "text": "The expected word 0x20 was accepted at cycle 4."
+                },
+                {
+                  "cycle": 5,
+                  "kind": "observed_word_offered",
+                  "row": "write_full",
+                  "text": "The observed word 0x00 was offered at cycle 5 (write requested while full); the contract ignored it."
+                }
+              ],
+              "note": "This is the first observed mismatch. The governing contract row is the condition at that edge; an earlier accepted or ignored operation may be the cause.",
+              "window": {
+                "start": 0,
+                "end": 8
+              },
+              "trace": "sim:property_witness",
+              "vcd": "batches/candidate-sim/out/candidate/sim/property_witness.vcd"
+            }
+          ],
+          "coverage": {
+            "reset": 2,
+            "write_not_full": 4,
+            "read_not_empty": 1,
+            "read_empty": 0,
+            "write_full": 1,
+            "both_mid": 0,
+            "both_empty": 0,
+            "both_full": 0,
+            "idle": 1,
+            "wrap_write": 0,
+            "wrap_read": 0,
+            "recurrent_reset": 1
+          },
+          "formal_covers": {},
+          "traces": {
+            "sim:property_witness": [
+              {
+                "cycle": 0,
+                "rst": 1,
+                "wr_en": 0,
+                "rd_en": 0,
+                "din": 0,
+                "row": "reset",
+                "pre_queue": null,
+                "post_queue": [],
+                "accepted": {
+                  "reset": true,
+                  "read": false,
+                  "write": false
+                },
+                "expected": {
+                  "dout": null,
+                  "empty": true,
+                  "full": false
+                },
+                "observed": {
+                  "dout": 215,
+                  "empty": true,
+                  "full": false
+                },
+                "dout_checked": false,
+                "mismatches": [],
+                "wraps": []
+              },
+              {
+                "cycle": 1,
+                "rst": 0,
+                "wr_en": 1,
+                "rd_en": 0,
+                "din": 32,
+                "row": "write_not_full",
+                "pre_queue": [],
+                "post_queue": [
+                  32
+                ],
+                "accepted": {
+                  "reset": false,
+                  "read": false,
+                  "write": true
+                },
+                "expected": {
+                  "dout": null,
+                  "empty": false,
+                  "full": false
+                },
+                "observed": {
+                  "dout": 215,
+                  "empty": false,
+                  "full": false
+                },
+                "dout_checked": false,
+                "mismatches": [],
+                "wraps": []
+              },
+              {
+                "cycle": 2,
+                "rst": 0,
+                "wr_en": 1,
+                "rd_en": 0,
+                "din": 0,
+                "row": "write_not_full",
+                "pre_queue": [
+                  32
+                ],
+                "post_queue": [
+                  32,
+                  0
+                ],
+                "accepted": {
+                  "reset": false,
+                  "read": false,
+                  "write": true
+                },
+                "expected": {
+                  "dout": null,
+                  "empty": false,
+                  "full": false
+                },
+                "observed": {
+                  "dout": 215,
+                  "empty": false,
+                  "full": false
+                },
+                "dout_checked": false,
+                "mismatches": [],
+                "wraps": []
+              },
+              {
+                "cycle": 3,
+                "rst": 0,
+                "wr_en": 1,
+                "rd_en": 0,
+                "din": 0,
+                "row": "write_not_full",
+                "pre_queue": [
+                  32,
+                  0
+                ],
+                "post_queue": [
+                  32,
+                  0,
+                  0
+                ],
+                "accepted": {
+                  "reset": false,
+                  "read": false,
+                  "write": true
+                },
+                "expected": {
+                  "dout": null,
+                  "empty": false,
+                  "full": false
+                },
+                "observed": {
+                  "dout": 215,
+                  "empty": false,
+                  "full": false
+                },
+                "dout_checked": false,
+                "mismatches": [],
+                "wraps": []
+              },
+              {
+                "cycle": 4,
+                "rst": 0,
+                "wr_en": 1,
+                "rd_en": 0,
+                "din": 32,
+                "row": "write_not_full",
+                "pre_queue": [
+                  32,
+                  0,
+                  0
+                ],
+                "post_queue": [
+                  32,
+                  0,
+                  0,
+                  32
+                ],
+                "accepted": {
+                  "reset": false,
+                  "read": false,
+                  "write": true
+                },
+                "expected": {
+                  "dout": null,
+                  "empty": false,
+                  "full": true
+                },
+                "observed": {
+                  "dout": 215,
+                  "empty": false,
+                  "full": true
+                },
+                "dout_checked": false,
+                "mismatches": [],
+                "wraps": []
+              },
+              {
+                "cycle": 5,
+                "rst": 0,
+                "wr_en": 1,
+                "rd_en": 0,
+                "din": 0,
+                "row": "write_full",
+                "pre_queue": [
+                  32,
+                  0,
+                  0,
+                  32
+                ],
+                "post_queue": [
+                  32,
+                  0,
+                  0,
+                  32
+                ],
+                "accepted": {
+                  "reset": false,
+                  "read": false,
+                  "write": false
+                },
+                "expected": {
+                  "dout": null,
+                  "empty": false,
+                  "full": true
+                },
+                "observed": {
+                  "dout": 215,
+                  "empty": false,
+                  "full": true
+                },
+                "dout_checked": false,
+                "mismatches": [],
+                "wraps": []
+              },
+              {
+                "cycle": 6,
+                "rst": 0,
+                "wr_en": 0,
+                "rd_en": 1,
+                "din": 0,
+                "row": "read_not_empty",
+                "pre_queue": [
+                  32,
+                  0,
+                  0,
+                  32
+                ],
+                "post_queue": [
+                  0,
+                  0,
+                  32
+                ],
+                "accepted": {
+                  "reset": false,
+                  "read": true,
+                  "write": false
+                },
+                "expected": {
+                  "dout": 32,
+                  "empty": false,
+                  "full": false
+                },
+                "observed": {
+                  "dout": 0,
+                  "empty": false,
+                  "full": false
+                },
+                "dout_checked": true,
+                "mismatches": [
+                  "read_data"
+                ],
+                "wraps": []
+              },
+              {
+                "cycle": 7,
+                "rst": 0,
+                "wr_en": 0,
+                "rd_en": 0,
+                "din": 0,
+                "row": "idle",
+                "pre_queue": [
+                  0,
+                  0,
+                  32
+                ],
+                "post_queue": [
+                  0,
+                  0,
+                  32
+                ],
+                "accepted": {
+                  "reset": false,
+                  "read": false,
+                  "write": false
+                },
+                "expected": {
+                  "dout": null,
+                  "empty": false,
+                  "full": false
+                },
+                "observed": {
+                  "dout": 0,
+                  "empty": false,
+                  "full": false
+                },
+                "dout_checked": false,
+                "mismatches": [],
+                "wraps": []
+              },
+              {
+                "cycle": 8,
+                "rst": 1,
+                "wr_en": 0,
+                "rd_en": 0,
+                "din": 0,
+                "row": "reset",
+                "pre_queue": [
+                  0,
+                  0,
+                  32
+                ],
+                "post_queue": [],
+                "accepted": {
+                  "reset": true,
+                  "read": false,
+                  "write": false
+                },
+                "expected": {
+                  "dout": null,
+                  "empty": true,
+                  "full": false
+                },
+                "observed": {
+                  "dout": 0,
+                  "empty": true,
+                  "full": false
+                },
+                "dout_checked": false,
+                "mismatches": [],
+                "wraps": []
+              }
+            ]
+          },
+          "batches": {
+            "sim": {
+              "argv": [
+                "docker",
+                "run",
+                "--rm",
+                "--name",
+                "ct-0a232c46cb64",
+                "--user",
+                "501:20",
+                "--network",
+                "none",
+                "--read-only",
+                "--tmpfs",
+                "/tmp:rw,exec,nosuid,size=1g",
+                "--cap-drop",
+                "ALL",
+                "--security-opt",
+                "no-new-privileges",
+                "--pids-limit",
+                "256",
+                "--memory",
+                "4g",
+                "--cpus",
+                "4",
+                "-v",
+                "/Users/jerem/Desktop/Projects/NVIDIA Hackathon/Countertrace/.countertrace/runs/20261016-154901-ver-9fa633/promoted-checks/replay/candidate/batches/candidate-sim/job:/job:ro",
+                "-v",
+                "/Users/jerem/Desktop/Projects/NVIDIA Hackathon/Countertrace/.countertrace/runs/20261016-154901-ver-9fa633/promoted-checks/replay/candidate/batches/candidate-sim/out:/out:rw",
+                "countertrace-verifier:26a51c6bce5dcf38"
+              ],
+              "container_returncode": 0,
+              "wall_s": 4.109,
+              "cancelled": false,
+              "timed_out": false,
+              "image": {
+                "tag": "countertrace-verifier:26a51c6bce5dcf38",
+                "image_id": "sha256:62dbb264be6153e08c5014540a0a134482d1e29ccfbdd1602385100defa72ce5",
+                "verifier_digest": "26a51c6bce5dcf38"
+              },
+              "resources": {
+                "cpus": "4",
+                "memory": "4g",
+                "pids": "256",
+                "tmpfs": "1g"
+              },
+              "network": "none",
+              "out_dir": "batches/candidate-sim/out",
+              "tool_versions": {
+                "verilator": "Verilator 5.053 devel rev v5.052-258-ga419e9157 (mod)",
+                "yosys": "Yosys 0.69+158 (git sha1 a1a0ad7d4-dirty, Release, GNU /usr/bin/aarch64-linux-gnu-g++ 15.2.0)",
+                "python": "Python 3.11.2",
+                "oss_cad_suite": "2026-09-30"
+              },
+              "steps": [
+                {
+                  "id": "candidate:ports",
+                  "argv": [
+                    "yosys",
+                    "-q",
+                    "-p",
+                    "read_verilog -sv dut.v; hierarchy -top fifo -chparam DEPTH 4 -chparam WIDTH 8; proc; write_json /out/candidate/ports.json"
+                  ],
+                  "timeout_s": 60,
+                  "returncode": 0,
+                  "timed_out": false,
+                  "duration_s": 0.011,
+                  "log": "candidate/logs/ports.log",
+                  "log_truncated": false
+                },
+                {
+                  "id": "candidate:properties",
+                  "argv": [
+                    "yosys",
+                    "-p",
+                    "read -formal -D CT_DUT=fifo dut.v; read -formal -D CT_DUT=fifo ct_formal_top.sv; chparam -set DEPTH 4 -set WIDTH 8 ct_formal_top; prep -top ct_formal_top; write_json /out/candidate/properties.json"
+                  ],
+                  "timeout_s": 60,
+                  "returncode": 0,
+                  "timed_out": false,
+                  "duration_s": 0.02,
+                  "log": "candidate/logs/properties.log",
+                  "log_truncated": false
+                },
+                {
+                  "id": "candidate:compile",
+                  "argv": [
+                    "verilator",
+                    "--binary",
+                    "--timing",
+                    "--trace",
+                    "-Wno-fatal",
+                    "-Wno-lint",
+                    "-Wno-style",
+                    "--x-assign",
+                    "unique",
+                    "--x-initial",
+                    "unique",
+                    "-DCT_DUT=fifo",
+                    "-GDEPTH=4",
+                    "-GWIDTH=8",
+                    "--top-module",
+                    "ct_sim_top",
+                    "--Mdir",
+                    "/tmp/work/candidate/obj",
+                    "-j",
+                    "2",
+                    "ct_sim_top.sv",
+                    "dut.v"
+                  ],
+                  "timeout_s": 60,
+                  "returncode": 0,
+                  "timed_out": false,
+                  "duration_s": 3.627,
+                  "log": "candidate/logs/compile.log",
+                  "log_truncated": false
+                },
+                {
+                  "id": "candidate:sim:property_witness",
+                  "argv": [
+                    "/tmp/work/candidate/obj/Vct_sim_top",
+                    "+stim=/job/stimulus/property_witness.txt",
+                    "+trace=/out/candidate/sim/property_witness.trace",
+                    "+vcd=/out/candidate/sim/property_witness.vcd",
+                    "+verilator+rand+reset+2",
+                    "+verilator+seed+1"
+                  ],
+                  "timeout_s": 30,
+                  "returncode": 0,
+                  "timed_out": false,
+                  "duration_s": 0.002,
+                  "log": "candidate/logs/sim_property_witness.log",
+                  "log_truncated": false
+                }
+              ]
+            }
+          },
+          "timings": {
+            "first_finding_s": 4.12
+          },
+          "integrity": [],
+          "integrity_checked": [
+            "sim"
+          ]
+        }
+      }
+    }
+  },
+  "explanation": {
+    "status": "ok_with_invalid_citations",
+    "result": {
+      "summary": "At cycle 5 a write while full (wr_en=1, full=1) was incorrectly accepted by the DUT, overwriting the oldest entry (0x21) with 0x65. At cycle 6 the read returned the overwritten value 0x65 instead of the expected 0x21.",
+      "steps": [
+        {
+          "text": "Cycle 5: write requested while full (wr_en=1, full=1). The contract rejects it (write_full), but the DUT executes the write because do_write lacks a full check, storing 0x65 at the write pointer (index 0) and advancing wr_ptr.",
+          "cycles": [
+            5
+          ],
+          "signals": [
+            "wr_en",
+            "full",
+            "din",
+            "wr_ptr",
+            "mem[0]"
+          ]
+        },
+        {
+          "text": "Cycle 6: read accepted (rd_en=1, count!=0). The DUT reads from rd_ptr (still 0) which now holds 0x65, outputting 0x65 instead of the expected 0x21.",
+          "cycles": [
+            6
+          ],
+          "signals": [
+            "rd_en",
+            "rd_ptr",
+            "dout",
+            "mem[0]"
+          ]
+        }
+      ],
+      "likely_cause": {
+        "text": "The write enable do_write is not gated by the full flag, so writes proceed even when the FIFO is full. This overwrites the oldest data before it can be read.",
+        "lines": [
+          25,
+          36,
+          37,
+          38,
+          45
+        ]
+      },
+      "next_action": "Change do_write to `wr_en && !full` (or `wr_en && (count != DEPTH)`) and ensure the write block is only entered when do_write is true.",
+      "limits": "This failure refutes the read_data contract for DEPTH=4, WIDTH=8. The simulation read_data check fails in 12 of 14 tests; formal read_data checks are unresolved (stopped at another counterexample). The cover reachability check passes bounded but only shows environment assumptions do not rule out contract scenarios. Other simulation checks (empty_flag, full_flag) also have counterexamples. No passing check establishes correctness for any property."
+    },
+    "calls": [
+      {
+        "task": "explain",
+        "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+        "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+        "at": "2026-10-16T19:49:33Z",
+        "attempts": 1,
+        "thinking": true,
+        "request_id": "fd64c69db322d5824c6b7d98387d2f34",
+        "latency_ms": 5327,
+        "prompt_tokens": 2707,
+        "completion_tokens": 1791,
+        "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+        "status": "ok",
+        "finish_reason": "stop"
+      }
+    ],
+    "citation_check": {
+      "valid": 14,
+      "invalid": [
+        {
+          "step": 0,
+          "kind": "signal",
+          "value": "mem[0]"
+        },
+        {
+          "step": 1,
+          "kind": "signal",
+          "value": "mem[0]"
+        }
+      ],
+      "uncited_steps": 0,
+      "allowed_cycles": [
+        0,
+        8
+      ]
+    },
+    "finding": {
+      "test": "fill_drain",
+      "cycle": 6,
+      "check": "read_data",
+      "requirement_id": "read_not_empty",
+      "source": "simulation"
+    }
+  },
+  "repair": {
+    "status": "passed",
+    "attempts": [
+      {
+        "index": 1,
+        "origin": "model",
+        "status": "passed_unchanged_checks",
+        "started_at": "2026-10-16T19:49:39Z",
+        "calls": [
+          {
+            "task": "repair",
+            "model_id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+            "endpoint_host": "api.tokenfactory.us-central1.nebius.com",
+            "at": "2026-10-16T19:49:39Z",
+            "attempts": 1,
+            "thinking": true,
+            "request_id": "c74697dc3b81d251f3f7425aee53495e",
+            "latency_ms": 6782,
+            "prompt_tokens": 1561,
+            "completion_tokens": 2393,
+            "model_reported": "nvidia/Nemotron-3-Ultra-550b-a55b",
+            "status": "ok",
+            "finish_reason": "stop"
+          }
+        ],
+        "rationale": "The write enable signal must be gated by the full flag to prevent writes when the FIFO is full. Currently, do_write = wr_en allows writes even when full, which corrupts memory (overwrites the oldest entry) and leads to incorrect read data. The contract requires writes to be ignored when full.",
+        "diff": "--- a/dut.v\n+++ b/dut.v\n@@ -22,7 +22,7 @@\n     reg [AW:0]      count;\n \n     wire do_read  = rd_en && (count != 0);\n-    wire do_write = wr_en;\n+    wire do_write = wr_en && !full;\n \n     assign empty = (count == 0);\n     assign full  = (count == DEPTH);\n",
+        "candidate_run_id": "20261016-154945-ver-46dc74",
+        "summary": "All 11 obligations resolved under the unchanged checks (4 proved, no counterexample).",
+        "frozen_match": true,
+        "finished_at": "2026-10-16T19:50:06Z"
+      }
+    ],
+    "max_attempts": 3,
+    "started_at": "2026-10-16T19:49:39Z",
+    "parent_frozen": {
+      "contract": "sha256:d8c9a8e739585556ac4f0931dbbbcc14b75d4f197cd000be00d91a1af4a58ce3",
+      "harness": {
+        "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+        "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+        "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+      },
+      "verifier_digest": "26a51c6bce5dcf38",
+      "stimulus_version": "stimulus-v1",
+      "stimulus": {
+        "learner_basic": "sha256:1251c52b29ed1844b0b10990abd1342a374a0bfdd3e5c59a01e434e77946d3f1",
+        "fill_drain": "sha256:08fb777f2a55280f4c87a08ededda1c44620983e78d24fff64064ac5dacd67fe",
+        "write_when_full": "sha256:04c6acd082206ba9a4c07800794d26098aa2b520e823e594f2e594b2829d65bf",
+        "simultaneous": "sha256:dc481895d0ed348e42982fc3a211b4b38178c5c196280238bcdacf8cfbf6ea50",
+        "wraparound": "sha256:545e9e9e1ca64f16b0cc986b453eb8bf8bbf560508a13d7b79dddf51e534643a",
+        "recurrent_reset": "sha256:b22685a91bb333e82d9c092150e3686d8ce5356c3c11b89a7f813358c7440291",
+        "random_s1": "sha256:8bd6ee1b4943fb0e7b773e2e1603d5db1b2fa925b2f8ed5006d931ddffae9dd2",
+        "random_s2": "sha256:4cf2ffe52bdf16b7ffa58ea0d1b2c946ce0ada219ced02edc40981537c564b4d",
+        "random_s3": "sha256:68f7c3a78971c7657450cba5f0b6292d211e1146682d09386ab017b6a6bf8165",
+        "random_s4": "sha256:7293c9d0ea3bfc69d0e9c784eb9e7fb338c243f78df2681b23a1b097979b8b9e",
+        "random_s5": "sha256:c69b2aa263a5185382f67c7d2d0eb543c8931cd4f1f3455a49d6169a878ffa82",
+        "random_s6": "sha256:9663d197ffedbfb6f7949601f1c1e15dc991b74c8e115bbfecbbf96bddee6b36",
+        "random_s7": "sha256:728636019d543950a64a569f69cb58f7c6a62b31eb454ead3d7e0cd12a815cf9",
+        "random_s8": "sha256:213b0afca2a40ffb3358aea6361f79d99472f1261ace1b388d8df920b7f9efd6"
+      },
+      "limits": {
+        "compile_s": 60,
+        "sim_s": 30,
+        "solver_s": 120,
+        "bmc_depth": 24,
+        "cover_depth": 24
+      },
+      "formal_tasks": [
+        "bmc",
+        "prove",
+        "cover"
+      ],
+      "expected_properties": {
+        "assert": 3,
+        "assume": 1,
+        "cover": 12
+      },
+      "promoted_checks": {
+        "schema": "countertrace-promoted-checks-v1",
+        "module": {
+          "id": "sync_fifo",
+          "title": "Synchronous FIFO",
+          "top": "fifo",
+          "clock": "clk",
+          "reset": "rst",
+          "params": [
+            {
+              "DEPTH": 4,
+              "WIDTH": 8
+            },
+            {
+              "DEPTH": 2,
+              "WIDTH": 8
+            }
+          ],
+          "inputs": {
+            "rst": 1,
+            "wr_en": 1,
+            "rd_en": 1,
+            "din": "WIDTH"
+          },
+          "outputs": {
+            "dout": "WIDTH",
+            "full": 1,
+            "empty": 1
+          },
+          "spec": "A synchronous first-in first-out queue holding up to DEPTH words of WIDTH bits, with one rising-edge clock clk.\nrst is a synchronous active-high reset: at a rising edge with rst high the queue becomes empty, and read and write requests at that edge are ignored.\nAt each rising edge without reset: a write (wr_en high) stores din at the tail unless the queue is full; a read (rd_en high) removes the head word unless the queue is empty. Full and empty are judged from the occupancy before the edge, so a read and a write at the same edge are each accepted or ignored on that basis.\nAfter an accepted read, dout contains the removed word after that edge. Its value is unconstrained at other times, including reset, idle cycles and ignored reads. Do not require it to remain stable between accepted reads.\nempty is high exactly when the queue holds no words; full is high exactly when it holds DEPTH words. Words come out in the order they were accepted.",
+          "split": "development"
+        },
+        "properties_hash": "sha256:371c4db366f60fb9d97a3e60331346482d27dc26b7db4155c3045716cad372a8",
+        "checker_hash": "sha256:55f19f4f7a1bd2b3186ae681df41d53aed0480a6c2ebd84cab15940f8e238224",
+        "golden_hash": "sha256:da0e5a92be992d813f92bbf4383fadf92883b24b4c91df621d9261b5565079d6",
+        "harness": {
+          "ct.sby.in": "sha256:31cf5e0ba7b170173bc41999c15ef1027e82e0b1abccceabc4de7e0a7702c955",
+          "ct_formal_top.sv": "sha256:6c0e6a2d337a6a5bfd3bc44963bfe821f24f6a844c0b3838730027cc78757cdc",
+          "ct_sim_top.sv": "sha256:918bc9a2ccf495305f3869b48f7677323b178ce4a6fb7d97cbd3ef64b0952534"
+        },
+        "verifier_digest": "26a51c6bce5dcf38",
+        "trusted_code": {
+          "bundle.py": "sha256:a29824fd095cbf67c8ab8d2e81522101ceebf67285448a06ff93b950a75092ae",
+          "design.py": "sha256:b31699ceca4534bd7a0033017fd5cef83810a3faf9a9719f667abc957fe86395",
+          "__init__.py": "sha256:b8f3265344eb7ae70d0c1b8687be2390283a0a4d948334c0236f726312f13912",
+          "compile.py": "sha256:ff04ee4c2e1d29afae9fdc04271e231345ebf7a450eefc6825dbaa401b379c67",
+          "gate.py": "sha256:db27e1c32cde7d14d8b82fcb290aabc743a691cfb6f3d084b8da1ee2ea217ae3",
+          "agent.py": "sha256:0cc8c7e7cf6f08acb0b3b9e7f5fa6fcaff6345961e3e5a1a84b436dbc6403c16",
+          "modules.py": "sha256:d0bbeabf053a00261fbd1409ec26abe633320bad3b601bada6e714684c6d6538"
+        },
+        "limits": {
+          "solver_s": 120,
+          "bmc_depth": 20,
+          "cover_depth": 20
+        },
+        "mutants": {
+          "count": 40,
+          "seed": 1
+        },
+        "promotion_threshold": 0.9
+      }
+    },
+    "finished_at": "2026-10-16T19:50:06Z"
+  },
+  "bundles": [
+    {
+      "kind": "checks",
+      "run_id": "20261016-154408-che-01f04d",
+      "path": ".countertrace/bundles/countertrace-20261016-154408-che-01f04d.zip",
+      "sha256": "sha256:efcc9d5c79c2ee31b6892e275f7addcd5fc3d4117e9efd553a552fe3b2c5a861",
+      "replay": {
+        "matches": true,
+        "rounds": [
+          {
+            "round": 0,
+            "matches": true,
+            "recorded": {
+              "stage": "golden",
+              "passed": false,
+              "status": "FAIL",
+              "failed": [
+                "dout_after_read"
+              ],
+              "config": {
+                "id": "p0",
+                "params": {
+                  "DEPTH": 4,
+                  "WIDTH": 8
+                }
+              }
+            },
+            "replayed": {
+              "stage": "golden",
+              "passed": false,
+              "status": "FAIL",
+              "failed": [
+                "dout_after_read"
+              ],
+              "config": {
+                "id": "p0",
+                "params": {
+                  "DEPTH": 4,
+                  "WIDTH": 8
+                }
+              }
+            }
+          },
+          {
+            "round": 1,
+            "matches": true,
+            "recorded": {
+              "stage": "mutants",
+              "passed": true,
+              "total": 40,
+              "killed": 39,
+              "equivalent": 1,
+              "invalid": 0,
+              "unresolved": 0,
+              "nonequivalent": 39,
+              "kill_rate": 1.0,
+              "survived": []
+            },
+            "replayed": {
+              "stage": "mutants",
+              "passed": true,
+              "total": 40,
+              "killed": 39,
+              "equivalent": 1,
+              "invalid": 0,
+              "unresolved": 0,
+              "nonequivalent": 39,
+              "kill_rate": 1.0,
+              "survived": []
+            }
+          }
+        ],
+        "image": {
+          "tag": "countertrace-verifier:26a51c6bce5dcf38",
+          "image_id": "sha256:62dbb264be6153e08c5014540a0a134482d1e29ccfbdd1602385100defa72ce5",
+          "verifier_digest": "26a51c6bce5dcf38"
+        },
+        "note": "Replayed deterministic gates only, not inference, latency or model text."
+      }
+    },
+    {
+      "kind": "hunt",
+      "run_id": "20261016-154901-ver-9fa633",
+      "path": ".countertrace/bundles/countertrace-20261016-154901-ver-9fa633.zip",
+      "sha256": "sha256:a1701a21d25e6f2587eb46fa63b571b29a6eb391427cc3f82713b22185e65105",
+      "replay": {
+        "matches": true,
+        "differences": [],
+        "recorded": {
+          "obligations": {
+            "bmc:empty_flag": "unresolved",
+            "bmc:full_flag": "counterexample",
+            "bmc:read_data": "unresolved",
+            "prove:empty_flag": "unresolved",
+            "prove:full_flag": "counterexample",
+            "prove:read_data": "unresolved",
+            "cover:reachability": "bounded_pass",
+            "simulation:empty_flag": "counterexample",
+            "simulation:full_flag": "counterexample",
+            "simulation:read_data": "counterexample",
+            "promoted:properties": "counterexample"
+          },
+          "findings": [
+            {
+              "source": "simulation",
+              "test": "fill_drain",
+              "cycle": 6,
+              "check": "read_data"
+            },
+            {
+              "source": "formal",
+              "test": "formal:bmc",
+              "cycle": 5,
+              "check": "full_flag"
+            }
+          ],
+          "replay": "reproduced"
+        },
+        "replayed": {
+          "obligations": {
+            "bmc:empty_flag": "unresolved",
+            "bmc:full_flag": "counterexample",
+            "bmc:read_data": "unresolved",
+            "prove:empty_flag": "unresolved",
+            "prove:full_flag": "counterexample",
+            "prove:read_data": "unresolved",
+            "cover:reachability": "bounded_pass",
+            "simulation:empty_flag": "counterexample",
+            "simulation:full_flag": "counterexample",
+            "simulation:read_data": "counterexample",
+            "promoted:properties": "counterexample"
+          },
+          "findings": [
+            {
+              "source": "simulation",
+              "test": "fill_drain",
+              "cycle": 6,
+              "check": "read_data"
+            },
+            {
+              "source": "formal",
+              "test": "formal:bmc",
+              "cycle": 5,
+              "check": "full_flag"
+            }
+          ],
+          "replay": "reproduced"
+        },
+        "frozen_match": true,
+        "image": {
+          "tag": "countertrace-verifier:26a51c6bce5dcf38",
+          "image_id": "sha256:62dbb264be6153e08c5014540a0a134482d1e29ccfbdd1602385100defa72ce5",
+          "verifier_digest": "26a51c6bce5dcf38"
+        }
+      }
+    },
+    {
+      "kind": "candidate",
+      "run_id": "20261016-154945-ver-46dc74",
+      "path": ".countertrace/bundles/countertrace-20261016-154945-ver-46dc74.zip",
+      "sha256": "sha256:7669ba4b98886d0a3d4366702cb73ef6d62a8690f3124d906a13ff175695b9a5",
+      "replay": {
+        "matches": true,
+        "differences": [],
+        "recorded": {
+          "obligations": {
+            "simulation:empty_flag": "simulation_passed",
+            "simulation:full_flag": "simulation_passed",
+            "simulation:read_data": "simulation_passed",
+            "bmc:empty_flag": "bounded_pass",
+            "bmc:full_flag": "bounded_pass",
+            "bmc:read_data": "bounded_pass",
+            "prove:empty_flag": "proved",
+            "prove:full_flag": "proved",
+            "prove:read_data": "proved",
+            "cover:reachability": "bounded_pass",
+            "promoted:properties": "proved"
+          },
+          "findings": [],
+          "replay": null
+        },
+        "replayed": {
+          "obligations": {
+            "simulation:empty_flag": "simulation_passed",
+            "simulation:full_flag": "simulation_passed",
+            "simulation:read_data": "simulation_passed",
+            "bmc:empty_flag": "bounded_pass",
+            "bmc:full_flag": "bounded_pass",
+            "bmc:read_data": "bounded_pass",
+            "prove:empty_flag": "proved",
+            "prove:full_flag": "proved",
+            "prove:read_data": "proved",
+            "cover:reachability": "bounded_pass",
+            "promoted:properties": "proved"
+          },
+          "findings": [],
+          "replay": null
+        },
+        "frozen_match": true,
+        "image": {
+          "tag": "countertrace-verifier:26a51c6bce5dcf38",
+          "image_id": "sha256:62dbb264be6153e08c5014540a0a134482d1e29ccfbdd1602385100defa72ce5",
+          "verifier_digest": "26a51c6bce5dcf38"
+        }
+      }
+    }
+  ],
+  "completed_at": "2026-10-16T19:51:14Z",
+  "usage_summary": {
+    "calls": 4,
+    "prompt_tokens": 5435,
+    "completion_tokens": 4805,
+    "estimated_cost_usd": 0.01985,
+    "pricing": "Configured per-model/default prices; not an invoice. Super uses the configured default Ultra rates, so its estimate is conservative relative to prior list prices."
+  },
+  "advisory_review": {
+    "reviewer": "coding assistant, not independent human validation",
+    "interpretation": "Incorrect conflict on write_when_full despite the compatible brief; schema validity is not semantic correctness. The explicitly selected fixed contract remained authoritative.",
+    "explanation": "Core overwrite-when-full diagnosis matches the witnessed defect; citation validator flagged two mem[0] references absent from sampled signals. This is ok_with_invalid_citations, not an unqualified explanation pass.",
+    "scope": "This exercised the local service workflow, not browser approvals, deployed hosting, or learner outcomes."
+  }
+}

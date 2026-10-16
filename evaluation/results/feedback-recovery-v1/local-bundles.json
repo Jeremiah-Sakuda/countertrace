@@ -1,0 +1,112 @@
+[
+  {
+    "module": "sync_fifo",
+    "repeat": 1,
+    "arm": "detailed",
+    "run_id": "20261016-154010-che-c2de9f",
+    "path": ".countertrace/bundles/countertrace-20261016-154010-che-c2de9f.zip",
+    "bytes": 74089,
+    "sha256": "sha256:7c4f0546ca0b9e370fa25001e9740b628b771f7d0cd0100dccd188f431053ac5"
+  },
+  {
+    "module": "sync_fifo",
+    "repeat": 1,
+    "arm": "rejection_only",
+    "run_id": "20261016-154101-che-27b86f",
+    "path": ".countertrace/bundles/countertrace-20261016-154101-che-27b86f.zip",
+    "bytes": 486886,
+    "sha256": "sha256:480c814ce4c9ffb04028367ec0faf6d8384e6cb3abb6ee5105cc252c5b729eab"
+  },
+  {
+    "module": "debouncer",
+    "repeat": 1,
+    "arm": "rejection_only",
+    "run_id": "20261016-154154-che-619cfb",
+    "path": ".countertrace/bundles/countertrace-20261016-154154-che-619cfb.zip",
+    "bytes": 52693,
+    "sha256": "sha256:488dd3b6e56a1659aedbe5ed9454ee0eb63f40b87f6162e44702ee5fb253e60a"
+  },
+  {
+    "module": "debouncer",
+    "repeat": 1,
+    "arm": "detailed",
+    "run_id": "20261016-154215-che-1d7922",
+    "path": ".countertrace/bundles/countertrace-20261016-154215-che-1d7922.zip",
+    "bytes": 52677,
+    "sha256": "sha256:9c9d6e3adbc2ee4627d17f9ade35178fe74423874a0ee262a431d4885c47e57c"
+  },
+  {
+    "module": "sync_fifo",
+    "repeat": 2,
+    "arm": "rejection_only",
+    "run_id": "20261016-154306-che-6b0432",
+    "path": ".countertrace/bundles/countertrace-20261016-154306-che-6b0432.zip",
+    "bytes": 486766,
+    "sha256": "sha256:024e7a076ec03fc45b0720fed867560d389c1111c3718bac57ba8d2f4d7c1ba4"
+  },
+  {
+    "module": "sync_fifo",
+    "repeat": 2,
+    "arm": "detailed",
+    "run_id": "20261016-154408-che-01f04d",
+    "path": ".countertrace/bundles/countertrace-20261016-154408-che-01f04d.zip",
+    "bytes": 486093,
+    "sha256": "sha256:efcc9d5c79c2ee31b6892e275f7addcd5fc3d4117e9efd553a552fe3b2c5a861",
+    "previous_export_sha256": "sha256:c7a00843de04f9cda7c644df0d6d63318ec2a518ad06bbeb996b7bd7894e9434",
+    "export_note": "Re-exported at the same path by the end-to-end runner; this current archive was successfully replayed in end-to-end.json. ZIP export timestamps change its byte hash."
+  },
+  {
+    "module": "debouncer",
+    "repeat": 2,
+    "arm": "detailed",
+    "run_id": "20261016-154456-che-682273",
+    "path": ".countertrace/bundles/countertrace-20261016-154456-che-682273.zip",
+    "bytes": 52697,
+    "sha256": "sha256:79e7f6bd8ef99664bdc38738bf0c1a82092cf6a1f799e496ef6d6a7788925b4b"
+  },
+  {
+    "module": "debouncer",
+    "repeat": 2,
+    "arm": "rejection_only",
+    "run_id": "20261016-154545-che-38b450",
+    "path": ".countertrace/bundles/countertrace-20261016-154545-che-38b450.zip",
+    "bytes": 361837,
+    "sha256": "sha256:7e8bfdb4b39b7179837c4e018fcefd96e04b00821468266537042ae2b217a7ac"
+  },
+  {
+    "module": "sync_fifo",
+    "repeat": 3,
+    "arm": "detailed",
+    "run_id": "20261016-154607-che-1b0509",
+    "path": ".countertrace/bundles/countertrace-20261016-154607-che-1b0509.zip",
+    "bytes": 485250,
+    "sha256": "sha256:c39027f8fd4829fa359e55515fc1161fb25fbdee3179c3a911552e3ac95e9d04"
+  },
+  {
+    "module": "sync_fifo",
+    "repeat": 3,
+    "arm": "rejection_only",
+    "run_id": "20261016-154644-che-9a9ece",
+    "path": ".countertrace/bundles/countertrace-20261016-154644-che-9a9ece.zip",
+    "bytes": 486171,
+    "sha256": "sha256:9de4245702809c2e9a03d7e805e59691038bc370ce1e27e6f9994539ddbf2076"
+  },
+  {
+    "module": "debouncer",
+    "repeat": 3,
+    "arm": "rejection_only",
+    "run_id": "20261016-154717-che-26e32f",
+    "path": ".countertrace/bundles/countertrace-20261016-154717-che-26e32f.zip",
+    "bytes": 53005,
+    "sha256": "sha256:4be94c63ce1874f256f8b5c44ad053ae5ede48ff6189ce2329d96453a75c9841"
+  },
+  {
+    "module": "debouncer",
+    "repeat": 3,
+    "arm": "detailed",
+    "run_id": "20261016-154745-che-f07d41",
+    "path": ".countertrace/bundles/countertrace-20261016-154745-che-f07d41.zip",
+    "bytes": 362160,
+    "sha256": "sha256:08ea558d97b6022e993811553b0d26ff768b0363bdb018903043a8cf0d5ae3a3"
+  }
+]

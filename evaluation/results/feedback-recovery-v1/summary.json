@@ -1,0 +1,90 @@
+{
+  "protocol_sha256": "9c721dc505a91c688aae01f32294070cb15769de94f5841d438326b0448d8f4d",
+  "scope": "Selected historical failures, not fresh holdouts or independent fixtures. Only two modules. No model seed control. Conditional recovery pilot, not full-workflow or broad causal reliability evidence. Pricing is estimated; transport failures can have unknown usage.",
+  "arms": {
+    "detailed": {
+      "attempts": 6,
+      "promoted": 3,
+      "calls": 8,
+      "prompt_tokens": 9810,
+      "completion_tokens": 84719,
+      "estimated_cost_usd": 0.263967,
+      "missing_usage": 0,
+      "length_replies": 3,
+      "latency_seconds": {
+        "median": 48.696,
+        "min": 37.033,
+        "max": 51.468
+      }
+    },
+    "rejection_only": {
+      "attempts": 6,
+      "promoted": 4,
+      "calls": 6,
+      "prompt_tokens": 6294,
+      "completion_tokens": 56362,
+      "estimated_cost_usd": 0.17538,
+      "missing_usage": 0,
+      "length_replies": 0,
+      "latency_seconds": {
+        "median": 30.887,
+        "min": 20.917,
+        "max": 61.617
+      }
+    }
+  },
+  "pairs": [
+    {
+      "module": "sync_fifo",
+      "repeat": 1,
+      "detailed": false,
+      "rejection_only": true
+    },
+    {
+      "module": "debouncer",
+      "repeat": 1,
+      "rejection_only": false,
+      "detailed": false
+    },
+    {
+      "module": "sync_fifo",
+      "repeat": 2,
+      "rejection_only": true,
+      "detailed": true
+    },
+    {
+      "module": "debouncer",
+      "repeat": 2,
+      "detailed": false,
+      "rejection_only": true
+    },
+    {
+      "module": "sync_fifo",
+      "repeat": 3,
+      "detailed": true,
+      "rejection_only": true
+    },
+    {
+      "module": "debouncer",
+      "repeat": 3,
+      "rejection_only": false,
+      "detailed": true
+    }
+  ],
+  "total": {
+    "calls": 14,
+    "prompt_tokens": 16104,
+    "completion_tokens": 141081,
+    "estimated_cost_usd": 0.439347,
+    "missing_usage": 0,
+    "length_replies": 3
+  },
+  "end_to_end_usage": {
+    "calls": 4,
+    "prompt_tokens": 5435,
+    "completion_tokens": 4805,
+    "estimated_cost_usd": 0.01985,
+    "pricing": "Configured per-model/default prices; not an invoice. Super uses the configured default Ultra rates, so its estimate is conservative relative to prior list prices."
+  },
+  "combined_estimated_cost_usd": 0.459197
+}

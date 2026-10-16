@@ -42,9 +42,19 @@ No VM has been created or funded. The Caddyfile passed local configuration valid
 
 One Nebius Compute CPU VM (start with 4 vCPU, 16 GiB, and 50 GiB SSD) runs Docker, the verifier image, and the control service behind Caddy for TLS. Runtime Nemotron calls go to Nebius Token Factory. Use local Docker on the VM for the MVP; defer Serverless Jobs unless a measured batch workload justifies it. The PRD permits this CPU runner. Jobs startup can take minutes and its minimum configurable timeout is one hour; that is not a minimum billing duration. [Jobs documentation](https://docs.nebius.com/serverless/jobs/manage)
 
-## Proposed budget, not spending authorization
+## Current budget decision — October 11
 
-Use **$300 before tax** as a planning envelope through December 15, 2026, with no GPU VM. A conservative 76 full days starting October 1 is 1,824 hours:
+The owner selected **credits-only testing, with $0 personal spending authorized**. Use local Docker for verification and the existing recorded Vercel deployment. Do not purchase hosting, top up an account, enable automatic replenishment, or upgrade a paid plan under this decision. The earlier $30 target/$50 ceiling recommendation was not accepted as spending authorization.
+
+**October 16 update:** the signed-in Token Factory account showed $24.04 available and a $25 AI Builder Program credit applied October 13. The owner subsequently authorized Countertrace's live comparison and synthetic end-to-end checks. Those bounded runs use process-local incremental estimated allowances of $1.50 and $0.25 respectively; these are not provider billing caps. Expiry and automatic top-up status were not visible in the inspected controls, and no billing settings were changed. Funding through December 15 remains unconfirmed.
+
+Before unattended or hosted model access, verify the account's promotional balance, expiry and eligible service, and whether exhausted credits can fall through to personal billing. The local inference ledger cannot establish any of these. Keep testing bounded within confirmed available credits; do not assume Token Factory credits fund a Cloud VM.
+
+Consider a paid upgrade only when a measured bottleneck affects the product or judge access. Present the observed limitation, expected improvement, least-cost option and total cost through December 15 for an explicit owner decision. No upgrade is authorized automatically by this testing preference. Free live judge access remains unresolved; recorded evidence alone does not satisfy that dependency.
+
+### Historical VM estimate — superseded, not authorized
+
+The original optional VM estimate used **$300 before tax** through December 15, 2026, with no GPU VM. It is retained for provenance and is not the current plan. A conservative 76 full days starting October 1 was 1,824 hours:
 
 | Item | Calculation | Estimated USD |
 | --- | --- | ---: |
@@ -56,11 +66,11 @@ Use **$300 before tax** as a planning envelope through December 15, 2026, with n
 
 Infrastructure rates are the published rates effective October 1, 2026, before tax. Account credits, expiry dates, selected region/preset availability, actual start date, and pricing must be checked before provisioning. Domain registration and additional backups are not included. [Official Compute pricing](https://docs.nebius.com/compute/resources/pricing)
 
-Use the hackathon credits first; do not treat a cash top-up as a prerequisite. The [hackathon resources](https://nebiusglobalaihackathon.devpost.com/resources) offer a $25 Token Factory promo and a further $25 through the Builders Program. The owner reports claiming credits, but balance, application, and expiry remain unverified. The October 3 model experiments used about $0.082 at public rates; this is not confirmed invoiced spend. No top-up or hosting purchase has been made. Confirm whether Token Factory and Cloud have separate balances and where hackathon credits apply. Delaying VM creation reduces compute cost; storage is still charged while a VM is stopped. The owner has asked for a recommendation and has not yet authorized a dollar limit.
+The [hackathon resources](https://nebiusglobalaihackathon.devpost.com/resources) offer a $25 Token Factory promo and a further $25 through the Builders Program. At the time of that estimate, the owner reported claiming credits but balance, application, and expiry were unverified; the October 16 account check above supersedes that balance/application status. The October 3 model experiments used about $0.082 at public rates; this is not confirmed invoiced spend. No top-up or hosting purchase has been made. Confirm whether Token Factory and Cloud have separate balances and where hackathon credits apply. Storage can still be charged while a VM is stopped.
 
 The current `COUNTERTRACE_DEPLOYMENT_SPEND_LIMIT_USD` is an inference-ledger threshold, not a hard total deployment cap. Each in-flight call reserves estimated input cost plus its full output allowance; tokenization, missing usage after transport failures, and actual prices can differ, so this does not guarantee a maximum bill. It excludes compute and storage. Configure account billing alerts and record an operating owner before public access. Verify spending and credit validity cover the entire judging window.
 
-## Steps
+## Optional VM steps — require a separate funding decision
 
 1. Create the VM (Ubuntu LTS), install Docker, Python 3.11+, Node 20+, Git, and Caddy. Create a `countertrace` user in the `docker` group.
 2. Clone the repository to `/opt/countertrace` at the release tag. Run `make image` and `make web`.

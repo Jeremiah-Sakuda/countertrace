@@ -14,6 +14,8 @@
 
 **Deployment:** Vercel serves actual recorded evidence without a login or key. Live model calls and Docker verification run in the configured local build. Project-funded live judge access through December 15 remains pending. The hosted site does not impersonate live inference.
 
+**Feedback comparison (October 16):** a frozen [recovery pilot](evaluation/results/feedback-recovery-v1/REPORT.md) compared one revision of the same rejected properties with detailed verifier feedback versus a rejection notice alone. Across two already-public modules and three repeats, detailed feedback promoted 3/6 attempts versus 4/6 for rejection-only feedback. This small conditional experiment does not demonstrate a feedback advantage; all 14 raw model responses and their outcomes are retained. It is not a fresh held-out evaluation or a full-loop comparison.
+
 The [repair casebook](https://countertrace.vercel.app/#/repair), three practice labs, testbench exercise, and [facilitator desk](https://countertrace.vercel.app/#/teach) remain an educational use case for instructors and FPGA club mentors. They use recorded execution and learner-owned notes; no learning gains or adoption are claimed.
 
 Built for the [Nebius x NVIDIA Global AI Hackathon](https://nebiusglobalaihackathon.devpost.com/), Coding and Agentic Engineering. Submission deadline: October 30, 2026, 1:00 p.m. EDT.

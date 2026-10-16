@@ -47,6 +47,7 @@ Impact priority selected October 4: help instructors and FPGA club mentors reuse
 - [ ] Extend golden-confirmed bug hunt and frozen repair beyond the implemented FIFO adapter (October 16 to 19).
 - [x] Check-writing interface in recorded mode and configured local live mode (October 9); funded public live runtime remains pending.
 - [x] Frozen held-out evaluation, three runs per module (completed October 9): 12/12 promoted across four modules, with all failures/retries preserved in [checks-v1](../evaluation/results/checks-v1/REPORT.md). These fixtures are no longer fresh holdouts for future tuning.
+- [x] Matched recovery pilot on two public rejected proposals (October 16): detailed feedback 3/6 versus rejection-only 4/6, three repeats per module, one revision per arm. [Report](../evaluation/results/feedback-recovery-v1/REPORT.md). No demonstrated feedback advantage; this does not replace the declared full-workflow repair or learning comparisons.
 - [x] Align README, PRD, Devpost draft, and demo script with model-written checks (October 9). Final submission review remains pending.
 
 ## October 9 to 14 — trustworthy release scope
