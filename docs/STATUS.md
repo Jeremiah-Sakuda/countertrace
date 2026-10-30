@@ -1,5 +1,11 @@
 # Implementation status
 
+## October 30 publication of the October 16 results
+
+Added the paired recovery pilot and synthetic FIFO end-to-end findings to the check-writing homepage, using the committed summary directly. The page reports detailed feedback 3/6 versus rejection-only 4/6, no demonstrated advantage, all 18 model calls and approximately $0.46 estimated inference, and the successful repair under 11 unchanged obligations. The false interpretation conflict and two unsupported explanation citations remain disclosed. Links pin the complete report, every comparison response, and end-to-end evidence to `6a17c53`; historical outcomes were not rewritten. No new model call or RTL run was made for this publication.
+
+Local validation passed: 129 Python tests, ten web tests, TypeScript and production build, workspace links and whitespace checks. Publication and unauthenticated hosted checks are recorded below after deployment. This update publishes results only; advisory fixes, live judge hosting and the demo video remain separate work.
+
 ## October 16 matched feedback recovery pilot
 
 Countertrace work resumed separately from Dira. The [paired recovery pilot](../evaluation/results/feedback-recovery-v1/REPORT.md) froze the same two previously rejected property sets, exact prompts, model/configuration and gate before execution (`d10891f`). Both original golden failures reproduced. Twelve new revisions used the same specification and prior properties with either full gate diagnostics or a generic rejection notice. Detailed feedback promoted 3/6 (FIFO 2/3, debouncer 1/3); rejection-only promoted 4/6 (FIFO 3/3, debouncer 1/3). There is no demonstrated feedback advantage. These are two selected historical failures with three stochastic repeats, not six independent modules or fresh holdouts. The trusted verifier and shipped prompts were unchanged.
